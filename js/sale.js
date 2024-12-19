@@ -8,9 +8,9 @@ SwitchSaleYear = 2024,
 SwitchSaleMonth = 11,
 SwitchSaleDay = 22,
 
-PSSaleYear = 2024,
-PSSaleMonth = 11,
-PSSaleDay = 22,
+PSSaleYear = 2025,
+PSSaleMonth = 1,
+PSSaleDay = 6,
 
 SteamSaleYear = 2024,
 SteamSaleMonth = 12,
