@@ -4,17 +4,17 @@
 const
 //それぞれのハードのセール終了日を記述
 
-SwitchSaleYear = 2024,
-SwitchSaleMonth = 11,
-SwitchSaleDay = 22,
+SwitchSaleYear = 2025,
+SwitchSaleMonth = 1,
+SwitchSaleDay = 6,
 
 PSSaleYear = 2025,
 PSSaleMonth = 1,
 PSSaleDay = 6,
 
-SteamSaleYear = 2024,
-SteamSaleMonth = 12,
-SteamSaleDay = 20,
+SteamSaleYear = 2025,
+SteamSaleMonth = 1,
+SteamSaleDay = 2,
 
 //日付テンプレここまで----------------------
 
