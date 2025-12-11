@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブアライブ,ライブ・ア・ライブ,LIVE A LIVE,攻略,HD-2D,リメイク,Nintendo Switch,PlayStation4,PlayStation5,Steam">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 回復スキルの検討">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/img/social.png">
+<meta property="og:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 回復スキルの検討">
+<meta name="twitter:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 回復スキルの検討</title>
+<link href="../css/main.min.css?20251129" rel="stylesheet">
+<link href="../css/remake.css?20250608" rel="stylesheet">
+<link href="../css/etc.css?20250712" rel="stylesheet">
+<link href="../css/calculation.css" rel="stylesheet">
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブアライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">戦闘システムの調査</a></li>
+<li class="here"><button type="button">検討</button>
+	<ul>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">戦闘システムの調査</a> &gt; 回復スキルの検討</h1>
+
+<h2>回復スキルの検討</h2>
+
+<p>ここまでは「攻撃スキルのダメージ量」について検討してきたが、このページでは回復スキルの回復量について検討した結果を紹介する。</p>
+
+<p>まず、SFC版での回復技の回復量計算について簡単に述べる。<br>
+データ解析サイト（<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様）によれば、回復量計算は以下のように定義されている。</p>
+
+<blockquote class="breakword"><span class="formula">(回復係数(LV差係数と同じ))*4<wbr>*乱数(1～1.25)</span><br>
+厳密には、乱数は<wbr>「256 + (0～63) / 256」</blockquote>
+
+<p>＊SFC版では計算結果はすべて小数点以下切り捨て</p>
+
+<p>つまり使用者のステータスは関係せず、技に設定された「LV差係数」という数値と乱数によってのみ回復量が決まる、という仕様である。<br>
+また、乱数により、回復量にはブレが生じ、最小値×1.25がほぼ最大値の関係が成立していることがわかる。<br>
+本作ではどうなっているのか、アキラの「セルフヒール」とキューブの「ハイスピードオペ」で試してみる。<br>
+この2つのスキルは使用してもHPが回復するのみで、ステータス変化が起きないので、同条件での回復量の計測にもってこいである。<br>
+「ハイスピードオペ」は範囲回復なので、「回復してもらう側の回復量」も見てみることにする。<br>
+本格的にデータを取る前に予備調査として幾つか数値を取ってみたのだが、「ハイスピードオペ」で回復してもらう側のステータスや向きは、回復量には関係していないようであった。<br>
+以下では回復スキルを使うキャラのステータスを変更しながら、サンプルを20回ずつ取ってみた。</p>
+
+<h3>セルフヒール</h3>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>アキラ</th><td colspan="7">レベル99</td></tr>
+	<tr><th>セルフヒール</th><td colspan="3">自身回復</td><th>サンプル数</th><td colspan="3">各20</td></tr>
+	<tr><th>武器</th><td colspan="5">グラブ(+4)</td><td>ド根性グラブ(+25)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">135</span></td><td>99</td><td>99</td><td>99</td><td>115</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">134</span></td><td>99</td><td>99</td><td>114</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>99</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td></tr>
+	<tr><th>回復量平均</th><td>363.2</td><td>364.5</td><td>360.8</td><td>365.7</td><td>358.45</td><td>361.7</td></tr>
+	<tr><th>回復量最大</th><td>392</td><td>395</td><td>392</td><td>392</td><td>393</td><td>393</td></tr>
+	<tr><th>回復量最小</th><td>332</td><td>333</td><td>331</td><td>330</td><td>332</td><td>330</td></tr>
+	<tr><th>最大÷最小</th><td>1.18</td><td>1.19</td><td>1.18</td><td>1.19</td><td>1.18</td><td>1.19</td></tr>
+</tbody>
+</table>
+
+<p>※セルフヒールの全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7RTOeh3xcmptL2lhiYsrkHkd1SfMyKvnNOP0MRtc7q6OYEXziyExkb-leNTNa78yNWrjZKjV3dyVY/pubhtml?gid=727796799&single=true" target="_blank">lal_skill - Googleスプレッドシート</a></p>
+
+<p>ステータスを変えても有意な差は見られない。<br>
+よって、SFC版と同じく、回復量は使用者のステータスには関係なくほぼ固定値と考えて良いだろう。<br>
+回復量にランダムでのブレは見られるが、最大÷最小は1.18～1.19と、ダメージ量のブレよりは低め。<br>
+つまり回復量のブレは平均値から約&plusmn;9％のブレになるのではないだろうか。<br>
+よって、<br>
+「セルフヒールの回復量は、アキラのステータスに関係なく、330から395の間の値をランダムで取る」<br>
+と結論付けて良いと考えられる。</p>
+
+<h3>ハイスピードオペ</h3>
+
+<p>「ハイスピードオペ」は、キューブ以外のパーティキャラ3人（今回はアキラ、おぼろ丸、サンダウン）の回復量も記録している。<br>
+結論を先に書くと、自身を回復する場合も、仲間を回復する場合も、有意な差はないので、最終的にはまとめて平均値などを算出した。<br>
+なので、実質的にはサンプル数が各80ということになる。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>キューブ</th><td colspan="7">レベル7</td></tr>
+	<tr><th>スピンドライブ</th><td colspan="3">エリア回復</td><th>サンプル数</th><td colspan="3">各20×4キャラ</td></tr>
+	<tr><th>武器</th><td colspan="5">虎の小手(+0)</td><td>１７ダイオード(+30)</td></tr>
+	<tr><th>物攻</th><td>29</td><td><span class="r">65</span></td><td>29</td><td>29</td><td>29</td><td>26</td></tr>
+	<tr><th>物防</th><td>96</td><td>96</td><td><span class="r">136</span></td><td>96</td><td>96</td><td>96</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>149</td></tr>
+	<tr><th>素早さ</th><td>18</td><td>18</td><td>18</td><td>18</td><td><span class="r">108</span></td><td>28</td></tr>
+	<tr><th>回復量平均</th><td>138.1</td><td>137.5</td><td>137.8</td><td>137.2</td><td>136.1</td><td>137.0</td></tr>
+	<tr><th>回復量最大</th><td>149</td><td>149</td><td>149</td><td>149</td><td>149</td><td>149</td></tr>
+	<tr><th>回復量最小</th><td>125</td><td>125</td><td>125</td><td>125</td><td>125</td><td>125</td></tr>
+	<tr><th>最大÷最小</th><td>1.192</td><td>1.192</td><td>1.192</td><td>1.192</td><td>1.192</td><td>1.192</td></tr>
+</tbody>
+</table>
+
+<p>※ハイスピードオペの全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7RTOeh3xcmptL2lhiYsrkHkd1SfMyKvnNOP0MRtc7q6OYEXziyExkb-leNTNa78yNWrjZKjV3dyVY/pubhtml?gid=1842409439&single=true" target="_blank">lal_skill - Googleスプレッドシート</a></p>
+
+<p>80回分をそれぞれ記録した結果、見事に、どのステータスでも最大が149、最小が125と揃った。<br>
+よって、<br>
+「ハイスピードオペの回復量は、キューブや回復してもらうキャラのステータスに関係なく、125から149の間の値をランダムで取る」<br>
+と結論付けて良いだろう。最小値・最大値もほぼ確定と考えて構わないと思われる。<br>
+また、最大÷最小も当然ながら全て同値で1.192、ほぼ1.2になっている。<br>
+やはり回復スキルの場合、回復量のブレは「最小値のだいたい1.2倍が最大値」と考えて良いようだ。</p>
+
+<p>ただしひとつだけ注意しておく点がある。<br>
+125×1.2は150である。「最小値を1.2倍」しても149ではない。<br>
+セルフヒールでも同様で、330×1.2は396であり、395ではない。<br>
+「最小値×1.2＝最大値」は成立しないのである。<br>
+あくまでも「最小値のだいたい1.2倍が最大値」である。<br>
+「最小値×1.2&minus;1＝最大値」になっていることから、例えば、</p>
+
+<p class="formula">回復量 = 基礎回復量 × 乱数<br>
+乱数は、1 &#x2266; (乱数) &#x3C; 1.2</p>
+
+<p>各回復スキルの最小回復量を「基礎回復量」のように設定した、上のような計算式が考えられるが、あくまでも推測になる。<br>
+SFC版と同じく、乱数上限の計算が「256 + 63 / 256」のように「ぎりぎり5/4に届かない値」に設定されているのかもしれない。</p>
+
+<p>余談になるが、SFC版での「セルフヒール」の回復量は320～399、「ハイスピードオペ」の回復量は96～119。<br>
+リメイク版と比較すると、「セルフヒール」での回復量はほぼ同値だが、「ハイスピードオペ」の回復量は増加している。<br>
+制限なく何度でもエリア回復可能とはいえ回復量が控えめだったSFC版の「ハイスピードオペ」だが、リメイク版制作にあたって、さすがに控えめすぎるという判断がなされたのだろうか。</p>
+
+<h3>追記　全回復スキル・回復アイテムの回復量</h3>
+
+<p>上検証後にデータを溜めて、全回復スキル・回復アイテムの回復量を調査した。<br>
+ひたすら該当のスキルやアイテムを使用して記録したため、最大・最小値に漏れがある可能性は残っているが、結果、どれも「最小値×1.2&minus;1＝最大値」が成立しているようである。</p>
+
+<h4>回復スキル</h4>
+
+<table style="font-size:smaller;">
+<thead><tr><th>使用者</th><th>スキル</th><th>回復量</th></tr></thead>
+<tbody>
+	<tr><td rowspan="2">アキラ</td><td>セルフヒール</td><td>330～395</td></tr>
+	<tr><td>ヒールタッチ</td><td>280～335</td></tr>
+	<tr><td>高原　日勝</td><td>気合い溜め</td><td>80～95</td></tr>
+	<tr><td>ユン</td><td>自己安静息</td><td>240～287</td></tr>
+	<tr><td>レイ</td><td>虎咆精気法</td><td>260～311</td></tr>
+	<tr><td rowspan="2">キューブ</td><td>ハイスピードオペ</td><td>125～149
+</td></tr>
+	<tr><td>アップグレード</td><td>50～59</td></tr>
+	<tr><td>キャプテンスクウェア</td><td>プラズマチャージ</td><td>120～143</td></tr>
+	<tr><td>べる</td><td>ふれふれー</td><td>150～179</td></tr>
+	<tr><td rowspan="2">ウラヌス</td><td>神の祝福</td><td>200～239</td></tr>
+	<tr><td>癒やしの祈り</td><td>320～383</td></tr>
+</tbody>
+</table>
+
+<h4>回復アイテム</h4>
+
+<table style="font-size:smaller;">
+<thead><tr><th>アイテム名</th><th>スキル</th><th>回復量</th></tr></thead>
+<tbody>
+	<tr><td>ファーストエイド<br>たい焼き<br>バナナクレープ<br>ミサワ焼き<br>あんまん<br>ホネ肉<br>干し肉<br>治り草</td><td>自分・中回復</td><td>150～179</td></tr>
+	<tr><td>ド根性焼き<br>小籠包<br>アリスのビスケ</td><td>自分・大回復</td><td>999</td></tr>
+	<tr><td>オオイヌノフグリ<br>シロツメ草<br>ペンペン草</td><td>食べてみる</td><td>50～59</td></tr>
+	<tr><td>てんむす<br>マタンゴライト<br>肉まん</td><td>エリア内を中回復</td><td>150～179</td></tr>
+	<tr><td>かすていら<br>ももまん<br>聖水<br>どデカホネ肉</td><td>エリア内を大回復</td><td>500～599</td></tr>
+	<tr><td>イザナギの巻き物<br>ポーションＮＯ９</td><td>全体・大回復</td><td>999</td></tr>
+	<tr><td>薬草</td><td>回復</td><td>250～299</td></tr>
+	<tr><td>気付け薬<br>鉄観音茶</td><td>エリア内を回復</td><td>250～299</td></tr>
+	<tr><td>ヨシュアの実</td><td>ステータス回復</td><td>120～143</td></tr>
+	<tr><td>ユニコーンホーン</td><td>全体のすべてを回復</td><td>50～59</td></tr>
+	<tr><td>印籠</td><td>恵みの回復</td><td>400～479</td></tr>
+	<tr><td>ぼいんビーナス</td><td>回復の祈り</td><td>150～179</td></tr>
+	<tr><td>マジカルウッド</td><td>ラブヒーリング</td><td>320～383</td></tr>
+</tbody>
+</table>
+
+<p>「自分・大回復」「全体・大回復」は回復量999固定で確定と思われる（SFC版でも回復量は999。計算上は1000以上の数値になっている）。</p>
+
+<div class="foot"><a href="index.html"><span class="button">&#9650;目次</span></a>　<a href="04-1.html"><span class="button">&#9654;次　ステータス上限</span></a></div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 70%, #f6f2fc);">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base00.html">SFC版からの変更点</a></li>
+		<li><a href="../base07.html">基本操作</a></li>
+		<li><a href="../base01.html">シナリオ</a></li>
+		<li><a href="../base02.html">メニュー画面</a></li>
+		<li><a href="../base03.html">セーブ</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../battle14.html">ステータス上昇</a></li>
+		<li><a href="../battle13.html">経験値</a></li>
+		<li><a href="../base05.html">アイテム</a></li>
+		<li><a href="../base06.html">設定</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">装備</a></li>
+		<li><a href="../battle02.html">陣形</a></li>
+		<li><a href="../battle03.html">エンカウント</a></li>
+		<li><a href="../battle04.html">行動ゲージ</a></li>
+		<li><a href="../battle05.html">向き</a></li>
+		<li><a href="../battle06.html">スキル</a></li>
+		<li><a href="../battle07.html">属性</a></li>
+		<li><a href="../battle08.html">状態異常</a></li>
+		<li><a href="../battle09.html">行動異常</a></li>
+		<li><a href="../battle10.html">能力増減</a></li>
+		<li><a href="../battle11.html">ダメージ地形</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle15.html">戦闘テクニック</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 70%, #c3fae5);" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../re_kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kinmirai/kaizou.html">アイテム改造</a></li>
+	<li><a href="../re_kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: linear-gradient(to right, #51635C, 70%, #dfedf7);" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../re_sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../re_sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: linear-gradient(to right, #734fab, 70%, #f8ccfc);" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../re_bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../re_bakumatsu/0nin.html">不殺（0人斬り）</a></li>
+	<li><a href="../re_bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../re_bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../re_bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../re_bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../re_bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../re_bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 70%, #cedef5);" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../re_kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kunfu/omake.html">おまけ・レベル16の弟子の修業</a></li>
+	<li><a href="../re_kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 70%, #fabbc5);" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../re_gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../re_gendai/omake.html">スキルをラーニングせずクリア</a></li>
+	<li><a href="../re_gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: linear-gradient(to right, #64BA02, 70%, #f6fcc0);" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../re_genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../re_genshi/item.html">アイテム合成</a></li>
+	<li><a href="../re_genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: linear-gradient(to right, #E38C00, 70%, #faf7cf);" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../re_seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../re_seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: linear-gradient(to right, #b59f14, 70%, #f7f5d0);" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../re_chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: linear-gradient(to right, #919c93, 70%, #f0f5eb);" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../re_saishu/chui01.html">注意点</a></li>
+	<li><a href="../re_saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../re_saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../re_saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../re_saishu/last.html">ラストバトル</a></li>
+	<li><a href="../re_saishu/omake.html">おまけ</a></li>
+	<li><a href="../re_saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../re_data/index.html">データ集トップページ</a></li>
+	<li><a href="../re_data/chara.html">キャラクター</a></li>
+	<li><a href="../re_data/equipment.html">装備</a></li>
+	<li><a href="../re_data/index.html#item">アイテム</a></li>
+	<li><a href="../re_data/enemy.html">敵</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle13" class="toggle">
+<label class="title" for="toggle13" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label>
+<div class="content">
+<ul>
+	<li><a href="../achievement/index.html">トロフィー＆実績一覧</a></li>
+	<li><a href="../achievement/guide.html">取得方法</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">調査トップページ</a></li>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle14" class="toggle">
+<label class="title" for="toggle14" style="color: #363638; background: #e5e4eb;">元ネタ＆雑学</label>
+<div class="content">
+	<ul>
+		<li><a href="../neta/index.html">元ネタ＆雑学目次</a></li>
+		<li><a href="../neta/01_kinmirai.html">近未来編</a></li>
+		<li><a href="../neta/02_sf.html">ＳＦ編</a></li>
+		<li><a href="../neta/03_bakumatsu.html">幕末編</a></li>
+		<li><a href="../neta/04_gendai.html">現代編</a></li>
+		<li><a href="../neta/05_genshi.html">原始編</a></li>
+		<li><a href="../neta/06_seibu.html">西部編</a></li>
+		<li><a href="../neta/07_kunfu.html">功夫編</a></li>
+		<li><a href="../neta/08_chusei.html">中世編</a></li>
+		<li><a href="../neta/09_saishu.html">最終編</a></li>
+	</ul>
+</div>
+</div>
+
+<br>
+<a href="../sfc/index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">SFC版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 80%, #f6f2fc);">TOP</label></a></li>
+		<li class="navigation__item"><a href="../re_kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 80%, #c3fae5);" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_sf/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #51635C, 80%, #dfedf7);" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #734fab, 80%, #f8ccfc);" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_kunfu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 80%, #cedef5);" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_gendai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 80%, #fabbc5);" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_genshi/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #64BA02, 80%, #f6fcc0);" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_seibu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #E38C00, 80%, #faf7cf);" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_chusei/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #b59f14, 80%, #f7f5d0);" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_saishu/index.html"><label class="title_n2" style="background: linear-gradient(to right, #919c93, 80%, #f0f5eb);" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+		<li class="navigation__item"><a href="../achievement/index.html"><label class="title_n2" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label></a></li>
+		<li class="navigation__item"><a href="index.html"><label class="title_n2"  style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブアライブ（リメイク版） 攻略メモ帳　　　<a href="https://x.com/hoso_boso" target="_blank"><img alt="中の人のX" src="../img/Logo white.svg" style="width:16px;"></a>　　<a href="https://mstdn.jp/@hoso_boso" rel="me" target="_blank"><img alt="中の人のMastodon（mstdn.jp）" src="../img/mastodon.svg" style="width:16px;"></a>　　<a href="https://taittsuu.com/users/hoso_boso" rel="me" target="_blank"><img alt="中の人のタイッツー" src="../img/taitsuico.svg" style="width:16px;"></a>
+</div>
+
+</div>
+<script src="../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

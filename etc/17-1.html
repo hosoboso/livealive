@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブアライブ,ライブ・ア・ライブ,LIVE A LIVE,攻略,HD-2D,リメイク,Nintendo Switch,PlayStation4,PlayStation5,Steam">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; ダメージ地形の検証（その1）">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/img/social.png">
+<meta property="og:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; ダメージ地形の検証（その1）">
+<meta name="twitter:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; ダメージ地形の検証（その1）</title>
+<link href="../css/main.min.css?20251129" rel="stylesheet">
+<link href="../css/remake.css?20250608" rel="stylesheet">
+<link href="../css/etc.css?20250712" rel="stylesheet">
+<link href="../css/calculation.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブアライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">戦闘システムの調査</a></li>
+<li class="here"><button type="button">検討</button>
+	<ul>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">戦闘システムの調査</a> &gt; ダメージ地形の検証（その1）</h1>
+
+<h2>ダメージ地形の検証（その1）</h2>
+
+<p>ダメージ地形については<a href="../battle11.html">基礎知識 &#x3e; ダメージ地形</a>も参照。<br>
+ゲーム内でもチュートリアルやTIPS「ダメージ地形について」などで説明があるが、詳しい仕様は明かされていない。<br>
+「ダメージ地形を作った後、どのタイミングで地形ダメージが発動するのか？」<br>
+「ダメージ地形のマスはどのタイミングで、どういう確率で消滅するのか？」<br>
+といった仕様は、特に隠しボスのキングマンモー戦や岩間さま戦などで知っておきたい方もいらっしゃるだろう。</p>
+
+<p>普通にプレイしていても、「地形ダメージが発動した後に、ダメージ地形が消えることがある」などの現象は気がつくと思う。<br>
+消去時は特に効果音などもなく、ゆっくりと消えていく（敵味方が次の行動をしている最中でもゆっくり消えていくモーションが残るほど）。<br>
+このため戦闘に集中していると、どのタイミングで消えたのか、ややわかりにくい。<br>
+基本的にはSFC版と同じく「発動後に一定確率で消滅」と見て良いようである。</p>
+
+<p>ここでは、</p>
+
+<ol>
+	<li>ダメージ地形の発動タイミングはいつなのか？</li>
+	<li>ダメージ地形発動後の消去の確率はどの程度か？</li>
+</ol>
+
+<p>の、2点について調査してみた。<br>
+このページではまず、1.の「ダメージ地形の発動タイミングはいつなのか？」を調査している。</p>
+
+<p>まず、SFC版においてのダメージ地形（ダメージフィールド）の仕様を、<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様の解説から引用する。</p>
+
+<blockquote><p>ダメージ発動は毒→火炎→電撃→水→の順の４周期で、敵か味方の技使用で発動ターンが進む<br>
+戦闘をまたいでも発動ターンは維持されるが、<br>
+メニューを開くかデータロード時にリセットされ、毒からになる<br>
+（例えば、メニュー開いた次の戦闘で、ウキッを使えば直後に毒フィールドのダメージが出る）</p>
+
+<p>ダメージ発動時に、特殊フィールドの消去判定が入る<br>
+消去率は各マスで1/16<br>
+判定は横書き順（左上から左→右で端まで行ったら次の行）で、<br>
+最後のマスの判定で消去となった場合、フィールドダメージ・エフェクトが不発となる<br>
+フィールドの消去もその時点では見た目変わらず、次の敵か味方の技使用直前にフィールドの見た目も変わる</p></blockquote>
+
+<p>SFC版においては、ダメージフィールドが存在している時、敵か味方が技を出す度に、ダメージフィールド4種が順番に発動している。<br>
+発動後に各マスで1/16の確率で消去される。発動は上に敵や味方が乗っていなくても起こり、消去判定も発生する。<br>
+SFC版だとダメージフィールドが発動する時に一瞬フィールドが光るが、誰もダメージフィールドに乗っていない状態で発動した時にも一瞬フィールドが光るので、発動したかどうかわかりやすい。<br>
+また、消去率に、敵味方のどちらが発生させたのかや、地形の種類、マスの位置、発動回数などの要因は関係しない。<br>
+リメイク版でもおそらく、これらの仕様はある程度引き継がれているだろう。<br>
+ただ、経験上、リメイク版での消去率は1/16（約6.3％）より高いような気がする。<br>
+また、発動のタイミングについても、行動順の仕様がSFC版から変更されたために上の法則通りではない。実際にどのタイミングで発動なのか、もし敵味方のステータスが絡むとなると、本作の敵の具体的なステータスが不明なので調査が難しいことになる。</p>
+
+<p>今回は、リメイク版でも、<br>
+「ダメージ地形の発動タイミングや消去率には、敵味方のどちらが発生させたのかや、発動回数などの要因は関係しない」<br>
+「ダメージ地形の消去率に地形の種類は関係しない」<br>
+という前提で調査してみることにする。<br>
+この前提が崩れるような結果が出てきた場合は、調査し直しである。</p>
+
+<p>まず、わかりやすさを重視し、ひとつの地形に絞って動画撮影、地形ダメージの発動タイミングと消去されるマスを記録してみることにした。<br>
+広い範囲にダメージ地形を作ることが可能な攻撃アイテム「水神の鱗」使用時の「水呼びの音色」で冷水地形を作るのがわかりやすいだろう。<br>
+「水神の鱗」だと、最大で縦5マス、横7マス、合計で35マス分の冷水地形を作ることができる。<br><br>
+最終編でホラーシップ×1の敵パーティを相手に、「水神の鱗」を使用してから全ての冷水地形が消去されるまで記録、を3回繰り返してみた。ホラーシップは大型の敵だが、浮いているため冷水地形が隠されることがなく地形の状態を判断可能である。また、ホラーシップは冷水地形でダメージを食らうが、HPが高いので3回分の記録の間に倒れることはなかった。</p>
+
+<p>また、測定中は以下のように行動してみた。</p>
+
+<ul>
+	<li>誰かが「水神の鱗」を使って「水呼びの音色」を発動</li>
+	<li>あとはひたすら味方がパスして時間を進め、地形ダメージを発動させる</li>
+	<li>味方キャラが敵に攻撃されてHPが危なくなった時は回復、また、味方キャラの下が通常マスに戻った場合はダメージ地形の上へ移動（地形ダメージが発動したかどうかわかりやすくするため）</li>
+</ul>
+
+<h4>結果</h4>
+
+<p>敵味方の行動、ダメージ地形発動タイミングなどを記録しつつ、何度か録画した動画を見返して気付いたのだが、敵と味方が合わせて4体にターンが回った直後に、ダメージ地形が発動していると見て良いようだ。<br>
+ここで言う「ターン」は、他キャラに行動順が回るまで行動することを指すので、味方キャラなら「移動または向き変えしてからパスまたはスキル使用」で1ターンとみなす。移動などの合間に敵の行動ゲージが満タンになって敵が割り込んで行動してくることもあるが、割り込み前後合わせて1ターンと数える。また、反撃は含まない。<br>
+敵の場合は「1マス移動」「向き変え」「スキルを出す」のいずれかで1ターンである。<br>
+SFC版だと「敵か味方の技使用で発動ターンが進む」ようになっているのだが、リメイク版ではスキル使用時以外の行動でも発動ターンが進んでいるということになる。
+SFC版より頻繁にダメージ地形が発動していることがあるような気がしていたが、それは気のせいではなかったらしい。</p>
+
+<p>ただし、最初の発動に限っては、「水神の鱗」で冷水地形ができた3ターン後にダメージ地形が発動しているので例外である。<br>
+これについては後述する。</p>
+
+<p>以下に、「水神の鱗」使用後のキャラ（今回は4人パーティ）の行動を一部記す。</p>
+
+<table>
+<thead>
+	<tr><th>ターン</th><th>行動</th></tr>
+</thead>
+<tbody>
+	<tr><td colspan="2">味方キャラ1が「水神の鱗」使用</td></tr>
+	<tr><td>1</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>2</td><td>ホラーシップ向き変え</td></tr>
+	<tr><td>3</td><td>キャラ3が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ4が「パス」</td></tr>
+	<tr><td>2</td><td>キャラ1が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ3が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ4が「パス」</td></tr>
+	<tr><td>2</td><td>ホラーシップ1マス移動</td></tr>
+	<tr><td>3</td><td>キャラ1が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ2が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ3が「パス」</td></tr>
+	<tr><td>2</td><td>キャラ4が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ1が「パス」</td></tr>
+	<tr><td>4</td><td>ホラーシップ向き変え</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>2</td><td>キャラ3が2マス移動してから「パス」</td></tr>
+	<tr><td>3-1</td><td>キャラ4が1マス移動</td></tr>
+	<tr><td>4</td><td>ホラーシップにターンが回り、「ミサイル」で攻撃<br>（「ミサイル」に対する味方の反撃あり）</td></tr>
+	<tr><td>3-2</td><td>キャラ4にターン戻り、「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ1が3マス移動してから「パス」</td></tr>
+	<tr><td>2</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ3が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ4が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1-1</td><td>キャラ1が2マス移動</td></tr>
+	<tr><td>2</td><td>ホラーシップにターンが回り、「火炎放射」で攻撃</td></tr>
+	<tr><td>1-2</td><td>キャラ1にターン戻り、「パス」</td></tr>
+	<tr><td>3</td><td>キャラ2が3マス移動してから「パス」</td></tr>
+	<tr><td>4</td><td>キャラ3が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ4が「パス」</td></tr>
+	<tr><td>2</td><td>キャラ1が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ3が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ4が「パス」</td></tr>
+	<tr><td>2</td><td>ホラーシップ向き変え</td></tr>
+	<tr><td>3</td><td>キャラ1が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ2が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ3が「パス」</td></tr>
+	<tr><td>2</td><td>キャラ4が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ1が「パス」</td></tr>
+	<tr><td>4</td><td>ホラーシップにターンが回り、「ミサイル」で攻撃</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>2</td><td>キャラ3が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ4が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ1が1マス移動してから「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>2</td><td>キャラ3が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ4が回復スキル</td></tr>
+	<tr><td>4</td><td>ホラーシップにターンが回り、「メーザー砲」で攻撃</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>キャラ1が回復スキル</td></tr>
+	<tr><td>2</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ3が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ4が2マス移動してから「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+	<tr><td>1</td><td>ホラーシップにターンが回り、「88ミリ戦車砲」で攻撃</td></tr>
+	<tr><td>2</td><td>キャラ1が「パス」</td></tr>
+	<tr><td>3</td><td>キャラ2が「パス」</td></tr>
+	<tr><td>4</td><td>キャラ3が「パス」</td></tr>
+	<tr><td colspan="2"><span style="color:#1443ff;">冷水地形発動</span></td></tr>
+</tbody>
+</table>
+
+<p>今回は最初の発動以外、「敵味方4キャラが行動後に地形ダメージ発動」の法則が必ず当てはまる。<br>
+では、他の事例も加えて確認してみよう。<br>
+ちょうど良い例として、筆者がアップロードした、動画「<a href="https://www.youtube.com/watch?v=JtEpzkm_B04" target="_blank">キングマンモーが「コーラのビン」を落とすまで普通に戦う（リメイク版 ライブアライブ） - YouTube</a>」の2戦目、キングマンモーが「大爆発」で火炎地形を作ってから（8分37秒あたり）撃破するまでを見てみる。<br>
+この戦闘ではキングマンモーが火炎地形、味方側が「ビリビリまきびし」で電撃地形を発生させている。<br>
+火炎地形発動を基準としてターン数を振ってある。</p>
+
+<table>
+<thead>
+	<tr><th>ターン</th><th>キャラ</th><th>行動</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>キングマンモー</td><td>「大爆発」（火炎地形生成）</td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>「ビリビリまきびし」（電撃地形生成）</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>キングマンモー</td><td>「大噴火」チャージ開始</td></tr>
+	<tr><td>3</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>パス</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">（火炎地形に誰も乗っていないが、一部が消えるので発動と思われる）</span></td></tr>
+	<tr><td>1</td><td>キングマンモー</td><td>大噴火（火炎地形生成/電撃地形消滅）</td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>「ビリビリまきびし」（電撃地形生成）</td></tr>
+	<tr><td>3</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td>4</td><td>キングマンモー</td><td>移動</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ポゴ</td><td>1マス移動＋「ビリビリまきびし」（電撃地形生成）</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>キングマンモー</td><td>「鼻ムチ」</td></tr>
+	<tr><td>3</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>キングマンモー</td><td>「火炎放射」</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>3</td><td>ゴリ</td><td>1マス移動＋「どデカホネ肉」</td></tr>
+	<tr><td>4</td><td>キングマンモー</td><td>「鼻ムチ」</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td>3</td><td>キングマンモー</td><td>「火炎放射」</td></tr>
+	<tr><td>4</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>キングマンモー</td><td>「鼻ムチ」</td></tr>
+	<tr><td>3</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>キングマンモー</td><td>「大噴火」チャージ開始</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>3</td><td>キングマンモー</td><td>大噴火（電撃地形消滅）</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ポゴ</td><td>「ビリビリまきびし」（電撃地形生成）</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>キングマンモー</td><td>「鼻ムチ」</td></tr>
+	<tr><td>3</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td>4</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>キングマンモー</td><td>「火炎放射」</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>「グイグイ」（マンモー麻痺）</td></tr>
+	<tr><td>3</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td>4</td><td colspan="3">（キングマンモーが麻痺しているのがパス扱い？）</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td>3</td><td>キングマンモー</td><td>移動</td></tr>
+	<tr><td>4</td><td>ポゴ</td><td>1マス移動＋「グイグイ」</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>キングマンモー</td><td>「鼻ムチ」</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td>3</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>4</td><td>キングマンモー</td><td>「大爆発」（電撃地形消滅）</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td>2</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td>3</td><td>ポゴ</td><td>「ビリビリまきびし」（電撃地形生成）</td></tr>
+	<tr><td>4</td><td>キングマンモー</td><td>「大噴火」チャージ開始</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>3</td><td>キングマンモー</td><td>「大噴火」チャージ終了・発動（地形上書き）</td></tr>
+	<tr><td>4</td><td>ポゴ</td><td>「ビリビリまきびし」（電撃地形生成）</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>キングマンモー</td><td>「火炎放射」</td></tr>
+	<tr><td>3</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">（火炎地形に誰も乗っていないが、一部が消えるので発動と思われる）</span></td></tr>
+	<tr><td>1</td><td>キングマンモー</td><td>「鼻ムチ」</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>3</td><td>キングマンモー</td><td>移動</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td colspan="3"><span style="color:#d6b911;">電撃地形発動</span></td></tr>
+	<tr><td>2</td><td>キングマンモー</td><td>「火炎放射」</td></tr>
+	<tr><td>3</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ開始</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>キングマンモー</td><td>「大爆発」（電撃地形消滅）</td></tr>
+	<tr><td>2</td><td>ポゴ</td><td>1マス移動＋「ビリビリまきびし」（電撃地形生成）</td></tr>
+	<tr><td>3</td><td>キングマンモー</td><td>「火炎放射」</td></tr>
+	<tr><td>4</td><td>ゴリ</td><td>「ぼいんビーナス」チャージ終了・発動</td></tr>
+	<tr><td colspan="3"><span style="color:#ad2f05;">火炎地形発動</span></td></tr>
+	<tr><td>1</td><td>ポゴ</td><td>「グイグイ」</td></tr>
+</tbody>
+</table>
+
+<p>火炎地形と電撃地形が発生しているのだが、やはり各地形が「敵と味方が合わせて4体にターンが回った直後にダメージ地形が発動」している。<br>
+しかも途中で地形が上書きされることもあるのに、火炎地形発生→キャラ行動1回分→電撃地形→キャラ行動3回分→……、という法則は崩れない。<br>
+チャージスキルは「スキル使用決定時」と「チャージスキル発動時」でそれぞれ行動したカウントに含まれている。<br>
+また、途中で二度起きているが、「火炎地形に誰も乗っていないが、一部地形が消滅する」現象が見られる。これは火炎地形発生のタイミングに敵味方誰も乗っていなくても、「地形ダメージが発動して一定確率で消滅」する現象が起きている、ということだろう。<br>
+もうひとつ、キングマンモーが麻痺している時、キングマンモーが何も行動していないにも関わらず、「キングマンモーの行動」と見なされているようである。</p>
+
+<p>これまでの結果から推測されることとして、本作の戦闘では、「ダメージ地形が作られてからのターン数で発動ターンが決まる」のではない。<br>
+ダメージ地形があってもなくても、敵味方キャラ問わず一定の行動を終えた時に、地形ダメージが発動するかどうかの判定が入るのではないか、と思われる。<br>
+ダメージ地形の発動は、敵味方キャラ問わず一定の行動を終えた時に、4種類の地形ダメージのうち1種類の発動判定が行われている。<br>
+順序は他の戦闘で検討してみる必要があるが、SFC版から設定を引き継いで、<br>
+毒沼→火炎→電撃→冷水→……<br>
+の可能性が高そうだ。実際、キングマンモー戦では、火炎地形の後に電撃地形が発動している。<br>
+そして各地形の判定をした時に<br>
+「該当のダメージ地形が発生しているかどうか」<br>
+「その地形の上に敵または味方キャラが乗っているか」<br>
+が判断され、発動後に消去判定が入り、4種類の地形ダメージを順に判定しているので、4回行動毎に、同じ地形が発動する、ということになるのではないだろうか。<br>
+そして、最初の地形ダメージ発動タイミングについては、「戦闘開始から敵味方キャラが何度行動したか」で決まりそうだ。そうならダメージ地形が作られてから最初の発動までのターンがバラけている理由が説明できる。</p>
+
+<p>敵味方の一定の行動は、「他キャラにターンが移る行動」に当たると推測される。<br>
+味方キャラなら、以下の6項目。</p>
+
+<ol>
+	<li>スキルを出す（反撃は含まれない）</li>
+	<li>チャージスキルを選択する</li>
+	<li>チャージスキルが発動する</li>
+	<li>アイテムを使用する（チャージがある攻撃・回復アイテムの場合、2.や3.と同じように選択時と発動時でそれぞれ別行動とカウント）</li>
+	<li>パス</li>
+	<li>移動・向き変え・ステイの後の1～5の行動（移動・向き変え・ステイの間に敵に行動を割り込まれた場合は、割り込み前後合わせて1回分の行動とカウント）</li>
+</ol>
+
+<p>敵キャラなら、以下の6項目。</p>
+
+<ol>
+	<li>スキルを出す（反撃は含まれない）</li>
+	<li>チャージスキルを選択する</li>
+	<li>チャージスキルが発動する</li>
+	<li>移動</li>
+	<li>向き変え</li>
+	<li>何もしない（パス）</li>
+</ol>
+
+<p>以上が該当すると思われる。<br>
+敵については、「チャージスキルを選択する」「移動」「向き変え」「何もしない（パス）」が一瞬で行われるので、敵の数が多い戦闘だと、敵が頻繁に行動することにより、ダメージ地形発動も頻発しているように見えるのだろう。ＳＦ編キャプテンスクウェアでのエレ・ミラージュ＆ピムリ戦における電撃地形発動などが該当する。</p>
+
+<p>更に、敵味方が状態異常で行動不能でも、どうやら「行動」に含まれるようである。これについてはもう少し詳しく調べる必要がありそうである。</p>
+
+<p>以上を踏まえて、以下を検討してみた。</p>
+
+<h5>戦闘開始直後に毒沼地形を発生させると、直後に毒沼ダメージが発生するかどうか？</h5>
+
+<p>原始編のデータをロードし、戦闘開始後すぐにゴリが「ウキッ」で毒沼地形を発生させてみると、毒沼地形ダメージが直後に発生。<br>
+さらにポゴが「ビリビリまきびし」をまくと、<br>
+戦闘開始→ゴリの「ウキッ」→毒沼地形ダメージ→敵の攻撃→ポゴが「ビリビリまきびし」→電撃地形ダメージ<br>
+となった。</p>
+
+<h5>最初の毒沼地形ダメージが発生したらすぐに逃げて、メニューなど開かずに続いて戦闘に突入した直後に毒沼地形を発生させると、やはり直後に毒沼ダメージが発生するかどうか？</h5>
+
+<p>毒沼地形ダメージが直後に発生。<br>
+つまりSFC版における「戦闘をまたいでも発動ターンは維持されるが、メニューを開くかデータロード時にリセットされ、毒からになる」現象は削除され、常に「戦闘直後の発動は毒沼から開始」となっているようである。</p>
+
+<h5>冷水地形発生タイミングは、他の地形ダメージ発動タイミングのどれほど後（または前）なのか？</h5>
+
+<p>最終編で、おぼろ丸が「忍法火炎蛍」→「水神の鱗」使用で火炎・冷水地形両方を作ってみて発動順を確かめてみたところ、<br>
+戦闘開始→おぼろ丸が「忍法火炎蛍」→敵1マス移動→火炎地形ダメージ→「水神の鱗」使用→敵1マス移動→冷水地形ダメージ<br>
+の順で発動したので、冷水地形発動は火炎地形発動の2ターン後である。<br>
+発動順はやはり、SFC版設定を引き継いで、毒沼→火炎→電撃→冷水→……と見て良いようだ。</p>
+
+<p>以上から、敵味方含むキャラの行動の合間に必ずダメージ地形判定が入り、以下の1～8が戦闘中繰り返されている、と思われる。<br>
+判定はそれぞれの地形につき「地形の存在判定→キャラが乗っているか判定→消去判定」を毎回行っているのだろう。</p>
+
+<ol start="0">
+	<li>戦闘開始</li>
+	<li>キャラの行動</li>
+	<li>毒沼地形判定</li>
+	<li>キャラの行動</li>
+	<li>火炎地形判定</li>
+	<li>キャラの行動</li>
+	<li>電撃地形判定</li>
+	<li>キャラの行動</li>
+	<li>冷水地形判定<br>……</li>
+</ol>
+
+<p>余談になるが、おそらく、敵味方キャラの行動後は「ダメージ地形判定」の他に、「反撃判定」「毒の状態異常なら毒ダメージの判定」のような複数の判定も一緒に行われているのだろう。</p>
+
+<p>次ページでは続いて、「<a href="17-2.html">ダメージ地形発動後の消去の確率はどの程度か？</a>」を調査している。</p>
+
+<div class="foot"><a href="index.html"><span class="button">&#9650;目次</span></a>　<a href="17-2.html"><span class="button">&#9654;次</span></a></div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 70%, #f6f2fc);">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base00.html">SFC版からの変更点</a></li>
+		<li><a href="../base07.html">基本操作</a></li>
+		<li><a href="../base01.html">シナリオ</a></li>
+		<li><a href="../base02.html">メニュー画面</a></li>
+		<li><a href="../base03.html">セーブ</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../battle14.html">ステータス上昇</a></li>
+		<li><a href="../battle13.html">経験値</a></li>
+		<li><a href="../base05.html">アイテム</a></li>
+		<li><a href="../base06.html">設定</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">装備</a></li>
+		<li><a href="../battle02.html">陣形</a></li>
+		<li><a href="../battle03.html">エンカウント</a></li>
+		<li><a href="../battle04.html">行動ゲージ</a></li>
+		<li><a href="../battle05.html">向き</a></li>
+		<li><a href="../battle06.html">スキル</a></li>
+		<li><a href="../battle07.html">属性</a></li>
+		<li><a href="../battle08.html">状態異常</a></li>
+		<li><a href="../battle09.html">行動異常</a></li>
+		<li><a href="../battle10.html">能力増減</a></li>
+		<li><a href="../battle11.html">ダメージ地形</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle15.html">戦闘テクニック</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 70%, #c3fae5);" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../re_kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kinmirai/kaizou.html">アイテム改造</a></li>
+	<li><a href="../re_kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: linear-gradient(to right, #51635C, 70%, #dfedf7);" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../re_sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../re_sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: linear-gradient(to right, #734fab, 70%, #f8ccfc);" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../re_bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../re_bakumatsu/0nin.html">不殺（0人斬り）</a></li>
+	<li><a href="../re_bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../re_bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../re_bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../re_bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../re_bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../re_bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 70%, #cedef5);" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../re_kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kunfu/omake.html">おまけ・レベル16の弟子の修業</a></li>
+	<li><a href="../re_kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 70%, #fabbc5);" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../re_gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../re_gendai/omake.html">スキルをラーニングせずクリア</a></li>
+	<li><a href="../re_gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: linear-gradient(to right, #64BA02, 70%, #f6fcc0);" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../re_genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../re_genshi/item.html">アイテム合成</a></li>
+	<li><a href="../re_genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: linear-gradient(to right, #E38C00, 70%, #faf7cf);" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../re_seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../re_seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: linear-gradient(to right, #b59f14, 70%, #f7f5d0);" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../re_chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: linear-gradient(to right, #919c93, 70%, #f0f5eb);" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../re_saishu/chui01.html">注意点</a></li>
+	<li><a href="../re_saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../re_saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../re_saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../re_saishu/last.html">ラストバトル</a></li>
+	<li><a href="../re_saishu/omake.html">おまけ</a></li>
+	<li><a href="../re_saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../re_data/index.html">データ集トップページ</a></li>
+	<li><a href="../re_data/chara.html">キャラクター</a></li>
+	<li><a href="../re_data/equipment.html">装備</a></li>
+	<li><a href="../re_data/index.html#item">アイテム</a></li>
+	<li><a href="../re_data/enemy.html">敵</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle13" class="toggle">
+<label class="title" for="toggle13" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label>
+<div class="content">
+<ul>
+	<li><a href="../achievement/index.html">トロフィー＆実績一覧</a></li>
+	<li><a href="../achievement/guide.html">取得方法</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">調査トップページ</a></li>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle14" class="toggle">
+<label class="title" for="toggle14" style="color: #363638; background: #e5e4eb;">元ネタ＆雑学</label>
+<div class="content">
+	<ul>
+		<li><a href="../neta/index.html">元ネタ＆雑学目次</a></li>
+		<li><a href="../neta/01_kinmirai.html">近未来編</a></li>
+		<li><a href="../neta/02_sf.html">ＳＦ編</a></li>
+		<li><a href="../neta/03_bakumatsu.html">幕末編</a></li>
+		<li><a href="../neta/04_gendai.html">現代編</a></li>
+		<li><a href="../neta/05_genshi.html">原始編</a></li>
+		<li><a href="../neta/06_seibu.html">西部編</a></li>
+		<li><a href="../neta/07_kunfu.html">功夫編</a></li>
+		<li><a href="../neta/08_chusei.html">中世編</a></li>
+		<li><a href="../neta/09_saishu.html">最終編</a></li>
+	</ul>
+</div>
+</div>
+
+<br>
+<a href="../sfc/index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">SFC版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 80%, #f6f2fc);">TOP</label></a></li>
+		<li class="navigation__item"><a href="../re_kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 80%, #c3fae5);" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_sf/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #51635C, 80%, #dfedf7);" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #734fab, 80%, #f8ccfc);" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_kunfu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 80%, #cedef5);" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_gendai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 80%, #fabbc5);" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_genshi/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #64BA02, 80%, #f6fcc0);" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_seibu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #E38C00, 80%, #faf7cf);" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_chusei/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #b59f14, 80%, #f7f5d0);" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_saishu/index.html"><label class="title_n2" style="background: linear-gradient(to right, #919c93, 80%, #f0f5eb);" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+		<li class="navigation__item"><a href="../achievement/index.html"><label class="title_n2" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label></a></li>
+		<li class="navigation__item"><a href="index.html"><label class="title_n2"  style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブアライブ（リメイク版） 攻略メモ帳　　　<a href="https://x.com/hoso_boso" target="_blank"><img alt="中の人のX" src="../img/Logo white.svg" style="width:16px;"></a>　　<a href="https://mstdn.jp/@hoso_boso" rel="me" target="_blank"><img alt="中の人のMastodon（mstdn.jp）" src="../img/mastodon.svg" style="width:16px;"></a>　　<a href="https://taittsuu.com/users/hoso_boso" rel="me" target="_blank"><img alt="中の人のタイッツー" src="../img/taitsuico.svg" style="width:16px;"></a>
+</div>
+
+</div>
+<script src="../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブアライブ,ライブ・ア・ライブ,LIVE A LIVE,攻略,HD-2D,リメイク,Nintendo Switch,PlayStation4,PlayStation5,Steam">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 向き補正の検証">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/img/social.png">
+<meta property="og:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 向き補正の検証">
+<meta name="twitter:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 向き補正の検証</title>
+<link href="../css/main.min.css?20251129" rel="stylesheet">
+<link href="../css/remake.css?20250608" rel="stylesheet">
+<link href="../css/etc.css?20250712" rel="stylesheet">
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブアライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">戦闘システムの調査</a></li>
+<li class="here"><button type="button">検討</button>
+	<ul>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">戦闘システムの調査</a> &gt; 向き補正の検証</h1>
+
+<h2>向きによる命中・ダメージ量補正の検証</h2>
+
+<p>本作では、向きによって命中やダメージ量が変化すると、チュートリアルやTIPSで明言されている。<br>
+また、<a href="../battle05.html">基礎知識 &gt; 向き</a>で、向きについてある程度解説をしてある。<br>
+では、実際のところ、向きによって命中・回避率や、ダメージ量はどれほど変化するのか？<br>
+という点を調査してみた。</p>
+
+<p>まず、SFC版での向きによる補正はどう計算されていたのかを説明する。</p>
+
+<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様及び、<a href="http://zsnsk.sakura.ne.jp/livealive/battle_system.html" target="_blank">ZsnsK's F**kin' Site</a>様の解説によると、SFC版では、全ての敵・味方キャラクターに、「側面補正」「背面補正」という内部数値が設定されている。<br>
+実際の補正値も上記ウェブサイト様に掲載されているので、参照していただきたい。<br>
+また、SFC版では、敵・味方のレベルの数値が命中や回避、ダメージ量計算に使われていたが、側面や背面から攻撃を受けた時のダメージ量は、それぞれの向き補正値分のレベルを減算してダメージ量が計算される。ただし減算した結果、負の値になった時は、レベル＝0として扱われる。</p>
+
+<p>例えばSFC版において、高原日勝だと、側面補正が2、背面補正が4と設定されている。<br>
+側面から攻撃を受けた場合、ダメージ量計算の時、本来の高原のレベルから2引いた値が計算値に使われるので、結果として正面から受けるダメージよりも側面から受けたダメージの方が高くなる、ということになる。<br>
+また現代編では高原のレベルが2で固定のため、側面補正が入ると2&#8722;2で0、背面補正が入ると2&#8722;4で&#8722;2だが、負の値なので結局0になる。<br>
+つまり現代編においては、側面からでも背面からでも受けるダメージ量に変化がない。<br>
+ということになる。<br>
+命中については、<br>
+「自身のレベル ＋ 技レベル ≧ (0～敵レベルの乱数) のとき命中」<br>
+となるのだが、『自身のレベル』『敵レベル』の部分が、側面補正や背面補正分引かれることになるため、側面・背面から攻撃した時・された時とで、命中率が変わってくる、ということになる。</p>
+
+<p>というのが、SFC版での向き補正である。<br>
+リメイク版チュートリアルに、<br>
+『敵の側面や背面から攻撃するとスキルの命中率や与えるダメージがアップする』<br>
+『<span style="font-weight:bold;">ただし効果のない敵も存在する</span>』<br>
+とあることから、「敵によって補正値が異なる」のは間違いないようだ。<br>
+ただし、敵の数は多いので、全ての敵を調べるとなると、とんでもない手間がかかる。どうせ調べるなら、強敵であるボス敵の補正がどれほどなのかは知りたいところではあるが。</p>
+
+<p>味方キャラについては、SFC版同様にリメイク版においても、補正値がキャラにより異なる可能性があるが、それらがどの程度かはリメイク版のTIPSなどでの説明がないため不明である。<br>
+今回は、最終編に登場する味方キャラ（オルステッド除く）に絞って、「向きによる回避率及びダメージ量の補正は存在するのか、また、キャラクターごとに補正の度合いは異なるのか」を調査してみることとする。<br>
+ちなみに、最終編の味方キャラのSFC版における補正値は以下の通りである。数値が大きいほど補正が大きくかかり、側面・背面からの敵の攻撃の命中率＆ダメージ量が増えてしまう、ということになる。ある程度はキャラの個性を反映した数値である、と思われる。</p>
+
+<table><thead><tr><th>キャラクター</th><th>側面補正</th><th>背面補正</th></tr></thead>
+<tbody><tr><td>アキラ</td><td>2</td><td>3</td></tr>
+	<tr><td>キューブ</td><td>1</td><td>1</td></tr>
+	<tr><td>おぼろ丸</td><td>1</td><td>2</td></tr>
+	<tr><td>ユン・ジョウ</td><td>2</td><td>4</td></tr>
+	<tr><td>レイ・クウゴ</td><td>1</td><td>2</td></tr>
+	<tr><td>サモ・ハッカ</td><td>4</td><td>6</td></tr>
+	<tr><td>高原　日勝</td><td>2</td><td>4</td></tr>
+	<tr><td>ポゴ</td><td>4</td><td>6</td></tr>
+	<tr><td>サンダウン</td><td>2</td><td>3</td></tr>
+</tbody>
+</table>
+
+<p>さて、実際に向き補正を調べる方法であるが、リメイク版におけるダメージ量計算式や、命中・回避率の計算式などは不明である。<br>
+命中率に関わる要素が、「命中」「回避」「向き」の3種類のみなのかどうかさえはっきりしない。<br>
+おそらくこれに加えて、スキル毎に命中に関係する何かしらの値も関係してくるとは思われる（SFC版における「技レベル」）。<br>
+よって、できることといったら、<br>
+「味方キャラの向きを正面・側面・背面向きと変えながら、敵から同じ攻撃を食らい続けて、ダメージ量と命中した回数を記録してみる」<br>
+という程度である。<br>
+側面・背面補正が小さめのキャラであれば、正面・側面・背面の記録にさほど差は出ないはずである。<br>
+逆に、側面・背面補正が大きいキャラの場合は、側面・背面のダメージ量や命中回数が、正面よりも増えるのではないだろうか。<br>
+命中率の計算などといった詳細を求めることはまず無理であろうが、SFC版のデータがある程度引き継がれているかどうか、それとも全く別物になっているのかくらいはなんとなく見えてくるのではなかろうか。</p>
+
+<p>ということで、ここからは、おなじみの影からひたすら攻撃を食らってみることにする。<br>
+ただし影のスキルは飛属性ばかりなので、素で飛属性耐性のあるサンダウンのみ、他キャラよりダメージ量は軽減される。とはいえ、サンダウン自身の正面・側面・背面補正がどれくらいあるか、を比較する分には困らない（はず）。</p>
+
+<p>測定方法：<br>
+測定するキャラは、防具なし、武器は各キャラの一番弱い装備（キューブとサンダウンのみ「虎の小手」）。<br>
+キャラのレベルは特に統一しないが、レベル99のデータ（命中・回避ともに99）では、敵からの攻撃の回避の確率が高くなりすぎている可能性もあるので、だいたいレベル20前後くらいで測定した。<br>
+キューブについては「強化パーツ」なしの初期状態で確認。<br>
+防具は全キャラ外しているが、これはできるだけダメージ量を大きくしたかったから（数字が大きい方が差がわかりやすい）である。<br>
+当然ダメージ量が増えて危険なので、キューブまたはアキラを常にパーティに入れて回復を担当させている（「印籠」などアイテム回復だとバフ効果も付いてしまうため使用しない）。<br>
+影からの攻撃は、「手裏剣乱糸」（最大6Hit）を各20回（つまり120Hit分）記録している。確率を求めるためのサンプル数としてはやや少ないかもしれないが、敵からの攻撃待ちという今回の測定の手間からも、この程度でご了承いただきたい。</p>
+
+<p>全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRe80SaY84x8_kfBEGmrnqCOWiJv3dhNm9nUK_ma_fzpE44ECtTsDDgldnan3FMVKprx1yXootnDmHu/pubhtml" target="_blank">lal_Evasion - Googleスプレッドシート</a>を。</p>
+
+<p>結果からわかることはいくつかあるので、順に記していく。</p>
+
+<h4>向きによる命中・回避の補正は存在する</h4>
+
+<p>今回は上の通り、敵から攻撃をひたすら食らって命中したかどうかと、命中した場合のダメージ量を記録していったため、敵側の「命中率」と味方側の「回避率」を求めたということになる訳だが、この先は味方の回避に絞って話を進める。</p>
+
+<table>
+<thead><tr><th rowspan="2">キャラクター</th><th rowspan="2">回避</th><th colspan="3">回避率</th></tr>
+	<tr><th>正面</th><th>側面</th><th>背面</th></tr></thead>
+<tbody>
+	<tr><td>アキラ</td><td>27</td><td>0.583</td><td>0.533</td><td>0.375</td></tr>
+	<tr><td>キューブ</td><td>22</td><td>0.483</td><td>0.475</td><td>0.400</td></tr>
+	<tr><td>おぼろ丸</td><td>30</td><td>0.558</td><td>0.533</td><td>0.479</td></tr>
+	<tr><td>ユン・ジョウ</td><td>31</td><td>0.550</td><td>0.575</td><td>0.517</td></tr>
+	<tr><td>レイ・クウゴ</td><td>28</td><td>0.533</td><td>0.458</td><td>0.475</td></tr>
+	<tr><td>サモ・ハッカ</td><td>28</td><td>0.500</td><td>0.483</td><td>0.400</td></tr>
+	<tr><td>高原　日勝</td><td>29</td><td>0.533</td><td>0.533</td><td>0.458</td></tr>
+	<tr><td>ポゴ</td><td>26</td><td>0.600</td><td>0.425</td><td>0.432</td></tr>
+	<tr><td>サンダウン</td><td>30</td><td>0.650</td><td>0.467</td><td>0.467</td></tr>
+</tbody>
+</table>
+
+<p>誤差を加味したとしても、どのキャラでも、回避率はほぼ正面＞側面＞背面と見て良いようである。<br>
+正面＞背面はどのキャラでも明白であろう。<br>
+また、SFC版と同じく、キャラにより補正の度合いが異なっていることも間違いない。<br>
+ユンやキューブ、高原のように正面と側面がほぼ同値と思われるキャラ、ポゴやサンダウン、レイのように側面と背面がほぼ同値と思われるキャラも居るが、これが誤差の範囲かどうかはサンプル数を更に取ることではっきりするかもしれない。</p>
+
+<p>また、SFC版の側面・背面補正の値の傾向と比較すると、おぼろ丸やキューブ、レイの補正が小さめ、ポゴやサモの補正がやや大きめといったあたりはSFC版を踏襲しているようである。<br>
+一方で、必ずしも一致していないキャラも居る。<br>
+SFC版では側面・背面補正が大きめであったユンだが、リメイク版ではさほど回避率に変化がない。最大HPが低めである上に、スキルの性質上近距離戦がメインになることに配慮しているのだろうか。<br>
+高原は側面・背面ともに、SFC版ほどの補正が入っている様子はない。現代編の難易度調整や、近距離戦向けキャラであることと同時に、より格闘家らしさが強調された結果かもしれない。<br>
+アキラは背面の回避率がかなり下がるが、SFC版ではそこまで極端に背面補正がかかる訳ではない。<br>
+サンダウンも正面からの回避率と、側面・背面の回避率の差がかなり大きいが、やはりSFC版ではそこまで極端な補正はかかっていない。<br>
+アキラやサンダウンは遠距離攻撃がメインになることから、側面や背面からの回避率が低めでもさほど問題ではない。逆に、これらの傾向から、サンダウンやアキラは敵とは距離を取り背面から攻撃されぬよう注意すべきキャラである、とも言える。</p>
+
+<p>なお、詳細はデータを見ていただければわかるが、体感としても、<br>
+サンダウンの正面の回避率（65.0％）……「手裏剣乱糸」を受けるとだいたい2～3Hit（今回は最大4Hit）、明らかに回避しやすい<br>
+アキラの背面の回避率（37.5％）……だいたい4～5Hitくらい（今回は最大6Hit）、明らかに回避が低い<br>
+ということがプレイしていてわかるようになっている。</p>
+
+<h4>向きによるダメージ量の差はほとんどない？</h4>
+
+<table>
+<thead><tr><th rowspan="2">キャラクター</th><th colspan="3">ダメージ量（最大/最小）</th></tr>
+	<tr><th>正面</th><th>側面</th><th>背面</th></tr></thead>
+<tbody>
+	<tr><td>アキラ</td><td>41/28</td><td>42/28</td><td>42/28</td></tr>
+	<tr><td>キューブ</td><td>36/24</td><td>36/24</td><td>36/24</td></tr>
+	<tr><td>おぼろ丸</td><td>39/26</td><td>39/26</td><td>39/26</td></tr>
+	<tr><td>ユン・ジョウ</td><td>33/23</td><td>33/22</td><td>33/22</td></tr>
+	<tr><td>レイ・クウゴ</td><td>40/27</td><td>40/27</td><td>40/27</td></tr>
+	<tr><td>サモ・ハッカ</td><td>31/21</td><td>32/22</td><td>32/22</td></tr>
+	<tr><td>高原　日勝</td><td>37/26</td><td>38/25</td><td>38/25</td></tr>
+	<tr><td>ポゴ</td><td>34/23</td><td>35/23</td><td>35/24</td></tr>
+	<tr><td>サンダウン</td><td>30/20</td><td>30/21</td><td>31/20</td></tr>
+</tbody>
+</table>
+
+<p>向きによる命中・回避率の差があるのはほぼ確定と見て良い一方で、ダメージ量については、向きによる有意な差がほとんど見られない。<br>
+一応、アキラやサモ、ポゴ、サンダウンのように、向き補正による回避率の差が大きめのキャラの場合は、側面や背面の方が最大値や最小値が大きい場合があるが、その差は「1」である。誤差の範囲の可能性も充分にある。<br>
+また、誤差でないとしたら、「手裏剣乱糸」1Hit分のダメージ量が小さめ（2桁）であるからほとんど差がない、つまり差があっても、ダメージ量30～40に対して1前後（2～3％程度？）ということになる。<br>
+一方で、これまでの調査で判明している通りに、ダメージ量には&plusmn;20％程度のブレがある。<br>
+今回の結果でも、ダメージ量の最大値÷最小値がほぼ1.5であることからわかる通りに、敵からの攻撃のダメージ量にもやはり&plusmn;20％程度のブレが存在している。<br>
+つまり、ダメージ量の乱数でのブレ&plusmn;20％と比べたら、向きによるダメージ量の補正が存在していたとしても、普通にゲームをプレイする分には無視しても問題ないくらい小さいのではないだろうか。<br>
+他のスキルについても検討する必要はあるものの、おそらく、「向きによるダメージ量の差はほとんどない」と考えて構わないと思われる。<br>
+1Hitのダメージ量が大きい、「旋牙連山拳」「忍法矢車草」「メーザーカノン」あたりを、側面・背面補正が大きい相手に当てれば、もう少しわかりやすい差が出るのかもしれない。</p>
+
+<p>この件については、次ページの<a href="12-2.html">「キャンセラレイ」の向き・ダメージ量検討</a>も参照のこと。</p>
+
+<hr>
+
+<p>その他、今回の検証の目的とは別に、興味深い点について以下に記しておく。</p>
+
+<h4>多段ヒットするスキルの命中率について</h4>
+
+<p>今回の結果を見ると、影からの「手裏剣乱糸」が1Hitでも命中する場合は、必ず1発目が命中していることがわかる。<br>
+1Hitだけ当たる場合、最初の1発が必ず命中し、残り5発がミスになっている。<br>
+4Hitする場合、ミスするのは2～6発目のうちの2Hit分で、1発目は必ず当たる。<br>
+つまり実際には、1発目の命中は「手裏剣乱糸」そのものが命中するかどうかのみが判定されており、2発目以降は多段ヒット分の命中計算をしている、ということになるのでは……？<br>
+1発目の命中率の計算と、2～6発目の命中率の計算が、全く別物である、という可能性を示していることになる。<br>
+上では全てごちゃ混ぜにして命中・回避を計算しているが、もしこの推測が正しいのであれば、上の命中率や回避率の数字は正確ではない……ということになる。<br>
+ただ、あるキャラにおいて正面・側面・背面の回避率は下がっていく、という比較自体にはほぼ影響はない（はず）。</p>
+
+<h4>「回避」の値と回避率の相関関係は……？</h4>
+
+<p>今回の検討は、影からひたすら「手裏剣乱糸」を受けて測定値をメモしている。<br>
+つまり敵側（攻撃する側）のステータスは一定と考えて良い、と思われる。<br>
+よって、味方側（攻撃を受ける側）の「回避」の値と「向き」で回避率が決まるのだろう、と筆者は考えていた。<br>
+つまり、回避の値が30であれば、どのキャラでも向きさえ同じならば、回避率は同じ程度だろう、と推測していたのであるが……<br>
+今回の結果を見ての通りに、「回避」の値と「正面からの回避率」の間には相関関係がない（比例していない）。<br>
+今回の測定では、おぼろ丸とサンダウンの回避は両者とも30なのであるが、結果を見ての通り、正面からの回避率はおぼろ丸が55.8％、サンダウンが65.0％となっており、誤差とは思えないほどの明白な差がある。<br>
+（ただし上に記した通り、1発目の命中は「手裏剣乱糸」そのものが命中するかどうかの判定、2発目以降は多段ヒット分の命中計算だとすれば、キャラ毎に単純に命中率の比較はできない可能性もあるため、以下の話は参考程度で）</p>
+
+<p>回避の値の低いキャラから順に並べ替えてみると、</p>
+
+<table>
+<thead><tr><th rowspan="2">キャラクター</th><th rowspan="2">回避</th><th colspan="3">回避率</th></tr>
+	<tr><th>正面</th><th>側面</th><th>背面</th></tr></thead>
+<tbody>
+	<tr><td>キューブ</td><td>22</td><td>0.483</td><td>0.475</td><td>0.400</td></tr>
+	<tr><td>ポゴ</td><td>26</td><td>0.600</td><td>0.425</td><td>0.432</td></tr>
+	<tr><td>アキラ</td><td>27</td><td>0.583</td><td>0.533</td><td>0.375</td></tr>
+	<tr><td>サモ・ハッカ</td><td>28</td><td>0.500</td><td>0.483</td><td>0.400</td></tr>
+	<tr><td>レイ・クウゴ</td><td>28</td><td>0.533</td><td>0.458</td><td>0.475</td></tr>
+	<tr><td>高原　日勝</td><td>29</td><td>0.533</td><td>0.533</td><td>0.458</td></tr>
+	<tr><td>おぼろ丸</td><td>30</td><td>0.558</td><td>0.533</td><td>0.479</td></tr>
+	<tr><td>サンダウン</td><td>30</td><td>0.650</td><td>0.467</td><td>0.467</td></tr>
+	<tr><td>ユン・ジョウ</td><td>31</td><td>0.550</td><td>0.575</td><td>0.517</td></tr>
+
+</tbody>
+</table>
+
+<p>各120回分の測定であるから、サンプル数が足りないが故の誤差があるとしても、正面からの回避率の順序がずいぶんとズレている。<br>
+特に補正値が大きめなポゴ、サンダウン、サモあたりで顕著にズレが生じている。<br>
+ただし、背面からの回避率を基準とすれば、まあまあ順番通りに並んでいる（誤差の範囲内？）、と見ることもできる。<br>
+先程例にあげた、おぼろ丸とサンダウンの場合、背面からの回避率はおぼろ丸が47.9％、サンダウンが46.7％であり、誤差程度の差になっているのである。<br>
+だとしたら、リメイク版では、「回避率は、背面を基準に、正面補正・側面補正が入っている」ということになるのだが、今回の結果だけではそれが正しいかどうかはわからない。背面の回避率も、順序が前後している箇所もあるため、回避以外のステータスなどが何らかの影響を及ぼしている可能性も残っている（例えば、回避の値に対してアキラやサモの回避率が低めである理由として、素早さの値が絡んでいる可能性も考えられる）。<br>
+今回の検討はあくまでも「向き補正があるかどうか」であって、回避率はどのステータスで決まるかについては、また別の検討を行う必要がある。</p>
+
+<p>ひとつ言えることは、（当然のことながら）回避の値が上がれば回避率は必ず上昇するということである。<br>
+「レベルが1上がると命中と回避が1上がるけど、その『1』にどれほど意味があるのか？」と疑問に思う方もいらっしゃるかもしれないが、今回の結果がひとつの答えになっている、と見ていただきたい。</p>
+
+<h4>ダメージ量について</h4>
+
+<p>SFC版では、影の使う「手裏剣乱糸」のダメージ量計算に、</p>
+
+<ul>
+	<li>影の「速の1/4」</li>
+	<li>攻撃される側の「速」と防御の1/2</li>
+</ul>
+
+<p>が関わっていた。<br>
+つまり、攻撃される側は、「速」と「防具の防御の値」が高いほどダメージ量が減るようになっていた。</p>
+
+<p>一方、今回についてはダメージ量を見てみると、単純に素早さと比例はしていないようである。<br>
+以下、ダメージ量の順に並べてある。<br>
+サンダウンのみ素で飛属性耐性があるので、ダメージ量は耐性がないキャラの0.75倍程度となっているはずであるから、例外と考えて構わない。</p>
+
+<table>
+<thead><tr><th rowspan="2">キャラクター</th><th rowspan="2">素早さ</th><th rowspan="2">物防</th><th colspan="3">ダメージ量（最大/最小）</th></tr>
+	<tr><th>正面</th><th>側面</th><th>背面</th></tr></thead>
+<tbody>
+	<tr><td>サンダウン</td><td>99</td><td>53</td><td>30/20</td><td>30/21</td><td>31/20</td></tr>
+	<tr><td>サモ・ハッカ</td><td>50</td><td>99</td><td>31/21</td><td>32/22</td><td>32/22</td></tr>
+	<tr><td>ユン・ジョウ</td><td>99</td><td>91</td><td>33/23</td><td>33/22</td><td>33/22</td></tr>
+	<tr><td>ポゴ</td><td>48</td><td>87</td><td>34/23</td><td>35/23</td><td>35/24</td></tr>
+	<tr><td>キューブ</td><td>18</td><td>96</td><td>36/24</td><td>36/24</td><td>36/24</td></tr>
+	<tr><td>高原　日勝</td><td>99</td><td>69</td><td>37/26</td><td>38/25</td><td>38/25</td></tr>
+	<tr><td>おぼろ丸</td><td>99</td><td>63</td><td>39/26</td><td>39/26</td><td>39/26</td></tr>
+	<tr><td>レイ・クウゴ</td><td>99</td><td>57</td><td>40/27</td><td>40/27</td><td>40/27</td></tr>
+	<tr><td>アキラ</td><td>41</td><td>52</td><td>41/28</td><td>42/28</td><td>42/28</td></tr>
+
+</tbody>
+</table>
+
+<p>全キャラ防具はない状態（防御＝0）で測定しているので、ダメージ量の違いはそれ以外のステータスによる影響で生じているはずだが、上の通り、素早さが高いほどダメージ量が減る、とはなっていない。<br>
+飛属性耐性があるサンダウンを抜きにすると、素早さが低めでも物防が99に達しているサモが一番ダメージ量が小さいのである。<br>
+他のキャラも物防が高いほどダメージ量が少ないことがわかる。<br>
+かといって素早さが全く関係ないという訳ではないことは、キューブのステータスとダメージ量から推測できる。<br>
+キューブは物防が96とかなり高めなのだが、素早さは18と低い。<br>
+物防だけならユンやポゴより少し上なのだが、素早さの値がユン＞ポゴ＞キューブになっているため、ここで順位が逆転しているのだろう、と推察できる。<br>
+つまり、リメイク版においては、影の使う「手裏剣乱糸」のダメージ量の計算に、攻撃される側の「物防」と「素早さ」が関わっているのだが、「素早さ」の関わる度合いは「物防」より小さめである、ということがわかる。</p>
+
+<p>既に<a href="01-2.html">スキルによるダメージ量の検討</a>で判明している通り、SFC版において、「物理攻撃」でありながら与えるダメージ量の依存値が「力」以外の「体」「速」だった技については、リメイク版で新たに「物攻」にも依存する傾向が見られる。<br>
+これは攻撃側での傾向であるが、防御側についても同様に、<br>
+<span style="font-weight:bold;">「物理攻撃」でありながら受けるダメージ量の依存値が「体」以外の「力」「速」だった技については、リメイク版で新たに「物防」にも依存する傾向がある。</span><br>
+という可能性があることを示しているのではないだろうか。<br>
+防御側が「力」依存だった物理攻撃の技というのはごく少ないが（「竜虎両破腕」「Ｇスープレックス」など）、「速」依存だった技というのは割と存在している（ほとんどが射撃や投擲などの技になる）。<br>
+それらもおそらくは敵側の「物攻」「素早さ」の影響が減り、「物防」をメインに参照してダメージ量を計算するようになったのではないか、と考えられる。</p>
+
+<div class="foot"><a href="index.html"><span class="button">&#9650;目次</span></a>　<a href="12-2.html"><span class="button">&#9654;次　「キャンセラレイ」の検証</span></a></div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 70%, #f6f2fc);">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base00.html">SFC版からの変更点</a></li>
+		<li><a href="../base07.html">基本操作</a></li>
+		<li><a href="../base01.html">シナリオ</a></li>
+		<li><a href="../base02.html">メニュー画面</a></li>
+		<li><a href="../base03.html">セーブ</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../battle14.html">ステータス上昇</a></li>
+		<li><a href="../battle13.html">経験値</a></li>
+		<li><a href="../base05.html">アイテム</a></li>
+		<li><a href="../base06.html">設定</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">装備</a></li>
+		<li><a href="../battle02.html">陣形</a></li>
+		<li><a href="../battle03.html">エンカウント</a></li>
+		<li><a href="../battle04.html">行動ゲージ</a></li>
+		<li><a href="../battle05.html">向き</a></li>
+		<li><a href="../battle06.html">スキル</a></li>
+		<li><a href="../battle07.html">属性</a></li>
+		<li><a href="../battle08.html">状態異常</a></li>
+		<li><a href="../battle09.html">行動異常</a></li>
+		<li><a href="../battle10.html">能力増減</a></li>
+		<li><a href="../battle11.html">ダメージ地形</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle15.html">戦闘テクニック</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 70%, #c3fae5);" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../re_kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kinmirai/kaizou.html">アイテム改造</a></li>
+	<li><a href="../re_kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: linear-gradient(to right, #51635C, 70%, #dfedf7);" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../re_sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../re_sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: linear-gradient(to right, #734fab, 70%, #f8ccfc);" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../re_bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../re_bakumatsu/0nin.html">不殺（0人斬り）</a></li>
+	<li><a href="../re_bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../re_bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../re_bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../re_bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../re_bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../re_bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 70%, #cedef5);" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../re_kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kunfu/omake.html">おまけ・レベル16の弟子の修業</a></li>
+	<li><a href="../re_kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 70%, #fabbc5);" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../re_gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../re_gendai/omake.html">スキルをラーニングせずクリア</a></li>
+	<li><a href="../re_gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: linear-gradient(to right, #64BA02, 70%, #f6fcc0);" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../re_genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../re_genshi/item.html">アイテム合成</a></li>
+	<li><a href="../re_genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: linear-gradient(to right, #E38C00, 70%, #faf7cf);" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../re_seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../re_seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: linear-gradient(to right, #b59f14, 70%, #f7f5d0);" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../re_chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: linear-gradient(to right, #919c93, 70%, #f0f5eb);" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../re_saishu/chui01.html">注意点</a></li>
+	<li><a href="../re_saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../re_saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../re_saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../re_saishu/last.html">ラストバトル</a></li>
+	<li><a href="../re_saishu/omake.html">おまけ</a></li>
+	<li><a href="../re_saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../re_data/index.html">データ集トップページ</a></li>
+	<li><a href="../re_data/chara.html">キャラクター</a></li>
+	<li><a href="../re_data/equipment.html">装備</a></li>
+	<li><a href="../re_data/index.html#item">アイテム</a></li>
+	<li><a href="../re_data/enemy.html">敵</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle13" class="toggle">
+<label class="title" for="toggle13" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label>
+<div class="content">
+<ul>
+	<li><a href="../achievement/index.html">トロフィー＆実績一覧</a></li>
+	<li><a href="../achievement/guide.html">取得方法</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">調査トップページ</a></li>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle14" class="toggle">
+<label class="title" for="toggle14" style="color: #363638; background: #e5e4eb;">元ネタ＆雑学</label>
+<div class="content">
+	<ul>
+		<li><a href="../neta/index.html">元ネタ＆雑学目次</a></li>
+		<li><a href="../neta/01_kinmirai.html">近未来編</a></li>
+		<li><a href="../neta/02_sf.html">ＳＦ編</a></li>
+		<li><a href="../neta/03_bakumatsu.html">幕末編</a></li>
+		<li><a href="../neta/04_gendai.html">現代編</a></li>
+		<li><a href="../neta/05_genshi.html">原始編</a></li>
+		<li><a href="../neta/06_seibu.html">西部編</a></li>
+		<li><a href="../neta/07_kunfu.html">功夫編</a></li>
+		<li><a href="../neta/08_chusei.html">中世編</a></li>
+		<li><a href="../neta/09_saishu.html">最終編</a></li>
+	</ul>
+</div>
+</div>
+
+<br>
+<a href="../sfc/index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">SFC版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 80%, #f6f2fc);">TOP</label></a></li>
+		<li class="navigation__item"><a href="../re_kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 80%, #c3fae5);" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_sf/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #51635C, 80%, #dfedf7);" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #734fab, 80%, #f8ccfc);" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_kunfu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 80%, #cedef5);" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_gendai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 80%, #fabbc5);" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_genshi/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #64BA02, 80%, #f6fcc0);" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_seibu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #E38C00, 80%, #faf7cf);" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_chusei/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #b59f14, 80%, #f7f5d0);" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_saishu/index.html"><label class="title_n2" style="background: linear-gradient(to right, #919c93, 80%, #f0f5eb);" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+		<li class="navigation__item"><a href="../achievement/index.html"><label class="title_n2" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label></a></li>
+		<li class="navigation__item"><a href="index.html"><label class="title_n2"  style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブアライブ（リメイク版） 攻略メモ帳　　　<a href="https://x.com/hoso_boso" target="_blank"><img alt="中の人のX" src="../img/Logo white.svg" style="width:16px;"></a>　　<a href="https://mstdn.jp/@hoso_boso" rel="me" target="_blank"><img alt="中の人のMastodon（mstdn.jp）" src="../img/mastodon.svg" style="width:16px;"></a>　　<a href="https://taittsuu.com/users/hoso_boso" rel="me" target="_blank"><img alt="中の人のタイッツー" src="../img/taitsuico.svg" style="width:16px;"></a>
+</div>
+
+</div>
+<script src="../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブアライブ,ライブ・ア・ライブ,LIVE A LIVE,攻略,HD-2D,リメイク,Nintendo Switch,PlayStation4,PlayStation5,Steam">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; レベル・命中・回避の検討">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/img/social.png">
+<meta property="og:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; レベル・命中・回避の検討">
+<meta name="twitter:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; レベル・命中・回避の検討</title>
+<link href="../css/main.min.css?20251129" rel="stylesheet">
+<link href="../css/remake.css?20250608" rel="stylesheet">
+<link href="../css/etc.css?20250712" rel="stylesheet">
+<link href="../css/calculation.css" rel="stylesheet">
+<link href="../css/modal.css?20250712" rel="stylesheet">
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブアライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">戦闘システムの調査</a></li>
+<li class="here"><button type="button">検討</button>
+	<ul>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">戦闘システムの調査</a> &gt; レベル・命中・回避の検討</h1>
+
+<h2>レベル・命中・回避の検討</h2>
+
+<p>※この検証の発端は、低レベルクリアに挑戦されている<a href="https://x.com/facts_gameo/status/1987439467041534350" target="_blank">おてつ様のポスト</a>であり、数々の情報に厚く感謝する次第です。</p>
+
+<p>SFC版では、レベルの値がダメージ量や命中・回避判定、状態異常成功判定などに関わる仕様であった。<br>
+また、レベルの値は戦闘中なら一時的にバフ・デバフで変動させることさえ可能であった。<br>
+技により、「力」や「知」など（リメイク版の「物攻」「特攻」）の依存ステータスが存在しているが、レベルの値は計算式の都合で、ダメージを与える技全てに影響するステータスだったのである。</p>
+
+<p>本作では、命中と回避のステータスが新たに設定され、命中・回避率の計算に使用されている（他のステータスが命中・回避率に関わっているかまではわからない）。<br>
+また、SFC版同様に命中と回避はバフとデバフで変動するようになっている。<br>
+キューブやタロイモに使うことができる「強化パーツ」は、リメイク版でHPだけでなく命中・回避の値が上がるようにもなったので、SFC版のように最終編でキューブの命中・回避がまったく上がらず困る事態が避けられるようになっている。</p>
+
+<p>では、レベルの値は、戦闘に一切関係のない数値になったのだろうか？<br>
+リメイク版発売前インタビューの以下のような受け答えから、リメイク版ではレベルの値は無関係になったと考えたプレイヤーも多かっただろう。かくいう筆者もそのひとりである。</p>
+
+<blockquote><p>――SFC版では、力やレベルのバフやデバフがかかると、頭の上にパネルがボッ、ボッと出てきましたよね。ただ、ハッキリとした効果はよくわからなかった記憶があります。</p>
+
+<p>時田<br>
+バフやデバフが効いているかどうかの情報も得られるようになりました。SFC版の『LAL』はレベルがすべて、みたいな部分があるゲームでもありましたが、そこも緩和しています。どのキャラでも遊びやすく、バランスをとっている形です。</p>
+
+<cite><a href="https://www.famitsu.com/news/202202/10250530.html" target="_blank">『ライブアライブ』リメイクの新要素や変更点を時田貴司氏に訊く。何度も続編やリメイクにトライし断念、浅野チームに合流してついに実現 | ファミ通.com</a></cite></blockquote>
+
+<p>（読み直してみると「レベルは戦闘においてまったく関係なくなった」とは書かれておらず「緩和した」とあるだけのことであり、勝手に思い込んだ筆者のミスである……）</p>
+
+<p>どうやらレベルもダメージ量計算に関わっているようだ、ということは、このページ上にも記した通り、低レベルクリアに挑戦されているおてつ様の検証から判明した。<br>
+レベルは関わらない、という思い込みは捨てて、改めてデータを取って調査してみることとした。</p>
+
+<p>ここではダメージ量にだけ絞って調べてみることにする。<br>
+また、前置きとして、SFC版での計算方法の説明から行っているが、リメイク版の検証結果だけ知りたいという方は、<span class="tri"><a href="18-2.html">次ページ</a></span>をご覧いただきたい。</p>
+
+<p>まず、改めてSFC版計算式を見てみよう。<br>
+やや長い説明になるが、実はおそらくリメイク版でもSFC版と似た仕様があるようなので、触れておく次第である。<br>
+また、SFC版攻略の<a href="../sfc/program.html#level" target="_blank">プログラミング関係の表記及び解説 &gt; ダメージ量とレベルについて</a>に、ほぼ同じ説明を掲載している。</p>
+
+<p>SFC版における単発ダメージ量は、</p>
+
+<p><span class="formula" style="word-break: keep-all;overflow-wrap: break-word;">(<span style="color:#6c6c75;">(</span>(min(max<span style="color:#6c6c75;">(</span>(8+技LV+自LV-敵LV)<wbr>,1<span style="color:#6c6c75;">)</span><wbr>,24)<wbr>*LV差係数/8+<wbr>(自能力値*係数))<wbr>*((255-敵能力値)/2)/256<span style="color:#6c6c75;">)</span><wbr>*2+攻撃力)<wbr>*乱数(1～1.25)</span></p>
+
+<p>これにヒット数を掛け算して、防御の値を引くと、総ダメージ量となる。<br>
+また、SFC版では計算の際、計算式の途中に小数点以下の端数が出ると必ず小数点以下を切り捨てて計算をする。<br>
+小数点以下の端数を切り捨てる関数<span class="formula">trunc()</span>を使うと、</p>
+
+<p><span class="formula" style="word-break: keep-all;overflow-wrap: break-word;">(<span style="font-weight:bold;color:red;">trunc</span><span style="color:#6c6c75;">(</span>(<wbr><span style="font-weight:bold;color:red;">trunc</span>(<wbr>min<span style="color:#6c6c75;">(</span><wbr>max((8+技LV+自LV-敵LV),1)<wbr>,24<span style="color:#6c6c75;">)</span><wbr>*LV差係数<span style="font-weight:bold;color:red;">/</span>8)<wbr>+<span style="font-weight:bold;color:red;">trunc</span>(自能力値*係数))*<wbr><span style="font-weight:bold;color:red;">trunc</span>((255-敵能力値)<span style="font-weight:bold;color:red;">/</span>2)<span style="font-weight:bold;color:red;">/</span>256<span style="color:#6c6c75;">)</span>*2<wbr>+攻撃力)<wbr>*乱数(1～1.25)</span></p>
+
+<p>このように、見た目だけだととてもややこしい計算式になる。<br>
+なお、「技LV」「LV差係数」は技に固有の数値、「自LV」は技を使うキャラのレベル、「敵LV」は技をくらうキャラのレベル、「自能力値」は技を使うキャラの依存ステータスの値、「係数」は「自能力値」のうちどの割合で関わるか（1または1/2または1/4）、「敵能力値」は技をくらうキャラの依存ステータスの値、「攻撃力」は技を使うキャラの攻撃の値である。</p>
+
+<p>ダメージ量計算にキャラのレベルが関わっているのは、最初の「自LV-敵LV」の部分だけである。<br>
+この、ややこしい式を分解してみる。</p>
+
+<p>まず、</p>
+
+<p><span class="formula">max((8+技LV+自LV-敵LV),1)</span></p>
+
+<p>この部分だが、これは「<span class="formula">8+技LV+自LV-敵LV</span>」を計算し、それが1以上なら「<span class="formula">8+技LV+自LV-敵LV</span>」、0以下なら「<span class="formula">1</span>」を採用する、という意味である。<br>
+つまり、<br>
+<span class="formula">max((8+技LV+自LV-敵LV),1)</span><br>
+を計算した結果、敵レベルがあまりにも大きくて0以下になってしまうと、ダメージ量が0を下回る、つまりマイナスの値になってしまうので、「1」ということにする、という意味になる。<br>
+敵が強すぎる場合、自キャラのレベルはここでは無視されてしまうということである。<br>
+無視される、といっても悪い意味ではなく、「弱くてもある程度の数値があるものとみなして計算をする」という方向で補正をしてくれるということである。</p>
+
+<p>その逆も然りで、敵が味方キャラを攻撃する場合、味方キャラのレベルがダメージ量計算に関わるのは、味方キャラがある程度強い場合だけである。</p>
+
+<p>更に、</p>
+
+<p><span class="formula">min(max((8+技LV+自LV-敵LV),1),24)</span></p>
+
+<p>まで含めて考えてみよう。<br>
+これは、最初に「<span class="formula">8+技LV+自LV-敵LV</span>」か<span class="formula">1</span>のいずれかが選ばれた後に、もし「<span class="formula">8+技LV+自LV-敵LV</span>」が選ばれていたら、「<span class="formula">8+技LV+自LV-敵LV</span>」の結果と<span class="formula">24</span>を比較して、小さい方の値を選ぶという意味である。<br>
+つまり「<span class="formula">8+技LV+自LV-敵LV</span>」が<span class="formula">24</span>より大きい計算結果であったら、ここでも敵レベルと味方レベルの値は関係なく「<span class="formula">24</span>」で計算するという意味になる。
+敵が弱すぎる場合でも、自キャラのレベルは無視されてしまうということである。<br>
+味方のレベルを際限なく上げていくと、どの技でも999ダメージが出るようになってラスボスが簡単に倒せる、というような事態にならないように考慮した結果かもしれない。ただし味方のレベルを極端に上げると、ラスボスの攻撃のダメージ量が極端に減るし、命中率も相当落ちるため、そういう意味では簡単に倒せるようになるが。</p>
+
+<p>まとめると、「<span class="formula">8+技LV+自LV-敵LV</span>」の計算結果が、</p>
+<ul>
+	<li>0以下なら「1」を採用</li>
+	<li>24以上なら「24」を採用</li>
+	<li>1以上24以下ならそのまま「<span class="formula">8+技LV+自LV-敵LV</span>」を採用</li>
+</ul>
+<p>という計算手順である。</p>
+
+<p>と、文章だけで説明してもわかりにくいので、SFC版における、実際の計算結果を紹介する。<br>
+最終編ラストバトル、ピュアオディオ戦にて、高原日勝が「Ｆシュタイナー」（リメイク版では「フランケン・シュタイナー」）でピュアオディオを真正面から攻撃する場合を考える。<br>
+「Ｆシュタイナー」の威力は高原の「知」依存で（実際には知1/2依存）、高原はレベルアップで「知」が上がらない。<br>
+よって、装備品を変えずに、レベルだけ上げていくと、レベル依存分のダメージ量の変動が起こる。<br>
+（ここでは乱数や命中については考慮せず、当たった時の単発ダメージ量の計算値だけ掲載する。つまり乱数＝1での計算を行う）</p>
+
+<table>
+<thead>
+	<tr><th colspan="2">Ｆシュタイナー</th></tr>
+</thead>
+<tbody>
+	<tr><td>技LV</td><td>2</td></tr>
+	<tr><td>LV差係数</td><td>80</td></tr>
+	<tr><td>係数</td><td>1/2</td></tr>
+	<tr><td>攻撃力</td><td>依存しない<br>（攻撃＝0で計算）</td></tr>
+	<tr><td>自能力値<br>（高原の「知」）</td><td>25</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th colspan="2">ピュアオディオ</th></tr>
+</thead>
+<tbody>
+	<tr><td>LV</td><td>30</td></tr>
+	<tr><td>敵能力値<br>（ピュアオディオの「体」）</td><td>170</td></tr>
+</tbody>
+</table>
+
+<p>高原のレベル、つまり「自LV」を高原の初期値2から、最大の99まで上げていくと、「Ｆシュタイナー」をピュアオディオに当てた時のダメージ量計算式は以下のようになる。</p>
+
+<p><span class="formula" style="word-break: keep-all;overflow-wrap: break-word;">Ｆシュタイナーダメージ量<wbr> = trunc((trunc(min(max((8+2+高原のレベル-30),1),24)*80/8)<wbr>+trunc(25*1/2))<wbr>*trunc((255-170)/2)/256)<wbr>*2+0</span></p>
+
+<p>「自LV」（高原のレベル）を2から99まで変えてみると以下のようになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/18-sfcdata.png" class="modal-link">
+		<img src="img/18-sfcdata.png" alt="ダメージ量グラフ（Ｆシュタイナー）" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>高原のレベル21まではダメージ量は6で変わらない。<br>
+レベル22からは、レベルの値に従って増加する。<br>
+レベル44でダメージ量が82まで増えるが、レベル45以降はダメージ量が82のまま増えない。<br>
+ということになる。<br>
+レベル22～44の増加の仕方が一見、デコボコしており、比例ではなく不規則のように見えるが、これは数値の小数点以下切り捨てをしながら計算しているため。<br>
+<span class="formula">trunc</span>を外し、小数点以下切り捨てを行わずに計算してみると、</p>
+
+<p><span class="formula" style="word-break: keep-all;overflow-wrap: break-word;">Ｆシュタイナーダメージ量<wbr> = ((8+2+高原のレベル-30)*80/8+25*1/2)<wbr>*((255-170)/2)<wbr>/256*2</span></p>
+
+<p>ダメージ量を <span class="formula">y</span> 、高原のレベルを <span class="formula">x</span> として計算すると、</p>
+
+<p><span class="formula" style="word-break: keep-all;overflow-wrap: break-word;">y = 850/256x - <wbr>31875/512</span></p>
+
+<p>傾きが<span class="formula">850/256</span>、切片が<span class="formula">-31875/512</span>となる一次関数である。<br>
+つまり、実際には、「高原のレベルが1上がると<span class="formula">850/256</span>（約3.32）ずつダメージ量が増える」のであるが、途中の小数点以下切り捨て処理のために、2増えたり4増えたりとバラバラになっているのである。</p>
+
+
+<p>参考までにもうひとつ、敵が鍵のダンジョンの固定敵「影」だった場合について計算し、ピュアオディオと比較してみる。<br>
+影のステータスはピュアオディオよりかなり低いことに注目。</p>
+
+<table>
+<thead>
+	<tr><th colspan="2">影</th></tr>
+</thead>
+<tbody>
+	<tr><td>LV</td><td>9</td></tr>
+	<tr><td>敵能力値<br>（影の「体」）</td><td>20</td></tr>
+</tbody>
+</table>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="../sfc/img/damage_calc.png" class="modal-link">
+		<img src="../sfc/img/damage_calc.png" alt="ダメージ量グラフ（Ｆシュタイナー）" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>影が相手だと、レベル2から23まではダメージ量が増加する。<br>
+ピュアオディオのように、低レベルだとダメージ量が固定されるエリアがない。<br>
+そして23以上だとダメージ量が固定になるのである。<br>
+このように、敵のレベル次第で、ダメージ量の変動レベル帯までが変わってしまう。</p>
+
+<p>以上が、SFC版の仕様である。<br>
+「力」「体」「知」「速」といったステータスとは異なり、「レベル」はどのダメージ量計算にも関わるステータスとなっているのではあるが、レベルを上げればダメージ量も上がるレベル帯があれば、そうではなく一定値のままのレベル帯もあるということである。</p>
+
+<p>リメイク版で以上の仕様が引き継がれているかどうかを調査する場合、検証はややこしい。<br>
+ピュアオディオの例だと、レベル2～21まではダメージ量が変わらないので、このレベルの範囲だけで検証したら、<br>
+「レベルの値は、ダメージ量とは関係がない」<br>
+という結論になってしまう。<br>
+ダメージ量が増えるレベルまで上げて検証しなければならないのだが、リメイク版にそもそも「敵レベル」というステータスがあるかどうかさえわからず、あったとしても敵レベルがSFC版と同じかどうかも不明である。<br>
+だが、もしレベルによるダメージ量の影響があるとしたら、レベル2とレベル99といった、極端に小さいレベル・大きなレベルだと、差が出てくるはずである。<br>
+ただし、レベル2とレベル99では、レベル以外のステータスが変動してしまう。<br>
+中世編のウラヌスやハッシュは、レベル・命中・回避以外のステータスがレベルアップで変動しないので問題ないのだが、このふたりのレベルを99まで上げる作業に手間がかかってしまう。<br>
+だが幸い、筆者は過去に<span class="tri"><a href="../re_saishu/omake08.html">最終編 &gt; おまけ &gt; 味方のレベルを99まで上げてみる</a></span>というやりこみで、最終編の一部キャラをレベル99まで上げたデータを所持している。<br>
+その中で高原日勝もレベルを99まで上げてあるが、彼はレベル99でも特攻のみ25と初期値のまま。<br>
+つまり、高原のスキルの中で、特攻依存のスキルを利用すれば、レベルの値がダメージ量に関わっているかどうかが検証できそうである。</p>
+
+<p>リメイク版ではもうひとつの問題があり、先に挙げたウラヌスやハッシュもそうだが、レベルを上げると必ず命中と回避も上がってしまう。<br>
+もし、レベルを上げることでダメージ量が増えたとしても、同時に命中と回避の値も上がっているため、「レベル」「命中」「回避」の中でどれがダメージ量増加に関わったのかわからない。</p>
+
+<p>そこで、今回の検証は以下のように行う。</p>
+
+<ol>
+	<li>「強化パーツ」を利用して、「レベルは関係なく、命中と回避の値だけ上げるとダメージ量が増減するか」を調査する。</li>
+	<li>1.の結果、命中と回避がダメージ量に関係ないようであれば、高原の「フランケン・シュタイナー」での検証を行う。</li>
+</ol>
+
+<p>次ページでは実際の検証結果を紹介する。</p>
+
+<div class="foot"><a href="index.html"><span class="button">&#9650;目次</span></a>　<a href="18-2.html"><span class="button">&#9654;次　検証結果</span></a></div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 70%, #f6f2fc);">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base00.html">SFC版からの変更点</a></li>
+		<li><a href="../base07.html">基本操作</a></li>
+		<li><a href="../base01.html">シナリオ</a></li>
+		<li><a href="../base02.html">メニュー画面</a></li>
+		<li><a href="../base03.html">セーブ</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../battle14.html">ステータス上昇</a></li>
+		<li><a href="../battle13.html">経験値</a></li>
+		<li><a href="../base05.html">アイテム</a></li>
+		<li><a href="../base06.html">設定</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">装備</a></li>
+		<li><a href="../battle02.html">陣形</a></li>
+		<li><a href="../battle03.html">エンカウント</a></li>
+		<li><a href="../battle04.html">行動ゲージ</a></li>
+		<li><a href="../battle05.html">向き</a></li>
+		<li><a href="../battle06.html">スキル</a></li>
+		<li><a href="../battle07.html">属性</a></li>
+		<li><a href="../battle08.html">状態異常</a></li>
+		<li><a href="../battle09.html">行動異常</a></li>
+		<li><a href="../battle10.html">能力増減</a></li>
+		<li><a href="../battle11.html">ダメージ地形</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle15.html">戦闘テクニック</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 70%, #c3fae5);" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../re_kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kinmirai/kaizou.html">アイテム改造</a></li>
+	<li><a href="../re_kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: linear-gradient(to right, #51635C, 70%, #dfedf7);" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../re_sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../re_sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: linear-gradient(to right, #734fab, 70%, #f8ccfc);" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../re_bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../re_bakumatsu/0nin.html">不殺（0人斬り）</a></li>
+	<li><a href="../re_bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../re_bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../re_bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../re_bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../re_bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../re_bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 70%, #cedef5);" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../re_kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kunfu/omake.html">おまけ・レベル16の弟子の修業</a></li>
+	<li><a href="../re_kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 70%, #fabbc5);" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../re_gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../re_gendai/omake.html">スキルをラーニングせずクリア</a></li>
+	<li><a href="../re_gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: linear-gradient(to right, #64BA02, 70%, #f6fcc0);" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../re_genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../re_genshi/item.html">アイテム合成</a></li>
+	<li><a href="../re_genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: linear-gradient(to right, #E38C00, 70%, #faf7cf);" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../re_seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../re_seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: linear-gradient(to right, #b59f14, 70%, #f7f5d0);" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../re_chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: linear-gradient(to right, #919c93, 70%, #f0f5eb);" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../re_saishu/chui01.html">注意点</a></li>
+	<li><a href="../re_saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../re_saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../re_saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../re_saishu/last.html">ラストバトル</a></li>
+	<li><a href="../re_saishu/omake.html">おまけ</a></li>
+	<li><a href="../re_saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../re_data/index.html">データ集トップページ</a></li>
+	<li><a href="../re_data/chara.html">キャラクター</a></li>
+	<li><a href="../re_data/equipment.html">装備</a></li>
+	<li><a href="../re_data/index.html#item">アイテム</a></li>
+	<li><a href="../re_data/enemy.html">敵</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle13" class="toggle">
+<label class="title" for="toggle13" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label>
+<div class="content">
+<ul>
+	<li><a href="../achievement/index.html">トロフィー＆実績一覧</a></li>
+	<li><a href="../achievement/guide.html">取得方法</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">調査トップページ</a></li>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle14" class="toggle">
+<label class="title" for="toggle14" style="color: #363638; background: #e5e4eb;">元ネタ＆雑学</label>
+<div class="content">
+	<ul>
+		<li><a href="../neta/index.html">元ネタ＆雑学目次</a></li>
+		<li><a href="../neta/01_kinmirai.html">近未来編</a></li>
+		<li><a href="../neta/02_sf.html">ＳＦ編</a></li>
+		<li><a href="../neta/03_bakumatsu.html">幕末編</a></li>
+		<li><a href="../neta/04_gendai.html">現代編</a></li>
+		<li><a href="../neta/05_genshi.html">原始編</a></li>
+		<li><a href="../neta/06_seibu.html">西部編</a></li>
+		<li><a href="../neta/07_kunfu.html">功夫編</a></li>
+		<li><a href="../neta/08_chusei.html">中世編</a></li>
+		<li><a href="../neta/09_saishu.html">最終編</a></li>
+	</ul>
+</div>
+</div>
+
+<br>
+<a href="../sfc/index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">SFC版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 80%, #f6f2fc);">TOP</label></a></li>
+		<li class="navigation__item"><a href="../re_kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 80%, #c3fae5);" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_sf/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #51635C, 80%, #dfedf7);" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #734fab, 80%, #f8ccfc);" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_kunfu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 80%, #cedef5);" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_gendai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 80%, #fabbc5);" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_genshi/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #64BA02, 80%, #f6fcc0);" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_seibu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #E38C00, 80%, #faf7cf);" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_chusei/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #b59f14, 80%, #f7f5d0);" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_saishu/index.html"><label class="title_n2" style="background: linear-gradient(to right, #919c93, 80%, #f0f5eb);" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+		<li class="navigation__item"><a href="../achievement/index.html"><label class="title_n2" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label></a></li>
+		<li class="navigation__item"><a href="index.html"><label class="title_n2"  style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブアライブ（リメイク版） 攻略メモ帳　　　<a href="https://x.com/hoso_boso" target="_blank"><img alt="中の人のX" src="../img/Logo white.svg" style="width:16px;"></a>　　<a href="https://mstdn.jp/@hoso_boso" rel="me" target="_blank"><img alt="中の人のMastodon（mstdn.jp）" src="../img/mastodon.svg" style="width:16px;"></a>　　<a href="https://taittsuu.com/users/hoso_boso" rel="me" target="_blank"><img alt="中の人のタイッツー" src="../img/taitsuico.svg" style="width:16px;"></a>
+</div>
+
+</div>
+<script src="../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

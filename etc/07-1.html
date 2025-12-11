@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブアライブ,ライブ・ア・ライブ,LIVE A LIVE,攻略,HD-2D,リメイク,Nintendo Switch,PlayStation4,PlayStation5,Steam">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 状態異常にするステータスの検証">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/img/social.png">
+<meta property="og:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 状態異常にするステータスの上昇量の検証">
+<meta name="twitter:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 状態異常にするステータスの上昇量の検証</title>
+<link href="../css/main.min.css?20251129" rel="stylesheet">
+<link href="../css/remake.css?20250608" rel="stylesheet">
+<link href="../css/etc.css?20250712" rel="stylesheet">
+<link href="../css/calculation.css" rel="stylesheet">
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブアライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">戦闘システムの調査</a></li>
+<li class="here"><button type="button">検討</button>
+	<ul>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">戦闘システムの調査</a> &gt; 状態異常にするステータスの検証</h1>
+
+<h2>状態異常にするステータスの検証</h2>
+
+<p>攻撃スキルの中には、攻撃すると追加効果として状態異常を付与するスキルが存在している。<br>
+敵を状態異常にする確率を上げたい時はどうしたら良いのか？　について調べてみた。<br>
+なお、確率自体を求めようという検証ではない。敵の防御の値により確率は変化するだろうから、敵のステータスがわからない以上、計算式などを算出することはできないからである。<br>
+あくまでも「味方側のステータス等の何を上げれば確率が上がるのか」という検証である。</p>
+
+<p>まず、SFC版での状態異常関係の計算方法だが、データ解析サイト（<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様）によれば以下の通り。</p>
+
+<blockquote class="breakword"><p>・状態異常：<br>
+<span class="formula">(自能力値<wbr>+(0～(自能力値-1)))/2<wbr>-敵能力値</span><wbr>が正のとき状態異常発生<wbr>（下の異常時間が17以上であることも条件）<br>
+・状態異常時間：<br>
+<span class="formula">上の引き算結果<wbr>*異常時間係数/8<wbr>+自能力値/敵LV</span></p>
+
+<p>※つまり、<br>
+<span class="formula">{(自能力値<wbr>+(0～(自能力値-1)))/2-敵能力値}<wbr>*異常時間係数/8<wbr>+自能力値/敵LV</span><br>
+の計算結果が17以上なら、必ず状態異常が発生する<br>
+（異常時間係数はそれぞれの技に設定されている数値）</p>
+</blockquote>
+
+<p>＊SFC版では計算結果はすべて小数点以下切り捨て</p>
+
+<p>「自能力値」というのは、そのスキルにおける「状態異常を発生させる依存ステータスの値」のこと。<br>
+例えばポゴの「グイグイ」は、麻痺の状態異常を発生することができるが、状態異常発生の依存ステータスは「知」。<br>
+一方、高原の「ジャーマンスープレックス」（SFC版だと「Ｇスープレックス」）も麻痺を発生させるが、状態異常発生の依存ステータスは「力」。<br>
+「クロスヒールホールド」（SFC版だと「Ｃ．Ｈ．ホールド」）には足封じの状態異常を発生する効果があるが、状態異常発生の依存ステータスは「体」。一方でダメージ量自体の依存値は「力1/4」だったりと、非常にややこしい。<br>
+麻痺にできるスキルは他にも多数存在するが、「百里道一歩脚」「凍手刀」は知依存、「シマリス脚」「ホローポイント弾」「ハリケンショット」は速依存と、状態異常にかかわるステータスはバラバラ。<br>
+また、上の計算式から、状態異常の発生確率には、味方側のステータスの中で「依存ステータスの値」のみが関わっていることがわかる。<br>
+以上がSFC版での仕様である。</p>
+
+<p>また、上にも書いた通り、SFC版では、敵味方のステータス次第で「必ず状態異常が発生する」仕様にもなっている（もちろん、敵が状態異常を完全無効化する場合を除く）。<br>
+自能力値をある程度上げた上で、敵のステータスを0まで落とすことが可能な「通打」「砂ジンの術」「ホーリーイメージ」で敵ステータス（上の計算式の「敵能力値」「敵LV」）を0にすると、技に設定された異常時間係数次第で、「必ず状態異常が発生する」状態へ持っていくことができる。<br>
+SFC版で、「砂ジンの術」→「影一文字」での石化コンボが強力なのは、こんな理由からである。</p>
+
+<p>ところがリメイク版では、SFC版に比べ、敵のステータスをダウンさせても、状態異常が入りにくい。<br>
+幕末編の隠しボスを「砂塵の術」→「影一文字」コンボで倒そうとしても、原始編のキングマンモーを麻痺や眠りで嵌めようとしても、うまくいかない。<br>
+ちなみにキングマンモーは、SFC版なら計算上、ポゴの知を102まで上げると確実に「グイグイ」で麻痺が入るようになっているので（詳細は<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様のRTAデータ）、ポゴのレベルをある程度まで上げて「モノな石」「ハナかざり」で知を102以上に補強して挑むと楽になる。<br>
+だがリメイク版では特攻を「モノな石」「ハナかざり」などで同程度まで上げたとしても、麻痺が確実に入るとは限らない。筆者は130近くまで特攻を上げてキングマンモーに挑んだが、麻痺が入る確率はかなり低めだった。</p>
+
+<p>ということがキングマンモーのみならず、他の敵でも起きているので、リメイク版では状態異常発生確率が全体的に引き下げられている、ということになる。<br>
+それがどれくらいまで下がっているのだろうか、どうやったら確率を上げることができるのか、という検討を行ってみたが……<br>
+実はこの検討、かなり難航することとなった。</p>
+
+<p>今回の検証の全データは<a href="https://docs.google.com/spreadsheets/d/18BVdJKYPDN6iwPclGzmICfOrGj18yXheK8psLp7ohXc/edit?usp=sharing" target="_blank">lal_statuseffect - Googleスプレッドシート</a>を。</p>
+
+<p>リメイク版においても、おそらくSFC版と同じように、状態異常にするにはそのスキルに設定されたステータス依存値を上げれば良いのだろう……という前提で確認作業を行ってみることとした。<br>
+やってみること自体は、<a href="01-1.html">スキルによるダメージ量検討</a>とほぼ同じである。<br>
+各ステータスをできるだけ上げてみて、「敵を状態異常にできるかどうか」を記録していく。<br>
+今回はついでにダメージ量も記録している。<br>
+敵はいつもの通りに「影」。SFC版データによると、影は無効にできる状態異常は存在しないとのことである。<br>
+スキルはまず、ポゴの「グイグイ」で試してみた。<br>
+SFC版においては、ダメージ量の依存ステータスも、麻痺の依存ステータスも「知」である。ということはおそらく、特攻の値を上げればダメージ量も麻痺にできる確率も上がるだろう、と想定して開始した。</p>
+
+<h3>グイグイ</h3>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>ポゴ</th><td colspan="3">レベル23</td><th>敵</th><td colspan="2">影</td></tr>
+	<tr><th>グイグイ</th><td colspan="3">真正面1マスから攻撃</td><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">木の棒(+4)</td><td>ブンブンナイフ(+30)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">142</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>65</td><td>65</td><td>65</td><td><span class="r">150</span></td><td>65</td><td>65</td></tr>
+	<tr><th>素早さ</th><td>80</td><td>80</td><td>80</td><td>80</td><td><span class="r">150</span></td><td>80</td></tr>
+	<tr><th>ダメージ量平均</th><td>20.82</td><td>20.96</td><td>21.42</td><td><span style="font-weight:bold;">33.06</span></td><td>20.96</td><td>20.52</td></tr>
+	<tr><th>ダメージ量最大</th><td>25</td><td>25</td><td>25</td><td><span style="font-weight:bold;">39</span></td><td>25</td><td>25</td></tr>
+	<tr><th>ダメージ量最小</th><td>17</td><td>17</td><td>17</td><td><span style="font-weight:bold;">26</span></td><td>17</td><td>17</td></tr>
+	<tr><th>麻痺回数</th><td>8</td><td>6</td><td>4</td><td><span style="font-weight:bold;">16</span></td><td>7</td><td>5</td></tr>
+	<tr><th>麻痺確率</th><td>0.16</td><td>0.12</td><td>0.08</td><td>0.32</td><td>0.14</td><td>0.10</td></tr>
+</tbody>
+</table>
+
+<p>まず、サンプル数について説明したい。<br>
+各50回取ったのだが、これは、最初に20回程度サンプルを取った時点で、麻痺にできる確率があまりにも低すぎてサンプル数20では比較にならないと判断したためである。<br>
+そうして各50回取った結果が上の通りであり、特攻を上げた時のみ、有意に麻痺にできる確率が上がったと判断して構わないであろうデータが取れた。<br>
+その他の値についてだが、上の結果だけだと「物防を99から142に上げたら麻痺にできる回数が半分になってしまった」と安直に判断はできない。<br>
+（普通に考えて……という言い方は良くないが、普通に考えて、何かしらのステータスを上げることにより確率が下がるというのは考えにくい……）<br>
+おそらく「特攻65では麻痺にできる確率が低いので、確率計算のためのサンプル数がまだ足りていない」のであろう……。</p>
+
+<p>仕方がないので更に50回追加！</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>ポゴ</th><td colspan="3">レベル23</td><th>敵</th><td colspan="2">影</td></tr>
+	<tr><th>グイグイ</th><td colspan="3">真正面1マスから攻撃</td><th>サンプル数</th><td colspan="2">各100</td></tr>
+	<tr><th>武器</th><td colspan="5">木の棒(+4)</td><td>ブンブンナイフ(+30)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">142</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>65</td><td>65</td><td>65</td><td><span class="r">150</span></td><td>65</td><td>65</td></tr>
+	<tr><th>素早さ</th><td>80</td><td>80</td><td>80</td><td>80</td><td><span class="r">150</span></td><td>80</td></tr>
+	<tr><th>ダメージ量平均</th><td>20.45</td><td>20.67</td><td>21.24</td><td><span style="font-weight:bold;">32.58</span></td><td>21.01</td><td>20.61</td></tr>
+	<tr><th>ダメージ量最大</th><td>25</td><td>25</td><td>25</td><td><span style="font-weight:bold;">39</span></td><td>25</td><td>25</td></tr>
+	<tr><th>ダメージ量最小</th><td>17</td><td>17</td><td>17</td><td><span style="font-weight:bold;">26</span></td><td>17</td><td>17</td></tr>
+	<tr><th>麻痺回数</th><td>16</td><td>14</td><td>14</td><td><span style="font-weight:bold;">31</span></td><td>14</td><td>14</td></tr>
+	<tr><th>麻痺確率</th><td>0.16</td><td>0.14</td><td>0.14</td><td>0.31</td><td>0.14</td><td>0.14</td></tr>
+</tbody>
+</table>
+
+<p>※グイグイの全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=0&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>実データから、「100回中14～16回麻痺が発生（つまり成功率15％程度）」という場合、「19回連続で麻痺が発生しない」ことがあったり、「10回の間に麻痺が5回成功」などということもあったりで（測定中に色々と不安になったのも言うまでもない）、「サンプル回数が少ない場合、サンプルをどの位置で抜き取るか」で結果が全く変わってしまうことがおわかりいただけるかと思う……。コンピュータゲームにおける確率とか疑似乱数とはこういうものなのである。<br>
+それはさておき、この結果ならば、<span style="font-weight:bold;">「麻痺にできる確率が有意に上がったのは特攻を上げた時のみ」「その他のステータスは関わらない」</span>と結論付けて構わないだろう。<br>
+つまり、SFC版と同じく、「状態異常にできるスキルには依存するステータスが設定されていて、そのステータスを変化させることにより、状態異常を付与する確率が変動する」ことがわかった。<br>
+よって、原始編の強敵・キングマンモー戦において、「グイグイ」での麻痺を狙う場合、「モノな石」「ハナかざり」で特攻を上げてから挑むと、ダメージ量・麻痺発生率どちらも上げることができて有利だということになる。</p>
+
+<p>以下では「グイグイ」以外のスキルについても調査しているが、さすがに各サンプル100回ずつは辛いので、30～50回程度で比較をしている。</p>
+
+<h3>グーグー</h3>
+
+<p>「グーグー」には眠りの状態異常が付いているが、SFC版でのステータス依存が「体」なので、SFC版の設定のままなら「物防」を上げれば状態異常発生確率を上げられることになる。<br>
+ちなみにSFC版での「グーグー」のダメージ量は必ず0。アキラの「ヘブンイメージ」と同じく「ダメージ量は0だが状態異常を付加する技」だったが、リメイク版では「グーグー」でダメージも入るようになったため、ついでにダメージ量の依存値も調べてみている。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>ポゴ</th><td colspan="3">レベル23</td><th>敵</th><td colspan="2">影</td></tr>
+	<tr><th>グーグー</th><td colspan="3">真正面2マスから攻撃</td><th>サンプル数</th><td colspan="2">各30</td></tr>
+	<tr><th>武器</th><td colspan="5">木の棒(+4)</td><td>ブンブンナイフ(+30)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">142</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>65</td><td>65</td><td>65</td><td><span class="r">150</span></td><td>65</td><td>65</td></tr>
+	<tr><th>素早さ</th><td>80</td><td>80</td><td>80</td><td>80</td><td><span class="r">150</span></td><td>80</td></tr>
+	<tr><th>ダメージ量平均</th><td>18.37</td><td>17.37</td><td>17.47</td><td><span style="font-weight:bold;">41.17</span></td><td>17.90</td><td>18.00</td></tr>
+	<tr><th>ダメージ量最大</th><td>21</td><td>21</td><td>21</td><td><span style="font-weight:bold;">48</span></td><td>21</td><td>21</td></tr>
+	<tr><th>ダメージ量最小</th><td>15</td><td>14</td><td>14</td><td><span style="font-weight:bold;">33</span></td><td>14</td><td>14</td></tr>
+	<tr><th>眠り回数</th><td>4</td><td>4</td><td>3</td><td><span style="font-weight:bold;">9</span></td><td>3</td><td>2</td></tr>
+	<tr><th>眠り確率</th><td>0.13</td><td>0.13</td><td>0.10</td><td>0.30</td><td>0.10</td><td>0.07</td></tr>
+</tbody>
+</table>
+
+<p>※グーグーの全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=69647136&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>サンプル数は各30とした（よって確率については母数が少なすぎるのであまり意味はない）が、これは30回計測の時点で、ダメージ量・状態異常発生確率ともに、明らかに特攻依存であるとわかったからである。眠り状態にできた回数を比較すれば一目瞭然である。<br>
+つまり、「グーグー」については、状態異常のステータス依存が「体」（「物防」）から「特攻」に変更されたのである。<br>
+理由は<a href="01-2.html">スキルによるダメージ量検討</a>でもちらりと触れた通りに、「状態異常を発生させる確率を上げるなら特攻だろう」というプレイヤーのイメージを優先したからではないかと思う。SFC版における、「体」を上げたら眠り状態にできる確率が上がる、というのは理屈としてもいまいちわかりにくい。ポゴは「グーグー」の時に何かぐるぐる回しているので、何かを回すのに体力が必要……と言われればそれまでなのだが。</p>
+
+<p>「スキルによるダメージ量検討」では、「速依存だったスキルが、物攻＆素早さ依存になった」という例があったので、SFC版同様に素早さを上げてダメージ量を上げることができる。<br>
+だが、「グーグー」の状態異常発生については、SFC版と同じく「体」依存だと思って「物防」を上げてみても、ダメージ量も状態異常発生確率も上がらないという罠が存在している、ということでもある。<br>
+ただ、リメイク版において、ゲーム内で状態異常の発生確率について詳細な説明は一切ないし、SFC版と仕様は同じであると明記してある訳でもないので、困惑するのは『SFC版では「グーグー」の状態異常発生の依存値が「体」だった』と知っている相当のマニアややりこみ勢くらいになるのかもしれないが……。</p>
+
+<p>とにかく、こうなると、冒頭で紹介した通り、状態異常発生の依存ステータスが「力」「体」「速」依存だったスキルについては、依存値が特攻に変更されている可能性がある。</p>
+
+<h3>ホローポイント弾</h3>
+
+<p>前述の通り、「ホローポイント弾」はSFC版においては麻痺のステータス依存が「速」になっている。<br>
+リメイク版では素早さ依存なのか、はたまた、「グーグー」のように特攻依存に変更されたのか。<br>
+なお「ホローポイント弾」は命中ダウンと回避ダウン効果も付くので別途記録してあるが、あくまでもここでは状態異常についてのみ考える。</p>
+
+<p>さて、ここで予想外のことが起きてしまった。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンダウン</th><td colspan="3">レベル99</td><th>敵</th><td colspan="2">影</td></tr>
+	<tr><th>ホローポイント弾</th><td colspan="3">真正面2マスから攻撃</td><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">虎の小手(+0)</td><td>４４マグナム(+29)</td></tr>
+	<tr><th>物攻</th><td>102</td><td><span class="r">146</span></td><td>102</td><td>102</td><td>102</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">137</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>103</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>150</td></tr>
+	<tr><th>ダメージ量平均</th><td>100.12</td><td>111.78</td><td>104.30</td><td>101.42</td><td>112.04</td><td>137.20</td></tr>
+	<tr><th>ダメージ量最大</th><td>120</td><td>134</td><td>121</td><td>121</td><td>136</td><td>169</td></tr>
+	<tr><th>ダメージ量最小</th><td>82</td><td>90</td><td>85</td><td>82</td><td>92</td><td>109</td></tr>
+	<tr><th>麻痺回数</th><td>13</td><td>15</td><td>13</td><td>17</td><td>15</td><td>16</td></tr>
+	<tr><th>麻痺確率</th><td>0.26</td><td>0.30</td><td>0.26</td><td>0.34</td><td>0.30</td><td>0.32</td></tr>
+</tbody>
+</table>
+
+<p>※ホローポイント弾の全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=1694460834&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>「グイグイ」なら、サンプル数50で、明らかに差があると思われる結果が出たのであるが、今回は「多分特攻を上げた時が一番高いのだろうけれど、目立って高いという訳でもない」結果なのである。<br>
+ならば発想を逆転して、いっそ特攻を思い切り下げてしまえば、明確な差になるのではないだろうか？<br>
+そもそも「グイグイ」も、特攻65と150で目に見える差が出たのだから、今回も60くらいまで下げてみたら差が出るのでは？<br>
+幸いにして特攻だけ下げる「ワタナベのワッペン」「悪夢のヘルメット」といった装備もあるので、特攻60でデータを取ってみた。<br>
+下表はわかりやすいように、特攻60、99、150の順に並べ替えてある。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンプル数</th><td colspan="3">各50</td></tr>
+	<tr><th>武器</th><td colspan="3">虎の小手(+0)</td></tr>
+	<tr><th>物攻</th><td>102</td><td>102</td><td>102</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td><span class="r">60</span></td><td><span class="r">99</span></td><td><span class="r">150</span></td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>ダメージ量平均</th><td>104.58</td><td>100.12</td><td>101.42</td></tr>
+	<tr><th>ダメージ量最大</th><td>122</td><td>120</td><td>123</td></tr>
+	<tr><th>ダメージ量最小</th><td>82</td><td>82</td><td>82</td></tr>
+	<tr><th>麻痺回数</th><td>17</td><td>13</td><td>17</td></tr>
+	<tr><th>麻痺確率</th><td>0.34</td><td>0.26</td><td>0.34</td></tr>
+</tbody>
+</table>
+
+<p>この結果に頭を抱えることになった……。<br>
+特攻を60に下げたのに麻痺回数は特攻150の時と変わらない。むしろ中間の特攻99の時が一番麻痺回数が低い。<br>
+この結果から考えられるのは、「サンプル数50ではそれなりの誤差が出る」ということだけ。<br>
+「グイグイ」のようにあからさまに20％近い違いが出れば別だが、今回については、麻痺回数が50回中13回でも17回でも「誤差の範囲で大差ない」のでは……？</p>
+
+<p>SFC版での依存ステータスが「速」だったことから、「素早さ」でも比較してみたのだが……（素早さを下げるなら「ぼいんビーナス」が便利）</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンプル数</th><td colspan="3">各50</td></tr>
+	<tr><th>武器</th><td colspan="3">虎の小手(+0)</td></tr>
+	<tr><th>物攻</th><td>102</td><td>102</td><td>102</td></tr>
+	<tr><th>物防</th><td>97</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>素早さ</th><td><span class="r">49</span></td><td><span class="r">99</span></td><td><span class="r">150</span></td></tr>
+	<tr><th>ダメージ量平均</th><td>90.98</td><td>100.12</td><td>112.04</td></tr>
+	<tr><th>ダメージ量最大</th><td>108</td><td>120</td><td>136</td></tr>
+	<tr><th>ダメージ量最小</th><td>73</td><td>82</td><td>92</td></tr>
+	<tr><th>麻痺回数</th><td>12</td><td>13</td><td>15</td></tr>
+	<tr><th>麻痺確率</th><td>0.24</td><td>0.26</td><td>0.30</td></tr>
+</tbody>
+</table>
+
+<p>一応、素早さと麻痺回数は比例しているようなのであるが、これまでの検討でわかる通り、正直なところ12回と13回と15回は誤差の範囲なのか差があるのか、判別ができない。少なくとも特攻よりは素早さの方が依存ステータスっぽい気がする……ような？</p>
+
+<p>いっそ、特攻、素早さ、あらゆるステータスを上げまくったら、麻痺の確率が上がるのでは？</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td>虎の小手(+0)</td><td>４４マグナム(+29)</td></tr>
+	<tr><th>物攻</th><td>102</td><td>144</td></tr>
+	<tr><th>物防</th><td>99</td><td>119</td></tr>
+	<tr><th>特攻</th><td>99</td><td>150</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>150</td></tr>
+	<tr><th>ダメージ量平均</th><td>100.12</td><td>151.70</td></tr>
+	<tr><th>ダメージ量最大</th><td>120</td><td>182</td></tr>
+	<tr><th>ダメージ量最小</th><td>82</td><td>123</td></tr>
+	<tr><th>麻痺回数</th><td>13</td><td>14</td></tr>
+	<tr><th>麻痺確率</th><td>0.26</td><td>0.28</td></tr>
+</tbody>
+</table>
+
+<p>……そんなことはなかった。</p>
+
+<p>訳がわからなくなってきたので、ここで一度保留にして、他のスキルも調べてみることにした。<br>
+ひとつだけ確かなのは、これだけステータスをいじりまわっても、「グイグイ」「グーグー」「ホローポイント弾」共に、状態異常にできる確率は高くても35％程度が限度だということくらいだろうか……。<br>
+相手が「影」だからこのあたりが上限という可能性もなくはないが。</p>
+
+<h3>ジャーマンスープレックス</h3>
+
+<p>相手が「影」だということを念頭に置いて、「ジャーマンスープレックス」での麻痺を試してみることにした。<br>
+影はSFC版において知の値が高く、敵側の状態異常の防御の依存ステータスが「知」にあたる「グイグイ」「グーグー」「ホローポイント弾」では、味方側のステータスをどれだけ上げてみても、状態異常にさせる確率を上げにくい可能性が考えられるからである。<br>
+SFC版において、「ジャーマンスープレックス」での麻痺は、味方側の依存値が「力」、敵側の依存値が「体」なので、「体」の値が低めの影には「ジャーマンスープレックス」で麻痺が入りやすい仕組みになっている。<br>
+実際SFC版だと、高原がレベル16、力99なら、影は「ジャーマンスープレックス」で100％麻痺になる、という計算になる。<br>
+ということでデータを取ってみた。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>高原日勝</th><td colspan="3">レベル99</td><th>敵</th><td colspan="2">影</td></tr>
+	<tr><th>ジャーマンスープレックス</th><td colspan="3">真正面1マスから攻撃</td><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">バンデージ(+5)</td><td>妙子のパンチ(+16)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">142</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>25</td><td>25</td><td>25</td><td><span class="r">150</span></td><td>25</td><td>25</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td></tr>
+	<tr><th>ダメージ量平均</th><td>141.66</td><td>163.30</td><td>148.48</td><td>144.36</td><td>146.80</td><td>156.52</td></tr>
+	<tr><th>ダメージ量最大</th><td>172</td><td>196</td><td>172</td><td>171</td><td>174</td><td>187</td></tr>
+	<tr><th>ダメージ量最小</th><td>116</td><td>133</td><td>117</td><td>117</td><td>116</td><td>128</td></tr>
+	<tr><th>麻痺回数</th><td>18</td><td>12</td><td>17</td><td>16</td><td>10</td><td>11</td></tr>
+	<tr><th>麻痺確率</th><td>0.36</td><td>0.24</td><td>0.34</td><td>0.32</td><td>0.20</td><td>0.22</td></tr>
+</tbody>
+</table>
+
+<p>※ジャーマンスープレックスの全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=529780196&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>これまたさっぱり訳がわからない。ステータスを変化させる前の物攻99/物防99/特攻25/素早さ99の時が一番麻痺にできる回数が高くなっていて他は下回る、というのはいくら何でもおかしい。<br>
+最初にも書いたが、「普通に考えて、何かしらのステータスを上げることにより確率が下がるというのは考えにくい」。<br>
+だが、これが実際の計測結果なのである。<br>
+こちらも「サンプル数50ではそれなりの誤差が出る」ということになってしまうのかもしれないが、いずれにせよ、やはりどう頑張っても麻痺にできる確率は30％くらいのようである。SFC版のように、味方側がステータスをどれだけ上げても確実に麻痺にできる訳ではないということになるのだろうか。<br>
+敵のステータスを下げればまた別なのかもしれないが、それは横に置いておくとして……</p>
+
+<h3>毒霧</h3>
+
+<p>ここまで麻痺や眠りといった「行動不能になる状態異常」ばかり検討してきたが、他の状態異常の発生確率についてはどうなのか？<br>
+そして、他の状態異常でも、確率に上限（らしきもの）が設けられているのだろうか？<br>
+麻痺や眠り（更には石化も）といった行動不能になる状態異常の場合は難易度調整のために発生確率に上限を設けるというのはわかるが、毒や酔い、腕封じ・足封じなど、さほどペナルティが重くない状態異常までも、発生確率に上限があるのかどうか。<br>
+ここでは毒と回避ダウンを発生させることができる「毒霧」で毒の発生率を調べてみた。サンプル数は各50。<br>
+なおSFC版では、「毒霧」による毒状態発生確率のステータス依存は「速」になっている。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>おぼろ丸</th><td colspan="4">レベル99/25</td><th>敵</th><td colspan="4">影</td></tr>
+	<tr><th>毒霧</th><td colspan="4">真正面1マスから攻撃</td><th>サンプル数</th><td colspan="4">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">兼定(+8)</td><td>村正(+40)</td><td colspan="3">兼定(+8)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td><td>150</td><td>119</td><td>68</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">137</span></td><td>99</td><td>99</td><td>99</td><td>89</td><td>69</td><td>81</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>99</td><td><span class="r">21</span></td><td>99</td><td>99</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>99</td><td><span class="r">39</span></td><td>99</td></tr>
+	<tr><th>命中</th><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">35</span></td></tr>
+	<tr><th>ダメージ量平均</th><td>14.50</td><td>14.56</td><td>14.60</td><td>21.46</td><td>14.36</td><td>14.36</td><td>4.06</td><td>14.42</td><td>14.64</td></tr>
+	<tr><th>ダメージ量最大</th><td>18</td><td>18</td><td>18</td><td>26</td><td>18</td><td>18</td><td>5</td><td>18</td><td>17</td></tr>
+	<tr><th>ダメージ量最小</th><td>12</td><td>12</td><td>12</td><td>17</td><td>12</td><td>12</td><td>3</td><td>12</td><td>12</td></tr>
+	<tr><th>毒回数</th><td>16</td><td>19</td><td>16</td><td>18</td><td>19</td><td>18</td><td>14</td><td>19</td><td>16</td></tr>
+	<tr><th>毒確率</th><td>0.32</td><td>0.38</td><td>0.32</td><td>0.36</td><td>0.38</td><td>0.36</td><td>0.28</td><td>0.38</td><td>0.32</td></tr>
+</tbody>
+</table>
+
+<p>※毒霧の全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=213641214&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>まず物攻・物防・特攻・素早さ全て99でのデータを取ってから、それぞれのステータスを上げたもの、そして武器を変えて攻撃力を変えたデータを取った。<br>
+結果、やはりというか、差はあるが「サンプル数50ではそれなりの誤差が出る」の範囲程度ではないのか？　というのが率直な感想である。<br>
+いっそ極端な数値でもデータを取ってみようかと、特攻や素早さを装備でがっつり下げて（「血の魔装」などを使ったため他の数値が上がっているが）測定もしてみたのだが、「もしかすると特効依存かもしれないが、誤差の範囲かもしれない……？」という程度のデータである。<br>
+最後にダメ押しで、おぼろ丸レベル25のデータ（命中35）でもデータを取ってみたのだが、結果は上の通りである。命中を60近く下げたことになるが、有意な差があるとは思えない。命中の値で状態異常発生確率は変わらないと考えて良いだろう。</p>
+
+<p>今回の結果だけ見ると、もし特攻依存だったとしても、特攻21から150まで上げて毒の発生確率は10％上がるかどうか。<br>
+そもそもおぼろ丸は初期値のレベル2でも特攻の値は17ある。「毒霧」を覚えるレベル5なら特攻は平均して32程度はある。<br>
+おぼろ丸の初期レベルでも、最終編で装備を工夫して特攻を150にしてみても、「毒霧」で毒状態にできる確率は大して変わらない……と考えて構わないのではなかろうか。<br>
+そもそも誤差の範囲である可能性も高いので、なんとも結論を出しにくい。</p>
+
+<p>ということで、最初の「グイグイ」「グーグー」以降に検討してみたスキルについては、「状態異常にする確率はステータス依存ではないスキルもあるかもしれない」疑惑である……。困ったものである。せめて乱数でのブレがもう少し小さければ……。</p>
+
+<h3>影一文字</h3>
+
+<p>魔神竜之介や岩間さまを石化で倒しにくくなったのは、確率に上限が設けられたせいなのか？　ということも含めて検討してみる。<br>
+だが、いざ影を「影一文字」で攻撃してみると、「影一文字」の威力が高いので、レベル99のおぼろ丸だと武器が「兼定」でも一撃で倒してしまう。<br>
+そこで、HPが高く石化が効くイシュタールとリンバースキュラ相手にひたすら「影一文字」を当ててみることにした。</p>
+
+<p>SFC版をプレイ済みの方なら、最終編終盤での経験値稼ぎといえばリンバースキュラ4体の敵パーティを倒すのが定番だろう。<br>
+SFC版では、「影一文字」の石化確率には、おぼろ丸の「知」と敵側の「知」の値が関わっている。<br>
+リンバースキュラは「知」が20と低く、おぼろ丸がレベル14・知69（知69はおぼろ丸レベル14での平均値）なら確実に石化して倒せる、という仕様になっていた。<br>
+ところがリメイク版では、特攻を上げたおぼろ丸でもリンバースキュラを石化できる確率がとても低い。<br>
+他ステータスが関わっているのか、それとも、ステータス依存はなく確率はほぼ一定なのか。<br>
+ちなみにイシュタールは知124なので「影一文字」での石化は入りにくいが「アルゴスの瞳」だと敵側ステータスが体依存なので石化しやすい。リメイク版において石化確率計算に敵ステータスが関わっている場合、敵によって石化の確率も変わってくる……はずである。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>おぼろ丸</th><td colspan="3">レベル99</td><th>敵</th><td colspan="2">イシュタール</td></tr>
+	<tr><th>影一文字</th><td colspan="3">正面真横1マスから攻撃</td><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">兼定(+8)</td><td>村正(+40)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">137</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>99</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td></tr>
+	<tr><th>ダメージ量平均</th><td>250.12</td><td>255.06</td><td>241.92</td><td>240.92</td><td>259.84</td><td>271.74</td></tr>
+	<tr><th>ダメージ量最大</th><td>292</td><td>306</td><td>292</td><td>295</td><td>306</td><td>329</td></tr>
+	<tr><th>ダメージ量最小</th><td>201</td><td>205</td><td>198</td><td>197</td><td>208</td><td>228</td></tr>
+	<tr><th>石化回数</th><td>6</td><td>9</td><td>9</td><td>7</td><td>5</td><td>10</td></tr>
+	<tr><th>石化確率</th><td>0.12</td><td>0.18</td><td>0.18</td><td>0.14</td><td>0.10</td><td>0.20</td></tr>
+</tbody>
+</table>
+
+<p>※影一文字（イシュタール）の全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=1665753851&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>おぼろ丸</th><td colspan="3">レベル99</td><th>敵</th><td colspan="2">リンバースキュラ</td></tr>
+	<tr><th>影一文字</th><td colspan="3">正面真横1マスから攻撃</td><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">兼定(+8)</td><td>村正(+40)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">137</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>99</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td></tr>
+	<tr><th>ダメージ量平均</th><td>251.12</td><td>255.18</td><td>243.64</td><td>249.18</td><td>250.84</td><td>280.68</td></tr>
+	<tr><th>ダメージ量最大</th><td>294</td><td>306</td><td>294</td><td>293</td><td>308</td><td>333</td></tr>
+	<tr><th>ダメージ量最小</th><td>198</td><td>206</td><td>198</td><td>206</td><td>210</td><td>224</td></tr>
+	<tr><th>石化回数</th><td>7</td><td>8</td><td>9</td><td>6</td><td>8</td><td>10</td></tr>
+	<tr><th>石化確率</th><td>0.14</td><td>0.16</td><td>0.18</td><td>0.12</td><td>0.16</td><td>0.20</td></tr>
+</tbody>
+</table>
+
+<p>※影一文字（リンバースキュラ）の全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=1462401911&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>「ジャーマンスープレックス」並によくわからないデータである。<br>
+ステータス依存があると言い切れるほど石化回数に差があるとは言いにくい。<br>
+そして敵を変えてみてもほぼ似たりよったりなデータである。どれも15％ちょい程度？　というところだろうか。<br>
+敢えて言うならば物防と攻撃力を上げた時は若干確率が上がっているように見えなくもないが、劇的に上がっているのかというとそうでもなく、誤差の範囲ではないかと言われればそれまでである。<br>
+これまでと異なるのは、どれだけステータスを上げてみても石化にできる確率は20％くらい、という程度か。<br>
+やはり即死効果でもある石化は、他の状態異常よりも成功確率が低めに設定されているのかもしれない。<br>
+もし石化確率の上限が20％であるとしたら、魔神竜之介や岩間さまに効きにくくなったのも納得である。</p>
+
+<h3>ホーリーイメージ</h3>
+
+<p>「ホーリーイメージ」については、ここまでの経緯から、どうせ大した差も出ないだろう……と、半分おまけのつもりでデータを取りはじめた（筆者もさすがに疲れてきた）。<br>
+なのだが、実際にはなかなか興味深いデータが取れているので紹介する次第である。<br>
+「停止」は行動異常で状態異常ではないので、一応除外している（記録はしてある）。</p>
+
+<p>「影一文字」の結果からして、石化とそれ以外とでは、確率上限が異なる可能性が高い。全状態異常が入る「ホーリーイメージ」なら、比較が可能だろう。<br>
+ちなみにSFC版だと技のダメージ量の依存ステータスは「知」、状態異常の依存ステータスは「力」と、アキラにとって上げにくい「力」が状態異常の確率に絡むため、「ホーリーイメージ」では状態異常が発生させにくかった。ステータスダウン効果の発生確率は敵のステータスにだけ依存していたため、SFC版では実質、ステータスダウンを狙うための技と考えて構わなかったのであるが……。</p>
+
+<p>また「ホーリーイメージ」はチャージスキルであり、しかも待機時間が「中」とやや長めのため、待機中に敵が移動してしまうこともある。敵との位置については「敵の正面から撃つ」ことだけ条件にしてあることをご了承いただきたい。<br>
+結果としてダメージ量は、他での測定同様に「最小値を1.5倍したらだいたい最大値」に収まっているので、特に問題はないと考えている。</p>
+
+<p>全状態異常にできるスキルのため、下表はやや見辛いことをお断りしておく。<br>
+また、石化で倒した時には、「石化以外の状態異常は同時に発生しない」「行動異常の『停止』及びステータスダウンは同時に発生する（が同時に石化して消滅するので意味はない）」という現象が起きたことも付け加えておく。このあたりはどういう内部処理が行われているのか不明。<br>
+例えば、石化発生後はそれ以外の状態異常の成否の判定が全てスキップされてしまうのであったら、石化が起きた時と、その他の状態異常が発生した時とは結果を混ぜずに確率を計算するべきなのであるが、実際の処理がわからないので、今回は全ての結果を混ぜて確率を出していることに留意していただきたい。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>アキラ</th><td colspan="6">レベル99</td><th>敵</th><td colspan="6">影</td></tr>
+	<tr><th>ホーリーイメージ</th><td colspan="6">正面から攻撃</td><th colspan="2">サンプル数</th><td colspan="5">各50</td></tr>
+	<tr><th>武器</th><td colspan="10">グラブ(+4)</td><td colspan="2">妙子のパンチ(+16)</td></tr>
+	<tr><th>物攻</th><td colspan="2">99</td><td colspan="2"><span class="r">143</span></td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td></tr>
+	<tr><th>物防</th><td colspan="2">99</td><td colspan="2">99</td><td colspan="2"><span class="r">137</span></td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td></tr>
+	<tr><th>特攻</th><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2"><span class="r">150</span></td><td colspan="2">99</td><td colspan="2">99</td></tr>
+	<tr><th>素早さ</th><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2"><span class="r">150</span></td><td colspan="2">99</td></tr>
+	<tr><th>ダメージ量平均</th><td colspan="2">43.62</td><td colspan="2">41.18</td><td colspan="2">42.24</td><td colspan="2">50.56</td><td colspan="2">43.16</td><td colspan="2">43.96</td></tr>
+	<tr><th>ダメージ量最大</th><td colspan="2">51</td><td colspan="2">52</td><td colspan="2">52</td><td colspan="2">60</td><td colspan="2">52</td><td colspan="2">52</td></tr>
+	<tr><th>ダメージ量最小</th><td colspan="2">35</td><td colspan="2">35</td><td colspan="2">35</td><td colspan="2">40</td><td colspan="2">35</td><td colspan="2">35</td></tr>
+	<tr><th>状態異常</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th></tr>
+	<tr><th>石化</th><td>5</td><td>0.10</td><td>3</td><td>0.06</td><td>4</td><td>0.08</td><td>10</td><td>0.20</td><td>5</td><td>0.10</td><td>6</td><td>0.12</td></tr>
+	<tr><th>酔い</th><td>8</td><td>0.16</td><td>5</td><td>0.10</td><td>3</td><td>0.06</td><td>4</td><td>0.08</td><td>5</td><td>0.10</td><td>3</td><td>0.06</td></tr>
+	<tr><th>眠り</th><td>8</td><td>0.16</td><td>5</td><td>0.10</td><td>6</td><td>0.12</td><td>7</td><td>0.14</td><td>2</td><td>0.04</td><td>6</td><td>0.12</td></tr>
+	<tr><th>麻痺</th><td>4</td><td>0.08</td><td>7</td><td>0.14</td><td>2</td><td>0.04</td><td>6</td><td>0.12</td><td>5</td><td>0.10</td><td>3</td><td>0.06</td></tr>
+	<tr><th>毒</th><td>7</td><td>0.14</td><td>2</td><td>0.04</td><td>7</td><td>0.14</td><td>7</td><td>0.14</td><td>6</td><td>0.12</td><td>6</td><td>0.12</td></tr>
+	<tr><th>腕封</th><td>3</td><td>0.06</td><td>4</td><td>0.08</td><td>6</td><td>0.12</td><td>6</td><td>0.12</td><td>4</td><td>0.08</td><td>6</td><td>0.12</td></tr>
+	<tr><th>足封</th><td>2</td><td>0.04</td><td>5</td><td>0.10</td><td>6</td><td>0.12</td><td>7</td><td>0.14</td><td>3</td><td>0.06</td><td>4</td><td>0.08</td></tr>
+	<tr><th>合計</th><td>37</td><td>0.11</td><td>31</td><td>0.09</td><td>34</td><td>0.10</td><td>47</td><td>0.13</td><td>30</td><td>0.09</td><td>34</td><td>0.10</td></tr>
+</tbody>
+</table>
+
+<p>※ホーリーイメージの全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=219489929&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>またしても誤差といえば誤差の範囲かもしれない程度のズレが見られるのではあるが、注目すべきは、特攻を上げた時だけ、石化する確率が他の倍近くに上がっていること、トータルで見た時に一番状態異常が発生している回数が多いことである。<br>
+もちろん、これまでの経緯もあるので、石化の確率が上がったように見えるのは誤差の範囲では？　と言われてしまえばそれまでなのだが、実は特攻を上げた時はステータスダウンの発生率も目に見えて上がっている。<br>
+（<a href="08-1.html">次のページ</a>で詳しく紹介する）<br>
+ということを踏まえて、「ホーリーイメージ」での状態異常・ステータスダウンを期待する場合、特攻をできる限り上げてやるとおそらく確率が上がる（ダメージ量もちょっと上がる）、と結論付けても良いのではないか……状態異常はともかくステータスダウンについては確率が上がると考えて良いだろう。<br>
+物攻を上げても「ホーリーイメージ」の状態異常発生確率に変化がないのはほぼ確定と見て良い結果なので、SFC版とは異なり、無理にアキラの物攻上昇値を吟味する必要はないのである。「ローキック」や「エルボー」のダメージ量を増やしたいという場合は別だが。</p>
+
+<p>ただし行動異常の「停止」については別で、「ホーリーイメージ」のデータを見てもらえればわかるが、特攻を上げても確率が上がる様子はないどころか、特攻を上げた時が一番発生確率が低くなっていたりもするので、これまでの検討で見られたような、ブレなのか変動なのかわからないような結果ということになるのか、それとも素早さを上げた時だけそこそこ回数が上がっているので、素早さ依存になるのかどうなのか……？　だとしたらアキラにとって上げにくい素早さ依存なのは少々困るところだが。<br>
+行動異常についてはまだきちんと検討をしていないので何とも言えないところだが、SFC版では状態異常と行動異常とでは発生する確率といった仕組みが全く別物だったため、ステータスに依存しない可能性も考えられる。ひとつ言えることは、「行動異常になる確率についてもそれなりの乱数のブレがあるのだろう」ということくらいである。</p>
+
+<p>「ホーリーイメージ」についてはもうひとつ、大半の状態異常の発生確率も、これまで検討してきたスキルより低めであるということも間違いない。<br>
+これまで検討してきたスキルは、それぞれの状態異常発生確率が30％～35％くらいが上限であったが、「ホーリーイメージ」については、どの状態異常も高くてせいぜい20％止まりである。<br>
+ただし多数の状態異常を発生することができるので、「ホーリーイメージ」を撃つと8割くらいは「何かしらの状態異常が起きる」ような感じである。<br>
+また、7種類の状態異常のうち、発生しやすい状態異常があるのかどうかについても、どうにも結論が付けにくい結果になってしまっている。</p>
+
+<p>なお、状態異常の継続時間だが、スキルにより多少異なるようである。<br>
+例えば「毒霧」の毒状態になった影は、影自身のターンが3～4回回るまで毒状態が継続するが、「ホーリーイメージ」での毒は、影のターンが2回回った時点で解除になっていた（解除のタイミング自体は必ず、自身にターンが回った時点）。<br>
+このあたりも調べてみれば興味深いのかもしれないが、とりあえず今回はここまで。</p>
+
+<p>ということで結論としては、</p>
+
+<ul>
+	<li>状態異常にできるスキルには、ステータス依存が存在するとはっきりわかるくらい確率が変動するものも、乱数でのブレの範囲なのかよくわからないものもある。</li>
+	<li>味方側がどれほど装備を充実させてステータスを上げてみても、状態異常の発生確率は3～4割が上限のようである。よってデバフで敵ステータスを下げることも、発生確率を上げる上で重要になるだろう。だがSFC版のように100％状態異常が効く状態に持っていける可能性はあまりないし、もしかすると確率には上限が設けられている可能性すらある。</li>
+</ul>
+
+<p>結論といえるかどうか何とも言えないが、こんなところだろうか……。</p>
+
+<div class="foot"><a href="index.html"><span class="button">&#9650;目次</span></a>　<a href="08-1.html"><span class="button">&#9654;次　ステータスダウン</span></a></div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 70%, #f6f2fc);">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base00.html">SFC版からの変更点</a></li>
+		<li><a href="../base07.html">基本操作</a></li>
+		<li><a href="../base01.html">シナリオ</a></li>
+		<li><a href="../base02.html">メニュー画面</a></li>
+		<li><a href="../base03.html">セーブ</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../battle14.html">ステータス上昇</a></li>
+		<li><a href="../battle13.html">経験値</a></li>
+		<li><a href="../base05.html">アイテム</a></li>
+		<li><a href="../base06.html">設定</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">装備</a></li>
+		<li><a href="../battle02.html">陣形</a></li>
+		<li><a href="../battle03.html">エンカウント</a></li>
+		<li><a href="../battle04.html">行動ゲージ</a></li>
+		<li><a href="../battle05.html">向き</a></li>
+		<li><a href="../battle06.html">スキル</a></li>
+		<li><a href="../battle07.html">属性</a></li>
+		<li><a href="../battle08.html">状態異常</a></li>
+		<li><a href="../battle09.html">行動異常</a></li>
+		<li><a href="../battle10.html">能力増減</a></li>
+		<li><a href="../battle11.html">ダメージ地形</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle15.html">戦闘テクニック</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 70%, #c3fae5);" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../re_kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kinmirai/kaizou.html">アイテム改造</a></li>
+	<li><a href="../re_kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: linear-gradient(to right, #51635C, 70%, #dfedf7);" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../re_sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../re_sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: linear-gradient(to right, #734fab, 70%, #f8ccfc);" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../re_bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../re_bakumatsu/0nin.html">不殺（0人斬り）</a></li>
+	<li><a href="../re_bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../re_bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../re_bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../re_bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../re_bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../re_bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 70%, #cedef5);" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../re_kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kunfu/omake.html">おまけ・レベル16の弟子の修業</a></li>
+	<li><a href="../re_kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 70%, #fabbc5);" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../re_gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../re_gendai/omake.html">スキルをラーニングせずクリア</a></li>
+	<li><a href="../re_gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: linear-gradient(to right, #64BA02, 70%, #f6fcc0);" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../re_genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../re_genshi/item.html">アイテム合成</a></li>
+	<li><a href="../re_genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: linear-gradient(to right, #E38C00, 70%, #faf7cf);" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../re_seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../re_seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: linear-gradient(to right, #b59f14, 70%, #f7f5d0);" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../re_chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: linear-gradient(to right, #919c93, 70%, #f0f5eb);" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../re_saishu/chui01.html">注意点</a></li>
+	<li><a href="../re_saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../re_saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../re_saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../re_saishu/last.html">ラストバトル</a></li>
+	<li><a href="../re_saishu/omake.html">おまけ</a></li>
+	<li><a href="../re_saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../re_data/index.html">データ集トップページ</a></li>
+	<li><a href="../re_data/chara.html">キャラクター</a></li>
+	<li><a href="../re_data/equipment.html">装備</a></li>
+	<li><a href="../re_data/index.html#item">アイテム</a></li>
+	<li><a href="../re_data/enemy.html">敵</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle13" class="toggle">
+<label class="title" for="toggle13" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label>
+<div class="content">
+<ul>
+	<li><a href="../achievement/index.html">トロフィー＆実績一覧</a></li>
+	<li><a href="../achievement/guide.html">取得方法</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">調査トップページ</a></li>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle14" class="toggle">
+<label class="title" for="toggle14" style="color: #363638; background: #e5e4eb;">元ネタ＆雑学</label>
+<div class="content">
+	<ul>
+		<li><a href="../neta/index.html">元ネタ＆雑学目次</a></li>
+		<li><a href="../neta/01_kinmirai.html">近未来編</a></li>
+		<li><a href="../neta/02_sf.html">ＳＦ編</a></li>
+		<li><a href="../neta/03_bakumatsu.html">幕末編</a></li>
+		<li><a href="../neta/04_gendai.html">現代編</a></li>
+		<li><a href="../neta/05_genshi.html">原始編</a></li>
+		<li><a href="../neta/06_seibu.html">西部編</a></li>
+		<li><a href="../neta/07_kunfu.html">功夫編</a></li>
+		<li><a href="../neta/08_chusei.html">中世編</a></li>
+		<li><a href="../neta/09_saishu.html">最終編</a></li>
+	</ul>
+</div>
+</div>
+
+<br>
+<a href="../sfc/index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">SFC版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 80%, #f6f2fc);">TOP</label></a></li>
+		<li class="navigation__item"><a href="../re_kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 80%, #c3fae5);" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_sf/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #51635C, 80%, #dfedf7);" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #734fab, 80%, #f8ccfc);" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_kunfu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 80%, #cedef5);" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_gendai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 80%, #fabbc5);" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_genshi/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #64BA02, 80%, #f6fcc0);" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_seibu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #E38C00, 80%, #faf7cf);" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_chusei/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #b59f14, 80%, #f7f5d0);" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_saishu/index.html"><label class="title_n2" style="background: linear-gradient(to right, #919c93, 80%, #f0f5eb);" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+		<li class="navigation__item"><a href="../achievement/index.html"><label class="title_n2" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label></a></li>
+		<li class="navigation__item"><a href="index.html"><label class="title_n2"  style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブアライブ（リメイク版） 攻略メモ帳　　　<a href="https://x.com/hoso_boso" target="_blank"><img alt="中の人のX" src="../img/Logo white.svg" style="width:16px;"></a>　　<a href="https://mstdn.jp/@hoso_boso" rel="me" target="_blank"><img alt="中の人のMastodon（mstdn.jp）" src="../img/mastodon.svg" style="width:16px;"></a>　　<a href="https://taittsuu.com/users/hoso_boso" rel="me" target="_blank"><img alt="中の人のタイッツー" src="../img/taitsuico.svg" style="width:16px;"></a>
+</div>
+
+</div>
+<script src="../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

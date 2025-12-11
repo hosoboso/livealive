@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブアライブ,ライブ・ア・ライブ,LIVE A LIVE,攻略,HD-2D,リメイク,Nintendo Switch,PlayStation4,PlayStation5,Steam">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; ステータスダウンにするステータスの検証">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/img/social.png">
+<meta property="og:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 状態異常にするステータスの上昇量の検証">
+<meta name="twitter:description" content="ライブアライブ（HD-2Dリメイク）の戦闘システムの調査です。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブアライブ（リメイク版） 攻略メモ帳 &gt; 戦闘システムの調査 &gt; 状態異常にするステータスの上昇量の検証</title>
+<link href="../css/main.min.css?20251129" rel="stylesheet">
+<link href="../css/remake.css?20250608" rel="stylesheet">
+<link href="../css/etc.css?20250712" rel="stylesheet">
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブアライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">戦闘システムの調査</a></li>
+<li class="here"><button type="button">検討</button>
+	<ul>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">戦闘システムの調査</a> &gt; ステータスダウンにするステータスの検証</h1>
+
+<h2>ステータスダウンにするステータスの検証</h2>
+
+<p>前ページの<a href="07-1.html">状態異常にするステータスの検証</a>では、「ホローポイント弾」「毒霧」「ホーリーイメージ」の検証の際、同時に発生するステータスダウンについてもデータを取ってみた。<br>
+このページではそのデータから、攻撃スキルに付随するステータスダウン効果は、ステータスに依存するのか？　について検証してみる。</p>
+
+<p>まず、SFC版でのステータスダウン・アップの計算方法だが、データ解析サイト（<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様）によれば以下の通り。</p>
+
+<blockquote>・能力値増減判定：<br>
+(0～63)の乱数&gt;敵LV+16</blockquote>
+
+<p>非常にシンプルである。<br>
+言い換えると「（0から63までの乱数）&minus;（敵のレベルに16を加えた数値）」の計算結果が1以上になった時にだけ、ステータスダウンが発生する。<br>
+敵のレベルしか確率に関わらない。味方のステータスをどんなに上げても、確率を上げることは不可能である。<br>
+以上がSFC版での仕様だが、リメイク版では味方のステータスがかかわるようになったのだろうか？</p>
+
+<p>今回の検証の全データは<a href="https://docs.google.com/spreadsheets/d/18BVdJKYPDN6iwPclGzmICfOrGj18yXheK8psLp7ohXc/edit?usp=sharing" target="_blank">lal_statuseffect - Googleスプレッドシート</a>を。</p>
+
+<h3>ホローポイント弾</h3>
+
+<p>「ホローポイント弾」には、「命中ダウン(小)」及び「回避ダウン(小)」の効果が付いているので、別々に記録していった。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンダウン</th><td colspan="3">レベル99</td><th>敵</th><td colspan="2">影</td></tr>
+	<tr><th>ホローポイント弾</th><td colspan="3">真正面2マスから攻撃</td><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">虎の小手(+0)</td><td>４４マグナム(+29)</td></tr>
+	<tr><th>物攻</th><td>102</td><td><span class="r">146</span></td><td>102</td><td>102</td><td>102</td><td>99</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">137</span></td><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>103</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>150</td></tr>
+	<tr><th>ダメージ量平均</th><td>100.12</td><td>111.78</td><td>104.30</td><td>101.42</td><td>112.04</td><td>137.20</td></tr>
+	<tr><th>ダメージ量最大</th><td>120</td><td>134</td><td>121</td><td>121</td><td>136</td><td>169</td></tr>
+	<tr><th>ダメージ量最小</th><td>82</td><td>90</td><td>85</td><td>82</td><td>92</td><td>109</td></tr>
+	<tr><th>命中↓回数</th><td>15</td><td>14</td><td>17</td><td>17</td><td>22</td><td>18</td></tr>
+	<tr><th>命中↓確率</th><td>0.30</td><td>0.28</td><td>0.34</td><td>0.34</td><td>0.44</td><td>0.36</td></tr>
+	<tr><th>回避↓回数</th><td>20</td><td>20</td><td>23</td><td>17</td><td>20</td><td>18</td></tr>
+	<tr><th>回避↓確率</th><td>0.40</td><td>0.40</td><td>0.46</td><td>0.34</td><td>0.40</td><td>0.36</td></tr>
+</tbody>
+</table>
+
+<p>※ホローポイント弾の全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=1694460834&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>「命中ダウン(小)」の結果だけ見ると、素早さを上げた時は確率が上がっているように見える……が、「回避ダウン(小)」の結果では素早さを上げてもこれといって回数は上がらず、物防を上げた時が一番確率が高い結果になっている。<br>
+そして状態異常の検証からして、「この程度の違いは乱数のブレじゃないの問題」がまたしてもちらつくのである……。</p>
+
+<p>「ホローポイント弾」については、わざと特攻や素早さを下げてみたデータもあるので、比較してみることにする。<br>
+まず特攻だけを変化させた結果。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンプル数</th><td colspan="3">各50</td></tr>
+	<tr><th>武器</th><td colspan="3">虎の小手(+0)</td></tr>
+	<tr><th>物攻</th><td>102</td><td>102</td><td>102</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td><span class="r">60</span></td><td><span class="r">99</span></td><td><span class="r">150</span></td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>ダメージ量平均</th><td>104.58</td><td>100.12</td><td>101.42</td></tr>
+	<tr><th>ダメージ量最大</th><td>122</td><td>120</td><td>123</td></tr>
+	<tr><th>ダメージ量最小</th><td>82</td><td>82</td><td>82</td></tr>
+	<tr><th>命中↓回数</th><td>16</td><td>15</td><td>17</td></tr>
+	<tr><th>命中↓確率</th><td>0.32</td><td>0.30</td><td>0.34</td></tr>
+	<tr><th>回避↓回数</th><td>20</td><td>20</td><td>17</td></tr>
+	<tr><th>回避↓確率</th><td>0.40</td><td>0.40</td><td>0.34</td></tr>
+</tbody>
+</table>
+
+<p>次に、素早さだけを変化させた結果。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンプル数</th><td colspan="3">各50</td></tr>
+	<tr><th>武器</th><td colspan="3">虎の小手(+0)</td></tr>
+	<tr><th>物攻</th><td>102</td><td>102</td><td>102</td></tr>
+	<tr><th>物防</th><td>97</td><td>99</td><td>99</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td></tr>
+	<tr><th>素早さ</th><td><span class="r">49</span></td><td><span class="r">99</span></td><td><span class="r">150</span></td></tr>
+	<tr><th>ダメージ量平均</th><td>90.98</td><td>100.12</td><td>112.04</td></tr>
+	<tr><th>ダメージ量最大</th><td>108</td><td>120</td><td>136</td></tr>
+	<tr><th>ダメージ量最小</th><td>73</td><td>82</td><td>92</td></tr>
+	<tr><th>命中↓回数</th><td>14</td><td>15</td><td>22</td></tr>
+	<tr><th>命中↓確率</th><td>0.28</td><td>0.30</td><td>0.44</td></tr>
+	<tr><th>回避↓回数</th><td>23</td><td>20</td><td>20</td></tr>
+	<tr><th>回避↓確率</th><td>0.46</td><td>0.40</td><td>0.40</td></tr>
+</tbody>
+</table>
+
+<p>おまけで全ステータスを上げてみた結果。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>サンプル数</th><td colspan="2">各50</td></tr>
+	<tr><th>武器</th><td>虎の小手(+0)</td><td>４４マグナム(+29)</td></tr>
+	<tr><th>物攻</th><td>102</td><td>144</td></tr>
+	<tr><th>物防</th><td>99</td><td>119</td></tr>
+	<tr><th>特攻</th><td>99</td><td>150</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>150</td></tr>
+	<tr><th>ダメージ量平均</th><td>100.12</td><td>151.70</td></tr>
+	<tr><th>ダメージ量最大</th><td>120</td><td>182</td></tr>
+	<tr><th>ダメージ量最小</th><td>82</td><td>123</td></tr>
+	<tr><th>命中↓回数</th><td>15</td><td>21</td></tr>
+	<tr><th>命中↓確率</th><td>0.30</td><td>0.42</td></tr>
+	<tr><th>回避↓回数</th><td>20</td><td>20</td></tr>
+	<tr><th>回避↓確率</th><td>0.40</td><td>0.40</td></tr>
+</tbody>
+</table>
+
+<p>「命中ダウン(小)」は「もしかすると素早さ依存かもしれないけれど乱数のブレの範囲かもしれない」、「回避ダウン(小)」は「どのステータスを変えてもだいたい40％」という程度であろうか……。<br>
+明確にステータス依存があるとは言えない結果である。</p>
+
+<h3>毒霧</h3>
+
+<p>「毒霧」には「回避ダウン(大)」の効果が付いている。<br>
+こちらも特攻を下げたり、レベル25（命中35）のおぼろ丸でのデータもあるため、一緒に掲載しておく。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>おぼろ丸</th><td colspan="4">レベル99/25</td><th>敵</th><td colspan="4">影</td></tr>
+	<tr><th>毒霧</th><td colspan="4">真正面1マスから攻撃</td><th>サンプル数</th><td colspan="4">各50</td></tr>
+	<tr><th>武器</th><td colspan="5">兼定(+8)</td><td>村正(+40)</td><td colspan="3">兼定(+8)</td></tr>
+	<tr><th>物攻</th><td>99</td><td><span class="r">143</span></td><td>99</td><td>99</td><td>99</td><td>99</td><td>150</td><td>119</td><td>68</td></tr>
+	<tr><th>物防</th><td>99</td><td>99</td><td><span class="r">137</span></td><td>99</td><td>99</td><td>99</td><td>89</td><td>69</td><td>81</td></tr>
+	<tr><th>特攻</th><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>99</td><td><span class="r">21</span></td><td>99</td><td>99</td></tr>
+	<tr><th>素早さ</th><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">150</span></td><td>99</td><td>99</td><td><span class="r">39</span></td><td>99</td></tr>
+	<tr><th>命中</th><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td>99</td><td><span class="r">35</span></td></tr>
+	<tr><th>ダメージ量平均</th><td>14.50</td><td>14.56</td><td>14.60</td><td>21.46</td><td>14.36</td><td>14.36</td><td>4.06</td><td>14.42</td><td>14.64</td></tr>
+	<tr><th>ダメージ量最大</th><td>18</td><td>18</td><td>18</td><td>26</td><td>18</td><td>18</td><td>5</td><td>18</td><td>17</td></tr>
+	<tr><th>ダメージ量最小</th><td>12</td><td>12</td><td>12</td><td>17</td><td>12</td><td>12</td><td>3</td><td>12</td><td>12</td></tr>
+	<tr><th>回避↓回数</th><td>18</td><td>16</td><td>17</td><td>22</td><td>20</td><td>12</td><td>13</td><td>11</td><td>13</td></tr>
+	<tr><th>回避↓確率</th><td>0.36</td><td>0.32</td><td>0.34</td><td>0.44</td><td>0.40</td><td>0.24</td><td>0.26</td><td>0.22</td><td>0.26</td></tr>
+</tbody>
+</table>
+
+<p>※毒霧の全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=213641214&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>「村正」装備時にやたらと「回避ダウン(大)」回数が下がっているが、攻撃力を上げたら確率が下がるということは考えにくいので、これは乱数でのブレの範囲になるのかどうか……。<br>
+そこのあたりを気にしないで他の数値を見てみると、「素早さ」「特攻」を上げた時には「回避ダウン(大)」回数がやや上がり、「素早さ」「特攻」を下げた時には「回避ダウン(大)」回数がやや下がる。命中が低い時にも下がっている？　かもしれない。<br>
+ステータスによる依存があるように見える（がブレかもしれない）、といったところだろうか。<br>
+「素早さ」「特攻」ともにおぼろ丸にとって上げやすいステータスなので、順調に育成すれば、ステータスダウンさせる確率も上がっていく、ということになるのだろう。<br>
+「ホローポイント弾」と共通しているのは、発生確率はどんなに高くても40％ちょっとだということ。</p>
+
+<p>もうひとつ、もし命中の値が関与する場合、実用的なデータを取るなら、キャラのレベルが25くらいで計測をするべきではないか……という気もするが、とりあえず今回はこんな感じで……。</p>
+
+<h3>ホーリーイメージ</h3>
+
+<p>「ホーリーイメージ」は、「物攻ダウン(大)・物防ダウン(大)・特攻ダウン(大)・特防ダウン(大)・素早さダウン(大)・命中ダウン(大)・回避ダウン(大)」の効果が付いている。<br>
+状態異常にするステータスの検証時にも触れたが、石化時もステータスダウンは同時に発生することがあり、ステータスダウンの表示が出た後に敵が石化で消滅する。この時のデータも含めた結果を以下に記している。</p>
+
+<table style="font-size:smaller;"><tbody>
+	<tr><th>アキラ</th><td colspan="6">レベル99</td><th>敵</th><td colspan="6">影</td></tr>
+	<tr><th>ホーリーイメージ</th><td colspan="6">正面から攻撃</td><th colspan="2">サンプル数</th><td colspan="5">各50</td></tr>
+	<tr><th>武器</th><td colspan="10">グラブ(+4)</td><td colspan="2">妙子のパンチ(+16)</td></tr>
+	<tr><th>物攻</th><td colspan="2">99</td><td colspan="2"><span class="r">143</span></td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td></tr>
+	<tr><th>物防</th><td colspan="2">99</td><td colspan="2">99</td><td colspan="2"><span class="r">137</span></td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td></tr>
+	<tr><th>特攻</th><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2"><span class="r">150</span></td><td colspan="2">99</td><td colspan="2">99</td></tr>
+	<tr><th>素早さ</th><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2">99</td><td colspan="2"><span class="r">150</span></td><td colspan="2">99</td></tr>
+	<tr><th>ダメージ量平均</th><td colspan="2">43.62</td><td colspan="2">41.18</td><td colspan="2">42.24</td><td colspan="2">50.56</td><td colspan="2">43.16</td><td colspan="2">43.96</td></tr>
+	<tr><th>ダメージ量最大</th><td colspan="2">51</td><td colspan="2">52</td><td colspan="2">52</td><td colspan="2">60</td><td colspan="2">52</td><td colspan="2">52</td></tr>
+	<tr><th>ダメージ量最小</th><td colspan="2">35</td><td colspan="2">35</td><td colspan="2">35</td><td colspan="2">40</td><td colspan="2">35</td><td colspan="2">35</td></tr>
+	<tr><th>ステータスダウン</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th><th>回数</th><th>確率</th></tr>
+	<tr><th>物攻↓</th><td>7</td><td>0.14</td><td>10</td><td>0.20</td><td>7</td><td>0.14</td><td>15</td><td>0.30</td><td>5</td><td>0.10</td><td>10</td><td>0.20</td></tr>
+	<tr><th>物防↓</th><td>12</td><td>0.24</td><td>6</td><td>0.12</td><td>8</td><td>0.16</td><td>14</td><td>0.28</td><td>11</td><td>0.22</td><td>6</td><td>0.12</td></tr>
+	<tr><th>特攻↓</th><td>4</td><td>0.08</td><td>8</td><td>0.16</td><td>9</td><td>0.18</td><td>16</td><td>0.32</td><td>8</td><td>0.16</td><td>8</td><td>0.16</td></tr>
+	<tr><th>特防↓</th><td>8</td><td>0.16</td><td>12</td><td>0.24</td><td>13</td><td>0.26</td><td>21</td><td>0.42</td><td>7</td><td>0.14</td><td>5</td><td>0.10</td></tr>
+	<tr><th>素早↓</th><td>7</td><td>0.14</td><td>11</td><td>0.22</td><td>11</td><td>0.22</td><td>11</td><td>0.22</td><td>6</td><td>0.12</td><td>4</td><td>0.08</td></tr>
+	<tr><th>命中↓</th><td>9</td><td>0.18</td><td>6</td><td>0.12</td><td>13</td><td>0.26</td><td>12</td><td>0.24</td><td>13</td><td>0.26</td><td>8</td><td>0.16</td></tr>
+	<tr><th>回避↓</th><td>8</td><td>0.16</td><td>7</td><td>0.14</td><td>5</td><td>0.10</td><td>20</td><td>0.40</td><td>5</td><td>0.10</td><td>7</td><td>0.14</td></tr>
+	<tr><th>合計</th><td>55</td><td>0.16</td><td>60</td><td>0.17</td><td>66</td><td>0.19</td><td>109</td><td>0.31</td><td>55</td><td>0.16</td><td>48</td><td>0.14</td></tr>
+</tbody>
+</table>
+
+<p>※ホーリーイメージの全データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRQj0BiaZSNjS7qEdfMuwVsWh39vZ5ZRqwmMhI64cVFfiZuPsNs8-3-h35-vNMIsGA8dHzvusVv5vO3/pubhtml?gid=219489929&single=true" target="_blank">lal_statuseffect - Googleスプレッドシート</a></p>
+
+<p>乱数のブレを加味したとしても、特攻を上げた時は明らかにステータスダウンの発生確率が上がっている。<br>
+よって、「ホーリーイメージ」におけるステータスダウンの依存値は特攻である、と結論付けて良いだろう。<br>
+ただし、どのステータスを下げやすいかについてまではわからない。<br>
+実のところ7種類のステータスダウンそれぞれの成功確率はだいたい同じ、という気もする。合計値を見ると、特攻を上げた時以外は発生確率が16％前後、特攻を上げた時だけ31％と大幅に増えているので、「試行回数を増やしたから特攻を上げた時以外の回数がだいたい同じくらいになった」と見ることもできるからである。<br>
+また「ホーリーイメージ」においても、ステータスダウンの発生確率はどんなに高くても40％くらいだろうということもわかる。</p>
+
+<p>ということで結論としては、状態異常にするステータスの検証の時とあまり変わらない気がするが、</p>
+
+<ul>
+	<li>ステータスダウンにできるスキルには、ステータス依存が存在するとはっきりわかるくらい確率が変動するものも、乱数でのブレの範囲なのかよくわからないものもある。SFC版のように「敵レベルの数値にのみ確率が依存する」ことは多分？　ない。</li>
+	<li>味方側がどれほど装備を充実させてステータスを上げてみても、状態異常の発生確率は4割程度が上限のようである。もしかすると確率には上限が設けられている可能性もある。</li>
+</ul>
+
+<p>というところであろう。</p>
+
+<div class="foot"><a href="index.html"><span class="button">&#9650;目次</span></a>　<a href="09-1.html"><span class="button">&#9654;次　耐性属性</span></a></div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 70%, #f6f2fc);">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base00.html">SFC版からの変更点</a></li>
+		<li><a href="../base07.html">基本操作</a></li>
+		<li><a href="../base01.html">シナリオ</a></li>
+		<li><a href="../base02.html">メニュー画面</a></li>
+		<li><a href="../base03.html">セーブ</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../battle14.html">ステータス上昇</a></li>
+		<li><a href="../battle13.html">経験値</a></li>
+		<li><a href="../base05.html">アイテム</a></li>
+		<li><a href="../base06.html">設定</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">装備</a></li>
+		<li><a href="../battle02.html">陣形</a></li>
+		<li><a href="../battle03.html">エンカウント</a></li>
+		<li><a href="../battle04.html">行動ゲージ</a></li>
+		<li><a href="../battle05.html">向き</a></li>
+		<li><a href="../battle06.html">スキル</a></li>
+		<li><a href="../battle07.html">属性</a></li>
+		<li><a href="../battle08.html">状態異常</a></li>
+		<li><a href="../battle09.html">行動異常</a></li>
+		<li><a href="../battle10.html">能力増減</a></li>
+		<li><a href="../battle11.html">ダメージ地形</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle15.html">戦闘テクニック</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 70%, #c3fae5);" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../re_kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kinmirai/kaizou.html">アイテム改造</a></li>
+	<li><a href="../re_kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: linear-gradient(to right, #51635C, 70%, #dfedf7);" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../re_sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../re_sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: linear-gradient(to right, #734fab, 70%, #f8ccfc);" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../re_bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../re_bakumatsu/0nin.html">不殺（0人斬り）</a></li>
+	<li><a href="../re_bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../re_bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../re_bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../re_bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../re_bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../re_bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 70%, #cedef5);" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../re_kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_kunfu/omake.html">おまけ・レベル16の弟子の修業</a></li>
+	<li><a href="../re_kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 70%, #fabbc5);" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../re_gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../re_gendai/omake.html">スキルをラーニングせずクリア</a></li>
+	<li><a href="../re_gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: linear-gradient(to right, #64BA02, 70%, #f6fcc0);" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../re_genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../re_genshi/item.html">アイテム合成</a></li>
+	<li><a href="../re_genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: linear-gradient(to right, #E38C00, 70%, #faf7cf);" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../re_seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../re_seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: linear-gradient(to right, #b59f14, 70%, #f7f5d0);" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../re_chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../re_chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: linear-gradient(to right, #919c93, 70%, #f0f5eb);" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../re_saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../re_saishu/chui01.html">注意点</a></li>
+	<li><a href="../re_saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../re_saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../re_saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../re_saishu/last.html">ラストバトル</a></li>
+	<li><a href="../re_saishu/omake.html">おまけ</a></li>
+	<li><a href="../re_saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../re_data/index.html">データ集トップページ</a></li>
+	<li><a href="../re_data/chara.html">キャラクター</a></li>
+	<li><a href="../re_data/equipment.html">装備</a></li>
+	<li><a href="../re_data/index.html#item">アイテム</a></li>
+	<li><a href="../re_data/enemy.html">敵</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle13" class="toggle">
+<label class="title" for="toggle13" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label>
+<div class="content">
+<ul>
+	<li><a href="../achievement/index.html">トロフィー＆実績一覧</a></li>
+	<li><a href="../achievement/guide.html">取得方法</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">調査トップページ</a></li>
+		<li><a href="01-1.html">ダメージ量</a></li>
+		<li><a href="02-1.html">ダメージ量のブレ</a></li>
+		<li><a href="18-1.html">レベル・命中・回避の検討</a></li>
+		<li><a href="03-1.html">回復スキルの回復量</a></li>
+		<li><a href="04-1.html">戦闘中のステータス上限</a></li>
+		<li><a href="06-1.html">バフの上昇量</a></li>
+		<li><a href="07-1.html">状態異常にするステータス</a></li>
+		<li><a href="08-1.html">ステータスダウン関係</a></li>
+		<li><a href="09-1.html">耐性属性によるダメージ量</a></li>
+		<li><a href="11-1.html">向き変え・吹き飛ばしの確率</a></li>
+		<li><a href="12-1.html">向きによる補正</a></li>
+		<li><a href="17-1.html">ダメージ地形の検証</a></li>
+		<li><a href="05-1.html">素早さと歩数</a></li>
+		<li><a href="15-1.html">「ほいこーろー」の検証</a></li>
+		<li><a href="10-1.html">テレポートの成功確率</a></li>
+		<li><a href="14-1.html">幕末編・敵ステータス検証</a></li>
+		<li><a href="13-1.html">最終編・敵パーティ出現確率</a></li>
+		<li><a href="16-1.html">ランダムエンカウント率</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle14" class="toggle">
+<label class="title" for="toggle14" style="color: #363638; background: #e5e4eb;">元ネタ＆雑学</label>
+<div class="content">
+	<ul>
+		<li><a href="../neta/index.html">元ネタ＆雑学目次</a></li>
+		<li><a href="../neta/01_kinmirai.html">近未来編</a></li>
+		<li><a href="../neta/02_sf.html">ＳＦ編</a></li>
+		<li><a href="../neta/03_bakumatsu.html">幕末編</a></li>
+		<li><a href="../neta/04_gendai.html">現代編</a></li>
+		<li><a href="../neta/05_genshi.html">原始編</a></li>
+		<li><a href="../neta/06_seibu.html">西部編</a></li>
+		<li><a href="../neta/07_kunfu.html">功夫編</a></li>
+		<li><a href="../neta/08_chusei.html">中世編</a></li>
+		<li><a href="../neta/09_saishu.html">最終編</a></li>
+	</ul>
+</div>
+</div>
+
+<br>
+<a href="../sfc/index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">SFC版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: linear-gradient(to right, #D8DEE9, 80%, #f6f2fc);">TOP</label></a></li>
+		<li class="navigation__item"><a href="../re_kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #2fc4fa, 80%, #c3fae5);" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_sf/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #51635C, 80%, #dfedf7);" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #734fab, 80%, #f8ccfc);" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_kunfu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #3b27b0, 80%, #cedef5);" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_gendai/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #cc4d33, 80%, #fabbc5);" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_genshi/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #64BA02, 80%, #f6fcc0);" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_seibu/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #E38C00, 80%, #faf7cf);" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_chusei/index.html"><label class="title_n2" style="color: #FFF; background: linear-gradient(to right, #b59f14, 80%, #f7f5d0);" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_saishu/index.html"><label class="title_n2" style="background: linear-gradient(to right, #919c93, 80%, #f0f5eb);" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../re_data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+		<li class="navigation__item"><a href="../achievement/index.html"><label class="title_n2" style="color: #453030; background: #e8dcdc;">トロフィー＆実績</label></a></li>
+		<li class="navigation__item"><a href="index.html"><label class="title_n2"  style="color: #474743; background: #e8e9d8;">戦闘システムの調査</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブアライブ（リメイク版） 攻略メモ帳　　　<a href="https://x.com/hoso_boso" target="_blank"><img alt="中の人のX" src="../img/Logo white.svg" style="width:16px;"></a>　　<a href="https://mstdn.jp/@hoso_boso" rel="me" target="_blank"><img alt="中の人のMastodon（mstdn.jp）" src="../img/mastodon.svg" style="width:16px;"></a>　　<a href="https://taittsuu.com/users/hoso_boso" rel="me" target="_blank"><img alt="中の人のタイッツー" src="../img/taitsuico.svg" style="width:16px;"></a>
+</div>
+
+</div>
+<script src="../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
