@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 原始編・中世編敵パーティ">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 原始編・中世編敵パーティ">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 原始編・中世編敵パーティ</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 原始編・中世編敵パーティ</h1>
+<h2>原始編・中世編敵パーティ</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>本作の戦闘は、イベント戦闘以外だと、敵との遭遇方法がシンボルエンカウント・ランダムエンカウントと2通りある。<br>
+シンボルエンカウントの場合はシンボルにより敵パーティが固定の場合とランダムの場合の2通りがあり、ランダムエンカウントでは敵パーティがランダムで決まる。<br>
+ランダムで決まるといってももちろん、一定法則に従って確率で決まるが、これらの決定方法について記す。</p>
+
+<p>敵パーティがランダムで決まるのは、原始編・中世編・最終編の3シナリオのみである。<br>
+他シナリオはシンボルにより決まるか、近未来編のワールドマップのようにアキラのレベルで決まる。</p>
+
+<p>原始編は見えないシンボルがうろついているシンボルエンカウントのエリアが幾つかあり、エリアとシナリオ進行度によって、シンボルとの接触時に敵パーティが複数パターンから確率で決まる。<br>
+このため、同じシンボルでも、逃げてから再度同じシンボルとの戦闘に入った場合、異なる敵パーティに変わることもある。</p>
+
+<p>中世編はランダムエンカウントで、エリアとシナリオ進行度によって、敵パーティが複数パターンから確率で決まる。<br>
+最終編もランダムエンカウントで、味方キャラの合計レベルとエリアにより敵パーティが4種類から各1/4で決まる。<span class="tri"><a href="program16.html">最終編敵パーティ</a></span>で解説している。</p>
+
+<h3><code>[$00:0041]</code>（エリア固有値）について</h3>
+
+<p>ランダムエンカウントのみならず、戦闘における各種の判定で重要になってくるのが、<code>[$00:0040]</code><code>[$00:0041]</code>の値である。<br>
+特に、<code>[$00:0041]</code>はランダムエンカウントに大きく関わる。<br>
+<span class="tri"><a href="program16.html">最終編敵パーティ</a></span>でも、<code>[$00:0041]</code>の算出方法を紹介した。<br>
+以下サブルーチンが<code>[$00:0041]</code>の算出に関わってくる。</p>
+
+<div class="code-container"><pre>
+$C0/185E LDA $2D    [$00:002D]   ;Aに[$00:002D]をロード
+$C0/1860 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/1861 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/1862 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/1863 AND #$03                ;Aと$03で論理積
+$C0/1865 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1867 LDA $011E  [$00:011E]   ;Aに[$00:011E]をロード
+$C0/186A ASL A                   ;Aを算術左シフト *2
+$C0/186B ASL A                   ;Aを算術左シフト *2
+$C0/186C ORA $30    [$00:0030]   ;Aと[$00:0030]で論理和
+$C0/186E TAX                     ;Aの値をXレジスタに転送
+$C0/186F PHB                     ;DBレジスタをスタックにプッシュ
+$C0/1870 LDA #$CD                ;Aに$CDをロード
+$C0/1872 PHA                     ;Aをスタックにプッシュ
+$C0/1873 PLB                     ;DBレジスタに値をプル
+$C0/1874 LDA $0018,x[$CD:001F]   ;Aに[$0018,x]をロード
+$C0/1877 ASL A                   ;Aを算術左シフト *2
+$C0/1878 ASL A                   ;Aを算術左シフト *2
+$C0/1879 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/187B PLB                     ;DBレジスタに値をプル
+$C0/187C LDA $0ACC  [$00:0ACC]   ;Aに[$00:0ACC]をロード
+$C0/187F BEQ $07    [$1888]      ;ゼロフラグが立っているとき[$1888]分岐
+;原始編・狩場2回目以降以外の処理
+$C0/1881 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1883 CLC                     ;キャリーフラグクリア
+$C0/1884 ADC #$08                ;A + $08
+$C0/1886 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;分岐合流
+$C0/1888 LDA $12FD  [$00:12FD]   ;Aに[$00:12FD]をロード
+$C0/188B CLC                     ;キャリーフラグクリア
+$C0/188C ADC $12FE  [$00:12FE]   ;A + [$00:12FE]
+$C0/188F CLC                     ;キャリーフラグクリア
+$C0/1890 ADC $12FF  [$00:12FF]   ;A + [$00:12FF]
+$C0/1893 ORA $30    [$00:0030]   ;Aと[$00:0030]で論理和
+$C0/1895 BRA $02    [$1899]      ;フラグにかかわりなく常に分岐[$1899]
+$C0/1899 STA $41    [$00:0041]   ;Aを[$00:0041]に書き込み
+</pre></div>
+
+<p>最終的に<code><span class="r">$C0/1899</span></code>で<code>[$00:0041]</code>が算出されているが、その前を辿ってみるとだいたい以下のようになる。</p>
+
+<div style="border: 1px solid gray; padding: .1em;"><p><span class="formula">x = <code>[$00:011E]</code>*4 | (<code>[$00:002D]</code> &#x3c;&#x3c; $03 &amp; $03)</span></p>
+
+<p><span class="formula"><code>[$00:0030]</code> = [$0018,x]*4</span><br>
+<span class="formula"><code>[$00:0ACC]</code>の値が<span class="formula">$00</span>以外だと、<br>
+<span class="formula"><code>[$00:0030]</code> = [$0018,x]*4 + $08</span></p>
+
+<p><span class="formula"><code>[$00:0041]</code> = (<code>[$00:12FD]</code> + <code>[$00:12FE]</code> + <code>[$00:12FF]</code>) | <code>[$00:0030]</code></span></p>
+
+<p>※<span class="formula">&#x3c;&#x3c;</span>は左ローテート、<span class="formula">|</span>は論理和の論理演算記号</p></div>
+
+<p><code>[$00:0041]</code>を求めるために必要なのは、</p>
+
+<ul>
+	<li><code>[$00:011E]</code></li>
+	<li><code>[$00:002D]</code></li>
+	<li><code>[$00:12FD]</code></li>
+	<li><code>[$00:12FE]</code></li>
+	<li><code>[$00:12FF]</code></li>
+	<li><code>[$00:0ACC]</code></li>
+</ul>
+
+<p>の6種類の変数だということがわかる。<br>
+<code>[$00:12FD]</code>、<code>[$00:12FE]</code>、<code>[$00:12FF]</code>の3バイト分は戦闘に関する<span class="tri"><a href="flag.html">進行フラグ</a></span>になる。<br>
+今回は原始編と中世編に絞って紹介する。</p>
+
+<h5>原始編</h5>
+
+<table>
+<thead>
+	<tr><th>エリア</th><th><code>$00:12FD</code></th><th><code>$00:12FE</code></th><th><code>$00:12FF</code></th><th><code>$00:0030</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>狩場(初回)</td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$04</span></td></tr>
+	<tr><td>狩場（2回目以降）</td><td><span class="formula">$01</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$04</span></td></tr>
+	<tr><td>荒野</td><td><span class="formula">$01</span></td><td><span class="formula">$01</span></td><td><span class="formula">$00</span></td><td><span class="formula">$0C</span></td></tr>
+	<tr><td>荒野の洞窟下</td><td><span class="formula">$01</span></td><td><span class="formula">$01</span></td><td><span class="formula">$00</span></td><td><span class="formula">$08</span></td></tr>
+	<tr><td>荒野の北側の細道</td><td><span class="formula">$01</span></td><td><span class="formula">$01</span></td><td><span class="formula">$01</span></td><td><span class="formula">$0C</span></td></tr>
+</tbody>
+</table>
+
+<h5>中世編</h5>
+
+<table>
+<thead>
+	<tr><th>状態</th><th><code>$00:12FD</code></th><th><code>$00:12FE</code></th><th><code>$00:12FF</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>偽魔王撃破前</td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>偽魔王撃破後</td><td><span class="formula">$01</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>エリアまたは進行度合いで値が変わる。</p>
+
+<p><code>[$00:011E]</code>、<code>[$00:002D]</code>はランダムエンカウント時における、エリア毎に設定された値になる。<br>
+原始編だと、敵シンボルとの戦闘が発生するエリアでは、<span class="formula"><code>[$00:011E]</code> = $02</span>で固定になっているようである。<br>
+<code>[$00:0ACC]</code>は狩場2回目以降のみ<span class="formula">$00</span>。<br>
+<code>[$00:002D]</code>は、荒野の洞窟だと<span class="formula">$00</span>、他は<span class="formula">$40</span>。</p>
+
+<p>一方、中世編だと、<code>[$00:011E]</code>、<code>[$00:002D]</code>はエリア毎に分けて設定されている。<br>
+<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様の、<a href="https://rodgersia.ninpou.jp/livealive/encount.txt" target="_blank">ランダムエンカウントに関するテキスト</a>に、ランダムエンカウントに関する詳細な説明があるが、<code>[$00:011E]</code>はエリア危険度、<code>[$00:002D]</code>下４ビットが増加値になる。<br>
+ただし、今回は、<br>
+<span class="formula">x = <code>[$00:011E]</code>*4 | (<code>[$00:002D]</code> &#x3c;&#x3c; $03 &amp; $03)</span><br>
+を計算しており、<span class="formula">(<code>[$00:002D]</code> &#x3c;&#x3c; $03 &amp; $03)</span>というのは実質、<code>[$00:002D]</code>の上2ビットの値なので、異なる値が算出される。</p>
+
+<p>中世編は、エリアは同じでも魔王戦前後で出現する敵パーティが変動するが、<br>
+<span class="formula"><code>[$00:0041]</code> = (<code>[$00:12FD]</code> + <code>[$00:12FE]</code> + <code>[$00:12FF]</code>) | <code>[$00:0030]</code></span><br>
+の、<code>[$00:0030]</code>部分はエリアで決まり、<span class="formula"><code>[$00:12FD]</code> + <code>[$00:12FE]</code> + <code>[$00:12FF]</code></span>がシナリオ進行で+1されることで敵パーティを変動させている。</p>
+
+
+<h3>敵パーティロード用サブルーチン</h3>
+
+<p>どの戦闘でも、敵パーティのデータを呼び出すため、戦闘開始直後に必ず<code><span class="r">$C1/F55D</span></code>～の処理を行う。<br>
+<code><span class="r">$C1/F55D</span></code>～で、<code>[$00:0040]</code><code>[$00:0041]</code>の値が必要となってくる。</p>
+
+<div class="code-container"><pre>
+$C1/F55D LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/F560 AND #$C0                ;Aと$C0で論理積
+$C1/F562 LSR A                   ;Aを論理右シフト　(/2)
+$C1/F563 STA $59    [$00:0359]   ;Aを[$00:0359]に書き込み
+（中略）
+$C1/F588 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/F58B CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/F58D BEQ $6C    [$F5FB]      ;ゼロフラグが立っているとき[$F5FB]分岐
+$C1/F58F BIT #$C0                ;Aと$C0で論理積（ステータスフラグ変更のみ）
+$C1/F591 BNE $5D    [$F5F0]      ;ゼロフラグが立っていないとき[$F5F0]分岐
+;ゼロフラグOFFは固定シンボル/イベント戦闘用分岐　$C1/F5F0へ
+$C1/F593 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00](シナリオID)をロード
+$C1/F596 CMP #$06                ;Aと$06を減算比較（ステータスレジスタ変更のみ）
+$C1/F598 BNE $15    [$F5AF]      ;ゼロフラグが立っていないとき[$F5AF]分岐
+;ゼロフラグON 近未来編処理
+$C1/F59A LDA $0041  [$00:0041]   ;Aに[$00:0041]をロード
+$C1/F59D BIT #$03                ;Aと$03で論理積（ステータスフラグ変更のみ）
+$C1/F59F BNE $0E    [$F5AF]      ;ゼロフラグが立っていないとき[$F5AF]分岐
+$C1/F5A1 LDA $0E86  [$00:0E86]   ;Aに[$00:0E86](アキラのレベル)をロード
+$C1/F5A4 CLC                     ;キャリーフラグクリア
+$C1/F5A5 ADC #$74                ;A + $74
+$C1/F5A7 CMP #$82                ;Aと$82を減算比較（ステータスレジスタ変更のみ）
+$C1/F5A9 BCC $45    [$F5F0]      ;キャリーフラグが立っていないとき[$F5F0]分岐
+$C1/F5AB LDA #$81                ;Aに$81をロード
+$C1/F5AD BRA $41    [$F5F0]      ;フラグにかかわりなく常に分岐[$F5F0]
+;近未来編処理 ここまで
+$C1/F5AF LDA $0A00  [$00:0A00]   ;Aに[$00:0A00](シナリオID)をロード
+$C1/F5B2 CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+;ゼロフラグON 最終編処理
+$C1/F5B4 BNE $05    [$F5BB]      ;ゼロフラグが立っていないとき[$F5BB]分岐
+$C1/F5B6 JSR $F4FA  [$C1:F4FA]   ;[$C1:F4FA]へジャンプ
+$C1/F5B9 BRA $35    [$F5F0]      ;フラグにかかわりなく常に分岐[$F5F0]
+;最終編処理 ここまで
+$C1/F5BB LDA $047E  [$00:047E]   ;Aに[$00:047E]をロード
+$C1/F5BE CMP #$AA                ;Aと$AAを減算比較（ステータスレジスタ変更のみ）
+$C1/F5C0 BNE $09    [$F5CB]      ;ゼロフラグが立っていないとき[$F5CB]分岐
+;ここでゼロフラグOFFだと乱数計算、敵パーティを乱数で決める
+$C1/F5C2 LDA $047F  [$00:047F]   ;Aに[$00:047F]をロード
+$C1/F5C5 INC A                   ;Aをインクリメント +1
+$C1/F5C6 STA $047F  [$00:047F]   ;Aを[$00:047F]に書き込み
+$C1/F5C9 BRA $03    [$F5CE]      ;フラグにかかわりなく常に分岐[$F5CE]
+
+;$C1/F5C0でゼロフラグOFF　乱数計算$C1/6150～$C1/61A4へ
+$C1/F5CB JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+</pre></div>
+
+<p>細かい説明は後回しにするとして、<code><span class="r">$C1/F5C0</span></code>でゼロフラグが立たない場合、<code><span class="r">$C1/F5CB</span></code>に進むが、そこから更に<code>$C1:6150</code>にジャンプしている。<br>
+<code>$C1:6150</code>～は、戦闘乱数計算用サブルーチンであり、戦闘乱数（<span class="formula">$00</span>～<span class="formula">$FF</span>）を<code>A</code>と<code>[$00:033B]</code>に入れた状態でサブルーチンが戻ってくることになる。<br>
+乱数計算に飛ぶ戦闘のみ、敵パーティが乱数でランダムに決まることになる。<br>
+それが中世編のランダムエンカウントと、原始編の見えないシンボルとのエンカウントである。<br>
+最終編については、<code><span class="r">$C1/F5AF</span></code>～でシナリオIDが<span class="formula">$08</span>（最終編）かどうかの分岐があるので、<code><span class="r">$C1/F5B4</span></code>～<code><span class="r">$C1/F5B9</span></code>の処理を経て<code><span class="r">$C1/F5F0</span></code>にジャンプし、別処理で敵パーティが決まる。</p>
+
+<p>改めて<code><span class="r">$C1/F55D</span></code>から処理を見てみると、<code>[$00:0040]</code>が<span class="formula">$04</span>ではない、<code>[$00:0040]</code>と<span class="formula">$C0</span>で論理積を取ってゼロフラグが立つかどうかでまず大きな分岐がある。<br>
+つまり、<code>[$00:0040]</code>が<span class="formula">$C0</span>より大きいか（上2ビットに値が入っているか）で分岐なのだが、<code>[$00:0040]</code>が<span class="formula">$C0</span>以上はシンボルで固定の戦闘（幕末編・功夫編など）やイベント戦闘が該当するようである。<br>
+敵パーティを乱数で判定する必要がないため、ここで分岐して<code><span class="r">$C1/F5F0</span></code>にジャンプする。<br>
+これ以降はシナリオ分岐で、<code><span class="r">$C1/F593</span></code>～<code><span class="r">$C1/F598</span></code>はシナリオIDが<span class="formula">$06</span>か、つまり近未来編かの判定である。<br>
+<code><span class="r">$C1/F59A</span></code>～<code><span class="r">$C1/F5AD</span></code>が近未来編用の前処理で、ワールドマップでの戦闘かどうかなど各種分岐と処理があるが、ここでは詳細を省く。<br>
+<code><span class="r">$C1/F5B4</span></code>～で最終編判定、<code><span class="r">$C1/F5BB</span></code>～で<code>[$00:047E]</code>が<span class="formula">$AA</span>ではない場合、戦闘乱数で敵パーティ判定、となる。<br>
+<code>$00:047E</code>だが、少し前で「<code>STZ $047E  [$00:047E]</code>」という処理があるので、おそらく特殊な状況でない限り<span class="formula">$00</span>が入っている（と思われる）。</p>
+
+<p>ここでは中世編のランダムエンカウントと、原始編の見えないシンボルとのエンカウントの場合、<code><span class="r">$C1/F5CB</span></code>のジャンプ先、<code><span class="r">$C1/6150</span></code>～<code><span class="r">$C1/61A4</span></code>で乱数計算をして、<code><span class="r">$C1/F5CE</span></code>で戻ってきた後の処理を見てみよう。</p>
+
+<div class="code-container"><pre>
+$C1/F5CE AND #$0F                ;Aと$0Fで論理積
+$C1/F5D0 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/F5D2 STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+</pre></div>
+
+<p><code>A</code>に戦闘乱数（<span class="formula">$00</span>～<span class="formula">$FF</span>）を読み込んだ状態で<code><span class="r">$C1/F5CE</span></code>に戻ってくるが、上の処理によると、乱数<span class="formula">$00</span>～<span class="formula">$FF</span>と<span class="formula">$0F</span>で論理積をとって<code>[$00:0310]</code>に書き込んでいる。<br>
+<span class="formula">$0F</span>と論理積をとると、乱数の下1桁だけ残る。<br>
+つまり、乱数<span class="formula">$00</span>～<span class="formula">$FF</span>は<span class="formula">$0～$F</span>のいずれかになり、<code>[$00:0310]</code>に書き込まれるのは<span class="formula">$00</span>～<span class="formula">$0F</span>である。<br>
+また、<span class="formula">$00</span>～<span class="formula">$0F</span>は当確率で出現することになる。<br>
+<span class="formula">$0F</span>と論理積をとって、例えば<span class="formula">$00</span>になるのは、<span class="formula">$00</span>, <span class="formula">$10</span>, <span class="formula">$20</span>, <span class="formula">$30</span>,……<span class="formula">$F0</span>の16通りである。どの数値でも同様。<br>
+<code>[$00:0310]</code>の数値が、後々で呼び出し先アドレスの違いに繋がる。</p>
+
+<div class="code-container"><pre>
+$C1/F5D4 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/F5D6 LDA $0041  [$00:0041]   ;Aに[$00:0042][$00:0041]をロード
+$C1/F5D9 AND #$00FF              ;Aと$00FFで論理積
+$C1/F5DC ASL A                   ;Aを算術左シフト *2
+$C1/F5DD ADC $D60050[$D6:0050]   ;A + [$D6:0051][$D6:0050]($526B)
+$C1/F5E1 TAX                     ;Aの値をXレジスタに転送
+$C1/F5E2 LDA $D60000,x           ;Aに[$D60000,x+1][$D60000,x]をロード
+$C1/F5E6 CLC                     ;キャリーフラグクリア
+$C1/F5E7 ADC $10    [$00:0310]   ;A + [$00:0311][$00:0310]
+$C1/F5E9 TAX                     ;Aの値をXレジスタに転送
+$C1/F5EA SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/F5EC LDA $D60000,x           ;Aに[$D60000,x]をロード
+$C1/F5F0 STA $50    [$00:0350]   ;Aを[$00:0350]に書き込み
+$C1/F5F2 STZ $51    [$00:0351]   ;[$00:0351]に$00を書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/F5D4</span></code>で16bitモードに切り替えたので、<code><span class="r">$C1/F5D6</span></code>では<code>[$00:0042]</code><code>[$00:0041]</code>の2バイト分呼び出すが、<code><span class="r">$C1/F5D9</span></code>で$00FFと論理積を取るから、結局、上に<span class="formula">00</span>を付けた<code>[$00:0041]</code>（1バイト）が<code>A</code>に残る。<br>
+<code><span class="r">$C1/F5DC</span></code>で<span class="formula"><code>[$00:0041]</code>*2</span>し、<code>[$D6:0051]</code><code>[$D6:0050]</code><span class="formula">($526B)</span>と加算した値が、<code>X</code>レジスタに転送され、<code><span class="r">$C1/F5E2</span></code>で<code>[$D60000,x+1]</code><code>[$D60000,x]</code>をロードしている。<br>
+つまり、<code><span class="r">$C1/F5E2</span></code>で呼び出すアドレスは、</p>
+
+<p><span class="formula"><code>[$D60000,x+1]</code><code>[$D60000,x]</code></span><br>
+<span class="formula">x = <code>[$00:0041]</code>*2 + $526B</span></p>
+
+<p>である。<br>
+上で述べた通り、<code>[$00:0041]</code>はシナリオ・エリアによって変動するので、ここで呼び出すアドレスが変動することになる。<br>
+更にその先では、<code>[$D60000,x+1]</code><code>[$D60000,x]</code> + <code>[$00:0311]</code><code>[$00:0310]</code>を<code>X</code>レジスタに転送し、<code><span class="r">$C1/F5EC</span></code>で<code>[$D60000,x]</code>をロードする。<br>
+よって<code><span class="r">$C1/F5EC</span></code>で呼び出すアドレスは、</p>
+
+<p><code>[$D60000,n]</code><br>
+<span class="formula">n = <code>[$D60000,x+1]</code><code>[$D60000,x]</code> + <code>[$00:0311]</code><code>[$00:0310]</code></span><br>
+<span class="formula">x = <code>[$00:0041]</code>*2 + $526B</span></p>
+
+<p>と、なかなか入り組んだ値である。<br>
+<code>[$00:0311]</code><code>[$00:0310]</code>は先程の計算どおり、乱数により<span class="formula">$0000～$000F</span>と変動する。<br>
+<code>[$00:0041]</code>はエリアによる固定値であるから、同じエリア内なら、<code>[$00:0311]</code><code>[$00:0310]</code>の乱数分だけ、<code><span class="r">$C1/F5EC</span></code>で呼び出すアドレスが変動するはずだ。</p>
+
+<h4>原始編</h4>
+
+<p>ここで例として、原始編での処理を見てみよう。<br>
+原始編の最初の戦闘、つまり狩場で、「ホネ肉」を得て長老に渡すまでについてサブルーチンを追いかけてみる。</p>
+
+<p><span class="formula"><code>[$00:0041]</code> = (<code>[$00:12FD]</code> + <code>[$00:12FE]</code> + <code>[$00:12FF]</code>) | <code>[$00:0030]</code></span></p>
+
+<p>は、</p>
+
+<p><span class="formula"><code>[$00:0041]</code> = ($00 + $00 + $00) | $04</span><br>
+<span class="formula"> = $04</span></p>
+
+<p>よって、</p>
+
+<p><span class="formula">x = <code>[$00:0041]</code>*2 + $526B</span><br>
+<span class="formula"> = $04*2 + $526B</span><br>
+<span class="formula"> = $5273</span></p>
+
+<p><span class="formula"><code>[$D60000,x+1]</code><code>[$D60000,x]</code></span><br>
+<span class="formula"> = <code>[$D6:5274]</code><code>[$D6:5273]</code></span></p>
+
+<p><code>[$D6:5274]</code><code>[$D6:5273]</code>の値を見ると<span class="formula">$53DB</span>である。</p>
+
+<p><code>[$D60000,n]</code><br>
+<span class="formula">n = <code>[$D60000,x+1]</code><code>[$D60000,x]</code> + <code>[$00:0311]</code><code>[$00:0310]</code></span><br>
+<span class="formula">= <code>[$D6:5274]</code><code>[$D6:5273]</code> + <code>[$00:0311]</code><code>[$00:0310]</code></span><br>
+<span class="formula">= $53DB + (乱数$0000～$000F)</span></p>
+
+<p>よって、<code><span class="r">$C1/F5EC</span></code>で呼び出される<code>[$D60000,n]</code>は、</p>
+
+<p><code>[$D6:53DB]</code>～<code>[$D6:53EA]</code></p>
+
+<p>以上のアドレスのいずれかである。<br>
+呼び出された値は<code><span class="r">$C1/F5F0</span></code>で<code>[$00:0350]</code>に書き込まれる。<br>
+<code>[$D6:53DB]</code>～<code>[$D6:53EA]</code>の値については横に置いて、続きを見てみる。</p>
+
+<div class="code-container"><pre>
+$C1/F5F4 CMP #$D3                ;Aと$D3を減算比較（ステータスレジスタ変更のみ）
+$C1/F5F6 BNE $03    [$F5FB]      ;ゼロフラグが立っていないとき[$F5FB]分岐
+;ゼロフラグON
+$C1/F5F8 JSR $714F  [$C1:714F]   ;[$C1:714F]へジャンプ
+;ゼロフラグOFF
+$C1/F5FB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/F5FD LDA $50    [$00:0350]   ;Aに[$00:0351][$00:0350]をロード
+$C1/F5FF ASL A                   ;Aを算術左シフト *2
+$C1/F600 ADC $D60020[$D6:0020]   ;A + [$D6:0021][$D6:0020]($4080)
+$C1/F604 TAX                     ;Aの値をXレジスタに転送
+$C1/F605 LDA $D60000,x           ;Aに[$D60000,x+1][$D60000,x]をロード
+$C1/F609 TAX                     ;Aの値をXレジスタに転送
+$C1/F60A STA $52    [$00:0352]   ;Aを[$00:0353][$00:0352]に書き込み
+$C1/F60C SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/F60E LDA $D60000,x           ;Aに[$D60000,x](敵パーティレベル)をロード
+$C1/F612 STA $55    [$00:0355]   ;Aを[$00:0355]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/F5F4</span></code>～<code><span class="r">$C1/F5F6</span></code>のゼロフラグ判定だが、おそらく原始編と中世編でゼロフラグが立つことはない。<br>
+<code><span class="r">$C1/F5FB</span></code>からは、<span class="formula"><code>[$00:0351]</code><code>[$00:0350]</code>*2 + $4080</span>を<code>X</code>レジスタに転送してから<code>[$D60000,x+1]</code><code>[$D60000,x]</code>をロードするのだが、後の処理でわかる通りに、<code><span class="r">$C1/F60E</span></code>で呼び出される<code>[$D60000,x]</code>が、この戦闘における敵パーティレベルに当たる。<br>
+敵パーティデータは最初のアドレスに敵パーティレベルが入るので、ここで敵パーティが呼び出せたことになる。<br>
+つまり、敵パーティデータの最初のアドレス（敵パーティレベルのアドレス）は、</p>
+
+<p><span class="formula">敵パーティレベルのアドレス = </span><br>
+<span class="formula">$D60000 + <code>[$D60000,x+1]</code><code>[$D60000,x]</code></span><br>
+　<span class="formula">x = <code>[$00:0351]</code><code>[$00:0350]</code>*2 + $4080</span></p>
+
+<p>である。</p>
+
+<div class="code-container"><pre>
+$C1/F5FB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/F5FD LDA $50    [$00:0350]   ;Aに[$00:0351][$00:0350]をロード
+$C1/F5FF ASL A                   ;Aを算術左シフト *2
+$C1/F600 ADC $D60020[$D6:0020]   ;A + [$D6:0021][$D6:0020]
+$C1/F604 TAX                     ;Aの値をXレジスタに転送
+$C1/F605 LDA $D60000,x           ;Aに[$D60000,x]をロード
+$C1/F609 TAX                     ;Aの値をXレジスタに転送
+$C1/F60A STA $52    [$00:0352]   ;Aを[$00:0352]に書き込み
+$C1/F60C SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/F60E LDA $D60000,x           ;Aに[$D60000,x](敵パーティレベル)をロード
+$C1/F612 STA $55    [$00:0355]   ;Aを[$00:0355]に書き込み
+$C1/F614 LDA $D60001,x           ;Aに[$D60001,x]をロード
+$C1/F618 STA $56    [$00:0356]   ;Aを[$00:0356]に書き込み
+$C1/F61A LDA $D60006,x           ;Aに[$D60006,x]をロード
+$C1/F61E STA $58    [$00:0358]   ;Aを[$00:0358]に書き込み
+$C1/F620 PHX                     ;Xをスタックにプッシュ
+$C1/F621 STZ $60    [$00:0360]   ;[$00:0360]に$00を書き込み
+$C1/F623 JSR $FB2B  [$C1:FB2B]   ;[$C1:FB2B]へジャンプ
+</pre></div>
+
+<p><code>[$00:0351]</code><code>[$00:0350]</code>は、<code>[$00:0351]</code>に00が入っているから、さきほどの原始編の例で言えば、<code>[$00:0350]</code>の上に00を付けた2バイトの値である。<br>
+<code>[$00:0350]</code>は、乱数により<code>[$D6:53DB]</code>～<code>[$D6:53EA]</code>のどれかになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$D6:53DB</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53DC</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53DD</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53DE</code></td><td><span class="formula">$37</span></td></tr>
+	<tr><td><code>$D6:53DF</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53E0</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53E1</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53E2</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53E3</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53E4</code></td><td><span class="formula">$37</span></td></tr>
+	<tr><td><code>$D6:53E5</code></td><td><span class="formula">$37</span></td></tr>
+	<tr><td><code>$D6:53E6</code></td><td><span class="formula">$37</span></td></tr>
+	<tr><td><code>$D6:53E7</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53E8</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53E9</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$D6:53EA</code></td><td><span class="formula">$40</span></td></tr>
+</tbody>
+</table>
+
+<p>実は<span class="formula">$37</span>と<span class="formula">$40</span>のどちらかしか入っていないのである。<br>
+では、<span class="formula">（<code>[$D6:53DB]</code>～<code>[$D6:53EA]</code>）*2 + $4080</span>を計算すると、</p>
+
+<p><span class="formula">$37*2 + $4080 = $40EE</span><br>
+<span class="formula">$40*2 + $4080 = $4100</span></p>
+
+<p>であるから、呼び出すアドレスと値は、</p>
+
+<p><span class="formula">$37</span> : <code>[$D6:40EF]</code><code>[$D6:40EE]</code><span class="formula"> = $45D3</span> <br>
+<span class="formula">$40</span> : <code>[$D6:4101]</code><code>[$D6:4100]</code><span class="formula"> = $4668</span></p>
+
+<p>これらの値のバンク<span class="formula">$D6</span>のアドレスこそが、該当の敵パーティレベルになる。</p>
+
+<table>
+<thead>
+	<tr><th>敵パーティレベルアドレス</th><th>敵パーティID</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$D6:45D3</code></td><td><span class="formula">$37</span></td><td>シンテトラケス&#x2640;</td></tr>
+	<tr><td><code>$D6:4668</code></td><td><span class="formula">$40</span></td><td>ころワン×4</td></tr>
+</tbody>
+</table>
+
+<p>実のところ、<code>[$00:0350]</code>に入った値は敵パーティIDだったのである。<br>
+よって、<code>$D6:53DB</code>～<code>$D6:53EA</code>とは、狩場（初回時）における敵パーティ表に他ならない。<br>
+表を見ると、<span class="formula">$37</span>が4パターン、<span class="formula">$40</span>が12パターンの合計16パターンである。<br>
+乱数により、敵パーティID<span class="formula">$37</span>が<span class="formula">4/16</span>、敵パーティID<span class="formula">$40</span>が<span class="formula">12/16</span>の確率で選ばれる、ということがわかる。<br>
+狩場（初回時）では、「シンテトラケス&#x2640;」か「ころワン×4」のどちらかの敵パーティしか出現しないが、「シンテトラケス&#x2640;」は<span class="formula">1/4</span>、「ころワン×4」は<span class="formula">3/4</span>で出現する、ということがわかった。<br>
+実際にプレイしても、初回は「ころワン×4」の方が出現しやすいことは体感でもわかるのだが、実際に確率としても「ころワン×4」の出現率が高めに設定されていたのである。</p>
+
+<p>ということで、<code>$D6:53DB</code>～<code>$D6:53EA</code>付近に、原始編における他エリアの敵パーティ表がありそうだ。<br>
+諸々の計算は横に置いて結論だけ述べると、<code>$D6:53CB</code>～以降、16バイト毎に<code>$D6:541A</code>までが原始編の敵パーティ表なのである。<br>
+入っている数値が敵パーティIDである。</p>
+
+<table>
+<thead>
+	<tr><th colspan="16">洞窟下 <code>$D6:53CB</code>～<code>$D6:53DA</code></th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$38</span></td><td><span class="formula">$3D</span></td><td><span class="formula">$3D</span></td><td><span class="formula">$3C</span></td><td><span class="formula">$3C</span></td><td><span class="formula">$3D</span></td><td><span class="formula">$42</span></td><td><span class="formula">$3E</span></td><td><span class="formula">$53</span></td><td><span class="formula">$53</span></td><td><span class="formula">$53</span></td><td><span class="formula">$53</span></td><td><span class="formula">$49</span></td><td><span class="formula">$49</span></td><td><span class="formula">$3C</span></td><td><span class="formula">$49</span></td></tr>
+	<tr><th colspan="16">狩場(初回) <code>$D6:53DB</code>～<code>$D6:53EA</code></th></tr>
+	<tr><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$37</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$37</span></td><td><span class="formula">$37</span></td><td><span class="formula">$37</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td><td><span class="formula">$40</span></td></tr>
+	<tr><th colspan="16">狩場(2回目以降) <code>$D6:53EB</code>～<code>$D6:53FA</code></th></tr>
+	<tr><td><span class="formula">$40</span></td><td><span class="formula">$37</span></td><td><span class="formula">$38</span></td><td><span class="formula">$38</span></td><td><span class="formula">$38</span></td><td><span class="formula">$36</span></td><td><span class="formula">$36</span></td><td><span class="formula">$44</span></td><td><span class="formula">$44</span></td><td><span class="formula">$36</span></td><td><span class="formula">$45</span></td><td><span class="formula">$45</span></td><td><span class="formula">$45</span></td><td><span class="formula">$40</span></td><td><span class="formula">$36</span></td><td><span class="formula">$3A</span></td></tr>
+	<tr><th colspan="16">荒野 <code>$D6:53FB</code>～<code>$D6:540A</code></th></tr>
+	<tr><td><span class="formula">$3A</span></td><td><span class="formula">$3B</span></td><td><span class="formula">$38</span></td><td><span class="formula">$21</span></td><td><span class="formula">$43</span></td><td><span class="formula">$44</span></td><td><span class="formula">$43</span></td><td><span class="formula">$48</span></td><td><span class="formula">$21</span></td><td><span class="formula">$3A</span></td><td><span class="formula">$3A</span></td><td><span class="formula">$45</span></td><td><span class="formula">$47</span></td><td><span class="formula">$4B</span></td><td><span class="formula">$45</span></td><td><span class="formula">$4C</span></td></tr>
+	<tr><th colspan="16">荒野の北側の細道 <code>$D6:540B</code>～<code>$D6:541A</code></th></tr>
+	<tr><td><span class="formula">$42</span></td><td><span class="formula">$48</span></td><td><span class="formula">$4A</span></td><td><span class="formula">$39</span></td><td><span class="formula">$54</span></td><td><span class="formula">$54</span></td><td><span class="formula">$4D</span></td><td><span class="formula">$54</span></td><td><span class="formula">$52</span></td><td><span class="formula">$54</span></td><td><span class="formula">$4E</span></td><td><span class="formula">$54</span></td><td><span class="formula">$3B</span></td><td><span class="formula">$46</span></td><td><span class="formula">$46</span></td><td><span class="formula">$55</span></td></tr>
+</tbody>
+</table>
+
+<p>というように並んでいる。<br>
+ひとつのエリアにつき、敵パーティ表の枠は16枠ということになり、狩場(初回)のように<span class="formula">$37</span>が4パターン、<span class="formula">$40</span>が12パターンとセットすることで、敵パーティにより出現確率を変えることができるようになっていることがわかる。<br>
+整理してみると、以下のようになる。</p>
+
+<h5>洞窟下 <code>$D6:53CB</code>～<code>$D6:53DA</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$38</span></td><td>1</td><td>ちびマンモス×3</td></tr>
+	<tr><td><span class="formula">$3C</span></td><td>3</td><td>ケケモグラ×12(配置1)</td></tr>
+	<tr><td><span class="formula">$3D</span></td><td>3</td><td>ケケモグラ×12(配置2)</td></tr>
+	<tr><td><span class="formula">$3E</span></td><td>1</td><td>アルコサウラ×1</td></tr>
+	<tr><td><span class="formula">$42</span></td><td>1</td><td>ケケモグラ×1</td></tr>
+	<tr><td><span class="formula">$49</span></td><td>3</td><td>アルコサウラ×1,アルコサウラ&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$53</span></td><td>4</td><td>アルコサウラ×1,アルコサウラ&#x2640;×3</td></tr>
+</tbody>
+</table>
+
+<h5>狩場(初回) <code>$D6:53DB</code>～<code>$D6:53EA</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$37</span></td><td>4</td><td>シンテトラケス&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>12</td><td>ころワン×4</td></tr>
+</tbody>
+</table>
+
+<h5>狩場(2回目以降) <code>$D6:53EB</code>～<code>$D6:53FA</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$36</span></td><td>4</td><td>シンテトラケス×1,シンテトラケス&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$37</span></td><td>1</td><td>シンテトラケス&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$38</span></td><td>3</td><td>ちびマンモス×3</td></tr>
+	<tr><td><span class="formula">$3A</span></td><td>1</td><td>原始バイソン×1,原始バイソン&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>2</td><td>ころワン×4</td></tr>
+	<tr><td><span class="formula">$44</span></td><td>2</td><td>原始バイソン×1</td></tr>
+	<tr><td><span class="formula">$45</span></td><td>3</td><td>アーケオテリウム×1,アーケオ&#x2640;×1</td></tr>
+</tbody>
+</table>
+
+<h5>荒野 <code>$D6:53FB</code>～<code>$D6:540A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$21</span></td><td>2</td><td>サーベルタイガー×3,サーベルタイガ&#x2640;×3</td></tr>
+	<tr><td><span class="formula">$38</span></td><td>1</td><td>ちびマンモス×3</td></tr>
+	<tr><td><span class="formula">$3A</span></td><td>3</td><td>原始バイソン×1,原始バイソン&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$3B</span></td><td>1</td><td>原始バイソン&#x2640;×1,モア&#x2640;×2</td></tr>
+	<tr><td><span class="formula">$43</span></td><td>2</td><td>サーベルタイガー×1,サーベルタイガ&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$44</span></td><td>1</td><td>原始バイソン×1</td></tr>
+	<tr><td><span class="formula">$45</span></td><td>2</td><td>アーケオテリウム×1,アーケオ&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$47</span></td><td>1</td><td>サーベルタイガー×2,サーベルタイガ&#x2640;×2</td></tr>
+	<tr><td><span class="formula">$48</span></td><td>2</td><td>モア×1,モア&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$4C</span></td><td>1</td><td>ナウマンゾウ&#x2640;×1</td></tr>
+</tbody>
+</table>
+
+<h5>荒野の北側の細道 <code>$D6:540B</code>～<code>$D6:541A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$39</span></td><td>1</td><td>サーベルタイガー×3,ブロントテリウム×1,ブロント&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$3B</span></td><td>2</td><td>原始バイソン&#x2640;×1,モア&#x2640;×2</td></tr>
+	<tr><td><span class="formula">$42</span></td><td>1</td><td>ケケモグラ×1</td></tr>
+	<tr><td><span class="formula">$46</span></td><td>2</td><td>アーケオテリウム×1,アーケオ&#x2640;×7</td></tr>
+	<tr><td><span class="formula">$48</span></td><td>1</td><td>モア×1,モア&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$4A</span></td><td>1</td><td>ブロントテリウム×1,ブロント&#x2640;×1</td></tr>
+	<tr><td><span class="formula">$4D</span></td><td>1</td><td>マンモス×1,ちびマンモス×1</td></tr>
+	<tr><td><span class="formula">$4E</span></td><td>1</td><td>マンモス&#x2640;×1,ブロント&#x2640;×2</td></tr>
+	<tr><td><span class="formula">$52</span></td><td>1</td><td>マンモス×1,サーベルタイガ&#x2640;×2</td></tr>
+	<tr><td><span class="formula">$54</span></td><td>5</td><td>ファルラルコス&#x2640;×1,ファルラルコス×1</td></tr>
+	<tr><td><span class="formula">$55</span></td><td>1</td><td>マンモス&#x2640;×2,ちびマンモス×1</td></tr>
+</tbody>
+</table>
+
+<p>回数を16で割ると各パーティの出現確率になる。<br>
+出現率に偏りをもたせていることがわかる。</p>
+
+<p>これで敵パーティの決定方法が判明した。<br>
+後は敵パーティデータから各種データを取り出してセットしていくことになる。</p>
+
+<h4>中世編</h4>
+
+<p>以上が原始編の仕組みだが、中世編も仕組みはだいたい似たようなものである。<br>
+ただ、<code>[$00:0350]</code>に入る値は、敵パーティIDに一定値を加えたものがある。<br>
+具体的には、<span class="formula">$60～$80</span>の値が入っていた場合、<span class="formula">$60</span>を引いた値が敵パーティID。<br>
+<span class="formula">$C0</span>～の値が入っていた場合、<span class="formula">$AC</span>を引いた値が敵パーティIDになる。</p>
+
+<p>中世編は、</p>
+
+<ul>
+	<li>ルクレチアの森</li>
+	<li>勇者の山</li>
+	<li>魔王山・洞窟エリア</li>
+	<li>魔王山・廃墟エリア</li>
+</ul>
+
+<p>と、エリアが4ヶ所に分かれていて、更に魔王戦前後で敵パーティ編成が変動するので、合計8パターンになる。<br>
+敵パーティ表は<code>$D6:541B</code>～<code>$D6:549A</code>になる。<br>
+<span class="formula">$60</span>以上の値が入っている場合、下段に敵パーティIDも併記した。</p>
+
+
+<table>
+<thead>
+	<tr><th colspan="16">ルクレチアの森 / 魔王戦前 <code>$D6:541B</code>～<code>$D6:542A</code></th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$60</span></td><td><span class="formula">$60</span></td><td><span class="formula">$60</span></td><td><span class="formula">$60</span></td><td><span class="formula">$61</span></td><td><span class="formula">$61</span></td><td><span class="formula">$61</span></td><td><span class="formula">$62</span></td><td><span class="formula">$62</span></td><td><span class="formula">$63</span></td><td><span class="formula">$63</span></td><td><span class="formula">$64</span></td><td><span class="formula">$64</span></td><td><span class="formula">$65</span></td><td><span class="formula">$66</span></td><td><span class="formula">$67</span></td></tr>
+	<tr><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$01</span></td><td><span class="formula">$01</span></td><td><span class="formula">$01</span></td><td><span class="formula">$02</span></td><td><span class="formula">$02</span></td><td><span class="formula">$03</span></td><td><span class="formula">$03</span></td><td><span class="formula">$04</span></td><td><span class="formula">$04</span></td><td><span class="formula">$05</span></td><td><span class="formula">$06</span></td><td><span class="formula">$07</span></td></tr>
+	<tr><th colspan="16">ルクレチアの森 / 魔王戦後 <code>$D6:542B</code>～<code>$D6:543A</code></th></tr>
+	<tr><td><span class="formula">$60</span></td><td><span class="formula">$61</span></td><td><span class="formula">$62</span></td><td><span class="formula">$63</span></td><td><span class="formula">$64</span></td><td><span class="formula">$65</span></td><td><span class="formula">$66</span></td><td><span class="formula">$67</span></td><td><span class="formula">$20</span></td><td><span class="formula">$20</span></td><td><span class="formula">$22</span></td><td><span class="formula">$23</span></td><td><span class="formula">$24</span></td><td><span class="formula">$25</span></td><td><span class="formula">$26</span></td><td><span class="formula">$27</span></td></tr>
+	<tr><td><span class="formula">$00</span></td><td><span class="formula">$01</span></td><td><span class="formula">$02</span></td><td><span class="formula">$03</span></td><td><span class="formula">$04</span></td><td><span class="formula">$05</span></td><td><span class="formula">$06</span></td><td><span class="formula">$07</span></td><td><span class="formula">$20</span></td><td><span class="formula">$20</span></td><td><span class="formula">$22</span></td><td><span class="formula">$23</span></td><td><span class="formula">$24</span></td><td><span class="formula">$25</span></td><td><span class="formula">$26</span></td><td><span class="formula">$27</span></td></tr>
+	<tr><th colspan="16">魔王山・洞窟エリア / 魔王戦前 <code>$D6:543B</code>～<code>$D6:544A</code></th></tr>
+	<tr><td><span class="formula">$68</span></td><td><span class="formula">$C5</span></td><td><span class="formula">$C6</span></td><td><span class="formula">$6B</span></td><td><span class="formula">$C8</span></td><td><span class="formula">$C9</span></td><td><span class="formula">$CA</span></td><td><span class="formula">$6F</span></td><td><span class="formula">$C4</span></td><td><span class="formula">$C4</span></td><td><span class="formula">$C5</span></td><td><span class="formula">$C5</span></td><td><span class="formula">$C6</span></td><td><span class="formula">$C6</span></td><td><span class="formula">$C7</span></td><td><span class="formula">$C7</span></td></tr>
+	<tr><td><span class="formula">$08</span></td><td><span class="formula">$19</span></td><td><span class="formula">$1A</span></td><td><span class="formula">$0B</span></td><td><span class="formula">$1C</span></td><td><span class="formula">$1D</span></td><td><span class="formula">$1E</span></td><td><span class="formula">$0F</span></td><td><span class="formula">$18</span></td><td><span class="formula">$18</span></td><td><span class="formula">$19</span></td><td><span class="formula">$19</span></td><td><span class="formula">$1A</span></td><td><span class="formula">$1A</span></td><td><span class="formula">$1B</span></td><td><span class="formula">$1B</span></td></tr>
+	<tr><th colspan="16">魔王山・洞窟エリア / 魔王戦後 <code>$D6:544B</code>～<code>$D6:545A</code></th></tr>
+	<tr><td><span class="formula">$28</span></td><td><span class="formula">$29</span></td><td><span class="formula">$28</span></td><td><span class="formula">$C5</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$28</span></td><td><span class="formula">$28</span></td><td><span class="formula">$29</span></td><td><span class="formula">$29</span></td><td><span class="formula">$2A</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$2C</span></td><td><span class="formula">$2D</span></td><td><span class="formula">$2E</span></td><td><span class="formula">$2F</span></td></tr>
+	<tr><td><span class="formula">$28</span></td><td><span class="formula">$29</span></td><td><span class="formula">$28</span></td><td><span class="formula">$19</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$28</span></td><td><span class="formula">$28</span></td><td><span class="formula">$29</span></td><td><span class="formula">$29</span></td><td><span class="formula">$2A</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$2C</span></td><td><span class="formula">$2D</span></td><td><span class="formula">$2E</span></td><td><span class="formula">$2F</span></td></tr>
+	<tr><th colspan="16">勇者の山 / 魔王戦前 <code>$D6:545B</code>～<code>$D6:546A</code></th></tr>
+	<tr><td><span class="formula">$70</span></td><td><span class="formula">$70</span></td><td><span class="formula">$71</span></td><td><span class="formula">$71</span></td><td><span class="formula">$72</span></td><td><span class="formula">$72</span></td><td><span class="formula">$73</span></td><td><span class="formula">$73</span></td><td><span class="formula">$72</span></td><td><span class="formula">$74</span></td><td><span class="formula">$75</span></td><td><span class="formula">$75</span></td><td><span class="formula">$71</span></td><td><span class="formula">$75</span></td><td><span class="formula">$74</span></td><td><span class="formula">$73</span></td></tr>
+	<tr><td><span class="formula">$10</span></td><td><span class="formula">$10</span></td><td><span class="formula">$11</span></td><td><span class="formula">$11</span></td><td><span class="formula">$12</span></td><td><span class="formula">$12</span></td><td><span class="formula">$13</span></td><td><span class="formula">$13</span></td><td><span class="formula">$12</span></td><td><span class="formula">$14</span></td><td><span class="formula">$15</span></td><td><span class="formula">$15</span></td><td><span class="formula">$11</span></td><td><span class="formula">$15</span></td><td><span class="formula">$14</span></td><td><span class="formula">$13</span></td></tr>
+	<tr><th colspan="16">勇者の山 / 魔王戦後 <code>$D6:546B</code>～<code>$D6:547A</code></th></tr>
+	<tr><td><span class="formula">$70</span></td><td><span class="formula">$77</span></td><td><span class="formula">$71</span></td><td><span class="formula">$72</span></td><td><span class="formula">$73</span></td><td><span class="formula">$74</span></td><td><span class="formula">$75</span></td><td><span class="formula">$76</span></td><td><span class="formula">$20</span></td><td><span class="formula">$20</span></td><td><span class="formula">$22</span></td><td><span class="formula">$23</span></td><td><span class="formula">$24</span></td><td><span class="formula">$25</span></td><td><span class="formula">$26</span></td><td><span class="formula">$27</span></td></tr>
+	<tr><td><span class="formula">$10</span></td><td><span class="formula">$17</span></td><td><span class="formula">$11</span></td><td><span class="formula">$12</span></td><td><span class="formula">$13</span></td><td><span class="formula">$14</span></td><td><span class="formula">$15</span></td><td><span class="formula">$16</span></td><td><span class="formula">$20</span></td><td><span class="formula">$20</span></td><td><span class="formula">$22</span></td><td><span class="formula">$23</span></td><td><span class="formula">$24</span></td><td><span class="formula">$25</span></td><td><span class="formula">$26</span></td><td><span class="formula">$27</span></td></tr>
+	<tr><th colspan="16">魔王山・廃墟エリア / 魔王戦前 <code>$D6:547B</code>～<code>$D6:548A</code></th></tr>
+	<tr><td><span class="formula">$70</span></td><td><span class="formula">$C4</span></td><td><span class="formula">$C4</span></td><td><span class="formula">$C5</span></td><td><span class="formula">$C5</span></td><td><span class="formula">$C6</span></td><td><span class="formula">$C6</span></td><td><span class="formula">$C7</span></td><td><span class="formula">$C7</span></td><td><span class="formula">$C8</span></td><td><span class="formula">$C8</span></td><td><span class="formula">$C9</span></td><td><span class="formula">$CA</span></td><td><span class="formula">$CA</span></td><td><span class="formula">$6F</span></td><td><span class="formula">$CA</span></td></tr>
+	<tr><td><span class="formula">$10</span></td><td><span class="formula">$18</span></td><td><span class="formula">$18</span></td><td><span class="formula">$19</span></td><td><span class="formula">$19</span></td><td><span class="formula">$1A</span></td><td><span class="formula">$1A</span></td><td><span class="formula">$1B</span></td><td><span class="formula">$1B</span></td><td><span class="formula">$1C</span></td><td><span class="formula">$1C</span></td><td><span class="formula">$1D</span></td><td><span class="formula">$1E</span></td><td><span class="formula">$1E</span></td><td><span class="formula">$0F</span></td><td><span class="formula">$1E</span></td></tr>
+	<tr><th colspan="16">魔王山・廃墟エリア / 魔王戦後 <code>$D6:548B</code>～<code>$D6:549A</code></th></tr>
+	<tr><td><span class="formula">$34</span></td><td><span class="formula">$28</span></td><td><span class="formula">$35</span></td><td><span class="formula">$2D</span></td><td><span class="formula">$2F</span></td><td><span class="formula">$29</span></td><td><span class="formula">$2A</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$2C</span></td><td><span class="formula">$2D</span></td><td><span class="formula">$2E</span></td><td><span class="formula">$2F</span></td><td><span class="formula">$30</span></td><td><span class="formula">$31</span></td><td><span class="formula">$32</span></td><td><span class="formula">$33</span></td></tr>
+</tbody>
+</table>
+
+
+<p>回数と敵パーティを整理すると以下の通り。</p>
+
+
+<h5>ルクレチアの森 / 魔王戦前 <code>$D6:541B</code>～<code>$D6:542A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>4</td><td>アイアンビートル×3</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>3</td><td>ライトライダー×3</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>2</td><td>シャープストロー×1,シングイーター×2</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>2</td><td>シャープストロー×2</td></tr>
+	<tr><td><span class="formula">$04</span></td><td>2</td><td>シングイーター×4</td></tr>
+	<tr><td><span class="formula">$05</span></td><td>1</td><td>ライトライダー×1</td></tr>
+	<tr><td><span class="formula">$06</span></td><td>1</td><td>ライトライダー×9</td></tr>
+	<tr><td><span class="formula">$07</span></td><td>1</td><td>アイアンビートル×6</td></tr>
+</tbody>
+</table>
+
+<h5>ルクレチアの森 / 魔王戦後 <code>$D6:542B</code>～<code>$D6:543A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>1</td><td>アイアンビートル×3</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>1</td><td>ライトライダー×3</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>1</td><td>シャープストロー×1,シングイーター×2</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>1</td><td>シャープストロー×2</td></tr>
+	<tr><td><span class="formula">$04</span></td><td>1</td><td>シングイーター×4</td></tr>
+	<tr><td><span class="formula">$05</span></td><td>1</td><td>ライトライダー×1</td></tr>
+	<tr><td><span class="formula">$06</span></td><td>1</td><td>ライトライダー×9</td></tr>
+	<tr><td><span class="formula">$07</span></td><td>1</td><td>アイアンビートル×6</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>2</td><td>王国兵×2(配置1)</td></tr>
+	<tr><td><span class="formula">$22</span></td><td>1</td><td>王国兵×3(配置1)</td></tr>
+	<tr><td><span class="formula">$23</span></td><td>1</td><td>グリーンナイト×1,王国兵×2</td></tr>
+	<tr><td><span class="formula">$24</span></td><td>1</td><td>王国兵×4</td></tr>
+	<tr><td><span class="formula">$25</span></td><td>1</td><td>王国兵×2(配置2)</td></tr>
+	<tr><td><span class="formula">$26</span></td><td>1</td><td>王国兵×2,グリーンナイト×1</td></tr>
+	<tr><td><span class="formula">$27</span></td><td>1</td><td>グリーンナイト×3</td></tr>
+</tbody>
+</table>
+
+<h5>魔王山・洞窟エリア / 魔王戦前 <code>$D6:543B</code>～<code>$D6:544A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$08</span></td><td>1</td><td>マンダイン×7</td></tr>
+	<tr><td><span class="formula">$0B</span></td><td>1</td><td>シングイーター×1,アイアンビートル×3,シャープストロー×1</td></tr>
+	<tr><td><span class="formula">$0F</span></td><td>1</td><td>シングイーター×1,シャープストロー×7</td></tr>
+	<tr><td><span class="formula">$18</span></td><td>2</td><td>レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$19</span></td><td>3</td><td>ホットビートル×1,レッサードラゴン×1,ドラグノン×1</td></tr>
+	<tr><td><span class="formula">$1A</span></td><td>3</td><td>バーンバルブ×2,レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$1B</span></td><td>2</td><td>リキッドストロー×4,レッサードラゴン</td></tr>
+	<tr><td><span class="formula">$1C</span></td><td>1</td><td>レッサードラゴン×1,バーンバルブ×2,ホットビートル×2</td></tr>
+	<tr><td><span class="formula">$1D</span></td><td>1</td><td>リキッドストロー×7</td></tr>
+	<tr><td><span class="formula">$1E</span></td><td>1</td><td>アームストロング×1,バーンバルブ×7</td></tr>
+</tbody>
+</table>
+
+<h5>魔王山・洞窟エリア / 魔王戦後 <code>$D6:544B</code>～<code>$D6:545A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$19</span></td><td>1</td><td>ホットビートル×1,レッサードラゴン×1,ドラグノン×1</td></tr>
+	<tr><td><span class="formula">$28</span></td><td>4</td><td>アヌビノフォビア</td></tr>
+	<tr><td><span class="formula">$29</span></td><td>1</td><td>アラクノフォビア×1,バーンバルブ×2</td></tr>
+	<tr><td><span class="formula">$2A</span></td><td>1</td><td>アラクノフォビア×1,バーンバルブ×4</td></tr>
+	<tr><td><span class="formula">$2B</span></td><td>3</td><td>アヌビノフォビア×1,レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$2C</span></td><td>1</td><td>エントモフォビア×1,リキッドストロー×1</td></tr>
+	<tr><td><span class="formula">$2D</span></td><td>1</td><td>ドラグノフォビア×1,レッサードラゴン×2</td></tr>
+	<tr><td><span class="formula">$2E</span></td><td>1</td><td>アラクノフォビア×1,レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$2F</span></td><td>1</td><td>エントモフォビア×3</td></tr>
+</tbody>
+</table>
+
+<h5>勇者の山 / 魔王戦前 <code>$D6:545B</code>～<code>$D6:546A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$10</span></td><td>2</td><td>フリーザイン×2,ファングイーター×2</td></tr>
+	<tr><td><span class="formula">$11</span></td><td>3</td><td>ファングイーター×4</td></tr>
+	<tr><td><span class="formula">$12</span></td><td>3</td><td>ファングイーター×2,クールバルブ×1</td></tr>
+	<tr><td><span class="formula">$13</span></td><td>3</td><td>クールバルブ×1,アームストロング×1,フリーザイン×2</td></tr>
+	<tr><td><span class="formula">$14</span></td><td>2</td><td>ナギーベア×1</td></tr>
+	<tr><td><span class="formula">$15</span></td><td>3</td><td>クールバルブ×2,ファングイーター×1</td></tr>
+</tbody>
+</table>
+
+<h5>勇者の山 / 魔王戦後 <code>$D6:546B</code>～<code>$D6:547A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$10</span></td><td>1</td><td>フリーザイン×2,ファングイーター×2</td></tr>
+	<tr><td><span class="formula">$11</span></td><td>1</td><td>ファングイーター×4</td></tr>
+	<tr><td><span class="formula">$12</span></td><td>1</td><td>ファングイーター×2,クールバルブ×1</td></tr>
+	<tr><td><span class="formula">$13</span></td><td>1</td><td>クールバルブ×1,アームストロング×1,フリーザイン×2</td></tr>
+	<tr><td><span class="formula">$14</span></td><td>1</td><td>ナギーベア×1</td></tr>
+	<tr><td><span class="formula">$15</span></td><td>1</td><td>クールバルブ×2,ファングイーター×1</td></tr>
+	<tr><td><span class="formula">$16</span></td><td>1</td><td>ナギーベア×2</td></tr>
+	<tr><td><span class="formula">$17</span></td><td>1</td><td>ナギーベア×1,クールバルブ×3,ファングイーター×2</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>2</td><td>王国兵×2(配置1)</td></tr>
+	<tr><td><span class="formula">$22</span></td><td>1</td><td>王国兵×3(配置1)</td></tr>
+	<tr><td><span class="formula">$23</span></td><td>1</td><td>グリーンナイト×1,王国兵×2</td></tr>
+	<tr><td><span class="formula">$24</span></td><td>1</td><td>王国兵×4</td></tr>
+	<tr><td><span class="formula">$25</span></td><td>1</td><td>王国兵×2(配置2)</td></tr>
+	<tr><td><span class="formula">$26</span></td><td>1</td><td>王国兵×2,グリーンナイト×1</td></tr>
+	<tr><td><span class="formula">$27</span></td><td>1</td><td>グリーンナイト×3</td></tr>
+</tbody>
+</table>
+
+<h5>魔王山・廃墟エリア / 魔王戦前 <code>$D6:547B</code>～<code>$D6:548A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$0F</span></td><td>1</td><td>シングイーター×1,シャープストロー×7</td></tr>
+	<tr><td><span class="formula">$10</span></td><td>1</td><td>フリーザイン×2,ファングイーター×2</td></tr>
+	<tr><td><span class="formula">$18</span></td><td>2</td><td>レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$19</span></td><td>2</td><td>ホットビートル×1,レッサードラゴン×1,ドラグノン×1</td></tr>
+	<tr><td><span class="formula">$1A</span></td><td>2</td><td>バーンバルブ×2,レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$1B</span></td><td>2</td><td>リキッドストロー×4,レッサードラゴン</td></tr>
+	<tr><td><span class="formula">$1C</span></td><td>2</td><td>レッサードラゴン×1,バーンバルブ×2,ホットビートル×2</td></tr>
+	<tr><td><span class="formula">$1D</span></td><td>1</td><td>リキッドストロー×7</td></tr>
+	<tr><td><span class="formula">$1E</span></td><td>3</td><td>アームストロング×1,バーンバルブ×7</td></tr>
+</tbody>
+</table>
+
+<h5>魔王山・廃墟エリア / 魔王戦後 <code>$D6:548B</code>～<code>$D6:549A</code></h5>
+<table>
+<thead>
+	<tr><th>ID</th><th>回数</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$28</span></td><td>1</td><td>アヌビノフォビア×1</td></tr>
+	<tr><td><span class="formula">$29</span></td><td>1</td><td>アラクノフォビア×1,バーンバルブ×2</td></tr>
+	<tr><td><span class="formula">$2A</span></td><td>1</td><td>アラクノフォビア×1,バーンバルブ×4</td></tr>
+	<tr><td><span class="formula">$2B</span></td><td>1</td><td>アヌビノフォビア×1,レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$2C</span></td><td>1</td><td>エントモフォビア×1,リキッドストロー×1</td></tr>
+	<tr><td><span class="formula">$2D</span></td><td>2</td><td>ドラグノフォビア×1,レッサードラゴン×2</td></tr>
+	<tr><td><span class="formula">$2E</span></td><td>1</td><td>アラクノフォビア×1,レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$2F</span></td><td>2</td><td>エントモフォビア×3</td></tr>
+	<tr><td><span class="formula">$30</span></td><td>1</td><td>ドラグノフォビア×1,エントモフォビア×1</td></tr>
+	<tr><td><span class="formula">$31</span></td><td>1</td><td>アヌビノフォビア×1,ドラグノフォビア×1</td></tr>
+	<tr><td><span class="formula">$32</span></td><td>1</td><td>リキッドストロー×2,ドラグノン×2,エントモフォビア×1</td></tr>
+	<tr><td><span class="formula">$33</span></td><td>1</td><td>アヌビノフォビア×2,レッサードラゴン×1</td></tr>
+	<tr><td><span class="formula">$34</span></td><td>1</td><td>ドラグノフォビア×1,アラクノフォビア×2</td></tr>
+	<tr><td><span class="formula">$35</span></td><td>1</td><td>ドラグノフォビア×2</td></tr>
+</tbody>
+</table>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program16.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program17.html"><span class="button">&#9654;次　行動異常</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 攻撃技のヒット数">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 攻撃技のヒット数">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説 &gt; 攻撃技のヒット数</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 攻撃技のヒット数</h1>
+<h2>攻撃技のヒット数</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここでは、攻撃技のヒット数がどう計算されているのか解説する。<br>
+特に、多段ヒット技、つまり最大連発数が2以上に設定されている技について説明する。</p>
+
+<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様の技データを見てみると、「最大連発数」の欄がある。<br>
+ここに書かれている数値が文字通りの最大連発数であるが、数値の後、カッコ内に注意が追記されている項目もある。<br>
+「(範囲全体)」は、「範囲内に1ヒット」の時の注意書きであるので、命中判定さえすれば「範囲内に1ヒット」の攻撃をする。<br>
+<span class="tri"><a href="program6_3.html">命中判定について</a></span>は、既に前ページで述べた通りである。</p>
+
+<p>多段ヒット技、つまり最大連発数が2以上の技について注目してみると、数値の後に何もない場合もあれば、<br>
+「(ランダムに減)」<br>
+「(レベルにより減)」<br>
+と書かれている技もある。<br>
+どの技でも、命中判定で命中することが決まった場合、最低でも1ヒットとなるはずである。</p>
+
+<ul>
+	<li>数値のみの技：<br>
+	最大連発数 = ヒット数</li>
+	<li>「ランダムに減」の技：<br>
+	ヒット数は、<span class="formula">1～最大連発数</span>である（ランダムで決まる。つまり乱数で計算している）</li>
+	<li>「レベルにより減」の技：<br>
+	ヒット数は使用者のレベルに依存して計算され、<span class="formula">1～最大連発数</span>である。</li>
+</ul>
+
+<p>この3パターンに分けられるということである。<br>
+これらヒット数のパターンを、とりあえず「ヒット数パターン」という名称にしておく。</p>
+
+<p>「範囲内に1ヒット」や、「最大連発数 = ヒット数」は戦闘中に計算するまでもなく、ヒット数が決まっている。命中するかどうかの判定がされるのみである（そのはずである）。<br>
+だが、「ランダムに減」や「レベルにより減」の場合は、何かしらの方法で実際のヒット数が計算されているはずだ。<br>
+このページでは、「ランダムに減」や「レベルにより減」の技のヒット数計算方法を紹介する。<br>
+計算式だけ知りたいという方は、最後の「<a href="#result">まとめ</a>」までジャンプしていただきたい。</p>
+
+<h3>技データ19について</h3>
+
+<p>ヒット数の計算の前に、技データ19について説明をする。<br>
+これまでも説明してきたが、各技のステータスなどは25バイト分（16進数2文字×25）のデータが記録されており、当コンテンツでは便宜上、25バイトのデータに0～24の番号をつけて、番号19のデータを「技データ19」とする。<br>
+技データ19には、最大連発数と、ヒット数パターンのデータが収められている。<br>
+つまり、ヒット数計算において重要なデータである。<br>
+技データ19には16進数2桁の数値、つまり1バイトのデータが入っている。<br>
+2進数だと8文字、つまり8ビットである。<br>
+その8ビットに以下のようにデータが入っている。</p>
+
+<table>
+<thead>
+	<tr><th>2進法の位</th><th>2<sup>7</sup></th><th>2<sup>6</sup></th><th>2<sup>5</sup></th><th>2<sup>4</sup></th><th>2<sup>3</sup></th><th>2<sup>2</sup></th><th>2<sup>1</sup></th><th>2<sup>0</sup></th></tr>
+</thead>
+<tbody>
+	<tr><th>技データ19</th><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+	<tr><th>収録データ</th><td style="text-align: center;">&#x2460;</td><td> </td><td colspan="2" style="text-align: center;">&#x2461;</td><td colspan="4" style="text-align: center;">&#x2462;</td></tr>
+</tbody>
+</table>
+
+<ul>
+	<li style="list-style: none;">&#x2460; 一番上の<span class="formula">2<sup>7</sup></span>の位。1だと「範囲内に1ヒット」。<br>
+	ここが1だと、上から2～8ビットに何の値が入っていたとしても「範囲内に1ヒット」が最優先になるようである（後のサブルーチンを参照）</li>
+	<li style="list-style: none;">&#x2461; 上から3、4番目（<span class="formula">2<sup>5</sup>～2<sup>4</sup></span>）の位（2ビット分）に、以下表のようにヒット数パターンが記録されている。</li>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>ヒット数パターン</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">00</span></td><td>通常（最大連発数がヒット数）</td></tr>
+	<tr><td><span class="formula">01</span></td><td>レベルにより減</td></tr>
+	<tr><td><span class="formula">10</span></td><td>範囲内に1ヒット</td></tr>
+	<tr><td><span class="formula">11</span></td><td>ランダムに減</td></tr>
+</tbody>
+</table>
+
+	<li style="list-style: none;">&#x2462; 下4ビット分は、「範囲内に1ヒット」以外の技の最大連発数。<br>
+	2進数<span class="formula">%0000～%1111</span>が入り、16進数だと<span class="formula">$0～$F</span>、10進数だと<span class="formula">0～15</span>。<br>
+	つまり本作の技の最大ヒット数は<span class="formula">15</span>。</li>
+</ul>
+
+<div style="border: 1px solid gray; padding: .4em;">例：
+	<dl>
+		<dt>ボコボコの技データ19は<span class="formula">$42</span>（<span class="formula">%0100 0010</span>）</dt>
+		<dd>最大連発数は<span class="formula">%0010</span>、10進数だと<span class="formula">2</span><br>
+		ヒット数パターンは「通常（最大連発数がヒット数）」</dd>
+<br>
+		<dt>ローキックの技データ19は<span class="formula">$12</span>（<span class="formula">%0001 0010</span>）</dt>
+		<dd>最大連発数は<span class="formula">%0010</span>、10進数だと<span class="formula">2</span><br>
+		ヒット数パターンは「レベルにより減」</dd>
+<br>
+		<dt>手裏剣乱糸の技データ19は<span class="formula">$56</span>（<span class="formula">%0101 0110</span>）</dt>
+		<dd>最大連発数は<span class="formula">%0110</span>、10進数だと<span class="formula">6</span><br>
+		ヒット数パターンは「レベルにより減」</dd>
+<br>
+		<dt>ハリケンショットの技データ19は<span class="formula">$7C</span>（<span class="formula">%0111 1100</span>）</dt>
+		<dd>最大連発数は<span class="formula">%1100</span>、10進数だと<span class="formula">12</span><br>
+		ヒット数パターンは「ランダムに減」</dd>
+<br>
+		<dt>インケイジの技データ19は<span class="formula">$80</span>（<span class="formula">%1000 0000</span>）</dt>
+		<dd>一番上の位が1なので、「範囲内に1ヒット」</dd>
+	</dl>
+</div>
+
+<h3>ヒット数パターンの判断</h3>
+
+<p>ヒット数計算をする場合、まずは使用技の「ヒット数パターン」が何なのかを判定しなければならない。<br>
+ヒット数パターンによって、ヒット数計算方法が変わるからである。<br>
+まず、「ヒット数パターン」の判定をしているサブルーチン（<code><span class="r">$C1/D6B9</span></code>～）を説明する。<br>
+技データ19についての仕様を踏まえた上で見ていただきたい。</p>
+
+<div class="code-container"><pre>
+$C1/D6B9 LDX $78    [$00:0378]   ;Xに[$00:0378]をロード（技使用者の番号）
+$C1/D6BB LDA $0038,x             ;Aに[$0038,x]をロード（技使用者のLV現在値）
+$C1/D6BE STA $11    [$00:0311]   ;A（技使用者のLV現在値）を[$00:0311]に書き込み
+$C1/D6C0 LDA $7E9023[$7E:9023]   ;Aに[$7E:9023]をロード（技データ19）
+$C1/D6C4 AND #$0F                ;技データ19と$0Fで論理積（技データ19から最大連発数を取り出す）
+$C1/D6C6 STA $10    [$00:0310]   ;A（最大連発数）を[$00:0310]に書き込み
+$C1/D6C8 LDA $7E9023[$7E:9023]   ;Aに[$7E:9023]をロード（技データ19）
+$C1/D6CC BIT #$80                ;技データ19と$80(10000000)と論理積(範囲内に1ヒットかどうかの判定）
+$C1/D6CE BNE $DE    [$D6AE]      ;ゼロフラグが立っていないとき（範囲内に1ヒットの場合）[$D6AE]分岐
+$C1/D6D0 AND #$30                ;技データ19と$30で論理積（00110000）（ヒット数タイプ取り出し）
+$C1/D6D2 CMP #$20                ;Aと$20を減算比較（00100000） = 10
+$C1/D6D4 BEQ $D8    [$D6AE]      ;ゼロフラグが立っているとき[$D6AE]分岐
+$C1/D6D6 CMP #$00                ;Aと$00を減算比較（00000000） = 通常（最大連発数がヒット数）
+$C1/D6D8 BNE $02    [$D6DC]      ;ゼロフラグが立っていないとき[$D6DC]分岐
+$C1/D6DA BRA $47    [$D723]      ;「通常（最大連発数がヒット数）」の処理
+$C1/D6DC CMP #$10                ;Aと$10を減算比較（00010000） = 「レベルにより減」(11だったら「ランダムに減」)
+$C1/D6DE BNE $2A    [$D70A]      ;ゼロフラグが立っていないとき（＝「ランダムに減」）[$D70A]分岐
+</pre></div>
+
+<p>順に説明する。</p>
+
+<div class="code-container"><pre>
+$C1/D6B9 A6 LDX $78    [$00:0378]   ;Xに[$00:0378]をロード（技使用者の番号）
+$C1/D6BB BD LDA $0038,x             ;Aに[$0038,x]をロード（技使用者のLV現在値）
+$C1/D6BE 85 STA $11    [$00:0311]   ;A（技使用者のLV現在値）を[$00:0311]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/D6B9</span></code>は、攻撃技を使う味方キャラの番号である。<br>
+味方キャラには隊形順に<span class="formula">1C00, 1C40, 1C80, 1CC0</span>と番号がふってあり、ここではそれを<code>X</code>にロードしている。<br>
+<code><span class="r">$C1/D6BB</span></code>は、攻撃技を使う味方キャラの現在のレベルである。<br>
+戦闘中ではバフやデバフでレベルが変動するが、技使用時点でのレベルの値を<code>A</code>にロードし、続いてその値は<code>[$00:0311]</code>に書き込まれている。</p>
+
+<div class="code-container"><pre>
+$C1/D6C0 LDA $7E9023[$7E:9023]   ;Aに[$7E:9023]をロード（技データ19）
+$C1/D6C4 AND #$0F                ;技データ19と$0Fで論理積（技データ19から最大連発数を取り出す）
+$C1/D6C6 STA $10    [$00:0310]   ;A（最大連発数）を[$00:0310]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/D6C0</span></code>では、<code>A</code>に<code>[$7E:9023]</code>をロードしているが、これが使用しようとしている技の技データ19の値である。<br>
+<code><span class="r">$C1/D6C4</span></code>で、<span class="formula">$0F</span>と論理積を取り、技データ19の下1桁、「最大連発数」を取り出す。<br>
+「最大連発数」は<code>[$00:0310]</code>に書き込まれている。<br>
+この次からが「ヒット数パターン」の判定である。</p>
+
+<div class="code-container"><pre>
+$C1/D6C8 LDA $7E9023[$7E:9023]   ;Aに[$7E:9023]をロード（技データ19）
+$C1/D6CC BIT #$80                ;技データ19と$80(10000000)と論理積(範囲内に1ヒットかどうかの判定）
+$C1/D6CE BNE $DE    [$D6AE]      ;ゼロフラグが立っていないとき（範囲内に1ヒットの場合）[$D6AE]分岐
+$C1/D6D0 AND #$30                ;技データ19と$30で論理積（00110000）（ヒット数タイプ取り出し）
+$C1/D6D2 CMP #$20                ;Aと$20を減算比較（00100000） = 10
+$C1/D6D4 BEQ $D8    [$D6AE]      ;ゼロフラグが立っているとき[$D6AE]分岐
+$C1/D6D6 CMP #$00                ;Aと$00を減算比較（00000000） = 通常（最大連発数がヒット数）
+$C1/D6D8 BNE $02    [$D6DC]      ;ゼロフラグが立っていないとき[$D6DC]分岐
+$C1/D6DA BRA $47    [$D723]      ;「通常（最大連発数がヒット数）」の処理
+$C1/D6DC CMP #$10                ;Aと$10を減算比較（00010000） = 「レベルにより減」(11だったら「ランダムに減」)
+$C1/D6DE BNE $2A    [$D70A]      ;ゼロフラグが立っていないとき（＝「ランダムに減」）[$D70A]分岐
+</pre></div>
+
+<p>もう一度技データ19（<code>[$7E:9023]</code>）を<code>A</code>に読み込み、まずは<span class="formula">$80</span>と論理積を取る。<br>
+これは技データ19の中の「範囲内に1ヒット」かどうかが記録されている部分で、「範囲内に1ヒット」なら論理積は<span class="formula">$80</span>、それ以外だと<span class="formula">$00</span>である。<br>
+<code><span class="r">$C1/D6CE</span></code>はゼロフラグが立っていない場合の分岐なので、『「範囲内に1ヒット」なら<code>[$D6AE]</code>へジャンプ』である。</p>
+
+<p>続いて、<code><span class="r">$C1/D6D0</span></code>では、技データ19と<span class="formula">$30</span>で論理積を取っている。<br>
+ここで「ヒット数パターン」を取り出しており、<code><span class="r">$C1/D6D2</span></code>では<span class="formula">$20</span>と減算比較し、<code><span class="r">$C1/D6D4</span></code>ではゼロフラグが立っているなら<code>[$D6AE]</code>へジャンプという処理になる。<br>
+この条件は、ヒット数パターンが「範囲内に1ヒット」の時なので、やはり<code>[$D6AE]</code>にジャンプする。<br>
+（「範囲内に1ヒット」の記録方法が2通りあるのは多分意味があるのだろうが、筆者にはわからない）<br>
+「範囲内に1ヒット」は、ヒット数が1ヒットで決定である。</p>
+
+<p><code><span class="r">$C1/D6D6</span></code>はヒット数パターンと<span class="formula">$00</span>の比較になるが、ヒット数パターンから<span class="formula">0</span>を引いてゼロフラグが立つのは、ヒット数パターンが「最大連発数がヒット数」の時。<br>
+ヒット数パターンが「最大連発数がヒット数」ならそのまま<code><span class="r">$C1/D6DA</span></code>に進み、更に<code>[$D723]</code>へジャンプするが、この先が「最大連発数がヒット数」の時のヒット数計算処理になる。<br>
+（といっても、「最大連発数がヒット数」なので、ヒット数は確定である）</p>
+
+<p>ヒット数パターンが「最大連発数がヒット数」ではないのなら、<code><span class="r">$C1/D6DC</span></code>へと進み、ヒット数パターンと<span class="formula">$10</span>を比較する。<br>
+ヒット数パターンが<span class="formula">$10</span>なら「レベルにより減」であり、そうでない時は「ランダムに減」である。<br>
+よってここでゼロフラグが立っていない場合は、「ランダムに減」パターンのヒット数計算処理の<code>[$D70A]</code>へジャンプする。<br>
+「レベルにより減」の場合はこのまま処理が進むことになる。<br>
+つまり、<code><span class="r">$C1/D6DE</span></code>より先は、「レベルにより減」の時のヒット数計算である。</p>
+
+<h3>「レベルにより減」のヒット数計算方法</h3>
+
+<p>まずはこのまま、「レベルにより減」の時のヒット数計算方法を見てみよう。</p>
+
+<div class="code-container"><pre>
+$C1/D6E0 LDA $10    [$00:0310]   ;Aに[$00:0310]（最大連発数）をロード
+$C1/D6E2 ASL A                   ;A×2
+$C1/D6E3 ASL A                   ;A×2
+$C1/D6E4 ASL A                   ;A×2
+$C1/D6E5 ASL A                   ;A×2
+$C1/D6E6 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト（最大連発数*$10）
+$C1/D6E9 LDA #$00                ;Aに$00をロード
+$C1/D6EB STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト（$00）
+$C1/D6EE LDA $11    [$00:0311]   ;Aに[$00:0311]（LV現在値）をロード
+$C1/D6F0 CMP #$10                ;LV現在値と$10（10進数16）を減算比較（LV現在値-$10）
+$C1/D6F2 BCC $02    [$D6F6]      ;キャリーフラグが立っていないとき（「LV現在値-$10」が負）、[$D6F6]へ分岐
+$C1/D6F4 LDA #$0F                ;Aに$0Fをロード
+$C1/D6F6 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/D6F9 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/D6FC LDA $2135  [$00:2135]   ;Aに乗算結果の中央バイトをロード
+$C1/D6FF INC A                   ;Aをインクリメント（+1）
+$C1/D700 CMP #$10                ;Aと$10を減算比較
+$C1/D702 BCC $02    [$D706]      ;キャリーフラグが立っていないとき、分岐
+$C1/D704 LDA #$0F                ;Aが$10以上なら、Aに$0Fを書き込む
+$C1/D706 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み（ヒット数）
+$C1/D708 BRA $19    [$D723]      ;オーバーフローフラグが立っているとき、分岐
+$C1/D723 LDA #$FF                ;Aに$FFを書き込み
+$C1/D725 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>順に見ていく。</p>
+
+<div class="code-container"><pre>
+$C1/D6E0 LDA $10    [$00:0310]   ;Aに[$00:0310]（最大連発数）をロード
+$C1/D6E2 ASL A                   ;A×2
+$C1/D6E3 ASL A                   ;A×2
+$C1/D6E4 ASL A                   ;A×2
+$C1/D6E5 ASL A                   ;A×2
+</pre></div>
+
+<p>ヒット数パターンの分岐前に、最大連発数の値を<code>[$00:0310]</code>に書き込んだが、ここでその値が<code>A</code>にロードされている。<br>
+その後、<code><span style="color: #0000FF;">ASL</span> A</code>で<code>A</code>の値を算術左シフトしているが、これは<code>A</code>の値を<span class="formula">2</span>倍しているのと同じことである。<br>
+4回繰り返しているから、<span class="formula">最大連発数×$10</span>（10進数では<span class="formula">×16</span>）ということになる。</p>
+
+<div class="code-container"><pre>
+$C1/D6E6 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト（最大連発数*$10）
+$C1/D6E9 LDA #$00                ;Aに$00をロード
+$C1/D6EB STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト（$00）
+</pre></div>
+
+<p>ここから、符号付16bit x 8bitの乗算が開始になっている。<br>
+まず、<code><span class="r">$C1/D6E6</span></code>で、計算した「<span class="formula">最大連発数×$10</span>」を被乗数の下位バイトとしてセットしている。<br>
+続いてAに<span class="formula">$00</span>をロードし、被乗数の上位バイトとしてセットした。<br>
+ということは、結局、被乗数は「<span class="formula">最大連発数×$10</span>」と変わらない（ただし16進数4桁の数値になっている）。</p>
+
+<div class="code-container"><pre>
+$C1/D6EE LDA $11    [$00:0311]   ;Aに[$00:0311]（LV現在値）をロード
+$C1/D6F0 CMP #$10                ;LV現在値と$10（10進数16）を減算比較（LV現在値-$10）
+$C1/D6F2 BCC $02    [$D6F6]      ;キャリーフラグが立っていないとき（「LV現在値-$10」が負）、[$D6F6]へ分岐
+$C1/D6F4 LDA #$0F                ;Aに$0Fをロード
+$C1/D6F6 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/D6F9 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+</pre></div>
+
+<p>一方、乗数の方だが、まずヒット数パターンの分岐前に<code>[$00:0311]</code>に入れた「LV現在値」を<code>A</code>にロードしている。<br>
+続いて、LV現在値と<span class="formula">$10</span>（10進数<span class="formula">16</span>）を減算比較している。つまり「<span class="formula">LV現在値 - $10</span>」である。<br>
+次でキャリーフラグが立つかどうかを判断しているが、「減算の時は、繰り下がりが発生しないとキャリーフラグが立つ（減算の結果が<span class="formula">0</span>か正の数の時）」であるから、</p>
+
+<ul>
+	<li>技を使用するキャラのレベルが（10進数で）<span class="formula">16</span>以上ならキャリーフラグが立つ→そのまま<code><span class="r">$C1/D6F4</span></code>へ</li>
+	<li>技を使用するキャラのレベルが（10進数で）<span class="formula">15</span>以下ならキャリーフラグが立たない→<code>[$D6F6]</code>へ分岐</li>
+</ul>
+
+<p>ということである。<br>
+そして、<code><span class="r">$C1/D6F4</span></code>では、<code>A</code>に<span class="formula">$0F</span>をロードしている。<br>
+その後に、<code>A</code>が乗数としてセットされている。<br>
+つまり、キャラのレベルが<span class="formula">15</span>以下の時はレベルの値が乗数としてセットされるが、キャラのレベルが<span class="formula">16</span>以上だと、乗数は<span class="formula">$0F</span>（10進数の<span class="formula">16</span>）に変更されることになる。<br>
+これは、数学関数<span class="formula">min()</span>（複数の値から最小値を求める関数）を使って、</p>
+
+<p class="formula">min(LV現在値, $0F)</p>
+
+<p>と表記することが可能である。<br>
+つまり乗数は「<span class="formula">min(LV現在値, $0F)</span>」である。</p>
+
+<p>計算したい乗算は、<br>
+<span class="formula">「最大連発数×$10」×「min(LV現在値, $0F)」</span><br>
+ということがここで判明した。</p>
+
+<div class="code-container"><pre>
+$C1/D6FC LDA $2135  [$00:2135]   ;Aに乗算結果の中央バイトをロード
+$C1/D6FF INC A                   ;Aをインクリメント（+1）
+</pre></div>
+
+<p>符号付16bit x 8bitの計算結果は、16進数6桁（24バイト）として、<code>[$00:2134]</code><code>[$00:2135]</code><code>[$00:2136]</code>に3分割されて出力される。<br>
+<code><span class="r">$C1/D6FC</span></code>では、3分割された乗算結果の中央の<code>[$00:2135]</code>が<code>A</code>にロードされている。<br>
+これまでも何度か似たような処理を見てきたが、下2桁を切り捨て次の2桁を取り出すという行為は、「<span class="formula">計算結果/$100</span>」を取り出す行為と同じである。<br>
+つまりここまでをまとめると、</p>
+
+<p class="formula">「最大連発数*$10」×「min(LV現在値, $0F)」/$100</p>
+
+<p>である。<br>
+分数部分（割り算部分）は<span class="formula">$10</span>で約分できるから、</p>
+
+<p class="formula">「最大連発数」×「min(LV現在値, $0F)」/$10</p>
+
+<p>ということになる。<br>
+<code><span class="r">$C1/D6FF</span></code>ではこの値をインクリメント（<span class="formula">+1</span>）したので、</p>
+
+<p class="formula">「最大連発数」×「min(LV現在値, $0F)」/$10 + 1</p>
+
+<p>となった。<br>
+実を言えば、この計算値こそがヒット数であるが、もう少し続きを見てみよう。</p>
+
+<div class="code-container"><pre>
+$C1/D700 CMP #$10                ;Aと$10を減算比較
+$C1/D702 BCC $02    [$D706]      ;キャリーフラグが立っていないとき、分岐
+$C1/D704 LDA #$0F                ;Aが$10以上なら、Aに$0Fを書き込む
+$C1/D706 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み（ヒット数）
+$C1/D708 BRA $19    [$D723]      ;オーバーフローフラグが立っているとき、分岐
+$C1/D723 LDA #$FF                ;Aに$FFを書き込み
+$C1/D725 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/D700</span></code>では、この値と、<span class="formula">$10</span>（10進数<span class="formula">16</span>）を減算比較している。<br>
+<span class="formula">$10</span>（10進数<span class="formula">16</span>）以上の時は<code><span class="r">$C1/D704</span></code>に分岐して、<code>A</code>に<span class="formula">$0F</span>を書き込んでいる。<br>
+つまり、計算値が<span class="formula">$10</span>（10進数<span class="formula">16</span>）以上だったら、<span class="formula">$0F</span>（10進数<span class="formula">15</span>）に変更する、という意味である。<br>
+要するに、本作のヒット数の最大値は<span class="formula">15</span>なので、計算上<span class="formula">16</span>以上になった場合は<span class="formula">15</span>に変更するという処理だろう。<br>
+そして最終的に<code>A</code>を<code>[$00:0310]</code>（元は最大連発数が入っていた値）に書き込んでいるが、これが最終的なヒット数として扱われる。<br>
+<code><span class="r">$C1/D708</span></code>はエラー時の処理らしいので説明は省く。</p>
+
+<p>「レベルにより減」の時のヒット数計算方法を改めてまとめると、</p>
+
+<p class="formula">min(『「最大連発数」×「min(LV現在値, $0F)」/$10 + 1』, $0F)</p>
+
+<p>ということになった。<br>
+ただ、最後に<code><span class="r">$C1/D704</span></code>で、ヒット数が計算上<span class="formula">$10</span>以上の時はヒット数を<span class="formula">$0F</span>に変更する処理が入っていたものの、それまでの計算で<span class="formula">$10</span>以上になることはおそらくない。<br>
+というのは、技に設定された「最大連発数」の最大値は<span class="formula">$0F</span>（10進数で<span class="formula">15</span>）で、LV現在値がどれほど大きくても、「<span class="formula">min(LV現在値, $0F)</span>」という処理を挟む以上、「<span class="formula">min(LV現在値, $0F)</span>」の最大値は<span class="formula">$0F</span>（10進数で<span class="formula">15</span>）である。<br>
+よって、<br>
+<span class="formula">「最大連発数」×「min(LV現在値, $0F)」/$10 + 1</span><br>
+の最大値は、<br>
+<span class="formula">$0F * $0F / $10 + 1 = $0F</span><br>
+であり、<span class="formula">$10</span>より小さい。<br>
+何かしらのエラーの際の対策なのかもしれないが、基本的には、</p>
+
+<p class="formula">「最大連発数」×「min(LV現在値, $0F)」/$10 + 1</p>
+
+<p>が、ヒット数の計算方法と考えて問題ないのではないかと思う。<br>
+とはいえ、こういう処理を入れている以上は何か意味があるのだろうと思うが、エラー対策以外、筆者にはわからない。</p>
+
+<p>数値を10進数にして、もう少し整理してみると、</p>
+
+<p>「レベルにより減」のヒット数<br>
+<span class="formula">= 最大連発数 * min(LV現在値, 15) / 16 + 1</span><br>
+※計算途中の小数点以下は切り捨て</p>
+
+<p>である。<br>
+つまり、「レベルにより減」と指定されている技のヒット数は、技使用者の「LV現在値」だけがヒット数計算に関わっていて、敵のステータスは関係しない。<br>
+乱数も一切関わらない。</p>
+
+<p>例として、「レベルにより減」の「ローキック」と「手裏剣乱糸」のヒット数を計算してみよう。</p>
+
+<h5>ローキック</h5>
+
+<p>最大連発数は<span class="formula">2</span>,<br>
+<span class="formula">ヒット数 = trunc(2 * min(LV現在値, 15) / 16) + 1</span><br>
+であるから、使用者のレベルが1～7だと1ヒット、8以上なら2ヒットである。</p>
+
+<h5>手裏剣乱糸</h5>
+
+<p>最大連発数は<span class="formula">6</span>,<br>
+<span class="formula">ヒット数 = trunc(6 * min(LV現在値, 15) / 16) + 1</span><br>
+であるから、使用者のレベルが1～2だと1ヒット、3～5だと2ヒット、6～7だと3ヒット、8～10だと4ヒット、12～13だと5ヒット、14以上だと6ヒットである。</p>
+
+<p>といっても、おぼろ丸の場合、手裏剣乱糸を覚えるのはレベル6なので、覚えた直後でも3ヒットということになる。<br>
+もちろん、戦闘中にバフやデバフでレベル変動が起こればヒット数も変わるので、おぼろ丸が手裏剣乱糸を覚えている状態でもレベルダウン状態になれば、ヒット数が2以下になることもあり得る。</p>
+
+<h3>「ランダムに減」のヒット数計算方法</h3>
+
+<p>「ランダムに減」の時は、「ヒット数パターン」の判定の最後で<code>[$D70A]</code>へジャンプすることになる。</p>
+
+<div class="code-container"><pre>
+$C1/D6DE BNE $2A    [$D70A]      ;ゼロフラグが立っていないとき（＝ランダムに減）[$D70A]分岐
+;
+$C1/D70A JSR $6150  [$C1:6150]   ;[$C1:6150]にジャンプ
+</pre></div>
+
+<p>飛び先の<code><span class="r">$C1/D70A</span></code>では更に<code>[$C1:6150]</code>へジャンプするよう命令があるのだが、この<code>$C1:6150</code>というアドレスは、既に<span class="tri"><a href="program5.html">戦闘用乱数の計算</a></span>で紹介した、戦闘用乱数の計算サブルーチンの開始アドレスである。<br>
+つまり、「ランダムに減」の計算をするため、さっそく戦闘用乱数の生成を行うのである。<br>
+<code>[$C1:6150]</code>にジャンプしてからの処理を以下に載せる。</p>
+
+<div class="code-container"><pre>
+$C1/6150 PHX                     ;乱数計算サブルーチンここから開始
+$C1/6151 PHB                     ;↓
+$C1/6152 LDA #$00                ;↓
+$C1/6154 PHA                     ;↓
+$C1/6155 PLB                     ;↓
+$C1/6156 LDA $38    [$00:0338]   ;↓
+$C1/6158 ORA $39    [$00:0339]   ;↓
+$C1/615A ORA $3A    [$00:033A]   ;↓
+$C1/615C ORA $3B    [$00:033B]   ;↓
+$C1/615E BNE $24    [$6184]      ;↓
+$C1/6184 LDX $38    [$00:0338]   ;↓
+$C1/6186 STX $4204  [$00:4204]   ;↓
+$C1/6189 LDA #$0D                ;↓
+$C1/618B STA $4206  [$00:4206]   ;↓
+$C1/618E JSR $46C8  [$C1:46C8]   ;↓
+;
+$C1/46C8 NOP                     ;↓
+$C1/46C9 RTS                     ;↓
+;
+$C1/6191 LDA $39    [$00:0339]   ;↓
+$C1/6193 STA $38    [$00:0338]   ;↓
+$C1/6195 LDA $3A    [$00:033A]   ;↓
+$C1/6197 STA $39    [$00:0339]   ;↓
+$C1/6199 LDA $3B    [$00:033B]   ;↓
+$C1/619B STA $3A    [$00:033A]   ;↓
+$C1/619D LDA $4214  [$00:4214]   ;↓
+$C1/61A0 STA $3B    [$00:033B]   ;↓
+$C1/61A2 PLB                     ;↓
+$C1/61A3 PLX                     ;↓
+$C1/61A4 RTS                     ;乱数計算サブルーチンここまで（Aに乱数入る）
+;
+$C1/D70D STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト（乱数）
+$C1/D710 LDA #$00                ;Aに$00をロード
+$C1/D712 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト（$00）
+$C1/D715 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/D717 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数（最大連発数[$00:0310]）
+$C1/D71A STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/D71D LDA $2135  [$00:2135]   ;Aに乗算結果の中央バイトをロード
+$C1/D720 INC A                   ;Aをインクリメント（+1）
+$C1/D721 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み（ヒット数）
+$C1/D723 LDA #$FF                ;Aに$FFを書き込み
+$C1/D725 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>乱数計算サブルーチンは、<span class="tri"><a href="program5.html">戦闘用乱数の計算</a></span>で紹介済みであるから、ここでの説明は省く。<br>
+残りの部分について説明する。</p>
+
+<div class="code-container"><pre>
+$C1/D70D STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト（乱数）
+$C1/D710 LDA #$00                ;Aに$00をロード
+$C1/D712 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト（$00）
+$C1/D715 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/D717 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数（最大連発数[$00:0310]）
+$C1/D71A STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/D71D LDA $2135  [$00:2135]   ;Aに乗算結果の中央バイトをロード
+$C1/D720 INC A                   ;Aをインクリメント（+1）
+$C1/D721 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み（ヒット数）
+$C1/D723 LDA #$FF                ;Aに$FFを書き込み
+$C1/D725 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>どこかで見たようなプログラムである。「レベルにより減」の計算をよりシンプルにしたようなものである。<br>
+符号付16bit x 8bitの計算は、「乱数」×「最大連発数<code>[$00:0310]</code>」であり、<code><span class="r">$C1/D71D</span></code>で乗算結果の中央バイトを<code>A</code>にロードしているから、乗算結果を<span class="formula">÷$100</span>していることと同じである。<br>
+<code><span class="r">$C1/D720</span></code>はその値を<span class="formula">+1</span>している。<br>
+最終的にこの値がヒット数ということになり、<code>[$00:0310]</code>に書き込まれている。<br>
+ということは、「ランダムに減」パターンのヒット数は、</p>
+
+<p class="formula">「乱数（$00～$FF）」×「最大連発数」/$100 + 1</p>
+
+<p>である。<br>
+数値を10進数にして、もう少し整理してみると、</p>
+
+<p>「ランダムに減」のヒット数<br>
+<span class="formula">= 最大連発数 * (0～255の乱数) / 256 + 1</span><br>
+※計算途中の小数点以下は切り捨て</p>
+
+<p>ということになる。<br>
+使用者のステータスは一切関係なく、乱数だけで決まっていることがわかる。</p>
+
+<p>例として、「ランダムに減」の「影一文字」と「ハリケンショット」のヒット数を計算してみよう。</p>
+
+<h5>影一文字</h5>
+
+<p>最大連発数は<span class="formula">2</span>,<br>
+<span class="formula">ヒット数 = trunc(2 * (0～255の乱数) / 256) + 1</span><br>
+であるから、以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>ヒット数</th><th>1</th><th>2</th></tr>
+</thead>
+<tbody>
+	<tr><td>乱数</td><td>0～127</td><td>128～255</td></tr>
+	<tr><td>確率</td><td>1/2</td><td>1/2</td></tr>
+</tbody>
+</table>
+
+<p>1ヒットと2ヒット、どちらになるかはそれぞれ確率1/2である。</p>
+	
+<h5>ハリケンショット</h5>
+
+<p>最大連発数は<span class="formula">12</span>,<br>
+<span class="formula">ヒット数 = trunc(12 * (0～255の乱数) / 256) + 1</span><br>
+であるから、以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>ヒット数</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+</thead>
+<tbody>
+	<tr><td>乱数</td><td>0～21</td><td>22～42</td><td>43～63</td><td>64～85</td><td>86～106</td><td>107～127</td></tr>
+	<tr><td>確率</td><td>22/256</td><td>21/256</td><td>21/256</td><td>22/256</td><td>21/256</td><td>21/256</td></tr>
+</tbody>
+<thead>
+	<tr><th>ヒット数</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></tr>
+</thead>
+<tbody>
+	<tr><td>乱数</td><td>128～149</td><td>150～170</td><td>171～191</td><td>192～213</td><td>214～234</td><td>235～255</td></tr>
+	<tr><td>確率</td><td>22/256</td><td>21/256</td><td>21/256</td><td>22/256</td><td>21/256</td><td>21/256</td></tr>
+</tbody>
+</table>
+
+<p><span class="formula">22/256</span>は約<span class="formula">8.6％</span>、<span class="formula">21/256</span>は約<span class="formula">8.2％</span>。<br>
+計算式を見る限りどのヒット数も同確率で出るはずだが、「計算途中で小数点以下を切り捨てる」ルールがあるために、上のようにヒット数によってわずかに差が出ることになる。<br>
+とはいえ、大雑把にいえば、各ヒット数が<span class="formula">8.5％</span>くらいの確率で出現することになる。</p>
+
+<hr>
+
+<p>以上、ヒット数が「レベルにより減」「ランダムに減」どちらも、最終的にヒット数が<code>[$00:0310]</code>に書き込まれる。<br>
+この先の処理は、次ページの<span class="tri"><a href="program6_5.html">敵ターゲット決定方法</a></span>に続く。</p>
+
+<h3 id="result">まとめ</h3>
+
+<p>多段ヒット技の中で、ヒット数が「レベルにより減」「ランダムに減」と設定されている技の実際のヒット数は、以下のように計算されていることがわかった。<br>
+（数値はすべて10進数表記）</p>
+
+<ul>
+	<li>「レベルにより減」のヒット数<br>
+	
+	<span class="formula">= 最大連発数 * min(LV現在値, 15) / 16 + 1</span><br>
+
+	※LV現在値は、技使用者の技使用時のレベル（バフ・デバフでの変動込みの値）<br>
+	※<span class="formula">min(a,b)</span>は、<span class="formula">a</span>と<span class="formula">b</span>を比較して最小値を選ぶ関数<br>
+	※計算途中の小数点以下は切り捨て</li>
+
+	<li>「ランダムに減」のヒット数<br>
+	<span class="formula">= 最大連発数 * (0～255の乱数) / 256 + 1</span><br>
+
+	※計算途中の小数点以下は切り捨て</li>
+</ul>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program6_3.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program6_5.html"><span class="button">&#9654;次　敵ターゲット決定方法</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script><div style="display:none;"><script type="text/javascript" src="//x7.shinobi.jp/ufo/07424540q"></script></div>
+</body>
+</html>

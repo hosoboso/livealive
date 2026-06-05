@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 経験値計算">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 経験値計算">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 経験値計算</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 取得経験値計算＆レベルアップ処理</h1>
+<h2>取得経験値計算＆レベルアップ処理</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>戦闘に勝利すると経験値を得るが、本作の経験値計算の仕様は<span class="tri"><a href="../battle08.html">経験値</a></span>で述べている通り、独特である。<br>
+味方キャラのレベルと敵パーティに設定された「敵パーティレベル」から取得経験値が計算されることや、その計算方法は<span class="tri"><a href="../battle08.html">経験値</a></span>に掲載している通りであるが、実際にプログラムではどう処理されているのかを紹介する。</p>
+
+<p>また、レベルアップ時に行われる、</p>
+
+<ul>
+	<li><a href="program10_2.html">ステータス上昇処理</a></li>
+	<li><a href="program10_3.html">技習得処理</a></li>
+</ul>
+
+<p>も、この後のページで紹介しているので、合わせて参照していただきたい。</p>
+
+<h3>経験値の計算方法</h3>
+
+<p>まず復習として、本作における経験値の計算方法は以下のようになっている。</p>
+
+<ul>
+	<li>経験値が取得できるのは、心山拳老師、キューブ、タロイモ以外のキャラで、かつ、バトル勝利時に戦闘離脱していないキャラ。</li>
+
+	<li>味方キャラのレベルと、敵パーティに設定された「敵パーティレベル」から取得経験値が計算される。<br>このため、パーティメンバーが複数の場合、味方キャラひとりずつ経験値計算を行う。<br>「敵パーティレベル」が0に設定されている戦闘は経験値が取得できない。</li>
+
+	<li>取得経験値の計算方法は以下の通り。</li>
+
+	<ul>
+		<li>敵パーティレベル = 0の時<br>
+		<span class="formula">取得経験値 = 0</span></li>
+		<li>敵パーティレベル＞味方キャラレベル、かつ経験値が増える行動を取った場合<br>
+		<span class="formula">取得経験値 = ( 敵パーティレベル - 味方キャラレベル ) * 16 + 8</span></li>
+		<li>敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合<br>
+		<span class="formula">取得経験値 = trunc(敵パーティレベル / 2) + trunc(16 / 味方キャラレベル)</span><br>※ただし計算結果が<span class="formula">0</span>の時は、<span class="formula">取得経験値 = 1</span>にする</li>
+	</ul>
+
+	<li>上計算式における、「経験値が増える行動」とは、以下を指す。</li>
+
+	<ul>
+		<li>技を出す。反撃技や攻撃をミスした場合、敵のいないマスに出して空振りになった時も含む。<br>タメ時間のある技は、待機中のまま戦闘が終わったり、敵に阻止されて中断されると無効。</li>
+		<li>アイテムを使う。</li>
+	</ul>
+</ul>
+
+<p>以上で計算された経験値を、キャラの現在の経験値を足して、100を越えたらレベルが1上がる。ただしレベルの最大値は99。<br>
+レベルアップ時に余剰の経験値が出ても、繰り越されない。<br>
+また、レベルは一度の戦闘で1しか上がらない。</p>
+
+<p>本作の経験値の仕様は以上である。<br>
+経験値を計算する上で、味方キャラの現在のレベル、現在の経験値、敵パーティレベルといったステータス値が必要になることがわかる。</p>
+
+<p>ということでまずは、味方キャラのレベルと経験値が、メモリのどこに格納されているのか、という話から始める。</p>
+
+<h3>味方キャラのステータス</h3>
+
+<p>味方キャラのステータスは、全シナリオ共通で、マップ上でも戦闘でも、メモリのアドレス<code>$00:0D00</code>～<code>$00:0FBF</code>にまとめて入っている。<br>
+また、同じ値が<code>$7E:0D00</code>～<code>$7E:0FBF</code>にミラーリングされている。<br>
+1キャラあたり64バイトの容量が使われているので、<code>$00:0D00</code>～<code>$00:0FBF</code>に入るのは11キャラ分のデータである。<br>
+シナリオにより、どこに誰のデータが入るか決まっているので、便宜上、「シナリオ別キャラデータ」としておく。<br>
+（データ上は、戦闘に参加しないキャラのデータが入ることもあるのだが、以下の表では省いた）</p>
+
+<table>
+<thead>
+	<tr><th>メモリ</th><th>原始</th><th>ＳＦ</th><th>功夫</th><th>西部</th><th>現代</th><th>近未来</th><th>幕末</th><th>中世</th><th>最終</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:0D00</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>オルステッド</td><td>オルステッド</td></tr>
+	<tr><td><code>$00:0D40</code>～</td><td>ポゴ</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>ポゴ</td></tr>
+	<tr><td><code>$00:0D80</code>～</td><td>-</td><td>キャプテン<br>スクウェア<br>/キューブ</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>キューブ</td></tr>
+	<tr><td><code>$00:0DC0</code>～</td><td>-</td><td>-</td><td>心山拳老師</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>心山拳師範</td></tr>
+	<tr><td><code>$00:0E00</code>～</td><td>-</td><td>-</td><td>-</td><td>サンダウン</td><td>-</td><td>-</td><td>-</td><td>-</td><td>サンダウン</td></tr>
+	<tr><td><code>$00:0E40</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>高原　日勝</td><td>-</td><td>-</td><td>-</td><td>高原　日勝</td></tr>
+	<tr><td><code>$00:0E80</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>アキラ</td><td>-</td><td>-</td><td>アキラ</td></tr>
+	<tr><td><code>$00:0EC0</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>おぼろ丸</td><td>-</td><td>おぼろ丸</td></tr>
+	<tr><td><code>$00:0F00</code>～</td><td>ゴリ</td><td>-</td><td>ユン・ジョウ</td><td>マッドドッグ</td><td>-</td><td>タロイモ</td><td>とらわれの男</td><td>ストレイボウ</td><td>-</td></tr>
+	<tr><td><code>$00:0F40</code>～</td><td>べる</td><td>-</td><td>レイ・クウゴ</td><td>-</td><td>-</td><td>無法松</td><td>カラクリ丸</td><td>ウラヌス</td><td>-</td></tr>
+	<tr><td><code>$00:0F80</code>～</td><td>ざき</td><td>-</td><td>サモ・ハッカ</td><td>-</td><td>-</td><td>ブリキ大王</td><td>-</td><td>ハッシュ</td><td>ブリキ大王</td></tr>
+</tbody>
+</table>
+
+<p>最初の8キャラ分のデータは各シナリオの主人公、残り3キャラは各シナリオで仲間になるキャラのデータが入ることがわかる。<br>
+（このデータに限ったことではないが、ほとんどのデータで一番上に来るのは中世編のデータであり、攻略本などで言われている通り「中世編を最初に制作した」ことからデータの並びが中世編から始まっているのだろう、と推測できる）<br>
+ＳＦ編は、ミニゲーム「キャプテンスクウェア」用のキャプテンスクウェアのデータ（<code>$00:0D80</code>～）がラストバトル前まで使われている。内部データでは、プレイヤーがキューブに対して付けた名前が「キャプテンスクウェアの名前」として扱われ、<code>$00:0D80</code>～内にもそのまま入っている。プレイ中に名前を入力して扉を開く場面などでも、<code>$00:0D80</code>～に登録したキャラ名と一致しているかを判定しており、ラストバトルのみキューブのデータに変更する仕組みで、キャプテンスクウェアの画面が止まり「KILL　YOU‥‥」が表示される寸前あたりに変更されている。<br>
+功夫編の枠である<code>$00:0DC0</code>～は、功夫編だと老師、最終編だと心山拳師範に選んだキャラのデータが入る。</p>
+
+<p>経験値計算では、レベルと経験値を計算するため、各キャラに対応した値を<code>$00:0D00</code>～<code>$00:0FBF</code>からロードして使用している。<br>
+例えば同じ<code>$00:0F00</code>～のデータでも、原始編ならゴリ、中世編ならストレイボウ、というように異なるキャラの値が入っているという点に注意が必要。</p>
+
+<p>シナリオ別キャラデータには、各キャラ64バイト分のデータがあると説明したが、そのデータに16進数で<span class="formula">$00</span>～<span class="formula">$3F</span>と番号を付けたとすると、現在のレベルが入っているのが<span class="formula">$06</span>、経験値が入っているのが<span class="formula">$1E</span>の位置に当たる。<br>
+オルステッドなら<code>$00:0D06</code>にレベル、<code>$00:0D1E</code>に経験値の値が入っている。<br>
+アキラなら<code>$00:0E86</code>にレベル、<code>$00:0E9E</code>に経験値の値が入っている。<br>
+<code>$00:0F06</code>に入っているのは、原始編ならゴリのレベル、功夫編ならユンのレベル、幕末編ならとらわれの男のレベル、中世編ならストレイボウのレベル、ということになる。</p>
+
+<p>以上の<code>$00:0D00</code>～<code>$00:0FBF</code>のシナリオ別キャラデータは、どのシナリオでも共通で存在している。<br>
+たとえば中世編プレイ中、他シナリオのキャラは一切登場しないが、<code>$00:0D40</code>～には原始編クリア時のポゴのデータが入ったままである。他シナリオの主人公たちのデータも同様に残っていて、最終編ではそれらデータがそのまま読み出されることになる。<br>
+また中世編シナリオが出現する前だと、<code>$00:0D00</code>～<code>$00:0D3F</code>のオルステッドのデータは、初期値（オルステッドのレベル1のデータ）が入っている。この仕様は未プレイのシナリオなら共通。<br>
+つまりシナリオ別キャラデータには、各キャラのステータスに加え、現代編で高原がラーニングした技や、プレイヤーが主人公につけた名前（拳法名）及び装備品のデータも格納されており、セーブデータにも記録され、最終編に引き継がれている。</p>
+
+<p>シナリオ別キャラデータとは別に、戦闘中のみ読み書きされる味方のデータがある。<br>
+こちらのデータは毎回の戦闘でのみ使われ、味方1人目が<code>$00:1C00</code>～<code>$00:1C3F</code>、2人目が<code>$00:1C40</code>～<code>$00:1C7F</code>、3人目が<code>$00:1C80</code>～<code>$00:1CBF</code>、4人目が<code>$00:1CC0</code>～<code>$00:1CFF</code>に読み込まれる。<br>
+（<code>$7E:1C00</code>～<code>$7E:1CFF</code>のミラーリングもある）<br>
+こちらは戦闘中のみ変動する値（残りHPや状態異常の状況など）を読み書きするために使うようだが、ここにも各キャラの通常時のレベルと経験値が読み込まれる。<br>
+最初のアドレスには各キャラのIDが入り、レベルは<span class="formula">+$02</span>したアドレスに、経験値は<span class="formula">+$05</span>したアドレスに入る。<br>
+また、<span class="formula">+$01</span>したアドレスには、その時点でのキャラの状態が入っているのだが、通常は<span class="formula">$FF</span>、戦闘離脱すると<span class="formula">$00</span>、ブリキ大王操作時及び、最終編でオルステッド主人公時に各シナリオのラストボスを操作する時には<span class="formula">$40</span>が入る。<br>
+ブリキ大王を操作する際、ブリキ大王のステータスは実は敵データとして登録されているので、「敵操作時かどうか」「戦闘離脱かどうか」のフラグをチェックしている値ということになる。<br>
+このあたりが、経験値計算に必要な味方側の値となる。</p>
+
+<p>経験値計算では、シナリオ別キャラデータ内のキャラのレベル＆経験値、戦闘中用データのキャラのレベル＆経験値、どちらも使われることになる。<br>
+戦闘前にはシナリオ別キャラデータからレベル＆経験値の数値を呼び出し、サブルーチン中では戦闘中用データで計算処理、最終的にシナリオ別キャラデータを新たなレベル＆経験値に更新しなければならないからである。<br>
+経験値計算のサブルーチンでは、<code>X</code>に「戦闘中用データを呼び出すための数値」、<code>Y</code>に「シナリオ別キャラデータを呼び出すための数値」が入るため、</p>
+
+<ul>
+	<li><code>[$00??,x]</code>のアドレスで読み書きされるのが戦闘中用データ</li>
+	<li><code>[$00??,y]</code>のアドレスで読み書きされるのがシナリオ別キャラデータ</li>
+</ul>
+
+<p>と見分けることができる。</p>
+
+<p>もうひとつ必要になるのが「敵パーティレベル」である。<br>
+敵パーティ関係の値は、戦闘開始時に読み込まれている。</p>
+
+<div class="code-container"><pre>
+$C1/F60E LDA $D60000,x           ;Aに[$D60000,x]（敵パーティレベル）をロード
+$C1/F612 STA $55    [$00:0355]   ;Aを[$00:0355]に書き込み
+$C1/F614 LDA $D60001,x           ;Aに[$D60001,x]（ブリキ大王操作時は$01、それ以外は$00）をロード
+$C1/F618 STA $56    [$00:0356]   ;Aを[$00:0356]に書き込み
+$C1/F61A LDA $D60006,x           ;Aに[$D60006,x]（上1桁がアイテム入手率補正、下1桁が敵の総数）をロード
+$C1/F61E STA $58    [$00:0358]   ;Aを[$00:0358]に書き込み
+</pre></div>
+
+<p>経験値計算に関係のない値もおまけで紹介したが、<code>[$00:0355]</code>に敵パーティレベル、<code>[$00:0356]</code>に操作キャラ（ブリキ大王かどうかの判定の模様）、<code>[$00:0358]</code>にアイテム入手率補正と敵の総数が書き込まれる。最後については<span class="tri"><a href="program8.html">ドロップアイテム判定</a></span>でも紹介した通りである。<br>
+経験値計算に必要となるのは、<code>[$00:0355]</code>に入った敵パーティレベルの値である。</p>
+
+<h3>経験値計算</h3>
+
+<p>前置きが長くなったが、実際にどのように経験値計算をしているのか、該当のサブルーチンを紹介する。<br>
+このサブルーチンは戦闘勝利時の「勝利ッ！！」という表示が出た直後に処理される。<br>
+順序としては、味方キャラの人数だけ「経験値取得判定と計算→レベルアップするキャラがいるならレベルアップ表示」を繰り返した後、ドロップアイテム判定→ドロップアイテムがあれば表示、という順序になっている。</p>
+
+<div class="code-container"><pre>
+$C1/2363 LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/2365 BEQ $18    [$237F]      ;ゼロフラグが立っているとき[$237F]分岐
+$C1/2367 LDX #$1C00              ;（味方キャラ1用処理）Xに$1C00をロード
+$C1/236A JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/236D LDX #$1C40              ;（味方キャラ2用処理）Xに$1C40をロード
+$C1/2370 JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/2373 LDX #$1C80              ;（味方キャラ3用処理）Xに$1C80をロード
+$C1/2376 JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/2379 LDX #$1CC0              ;（味方キャラ4用処理）Xに$1CC0をロード
+$C1/237C JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/237F RTS                     ;サブルーチン戻り
+
+$C1/2397 LDA $0001,x             ;Aに[$0001,x]をロード（キャラの状態）
+$C1/239A BIT #$40                ;Aと$40で論理積（ステータスフラグの変更のみ）
+$C1/239C BEQ $38    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/239E LDY $0002,x             ;Yに[$0002,x]（味方キャラレベル）をロード
+$C1/23A1 LDA $0000,x             ;Aに[$0000,x]（味方キャラID）をロード
+$C1/23A4 CMP #$08                ;Aと$08を減算比較（キャラID$08は心山拳老師）
+$C1/23A6 BEQ $2E    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/23A8 CMP #$12                ;Aと$12を減算比較（キャラID$08はタロイモ）
+$C1/23AA BEQ $2A    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/23AC CMP #$14                ;Aと$14を減算比較（キャラID$14はキューブ）
+$C1/23AE BEQ $26    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/23B0 LDA $C0FFBC[$C0:FFBC]   ;Aに[$C0:FFBC]をロード
+$C1/23B4 BNE $08    [$23BE]      ;ゼロフラグが立っていないとき[$23BE]分岐
+
+$C1/23BE LDA $0020,x             ;Aに[$0020,x]をロード（戦闘中行動フラグ　行動すると80）
+$C1/23C1 BPL $14    [$23D7]      ;ネガティブフラグが立っていないとき[$23D7]分岐
+$C1/23C3 LDA $0006,y             ;Aに[$0006,y]（味方キャラレベル）をロード
+$C1/23C6 CMP #$63                ;Aと$63（99・レベル最大値）を減算比較
+$C1/23C8 BCS $0C    [$23D6]      ;キャリーフラグが立っているとき[$23D6]分岐
+$C1/23CA LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/23CC SEC                     ;キャリーフラグを立てる（引き算用）
+$C1/23CD SBC $0006,y             ;A - [$0006,y]　※「敵パーティレベル - 味方キャラレベル」
+$C1/23D0 BCC $05    [$23D7]      ;キャリーフラグが立っていないとき[$23D7]分岐
+$C1/23D2 BEQ $03    [$23D7]      ;ゼロフラグが立っているとき[$23D7]分岐
+$C1/23D4 BRA $2C    [$2402]      ;フラグにかかわりなく常に[$2402]分岐
+$C1/23D6 RTS                     ;サブルーチン戻り
+
+;敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合
+$C1/23D7 LDA #$10                ;Aに$10（10進数16）をロード
+$C1/23D9 STA $4204  [$00:4204]   ;符号付16bit / 8bit　被除数（下位バイト）
+$C1/23DC LDA #$00                ;Aに$00をロード
+$C1/23DE STA $4205  [$00:4205]   ;符号付16bit / 8bit　被除数（上位バイト）
+$C1/23E1 LDA $0006,y             ;Aに[0006,y]（味方キャラレベル）をロード
+$C1/23E4 STA $4206  [$00:4206]   ;符号付16bit / 8bit　除数　※除算は「$0010/味方キャラレベル = 16/味方キャラレベル」
+$C1/23E7 JSR $46C8  [$C1:46C8]   ;[$C1:46C8]へジャンプ（計算待機用）
+
+$C1/46C8 NOP                     ;（符号付16bit / 8bitの計算待機）
+$C1/46C9 RTS                     ;サブルーチン戻り
+
+$C1/23EA LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/23EC LSR A                   ;Aを論理右シフト（/2）　※敵パーティレベル/2
+$C1/23ED CLC                     ;キャリーフラグをクリア
+$C1/23EE ADC $4214  [$00:4214]   ;A + [$00:4214]　※敵パーティレベル/2 + 16/味方キャラレベル
+$C1/23F1 BNE $01    [$23F4]      ;ゼロフラグが立っていないとき[$23F4]分岐
+$C1/23F3 INC A                   ;Aをインクリメント(+1)　※「敵パーティレベル/2 + 16/味方キャラレベル」の結果が0の時は+1
+$C1/23F4 CLC                     ;キャリーフラグをクリア
+$C1/23F5 ADC $001E,y             ;A + [$001E,y]　※キャラの経験値に計算結果を足す
+$C1/23F8 BCS $25    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/23FA CMP #$64                ;Aと$64（100）を減算比較
+$C1/23FC BCS $21    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/23FE STA $001E,y             ;Aを[$001E,y]に書き込み　※経験値の値を更新
+$C1/2401 RTS                     ;サブルーチン戻り
+;敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合　ここまで
+
+;敵パーティレベル＞味方キャラレベル、かつ経験値が増える行動を取った場合
+$C1/2402 LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/2404 SEC                     ;キャリーフラグを立てる（引き算用）
+$C1/2405 SBC $0006,y             ;A - [$0006,y]　※「敵パーティレベル - 味方キャラレベル」
+$C1/2408 BIT #$F0                ;Aと$F0で論理積（フラグだけ変更）　※「敵パーティレベル - 味方キャラレベル」の161の位の判定
+$C1/240A BNE $13    [$241F]      ;ゼロフラグが立っていないとき[$241F]分岐　※「敵パーティレベル - 味方キャラレベル」が$10以上なのでレベルアップ確定
+$C1/240C ASL A                   ;算術左シフト（×2）
+$C1/240D ASL A                   ;算術左シフト（×2）
+$C1/240E ASL A                   ;算術左シフト（×2）
+$C1/240F ASL A                   ;算術左シフト（×2）　※(「敵パーティレベル - 味方キャラレベル」)*$10
+$C1/2410 ORA #$08                ;Aと$08(%0000 1000)で論理和(+$08)
+$C1/2412 ADC $001E,y             ;A + [$001E,y]（味方キャラ経験値）
+$C1/2415 BCS $08    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/2417 CMP #$64                ;Aと$64（100）を減算比較
+$C1/2419 BCS $04    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/241B STA $001E,y             ;Aを[$001E,y]に書き込み　※経験値の値を更新
+$C1/241E RTS                     ;サブルーチン戻り
+;敵パーティレベル＞味方キャラレベル、かつ経験値が増える行動を取った場合　ここまで
+
+;レベルアップ時の処理
+$C1/241F LDA $0005,x             ;Aに[$0005,x]（味方キャラ経験値）をロード
+$C1/2422 STA $001C,x             ;Aを[$001C,x]に書き込み
+$C1/2425 LDA #$00                ;Aに$00をロード
+$C1/2427 STA $0005,x             ;Aを[$0005,x]（味方キャラ経験値）に書き込み
+$C1/242A LDA $0006,y             ;Aに[$0006,y]（味方キャラレベル）をロード
+$C1/242D INC A                   ;Aをインクリメント（+1）
+$C1/242E CMP #$64                ;Aと$64（100）を減算比較（レベルが100かどうか）
+$C1/2430 BEQ $A4    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/2432 STA $0006,y             ;Aを[$0006,y]（味方キャラレベル）に書き込み　※レベル更新
+$C1/2435 LDA #$00                ;Aに$00をロード
+$C1/2437 STA $001E,y             ;Aを[$001E,y]（キャラ経験値）に書き込み
+$C1/243A PHX                     ;Xをスタックにプッシュ
+$C1/243B PHY                     ;Yをスタックにプッシュ
+$C1/243C TXY                     ;Xの値をYに転送
+$C1/243D JSR $273C  [$C1:273C]   ;[$C1:273C]へ
+;（レベルアップ時の表示＆モーション表示のサブルーチンへ）
+
+;（味方キャラが複数なら次キャラの判定へ）
+</pre></div>
+
+<p>長いが順に説明していく。</p>
+
+<div class="code-container"><pre>
+$C1/2363 LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/2365 BEQ $18    [$237F]      ;ゼロフラグが立っているとき[$237F]分岐
+$C1/2367 LDX #$1C00              ;（味方キャラ1用処理）Xに$1C00をロード
+$C1/236A JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/236D LDX #$1C40              ;（味方キャラ2用処理）Xに$1C40をロード
+$C1/2370 JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/2373 LDX #$1C80              ;（味方キャラ3用処理）Xに$1C80をロード
+$C1/2376 JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/2379 LDX #$1CC0              ;（味方キャラ4用処理）Xに$1CC0をロード
+$C1/237C JSR $2397  [$C1:2397]   ;[$C1:2397]にジャンプ
+$C1/237F RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>最初に行われるのは<code>[$00:0355]</code>の値、つまり敵パーティレベルの値による分岐で、敵パーティレベルが<span class="formula">0</span>の時はこの後の経験値計算処理すべてが飛ばされる。<br>
+各シナリオのラストバトル、現代編や西部編、ＳＦ編などの戦闘は敵パーティレベルがすべて<span class="formula">0</span>に設定されているので、この最初の分岐により、経験値計算自体がされない。<br>
+よって、経験値計算が行われるのは、敵パーティレベルが<span class="formula">1</span>以上の時、ということになる。<br>
+その後は、これ以前の処理で、味方キャラ1～4番目により<code>X</code>に読み込む値を変え、経験値計算処理をするため、以下の<code>[$C1:2397]</code>にジャンプすることになる。</p>
+
+<div class="code-container"><pre>
+$C1/2397 LDA $0001,x             ;Aに[$0001,x]をロード（キャラの状態）
+$C1/239A BIT #$40                ;Aと$40で論理積（ステータスフラグの変更のみ）
+$C1/239C BEQ $38    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/239E LDY $0002,x             ;Yに[$0002,x]（味方キャラレベル）をロード
+$C1/23A1 LDA $0000,x             ;Aに[$0000,x]（味方キャラID）をロード
+$C1/23A4 CMP #$08                ;Aと$08を減算比較（キャラID$08は心山拳老師）
+$C1/23A6 BEQ $2E    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/23A8 CMP #$12                ;Aと$12を減算比較（キャラID$08はタロイモ）
+$C1/23AA BEQ $2A    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/23AC CMP #$14                ;Aと$14を減算比較（キャラID$14はキューブ）
+$C1/23AE BEQ $26    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/23B0 LDA $C0FFBC[$C0:FFBC]   ;Aに[$C0:FFBC]をロード
+$C1/23B4 BNE $08    [$23BE]      ;ゼロフラグが立っていないとき[$23BE]分岐
+</pre></div>
+
+<p>この後も経験値計算を行うかどうかの判断が続く。<br>
+<code><span class="r">$C1/2397</span></code>で呼び出している<code>[$0001,x]</code>は、先に説明した「キャラの状態」で、戦闘終了時の状況をロードする。<br>
+通常は<span class="formula">$FF</span>、戦闘離脱すると<span class="formula">$00</span>、ブリキ大王操作時及び、最終編でオルステッド主人公時に各シナリオのラストボスを操作する時には<span class="formula">$40</span>が入っている。<br>
+次の<code><span class="r">$C1/239A</span></code>で<code>A</code>と<span class="formula">$40</span>で論理積を取り、ゼロフラグが立っているとき<code>[$23D6]</code>分岐、と処理されている。<br>
+<span class="formula">$00</span>と<span class="formula">$40</span>の論理積は<span class="formula">0</span>、<span class="formula">$40</span>と<span class="formula">$40</span>の論理積は<span class="formula">$40</span>、<span class="formula">$FF</span>と<span class="formula">$40</span>の論理積は<span class="formula">$40</span>なので、ゼロフラグが立つのは「戦闘離脱しているキャラ」の時であり、<code>[$23D6]</code>へジャンプすることになる。<br>
+飛び先の<code>[$23D6]</code>は経験値計算を飛ばすことになるため、ここで「戦闘離脱しているキャラ」は経験値計算をしない、という条件分岐が行われたことになる。<br>
+この先も「ゼロフラグが立っているとき<code>[$23D6]</code>分岐」が続く。</p>
+
+<p><code><span class="r">$C1/239E</span></code>で<code>Y</code>に味方キャラレベルをロードした後、<code>A</code>に<code>[$0000,x]</code>をロードしているが、これは味方キャラのIDである。<br>
+操作可能な味方キャラには<span class="formula">$00</span>から<span class="formula">$16</span>までIDが振られており、上では<code><span class="r">$C1/23A4</span></code>～<code><span class="r">$C1/23AE</span></code>で連続して、<span class="formula">$08</span>、<span class="formula">$12</span>、<span class="formula">$14</span>と比較しているが、これはそれぞれ心山拳老師、タロイモ、キューブのIDである。<br>
+つまり戦闘で経験値が得られないキャラ3人は、ここで経験値計算をしない、という条件分岐が行われて<code>[$23D6]</code>にジャンプする。</p>
+
+<p>最後の<code><span class="r">$C1/23B0</span></code>についてはなぜこれを行っているのかよくわからないが、<code>[$C0:FFBC]</code>には<span class="formula">$06</span>が入っているので、ゼロフラグは立たずに<code>[$23BE]</code>に飛ぶ。<br>
+ここまでの処理でネガティブフラグが立っている場合、<code><span class="r">$C1/23B0</span></code>でネガティブフラグをオフにできるので、その手のフラグ操作を行っているのかもしれないが、筆者にはよくわからない。</p>
+
+<div class="code-container"><pre>
+$C1/23BE LDA $0020,x             ;Aに[$0020,x]をロード（戦闘中行動フラグ　行動すると80）
+$C1/23C1 BPL $14    [$23D7]      ;ネガティブフラグが立っていないとき[$23D7]分岐
+$C1/23C3 LDA $0006,y             ;Aに[$0006,y]（味方キャラレベル）をロード
+$C1/23C6 CMP #$63                ;Aと$63（99・レベル最大値）を減算比較
+$C1/23C8 BCS $0C    [$23D6]      ;キャリーフラグが立っているとき[$23D6]分岐
+$C1/23CA LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/23CC SEC                     ;キャリーフラグを立てる（引き算用）
+$C1/23CD SBC $0006,y             ;A - [$0006,y]　※「敵パーティレベル - 味方キャラレベル」
+$C1/23D0 BCC $05    [$23D7]      ;キャリーフラグが立っていないとき[$23D7]分岐
+$C1/23D2 BEQ $03    [$23D7]      ;ゼロフラグが立っているとき[$23D7]分岐
+$C1/23D4 BRA $2C    [$2402]      ;フラグにかかわりなく常に[$2402]分岐
+$C1/23D6 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/23BE</span></code>では<code>A</code>に<code>[$0020,x]</code>をロードしているが、このアドレスは、「戦闘開始時は<span class="formula">$00</span>が入っており、技を出すかアイテムを使うと<span class="formula">$80</span>が入る」処理が行われるメモリである。<br>
+つまり、経験値計算で必要な、「経験値が増える行動を取ったかどうか」を判断するフラグである。<br>
+次の<code><span class="r">$C1/23C1</span></code>で、ネガティブフラグが立っていない場合は<code>[$23D7]</code>に分岐となっているが、<span class="formula">$80</span>は2進数の<span class="formula">%1000 0000</span>で、頭に「<span class="formula">1</span>」がついているので負数（最上位ビットが1なら負数）であり、ネガティブフラグが立つ。<br>
+よって、「経験値が増える行動を取っていない」時に<code>[$23D7]</code>にジャンプということであり、<code>[$23D7]</code>からの処理は「敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合」の経験値計算であろう、と推測できるが、実際にその通りである。</p>
+
+<p><code><span class="r">$C1/23C3</span></code>では<code>A</code>に<code>[$0006,y]</code>（味方キャラレベル）をロードし、<span class="formula">$63</span>と比較しているが、<span class="formula">$63</span>は10進数だと<span class="formula">99</span>。<br>
+味方キャラのレベルが<span class="formula">99</span>の場合、レベルアップ処理をする必要がないので、<code>[$23D6]</code>にジャンプする。</p>
+
+<p><code><span class="r">$C1/23CA</span></code>からは、「敵パーティレベル - 味方キャラレベル」の計算を行っている。<br>
+<code>[$00:0355]</code>に入っている敵パーティレベルをロードしてから、キャリーフラグを立て（引き算の繰り下がりに備えている）、<code>[$0006,y]</code>（味方キャラレベル）を引いている。<br>
+引き算の結果が負の時は<code><span class="r">$C1/23D0</span></code>のキャリーフラグが立っていないときに当たり、引き算の結果が<span class="formula">0</span>の時は<code><span class="r">$C1/23D2</span></code>のゼロフラグが立っているときであり、どちらも<code>[$23D7]</code>にジャンプする。<br>
+つまり、「敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合」の経験値計算に飛ぶ。<br>
+引き算の結果が正の時だけ、<code><span class="r">$C1/23D4</span></code>で<code>[$2402]</code>にジャンプすることから、この先が「敵パーティレベル＞味方キャラレベル、かつ経験値が増える行動を取った場合」の経験値計算である。</p>
+
+<div class="code-container"><pre>
+;敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合
+$C1/23D7 LDA #$10                ;Aに$10（10進数16）をロード
+$C1/23D9 STA $4204  [$00:4204]   ;符号付16bit / 8bit　被除数（下位バイト）
+$C1/23DC LDA #$00                ;Aに$00をロード
+$C1/23DE STA $4205  [$00:4205]   ;符号付16bit / 8bit　被除数（上位バイト）
+$C1/23E1 LDA $0006,y             ;Aに[0006,y]（味方キャラレベル）をロード
+$C1/23E4 STA $4206  [$00:4206]   ;符号付16bit / 8bit　除数　※除算は「$0010/味方キャラレベル = 16/味方キャラレベル」
+$C1/23E7 JSR $46C8  [$C1:46C8]   ;[$C1:46C8]へジャンプ（計算待機用）
+
+$C1/46C8 NOP                     ;（符号付16bit / 8bitの計算待機）
+$C1/46C9 RTS                     ;サブルーチン戻り
+
+$C1/23EA LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/23EC LSR A                   ;Aを論理右シフト（/2）　※敵パーティレベル/2
+$C1/23ED CLC                     ;キャリーフラグをクリア
+$C1/23EE ADC $4214  [$00:4214]   ;A + [$00:4214]　※敵パーティレベル/2 + 16/味方キャラレベル
+$C1/23F1 BNE $01    [$23F4]      ;ゼロフラグが立っていないとき[$23F4]分岐
+$C1/23F3 INC A                   ;Aをインクリメント(+1)　※「敵パーティレベル/2 + 16/味方キャラレベル」の結果が0の時は+1
+$C1/23F4 CLC                     ;キャリーフラグをクリア
+$C1/23F5 ADC $001E,y             ;A + [$001E,y]　※キャラの経験値に計算結果を足す
+$C1/23F8 BCS $25    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/23FA CMP #$64                ;Aと$64（100）を減算比較
+$C1/23FC BCS $21    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/23FE STA $001E,y             ;Aを[$001E,y]に書き込み　※経験値の値を更新
+$C1/2401 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上が、「敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合」の経験値計算である。<br>
+ここでは<a href="https://donkeyhacks.zouri.jp/databank/65C816/function/65c816timedivide.html" target="_blank">65C816命令表　ロード･ストア命令 - 乗除算</a>の符号付16bit / 8bit、つまり16進数で2バイト÷1バイトの割り算のやり方で計算を行っている。<br>
+被除数（下位バイト）として<span class="formula">$10</span>（10進数<span class="formula">16</span>）、被除数（上位バイト）として<span class="formula">$00</span>、除数に<code>[0006,y]</code>（味方キャラレベル）をセットしていることから、</p>
+
+<p class="formula">$0010 / 味方キャラレベル</p>
+
+<p>という割り算を行っている。</p>
+
+<p><span class="formula">$0010</span>は10進数で<span class="formula">16</span>なので、</p>
+
+<p class="formula">16 / 味方キャラレベル</p>
+
+<p>ということになる。10進数計算なら小数点は切り捨てである。<br>
+つまり、</p>
+
+<p class="formula">獲得経験値 = trunc(敵パーティレベル / 2) + trunc(16 / 味方キャラレベル)</p>
+
+<p>の、<span class="formula">trunc(16 / 味方キャラレベル)</span>の部分になる。<br>
+割り算の計算結果は<code>[$00:4214]</code>に入るのだが、計算結果が出る前の<code><span class="r">$C1/23EA</span></code>～<code><span class="r">$C1/23EC</span></code>で、敵パーティレベルを論理右シフト、つまり<span class="formula">÷2</span>している。<br>
+これは上の計算式の<span class="formula">trunc(敵パーティレベル / 2)</span>の部分である。<br>
+最終的に、<code><span class="r">$C1/23EE</span></code>で、<span class="formula">trunc(敵パーティレベル / 2)</span>に割り算の結果を足し算しているから、<code><span class="r">$C1/23EE</span></code>の計算結果は、</p>
+
+<p class="formula">獲得経験値 = trunc(敵パーティレベル / 2) + trunc(16 / 味方キャラレベル)</p>
+
+<p>まさにこれである。</p>
+
+<p><code><span class="r">$C1/23F1</span></code>～<code><span class="r">$C1/23F3</span></code>は、上の計算結果が<span class="formula">0</span>の時のみインクリメント(<span class="formula">+1</span>)する処理である。<br>
+ただし、上の計算結果が<span class="formula">0</span>になるのは、敵パーティレベルが<span class="formula">1</span>で味方キャラレベルが<span class="formula">17</span>以上という、あまりない状況の時である。<br>
+（たとえば中世編のアイアンビートル×3の敵パーティレベルが<span class="formula">1</span>なので、中世編の味方キャラのレベルが<span class="formula">17</span>以上の時が該当する）<br>
+あまりない状況とはいえ、「経験値が得られる戦闘では、最低でも経験値を<span class="formula">1</span>得られるようにする」という処理がきちんと入っていることがわかる。</p>
+
+<p>このようにして、「敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合」の経験値が計算できた。<br>
+<code><span class="r">$C1/23F5</span></code>は、<code>[$001E,y]</code>と計算結果を足し算している。つまり、戦闘前のキャラの経験値と、戦闘で得た経験値を足している。<br>
+足し算の計算結果が10進数で<span class="formula">100</span>以上になればレベルアップというのが本作の仕様であるから、ここでレベルアップするかしないかの判定が行われていることになる。<br>
+<span class="r">$C1/23F8</span>では、足し算の時点でキャリーフラグが立っているのなら<code>[$241F]</code>へジャンプとなっているが、<code>[$241F]</code>以降がレベルアップ処理である。<br>
+この時点では8bitモードなので、キャリーフラグは1バイトを越えた時、つまり<span class="formula">$FF</span>より<span class="formula">1</span>多い<span class="formula">$100</span>（10進数<span class="formula">256</span>）以上の計算結果となった時に立つ。<br>
+<span class="formula">256</span>は<span class="formula">100</span>を越えているから、当然レベルアップである。<br>
+続いて、<code><span class="r">$C1/23FA</span></code>では足し算結果と<span class="formula">$64</span>（10進数<span class="formula">100</span>）を減算比較している。減算の結果<span class="formula">0</span>以上ならキャリーフラグが立ち、レベルアップ処理に飛ぶ。<br>
+キャリーフラグが立たない時はレベルアップしないので、足し算結果がそのまま戦闘終了時の経験値ということになり、<code>[$001E,y]</code>、つまりシナリオ別キャラデータの経験値として新たに書き込まれて経験値計算終了である。</p>
+
+<div class="code-container"><pre>
+;敵パーティレベル＞味方キャラレベル、かつ経験値が増える行動を取った場合
+$C1/2402 LDA $55    [$00:0355]   ;Aに[$00:0355]（敵パーティレベル）をロード
+$C1/2404 SEC                     ;キャリーフラグを立てる（引き算用）
+$C1/2405 SBC $0006,y             ;A - [$0006,y]　※「敵パーティレベル - 味方キャラレベル」
+$C1/2408 BIT #$F0                ;Aと$F0で論理積（フラグだけ変更）　※「敵パーティレベル - 味方キャラレベル」の161の位の判定
+$C1/240A BNE $13    [$241F]      ;ゼロフラグが立っていないとき[$241F]分岐　※「敵パーティレベル - 味方キャラレベル」が$10以上なのでレベルアップ確定
+$C1/240C ASL A                   ;算術左シフト（×2）
+$C1/240D ASL A                   ;算術左シフト（×2）
+$C1/240E ASL A                   ;算術左シフト（×2）
+$C1/240F ASL A                   ;算術左シフト（×2）　※(「敵パーティレベル - 味方キャラレベル」)*$10
+$C1/2410 ORA #$08                ;Aと$08(%0000 1000)で論理和(+$08)
+$C1/2412 ADC $001E,y             ;A + [$001E,y]（味方キャラ経験値）
+$C1/2415 BCS $08    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/2417 CMP #$64                ;Aと$64（100）を減算比較
+$C1/2419 BCS $04    [$241F]      ;キャリーフラグが立っているとき[$241F]分岐
+$C1/241B STA $001E,y             ;Aを[$001E,y]に書き込み　※経験値の値を更新
+$C1/241E RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>こちらは、「敵パーティレベル＞味方キャラレベル、かつ経験値が増える行動を取った場合」の経験値計算処理である。<br>
+まず、先の<code><span class="r">$C1/23CA</span></code>～<code><span class="r">$C1/23CD</span></code>と同じ方法で、「敵パーティレベル - 味方キャラレベル」を計算する。<br>
+<code><span class="r">$C1/2408</span></code>では「敵パーティレベル - 味方キャラレベル」と<span class="formula">$F0</span>で論理積を取っているが、これで「敵パーティレベル - 味方キャラレベル」の<span class="formula">16<sup>1</sup></span>の位の値だけ残り、<span class="formula">16<sup>0</sup></span>の位は<span class="formula">0</span>になる。<br>
+<code><span class="r">$C1/240A</span></code>の判定はゼロフラグが立っているかどうかだが、ゼロフラグが立つのは<span class="formula">16<sup>1</sup></span>の位が<span class="formula">0</span>の時だけである。<br>
+<span class="formula">16<sup>1</sup></span>の位が<span class="formula">1</span>以上だと、「敵パーティレベル - 味方キャラレベル」の結果が<span class="formula">$10</span>以上、10進数で<span class="formula">16</span>以上であることが確定になる。</p>
+
+<p class="formula">取得経験値 = ( 敵パーティレベル - 味方キャラレベル ) * 16 + 8</p>
+
+<p>なので、<span class="formula">16 * 16 + 8 = 264</span>になるから、取得経験値が<span class="formula">100</span>を越えていてレベルアップ確定となる。<br>
+このため、<code><span class="r">$C1/240A</span></code>の「ゼロフラグが立っていないとき<code>[$241F]</code>分岐」は、「取得経験値が<span class="formula">100</span>以上確定なので、レベルアップ処理へジャンプ」になる。<br>
+続いて、「敵パーティレベル - 味方キャラレベル」の結果が<span class="formula">$10</span>未満の処理になるが、4回連続で<code><span style="color: #0000FF;">ASL</span></code>、算術左シフトを行っているので、<span class="formula">×2</span>を4回繰り返している。<br>
+よって10進数なら<span class="formula">×16</span>、16進数なら<span class="formula">×$10</span>の処理である。</p>
+
+<p class="formula">取得経験値 = ( 敵パーティレベル - 味方キャラレベル ) * 16 + 8</p>
+
+<p>の、「<span class="formula">( 敵パーティレベル - 味方キャラレベル ) * 16</span>」部分の計算である。<br>
+次に<code><span class="r">$C1/2410</span></code>で、「<span class="formula">( 敵パーティレベル - 味方キャラレベル ) * 16</span>」と<span class="formula">$08</span>の論理和を取っている。<br>
+「<span class="formula">( 敵パーティレベル - 味方キャラレベル ) * 16</span>」、つまり「<span class="formula">( 敵パーティレベル - 味方キャラレベル ) * $10</span>」は、16進数だと<span class="formula">16<sup>1</sup></span>の位が<span class="formula">( 敵パーティレベル - 味方キャラレベル )</span>で、<span class="formula">16<sup>0</sup></span>の位が<span class="formula">0</span>だから、<span class="formula">$08</span>と論理和を取るということは、<span class="formula">16<sup>0</sup></span>の位が<span class="formula">0</span>から<span class="formula">8</span>に変わる、という処理と同じ意味である。<br>
+結局、論理和を取ることは、「<span class="formula">( 敵パーティレベル - 味方キャラレベル ) * 16</span>」に<span class="formula">$08</span>を足すことと同じ処理になる。<br>
+「<span class="formula">( 敵パーティレベル - 味方キャラレベル ) * 16 + 8</span>」<br>
+の計算がここで終了したということである。</p>
+
+<p>後の処理は、「敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合」と同じである。<br>
+<code><span class="r">$C1/2412</span></code>で、戦闘前のキャラの経験値と、戦闘で得た経験値を足し、キャリーフラグが立っていたらレベルアップ処理へジャンプ。<br>
+<code><span class="r">$C1/2417</span></code>で、足し算結果と<span class="formula">$64</span>（10進数<span class="formula">100</span>）を減算比較し、<span class="formula">0</span>以上ならキャリーフラグが立ち、レベルアップ処理へジャンプ。<br>
+それ以外は足し算結果がそのまま戦闘終了時の経験値となり、<code><span class="r">$C1/241B</span></code>で<code>[$001E,y]</code>（シナリオ別キャラデータの経験値）に書き込まれて経験値計算終了である。</p>
+
+<div class="code-container"><pre>
+;レベルアップ時の処理
+$C1/241F LDA $0005,x             ;Aに[$0005,x]（味方キャラ経験値）をロード
+$C1/2422 STA $001C,x             ;Aを[$001C,x]に書き込み
+$C1/2425 LDA #$00                ;Aに$00をロード
+$C1/2427 STA $0005,x             ;Aを[$0005,x]（味方キャラ経験値）に書き込み
+$C1/242A LDA $0006,y             ;Aに[$0006,y]（味方キャラレベル）をロード
+$C1/242D INC A                   ;Aをインクリメント（+1）
+$C1/242E CMP #$64                ;Aと$64（100）を減算比較（レベルが100かどうか）
+$C1/2430 BEQ $A4    [$23D6]      ;ゼロフラグが立っているとき[$23D6]分岐
+$C1/2432 STA $0006,y             ;Aを[$0006,y]（味方キャラレベル）に書き込み　※レベル更新
+$C1/2435 LDA #$00                ;Aに$00をロード
+$C1/2437 STA $001E,y             ;Aを[$001E,y]（キャラ経験値）に書き込み
+$C1/243A PHX                     ;Xをスタックにプッシュ
+$C1/243B PHY                     ;Yをスタックにプッシュ
+$C1/243C TXY                     ;Xの値をYに転送
+$C1/243D JSR $273C  [$C1:273C]   ;[$C1:273C]へ
+;（レベルアップ時の表示＆モーション表示のサブルーチンへ）
+</pre></div>
+
+<p>最後にレベルアップ時の処理を紹介しておく。<br>
+（<code><span class="r">$C1/2422</span></code>の<code>[$001C,x]</code>の処理はよくわからないのでパス）<br>
+レベルアップした時、経験値の余剰は繰り越しにならず、<span class="formula">0</span>になるので、<code><span class="r">$C1/2425</span></code>～<code><span class="r">$C1/2427</span></code>でキャラの経験値<code>[$0005,x]</code>に<span class="formula">$00</span>を書き込んでいる。<br>
+<code><span class="r">$C1/242A</span></code>では、シナリオ別キャラデータのキャラレベルが読み込まれ、<code><span class="r">$C1/242D</span></code>ではレベルアップしたのでレベルを<span class="formula">+1</span>している。<br>
+ただし<code><span class="r">$C1/242E</span></code>で、上がったレベルの値と<span class="formula">$64</span>（10進数<span class="formula">100</span>）と比較し、ゼロフラグが立っている場合、つまりレベルが<span class="formula">100</span>になっていたら、<code><span class="r">$C1/23D6</span></code>へ戻る。<br>
+「<code><span class="r">$C1/23D6</span> <span style="color: #0000FF;">RTS</span></code>」の後は、「敵パーティレベル≦味方キャラレベル、または経験値が増えない行動を取った場合」の処理であり、レベル99、かつ<code>[$0005,x]</code>（味方キャラ経験値）に<span class="formula">$00</span>を入れた状態で再び経験値計算処理に戻されたということになるが、この状況ではどうやっても「<span class="formula">trunc(敵パーティレベル / 2) + trunc(16 / 味方キャラレベル=99)</span>」が<span class="formula">100</span>を越えてレベルアップすることはない。本作の敵パーティレベルの最大値が<span class="formula">45</span>（イシュタール×1）だからである。<br>
+よってレベル99以上にはレベルアップしない、という処理になるようだ。</p>
+
+<p>レベルアップで上がったレベルが99以下の場合はそのまま、シナリオ別キャラデータのキャラレベル<code>[$0006,y]</code>に上書きされる。<br>
+また、シナリオ別キャラデータのキャラ経験値<code>[$001E,y]</code>には、<code><span class="r">$C1/2437</span></code>で<span class="formula">$00</span>が書き込まれて更新される。<br>
+以上で、レベルアップ時のレベル・経験値の値の更新が終了となる。<br>
+この後はレベルアップ時の表示やモーションなどのサブルーチンへと飛び、それが終わると、味方キャラが複数の場合、他の味方キャラの取得経験値計算＆レベルアップ処理を行い、全員分の処理を行った後は、<span class="tri"><a href="program8.html">ドロップアイテム判定</a></span>処理を行って戦闘終了である。</p>
+
+<p>次ページで、<a href="program10_2.html">レベルアップ時のステータス上昇値の計算と処理</a>を紹介する。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program8.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program10_2.html"><span class="button">&#9654;次　レベルアップ時のステータス上昇値</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

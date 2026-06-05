@@ -53,8 +53,17 @@ materialItem = [
 ];
 
 // アイテム合成
-d.getElementById("formg").addEventListener("change", () => d.getElementById("view1").innerHTML = itemlist[d.getElementById("selectForm1").selectedIndex][d.getElementById("selectForm2").selectedIndex]);
+d.getElementById("formg").addEventListener("change", () => {
+//	d.getElementById("view1").innerHTML = itemlist[d.getElementById("selectForm1").selectedIndex][d.getElementById("selectForm2").selectedIndex]
+	d.getElementById("view1").replaceChildren();
+	d.getElementById("view1").insertAdjacentHTML("afterbegin", itemlist[d.getElementById("selectForm1").selectedIndex][d.getElementById("selectForm2").selectedIndex]);
+});
 
 // アイテム合成逆引き（材料検索）
-d.getElementById("formk").addEventListener("change", () => d.getElementById("view2").innerHTML = materialItem[d.getElementById("selectForm3").selectedIndex]);
+d.getElementById("formk").addEventListener("change", () => {
+//	d.getElementById("view2").innerHTML = materialItem[d.getElementById("selectForm3").selectedIndex]);
+	d.getElementById("view2").replaceChildren();
+	d.getElementById("view2").insertAdjacentHTML("afterbegin", materialItem[d.getElementById("selectForm3").selectedIndex]);
+});
+
 }

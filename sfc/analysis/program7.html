@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ乱数について">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ乱数について">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ乱数について</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; マップ乱数について</h1>
+<h2>マップ乱数について</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><span class="tri"></span><a href="program5.html">ダメージ計算式の簡易解説（乱数計算）</a>では、戦闘における乱数について説明した。<br>
+だが、<span class="tri"><a href="program2.html">テレポートの仕様簡易解説</a></span>では、乱数生成方法について説明を省いた。<br>
+そのあたりについて説明する。</p>
+
+<p>ここまでに述べた通り、テレポートの飛び先などの計算で使われる乱数は、戦闘中にダメージ量計算などに使われる戦闘用乱数とは計算方法が異なる。<br>
+テレポートの飛び先計算で使われる乱数の計算方法は、マップ（フィールド）にいる時に常に計算され続けている乱数の計算方法とほぼ同一である。<br>
+<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様に、マップでの乱数に関して以下のような説明がある。</p>
+
+<blockquote>マップ乱数は、マップっぽい画面が見えている間、フレーム単位で変化する。<br>
+（マップっぽい画面という表現は曖昧ですが・・）<br>
+メニュー画面や名前入力画面では変化しない。<br>
+デモでおぼろ丸が降りてくる場面などでは変化する。</blockquote>
+
+<p>ということで以下では、マップ上で計算されている乱数のことは「マップ乱数」とする。</p>
+
+<p>以下ではマップ乱数の生成方法について長々と話が続くので、マップ乱数計算方法だけ知りたいという方は、<a href="#result">計算方法のまとめ</a>まで飛ばしていただきたい。</p>
+
+<h3>マップ乱数の生成概要</h3>
+
+<p>テレポートの飛び先計算及び、アイテム改造やたい焼き屋の客の確率計算に使われる、マップ乱数生成のサブルーチンのアドレスは、<code><span class="r">$C0/B900</span></code>～<code><span class="r">$C0/B924</span></code>である。<br>
+実際には、この間に、<code><span class="r">$C0/BA16</span></code>～<code><span class="r">$C0/BA75</span></code>というサブルーチンが2回挟まっている。<br>
+アドレスで記すと、</p>
+
+<div style="border: 1px solid gray; padding: .5em;">　<code><span class="r">$C0/B900</span></code>～<code><span class="r">$C0/B911</span></code><br>
+→<code><span class="r">$C0/BA16</span></code>～<code><span class="r">$C0/BA75</span></code>（1回目）<br>
+→<code><span class="r">$C0/B914</span></code>～<code><span class="r">$C0/B91D</span></code><br>
+→<code><span class="r">$C0/BA16</span></code>～<code><span class="r">$C0/BA75</span></code>（2回目）<br>
+→<code><span class="r">$C0/B920</span></code>～<code><span class="r">$C0/B924</span></code></div>
+
+<p>以上で、乱数がインデックスレジスタX（以下<code>X</code>と表記する）に出力という手順である。<br>
+マップ上では、1フレーム（つまり1/60秒）毎に1回の頻度で上の計算が繰り返されているようである。<br>
+（※マップ上だと、最初の「<code><span class="r">$C0/B900</span></code>～<code><span class="r">$C0/B911</span></code>」が、「<code><span class="r">$C0/B90C</span></code>～<code><span class="r">$C0/B911</span></code>」に置き換わっているが、内容に大きな違いはない）<br>
+マップやフィールド上では乱数計算以外の諸々（キャラのモーションやモブキャラの移動、エンカウント関係など）も一緒に計算されているので、乱数計算だけで1/60秒かかっているという意味ではない。<br>
+乱数計算など諸々込みで1フレームに1回ループし計算している、ということである。</p>
+
+<p>また、その乱数は同時にメモリ<code>$00:0036</code>と<code>$7E:000D</code>（<code>$00:000D</code>と同値）にも出力され、次の乱数の生成の計算にも用いられる。<br>
+<code><span class="r">$C0/BA16</span></code>～<code><span class="r">$C0/BA75</span></code>の計算には<code>[$00:0030]～[$00:0037]</code>に収納された数値が使われており、何度も乗算を行うなどプログラミング初心者の筆者には謎の計算のように見えたが、色々といじりまわしたりネットで調べてみた結果、<code><span class="r">$C0/BA16</span></code>～<code><span class="r">$C0/BA75</span></code>のサブルーチンは、<br>
+「16bit×16bit（16進数4桁×4桁）の乗算を行うサブルーチン」<br>
+らしい、と判明した。<br>
+つまり、</p>
+
+<div style="border: 1px solid gray; padding: .5em;">　<code><span class="r">$C0/B900</span></code>～<code><span class="r">$C0/B911</span></code><br>
+→16bit×16bitの乗算を行うサブルーチン（1回目）<br>
+→<code><span class="r">$C0/B914</span></code>～<code><span class="r">$C0/B91D</span></code><br>
+→16bit×16bitの乗算を行うサブルーチン（2回目）<br>
+→<code><span class="r">$C0/B920</span></code>～<code><span class="r">$C0/B924</span></code></div>
+
+<p>こんな順序でマップ乱数が計算されているようだ。</p>
+
+<p>ひとつ不思議なのは、テレポートの飛び先計算などで、上の乱数生成サブルーチンが使われているものの、「<span class="formula">0～255</span>の乱数生成」にも、「<span class="formula">0～98</span>の乱数生成」にも、同じサブルーチンを使っていることである。<br>
+ということは、サブルーチン実行前に、乱数の最大値を何かしらの変数としてサブルーチンに入れているはずである。<br>
+そのあたりについては後に記す。</p>
+
+<h3>16bit×16bitの乗算を行うサブルーチン</h3>
+
+<p>「16bit×16bitの乗算を行うサブルーチン」こと、<code><span class="r"><span class="r">$C0/BA16</span></span></code>～<code><span class="r"><span class="r">$C0/BA75</span></span></code>の部分の説明から行う。<br>
+先に述べた通り、このサブルーチンには8種のメモリ<code>[$00:0030]</code>～<code>[$00:0037]</code>を使っている。<br>
+このサブルーチンに入る前に、<code>[$00:0030]</code>に被乗数（16bit）、<code>[$00:0032]</code>に乗数（16bit）をセットする。<br>
+16bit、つまり16進数で4桁の値をメモリに入れると、下位2桁が該当アドレスのメモリ、上位2桁が該当アドレス+1のメモリに入るのがポイント。</p>
+
+<p>例えば、<span class="formula">$1234×$ABCD</span>の16bit×16bit掛け算をしたい場合、<code>[$00:0030]</code>に<span class="formula">$1234</span>、<code>[$00:0032]</code>に<span class="formula">$ABCD</span>を入れる。<br>
+各アドレスは8ビット( = 1バイト）しかデータを収められない。<br>
+よって、<br>
+「<code>[$00:0030]</code>に<span class="formula">$1234</span>を入れる」<br>
+という時は、<code>[$00:0030]</code>には下2桁の<span class="formula">$34</span>しか入らない。<br>
+<span class="formula">$12</span>の部分は、<code>[$00:0030]</code>の次の<code>[$00:0031]</code>に入る。<br>
+という8bitモードと16bitモードの違いはこれまでも触れてきた通りである。</p>
+
+<p>「16bitモードで、<code>[$00:0030]</code>に<span class="formula">$1234</span>、<code>[$00:0032]</code>に<span class="formula">$ABCD</span>を入れる」<br>
+を、実際に行った結果は以下の通りである。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値(8bitモード)</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0030]</code></td><td><span class="formula">$34</span></td></tr>
+	<tr><td><code>[$00:0031]</code></td><td><span class="formula">$12</span></td></tr>
+	<tr><td><code>[$00:0032]</code></td><td><span class="formula">$CD</span></td></tr>
+	<tr><td><code>[$00:0033]</code></td><td><span class="formula">$AB</span></td></tr>
+</tbody>
+</table>
+
+<p>「<span class="formula">$1234</span>」「<span class="formula">$ABCD</span>」が分割されて<code>[$00:0030]</code>～<code>[$00:0033]</code>に入った状態でサブルーチンを実行する、ということになる。</p>
+
+<p>さて、以下が実際の「16bit×16bitの乗算を行うサブルーチン」である。<br>
+また、符号付8bit×8bitの計算を4回実行しているが、どこで何を実行したか区別するため、8bit×8bitに関係するところには&#x2460;&#x2461;&#x2462;&#x2463;と丸数字を付けておく。</p>
+
+<div class="code-container"><pre>
+$C0/BA16 PHX                   ;Xをスタックにプッシュ
+$C0/BA17 LDA $30    [$00:0030] ;Aに[$00:0030]をロード
+$C0/BA19 STA $4202  [$00:4202] ;&#x2460;A（[$00:0030]）を被乗数として[$00:4202]にセット
+$C0/BA1C LDA $32    [$00:0032] ;Aに[$00:0032]をロード
+$C0/BA1E STA $4203  [$00:4203] ;&#x2460;A（[$00:0032]）を乗数として[$00:4203]にセット
+$C0/BA21 NOP                   ;（乗算の計算待機）
+$C0/BA22 NOP                   ;（乗算の計算待機）
+$C0/BA23 NOP                   ;（乗算の計算待機）
+$C0/BA24 LDA $31    [$00:0031] ;Aに[$00:0031]をロード
+$C0/BA26 LDX $4216  [$00:4216] ;&#x2460;掛け算の結果をXにロード
+$C0/BA29 STX $34    [$00:0034] ;&#x2460;（掛け算の結果）を[$00:0034]に書き込み
+$C0/BA2B STA $4202  [$00:4202] ;&#x2461;&#x2462;A（[$00:0031]）を被乗数として[$00:4202]にセット
+$C0/BA2E LDA $33    [$00:0033] ;Aに[$00:0033]をロード
+$C0/BA30 STA $4203  [$00:4203] ;&#x2461;A（[$00:0033]）を乗数として[$00:4203]にセット
+$C0/BA33 NOP                   ;（乗算の計算待機）
+$C0/BA34 NOP                   ;（乗算の計算待機）
+$C0/BA35 NOP                   ;（乗算の計算待機）
+$C0/BA36 LDA $32    [$00:0032] ;Aに[$00:0032]をロード
+$C0/BA38 LDX $4216  [$00:4216] ;&#x2461;掛け算の結果をXにロード
+$C0/BA3B STX $36    [$00:0036] ;&#x2461;（掛け算の結果）を[$00:0036]に書き込み
+$C0/BA3D STA $4203  [$00:4203] ;&#x2462;A（[$00:0032]）を乗数として[$00:4203]にセット
+$C0/BA40 NOP                   ;（乗算の計算待機）
+$C0/BA41 NOP                   ;（乗算の計算待機）
+$C0/BA42 NOP                   ;（乗算の計算待機）
+$C0/BA43 REP #$20              ;Mフラグクリア　Aレジスタ16bitモード
+$C0/BA45 LDA $4216  [$00:4216] ;&#x2462;掛け算の結果をAにロード
+$C0/BA48 CLC                   ;キャリーフラグをクリア
+$C0/BA49 ADC $35    [$00:0035] ;&#x2462;（掛け算の結果） + [$00:0035] (16bitモード)
+$C0/BA4B STA $35    [$00:0035] ;A(&#x2462; + [$00:0035])を[$00:0035]に書き込み (16bitモード)
+$C0/BA4D SEP #$20              ;MフラグON　Aレジスタ8bitモード
+$C0/BA4F LDA #$00              ;Aに$00をロード
+$C0/BA51 ADC $37    [$00:0037] ;A + [$00:0037]
+$C0/BA53 STA $37    [$00:0037] ;Aを[$00:0037]に書き込み
+$C0/BA55 LDA $30    [$00:0030] ;Aに[$00:0030]をロード
+$C0/BA57 STA $4202  [$00:4202] ;&#x2463;A（[$00:0030]）を被乗数として[$00:4202]にセット
+$C0/BA5A LDA $33    [$00:0033] ;Aに[$00:0033]をロード
+$C0/BA5C STA $4203  [$00:4203] ;&#x2463;A（[$00:0033]）を乗数として[$00:4203]にセット
+$C0/BA5F NOP                   ;（乗算の計算待機）
+$C0/BA60 NOP                   ;（乗算の計算待機）
+$C0/BA61 NOP                   ;（乗算の計算待機）
+$C0/BA62 REP #$20              ;Mフラグクリア　Aレジスタ16bitモード
+$C0/BA64 LDA $4216  [$00:4216] ;&#x2463;掛け算の結果をAにロード
+$C0/BA67 CLC                   ;キャリーフラグをクリア
+$C0/BA68 ADC $35    [$00:0035] ;A&#x2463;（掛け算の結果） + [$00:0035] (16bitモード)
+$C0/BA6A STA $35    [$00:0035] ;A（&#x2463; + [$00:0035]）を[$00:0035]に書き込み (16bitモード)
+$C0/BA6C SEP #$20              ;MフラグON　Aレジスタ8bitモード
+$C0/BA6E LDA #$00              ;Aに$00をロード
+$C0/BA70 ADC $37    [$00:0037] ;A + [$00:0037]
+$C0/BA72 STA $37    [$00:0037] ;Aを[$00:0037]に書き込み
+$C0/BA74 PLX                   ;Xに値をプル
+$C0/BA75 RTS                   ;サブルーチン戻り
+</pre></div>
+
+<p>上のサブルーチンで16bit×16bitの乗算をどうやっているのか、理屈を説明するため、わかりやすく10進法の話に例えることにしよう。<br>
+4桁の掛け算、たとえば、</p>
+
+<p class="formula">1234×5678</p>
+
+<p>を計算するとする。<br>
+ただし、「掛け算のみ、2桁×2桁の計算か、<span class="formula">×10<sup>n</sup></span>しかできない」という条件付きである。<br>
+この掛け算は、それぞれの数字を分割すると、</p>
+
+<p class="formula">(1200+34)×(5600+78)</p>
+
+<p>である。つまり、</p>
+
+<p class="formula">1200×5600 + 1200×78 + 5600×34 + 34×78<br>
+=12×56×10<sup>4</sup> + (12×78 + 56×34)×10<sup>2</sup> + 34×78</p>
+
+<p>と、4回の2桁×2桁の計算及び、<span class="formula">×10<sup>4</sup></span>と<span class="formula">×10<sup>2</sup></span>に分解できる。</p>
+
+<p>この分解＆計算を16進数で行ったのが、上のサブルーチンだと考えれば良い。<br>
+（前にも記したが、スーパーファミコンのプログラミング言語65C816には、乗除算の機能がなく、コプロセッサという別機能に数値を渡して乗除算を行う。しかも計算の桁数によって様々な工夫をしなければならない。今回は、2桁×2桁に分解して計算するという工夫で4桁×4桁を実現しているのである）<br>
+<span class="formula">10<sup>4</sup></span>と<span class="formula">10<sup>2</sup></span>の部分を、<span class="formula">16<sup>4</sup></span>と<span class="formula">16<sup>2</sup></span>に変えれば、16進数の計算と同じである。<br>
+数字の分解自体は、既に<code>[$00:0030]</code>～<code>[$00:0033]</code>で4分割されているから、サブルーチン前に終えている。<br>
+それらが「4回の2桁×2桁の計算（＝符号付8bit×8bitの計算）」で処理され、答えもまた4分割されて<code>[$00:0034]</code>～<code>[$00:0037]</code>に入る、という手順である。<br>
+16bit×16bitの答えの最大値は<span class="formula">$FFFF×$FFFF = $FFFE0001</span>、つまり16進数だと桁数の最大値は8である。<br>
+サブルーチン計算後、実際に入る数値は、8桁を4分割して、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0034]</code></td><td>計算結果の上から7・8桁目</td></tr>
+	<tr><td><code>[$00:0035]</code></td><td>計算結果の上から5・6桁目</td></tr>
+	<tr><td><code>[$00:0036]</code></td><td>計算結果の上から3・4桁目</td></tr>
+	<tr><td><code>[$00:0037]</code></td><td>計算結果の上から1・2桁目</td></tr>
+</tbody>
+</table>
+
+<p>である（各8bit）。</p>
+
+<div class="place"><p>例：<br>
+最初に記した、<span class="formula">$1234×$ABCD</span>の16bit×16bit乗算の答えは「<span class="formula">$0C374FA4</span>」である。<br>
+（WindowsパソコンならWindows付属の電卓をプログラマー電卓モードに切り替え、16進数のHEXモードに切り替えて入力すれば答えが計算される。また、検索すれば16進数の計算ができるウェブサイトも多数ある）<br>
+上サブルーチン実行前に、以下のように数値をセットすると、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0030]</code></td><td><span class="formula">$34</span></td></tr>
+	<tr><td><code>[$00:0031]</code></td><td><span class="formula">$12</span></td></tr>
+	<tr><td><code>[$00:0032]</code></td><td><span class="formula">$CD</span></td></tr>
+	<tr><td><code>[$00:0033]</code></td><td><span class="formula">$AB</span></td></tr>
+</tbody>
+</table>
+
+<p>サブルーチン実行後には、<code>[$00:0034]</code>～<code>[$00:0037]</code>に以下のように答えが出力される。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0034]</code></td><td><span class="formula">$A4</span></td></tr>
+	<tr><td><code>[$00:0035]</code></td><td><span class="formula">$4F</span></td></tr>
+	<tr><td><code>[$00:0036]</code></td><td><span class="formula">$37</span></td></tr>
+	<tr><td><code>[$00:0037]</code></td><td><span class="formula">$0C</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>乱数生成計算</h3>
+
+<p>以上、16bit×16bit乗算サブルーチンの詳細が判明したところで、全体を見返してみる。</p>
+
+<div style="border: 1px solid gray; padding: .5em;">
+　<code><span class="r">$C0/B900</span></code>～<code><span class="r">$C0/B911</span></code><br>
+→16bit×16bitの乗算を行うサブルーチン（1回目）<br>
+→<code><span class="r">$C0/B914</span></code>～<code><span class="r">$C0/B91D</span></code><br>
+→16bit×16bitの乗算を行うサブルーチン（2回目）<br>
+→<code><span class="r">$C0/B920</span></code>～<code><span class="r">$C0/B924</span></code></div>
+
+<p>16bit×16bit乗算サブルーチン以外の部分の実際の計算は、以下の通り。<br>
+なおここでは、サブルーチン前に<code>X</code>に<span class="formula">$100 = 10進数256</span>が入力されたものとして進める。</p>
+
+<div class="code-container"><pre>
+$C0/B900 PHA                    ; X:0100 Aをスタックにプッシュ
+$C0/B901 PHB                    ; X:0100 DBレジスタをスタックにプッシュ
+$C0/B902 LDA #$00               ; X:0100 Aに$00をロード
+$C0/B904 PHA                    ; X:0100 Aをスタックにプッシュ
+$C0/B905 PLB                    ; X:0100 DBレジスタに値をプル（$00）
+$C0/B906 PHX                    ; X:0100 Xをスタックにプッシュ
+$C0/B907 LDX #$3D09             ; X:0100 $3D09をXにロード
+$C0/B90A STX $30    [$00:0030]  ; X:3D09 Xを[$00:0030]に書き込み
+$C0/B90C LDX $0C    [$00:000C]  ; X:3D09 [$00:000C]をXにロード
+$C0/B90E INX                    ; X:xxxx Xをインクリメント(+1)
+$C0/B90F STX $32    [$00:0032]  ; X:xxxx Xを[$00:0032]に書き込み
+$C0/B911 JSR $BA16  [$C0:BA16]  ; X:xxxx 16bit×16bit乗算サブルーチンにジャンプ
+;
+;16bit×16bit乗算サブルーチン1回目（計算省略）
+;
+$C0/B914 LDX $34    [$00:0034]  ; X:xxxx Xに[$00:0034]をロード
+$C0/B916 STX $0C    [$00:000C]  ; X:xxxx X（=[$00:0034]）を[$00:000C]に書き込み
+$C0/B918 STX $32    [$00:0032]  ; X:xxxx X（=[$00:0034]）を[$00:0032]に書き込み
+$C0/B91A PLX                    ; X:xxxx Xに値をプル
+$C0/B91B STX $30    [$00:0030]  ; X:0100 Xを[$00:0030]に書き込み
+$C0/B91D JSR $BA16  [$C0:BA16]  ; X:0100 16bit×16bit乗算サブルーチンにジャンプ
+;
+;16bit×16bit乗算サブルーチン2回目（計算省略）
+;
+$C0/B920 PLB                    ; X:0100 DBレジスタに値をプル
+$C0/B921 LDX $36    [$00:0036]  ; X:0100 Xに[$00:0036]をロード
+$C0/B923 PLA                    ; X:00xx Aに値をプル
+$C0/B924 RTS                    ; X:00xx サブルーチン戻り
+</pre></div>
+
+<p>最後、<code><span class="r">$C0/B921</span></code>の「<code><span style="color: #0000FF;">LDX</span> $36</code>」で<code>X</code>に出力された値（8bit）が乱数として扱われることになる。<br>
+では、各部分を見ていく。</p>
+
+<div class="code-container"><pre>
+$C0/B900 PHA                    ; X:0100 Aをスタックにプッシュ
+$C0/B901 PHB                    ; X:0100 DBレジスタをスタックにプッシュ
+$C0/B902 LDA #$00               ; X:0100 Aに$00をロード
+$C0/B904 PHA                    ; X:0100 Aをスタックにプッシュ
+$C0/B905 PLB                    ; X:0100 DBレジスタに値をプル（$00）
+$C0/B906 PHX                    ; X:0100 Xをスタックにプッシュ
+$C0/B907 LDX #$3D09             ; X:0100 $3D09をXにロード
+$C0/B90A STX $30    [$00:0030]  ; X:3D09 Xを[$00:0030]に書き込み
+$C0/B90C LDX $0C    [$00:000C]  ; X:3D09 [$00:000C]をXにロード
+$C0/B90E INX                    ; X:xxxx Xをインクリメント(+1)
+$C0/B90F STX $32    [$00:0032]  ; X:xxxx Xを[$00:0032]に書き込み
+$C0/B911 JSR $BA16  [$C0:BA16]  ; X:xxxx 16bit×16bit乗算サブルーチンにジャンプ
+</pre></div>
+
+<p>最初の16bit×16bit乗算サブルーチン前なので、これから掛け算に使う値を<code>[$00:0030]</code>～<code>[$00:0033]</code>に入れている。<br>
+<code><span class="r">$C0/B907</span></code>～<code><span class="r">$C0/B90A</span></code>では、<span class="formula">$3D09</span>を<code>[$00:0030]</code>に書き込んでいる（16bit）。<br>
+よってここで、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0030]</code></td><td><span class="formula">$09</span></td></tr>
+	<tr><td><code>[$00:0031]</code></td><td><span class="formula">$3D</span></td></tr>
+</tbody>
+</table>
+
+<p>が確定である。</p>
+
+<p>また、<code><span class="r">$C0/B90F</span></code>で<code>[$00:0032]</code>にXを書き込み（16bit）しているが、その前の計算をみると、Xに入っているのは<code>[$00:000C]</code>(16bit)を<span class="formula">+1</span>した値だということがわかる。<br>
+16bitであるから、<code>[$00:000C]</code>の次のメモリ<code>[$00:000D]</code>に入っている8bitの値が、<code>[$00:000C]</code>の上2桁の扱いになる、という点に注意。<br>
+16bitモードの計算などで<code>[$00:000C]</code>をロードする場合、「<span class="formula"><code>[$00:000D]</code>(8bit)×$100 + <code>[$00:000C]</code>(8bit)</span>」が取り出される、ということである。<br>
+以下では便宜上<code>[$00:000D]</code><code>[$00:000C]</code>とする。</p>
+
+<p>よって、16bit×16bit乗算サブルーチンにて計算したいのは、</p>
+
+<p><span class="formula">$3D09×(<code>[$00:000D]</code><code>[$00:000C]</code> + 1)</span></p>
+
+<p>ということがわかる。<br>
+また、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0032]</code></td><td><code>[$00:000C]</code></td></tr>
+	<tr><td><code>[$00:0033]</code></td><td><code>[$00:000D]</code></td></tr>
+</tbody>
+</table>
+
+<p>である。</p>
+
+<p>なお、最初に書いたが、計算した乱数は最終的に<code>$00:0036</code>と<code>$7E:000D</code>（<code>$00:000D</code>と同値）にも出力される。<br>
+つまり、「<span style="font-weight:bold;">ひとつ前に計算された乱数の値を、次の乱数の計算に使っている</span>」ということがここでわかる。<br>
+戦闘用乱数と同じで、何かしらの漸化式でマップ乱数も計算しているということだ。<br>
+後々の都合から、この漸化式を、<code>[$00:000<span style="font-weight:bold;">C</span>]</code>の「C」から取って、</p>
+
+<p><span class="formula">C<sub>n</sub></span></p>
+
+<p>としよう。<br>
+<span class="formula">C<sub>n</sub></span>は16bit4桁の値で、上2桁が<code>[$00:000D]</code>(8bit)、下2桁が<code>[$00:000C]</code>(8bit)ということになる。<br>
+よって</p>
+
+<p><span class="formula">乱数<code>[$00:000D]</code> = C<sub>n</sub> / $100</span></p>
+
+<p>で表すことが可能である。</p>
+
+<p>今回、16bit×16bit乗算に入れるひとつ前の<span class="formula">C<sub>n</sub></sub>のことは、<span class="formula">C<sub>n-1</sub></span>として、</p>
+
+<p><span class="formula">$3D09 × (C<sub>n-1</sub> + 1)</span></p>
+
+<p>と、いうことになる。</p>
+
+<p>また、<code><span class="r">$C0/B906</span></code>にて一度、X（<span class="formula">=$100</span>）がスタックにプッシュ（収納）されている。</p>
+
+<div class="code-container"><pre>
+;16bit×16bit乗算サブルーチン1回目（計算省略）
+;
+$C0/B914 LDX $34    [$00:0034]  ; X:xxxx Xに[$00:0034]をロード
+$C0/B916 STX $0C    [$00:000C]  ; X:xxxx X（=[$00:0034]）を[$00:000C]に書き込み
+$C0/B918 STX $32    [$00:0032]  ; X:xxxx X（=[$00:0034]）を[$00:0032]に書き込み
+$C0/B91A PLX                    ; X:xxxx Xに値をプル
+$C0/B91B STX $30    [$00:0030]  ; X:0100 Xを[$00:0030]に書き込み
+$C0/B91D JSR $BA16  [$C0:BA16]  ; X:0100 16bit×16bit乗算サブルーチンにジャンプ
+</pre></div>
+
+<p>1回目の16bit×16bit乗算サブルーチンを行った後。<br>
+ここで、</p>
+
+<span class="formula">$3D09×(<code>[$00:000D]</code><code>[$00:000C]</code> + 1)</span>
+
+<p>の結果が、<code>[$00:0034]</code>～<code>[$00:0037]</code>に分かれて出力されたはずである。<br>
+先程記した通り、乗算結果は、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0034]</code></td><td>計算結果の上から7・8桁目</td></tr>
+	<tr><td><code>[$00:0035]</code></td><td>計算結果の上から5・6桁目</td></tr>
+	<tr><td><code>[$00:0036]</code></td><td>計算結果の上から3・4桁目</td></tr>
+	<tr><td><code>[$00:0037]</code></td><td>計算結果の上から1・2桁目</td></tr>
+</tbody>
+</table>
+
+<p>となっている。<br>
+その上で、16bit×16bit乗算サブルーチンの後を見てみる。</p>
+
+<p><code><span class="r">$C0/B916</span></code>では、<code>[$00:0034]</code>を16bitモードで<code>[$00:000C]</code>に書き込んでいる。<br>
+16bitモードで<code>[$00:0034]</code>は、<code>[$00:0035]</code>(8bit)・<code>[$00:0034]</code>(8bit)のことになるから、結局、「乗算結果の5～8桁目」、下4桁を意味する。<br>
+また16bitなので、</p>
+
+<p><code>[$00:000C]</code>には「1回目の16bit×16bit乗算結果の5～8桁目（16bit）」<br>
+<code>[$00:000D]</code>には「1回目の16bit×16bit乗算結果の5～6桁目」</p>
+
+<p>が入ったということになる。<br>
+「乗算結果の5～8桁目（＝下4桁）」と書くと後々の計算で面倒なので、「16進数から下4桁だけを取り出す」ことにする。<br>
+論理積の記号を「<span class="formula">&</span>」として、</p>
+
+<p><code>[$00:000C]</code>には「<span class="formula">1回目の16bit×16bit乗算結果 & $FFFF（16bit）</span>」</p>
+
+<p>が入った、と書き換えることができる。</p>
+
+<div style="border: 1px solid gray; padding: .5em;">例：<br>
+<span class="formula">$12345678</span>から、下4桁だけ抜き出したい時<br>
+<span class="formula">$12345678 & $FFFF = $5678</span><br>
+となる。</div>
+
+<p>そして重要なことは、<span class="formula">$3D09×(<code>[$00:000D]</code><code>[$00:000C]</code> + 1)</span>を計算した結果、その乗算結果の5～8桁目を<code>[$00:000D]</code><code>[$00:000C]</code>に上書きした、という点。<br>
+最初にも書いたが、<code>[$00:000C]</code>はひとつ前の<code>[$00:000C]</code>から計算している漸化式であり、</p>
+
+<p><span class="formula">C<sub>n</sub> = ($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF</span></p>
+
+<p>ということがわかったのである。<br>
+更に、</p>
+
+<p><span class="formula">乱数<code>[$00:000D]</code> = C<sub>n</sub> / $100</span></p>
+
+<p>とも記した。<br>
+このため、</p>
+
+<p class="formula">乱数(8bit) = (($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF) / $100<br>
+※C<sub>n-1</sub>は16bit</p>
+
+<p>ということになる。</p>
+
+<p>……と、勝手に話が終わりそうな雰囲気だが、実際にはサブルーチンはまだ続いている。<br>
+だが、後の処理を見るとわかるとおり、実はこれで合っている。<br>
+とりあえず後の処理について続ける。</p>
+
+<p><code><span class="r">$C0/B91A</span></code>では、16bit×16bit乗算サブルーチンにスタックへプッシュしていた元々の値<span class="formula">$0100</span>をプル（戻す）している。<br>
+それを<code>[$00:0030]</code>に書き込み(16bit)しているので、</p>
+
+<p><code>[$00:0030]</code>には<span class="formula">$00</span><br>
+<code>[$00:0031]</code>には<span class="formula">$01</span></p>
+
+<p>が入ったということになる。<br>
+※ここでは、サブルーチン開始前の<code>X</code>の値<span class="formula"> = $0100</span>の場合で計算をしているが、これ以外の値が入ることもある。その話は後で。</p>
+
+<p>ここで、2回目の16bit×16bit乗算サブルーチンで何を計算するかが判明した。<br>
+上の数値から、</p>
+
+<p><span class="formula">$0100×「1回目の16bit×16bit乗算結果の5～8桁目（下4桁）」</span></p>
+
+<p>である。<br>
+ビット計算に慣れている方なら、これなら計算するまでもないとすぐに気づくだろう。<br>
+16進数で<span class="formula">$100</span>を掛け算するということは、下に<span class="formula">00</span>をふたつ付けるということである。<br>
+また、1～2桁目も必ず<span class="formula">00</span>になる。<br>
+（10進数で例えると、<span class="formula">1234×100 = 00123400</span>であるのと同じ理屈）</p>
+
+<p>何はともあれ、続きを見てみるとしよう。</p>
+
+<div class="code-container"><pre>
+;16bit×16bit乗算サブルーチン2回目（計算省略）
+;
+$C0/B920 PLB                    ; X:0100 DBレジスタに値をプル
+$C0/B921 LDX $36    [$00:0036]  ; X:0100 Xに[$00:0036]をロード
+$C0/B923 PLA                    ; X:00xx Aに値をプル
+$C0/B924 RTS                    ; X:00xx サブルーチン戻り
+</pre></div>
+
+<p>最後にやっていることは実質、<code><span class="r">$C0/B921</span></code>の「<code>X</code>に<code>[$00:0036]</code>をロード」だけである。<br>
+8bitであるから、</p>
+
+<p><code>[$00:0036]</code>には乗算結果の3・4桁目<br>
+<code>[$00:0037]</code>には乗算結果の1・2桁目</p>
+
+<p>が呼び出されて<code>X</code>に入る。<br>
+先に述べたが、2回目の16bit×16bit乗算サブルーチンでやったことは、結局、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>桁の位置</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0034]</code></td><td>2回目の乗算結果の上から7・8桁目</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:0035]</code></td><td>2回目の乗算結果の上から5・6桁目</td><td>1回目の16bit×16bit乗算結果の7・8桁目がそのまま入る</td></tr>
+	<tr><td><code>[$00:0036]</code></td><td>2回目の乗算結果の上から3・4桁目</td><td>1回目の16bit×16bit乗算結果の5・6桁目がそのまま入る</td></tr>
+	<tr><td><code>[$00:0037]</code></td><td>2回目の乗算結果の上から1・2桁目</td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>と、いうことになる。<br>
+つまり<code>X</code>に入る値は必ず、「<span class="formula">$00??</span>」であり、「16進数1～2桁の数」になることが決定する。<br>
+つまり<span class="formula">$00～$FF</span>、0から255の乱数を生成したことがわかる。<br>
+また、「<span class="formula">??</span>」は、「16bit×16bit乗算サブルーチン1回目の乗算結果の5・6桁目」である。</p>
+
+<p>ここで少し巻き戻って、<code><span class="r">$C0/B916</span></code>の処理を見直してみる。そこでは新たに、</p>
+
+<p><code>[$00:000C]</code>には「1回目の16bit×16bit乗算結果の5～8桁目（16bit）」<br>
+<code>[$00:000D]</code>には「1回目の16bit×16bit乗算結果の5～6桁目」</p>
+
+<p>を入れたのだから、結局この時点で<code>[$00:000D]</code>に乱数（8bit）が入っていたということになる。<br>
+先に記したとおり、</p>
+
+<div style="border: 1px solid gray; padding: .5em;">0から255の乱数を生成する計算式：<br>
+<span class="formula">乱数(8bit) = (($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF) / $100</span><br>
+<span class="formula">C<sub>n</sub> = ($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF</span><br>
+※<span class="formula">C<sub>n</sub></span>は16bit</div>
+
+<p>これが結論となるのである。<br>
+（合っているかどうかはまったく自信がない）<br>
+マップ上では、ひとつ前の乱数が<code>[$00:000C]</code><code>[$00:000D]</code>（各8bit）として入っていて、16bitモードで<code>[$00:000C]</code>を呼び出すと、<code>[$00:000C]</code>は「<span class="formula"><code>[$00:000D]</code>*$100 + <code>[$00:000C]</code></span>」の形で読み込まれ、上の計算の結果、上2桁を新乱数としており（新<code>[$00:000D]</code>）、下2桁（<code>新[$00:000C]</code>）と合わせて次の乱数の計算用に記録される。<br>
+という手順なのだろう。</p>
+
+<p>例：<span class="formula">C<sub>n-1</sub> = $1234</span>だった時、つまりひとつ前の乱数が<span class="formula">$12</span>の時、</p>
+
+<p><span class="formula">C<sub>n</sub> = ($3D09×($1234 + 1)) & $FFFF = $44DD</span><br>
+乱数(8bit)は <span class="formula">$44DD / $100 = $44</span></p>
+
+<p>と、いうことになる……と思われる。</p>
+
+<h3>生成する乱数の幅</h3>
+
+<p>さて、話を最初の方へ戻すが、「0～255の乱数生成」にも、「0～98の乱数生成」にも、同じサブルーチンを使っていると記した。<br>
+ここまでは「0～255の乱数生成」の乱数生成の話である。<br>
+「0～98の乱数生成」は、どこが違うのだろうか？<br>
+先に結論を述べると、乱数生成サブルーチン前の<code>X</code>の値である。<br>
+<code>X</code>に、16進数で「<span class="formula">生成したい乱数の最大値+1</span>」を入れてから乱数生成サブルーチンを計算すると、「<span class="formula">0～生成したい乱数の最大値</span>」の乱数が算出されるのである。<br>
+「0～98の乱数生成」をしたい場合、<span class="formula">98</span>は16進数で<span class="formula">$62</span>。<br>
+ということは、<span class="formula"><code>X</code> = $63</span>でサブルーチンを開始すると、「<span class="formula">$00～$62</span>」の乱数が生成されるはずだ。<br>
+<code>X</code>の値が関係するのは、16bit×16bit乗算サブルーチン2回目である。<br>
+2回目の乗算は、</p>
+
+<p><span class="formula">$0063×「1回目の16bit×16bit乗算結果の5～8桁目（下4桁）」</span></p>
+
+<p>に、変更されることになる。<br>
+乗算計算結果の<code>[$00:0036]</code>、つまり乗算結果の3・4桁目（下からだと5・6桁目の位置）が新たな乱数になる、ということは変わらない。<br>
+こうすると何が変わるのだろうか。<br>
+わかりやすくするため、前にもやってみた、10進数4桁の掛け算の話をもう一度やってみよう。</p>
+
+<p>たとえば、10進数で、</p>
+
+<p class="formula">0063×9999</p>
+
+<p>の計算とする。<br>
+答えは<span class="formula">629937</span>であり、<span class="formula">0063×10000（630000）</span>より<span class="formula">63</span>少ない。<br>
+先程と同じように数を分解すると、</p>
+
+<p class="formula">= (0000+63)×(9900+99)<br>
+= 0000×9900 + 0000×99 + 9900×63 + 63×99<br>
+= 9900×63 + 63×99</p>
+
+<p>となる。<br>
+<span class="formula">63×99</span>の部分は、計算しても最大4桁。<br>
+<span class="formula">9900×63</span>の部分は、下2桁は必ず<span class="formula">00</span>で、残りの<span class="formula">99×63</span>については、<span class="formula">100×63=6300</span>を越えることはない。<br>
+つまり上2桁（下からだと5・6桁目の位置）が、<span class="formula">63</span>を越えることはない。<br>
+実際の結果も<span class="formula">629937</span>で、上2桁は「<span class="formula">62</span>」である。<br>
+ここから考えて、</p>
+
+<p><span class="formula">$0063×「1回目の16bit×16bit乗算結果の5～8桁目（下4桁）」</span></p>
+
+<p>の結果、下からだと5・6桁目の位置の数値は、<span class="formula">$00～$62</span>である。</p>
+
+<p>もちろん、<span class="formula">$100</span>や<span class="formula">$0063</span>だけでなく、他の数値でも同じことが言える。<br>
+（いちいち計算しなくても、<span class="formula">0063×10000</span>の結果からすぐにわかった人もいるかもしれないが、筆者は数字の計算が不得手なのでこうして延々と書き記してやっとわかった次第である）</p>
+
+<h3 id="result">結果</h3>
+
+<p>図に書いてみると以下の通り。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="../img/random.png" class="modal-link">
+		<img src="../img/random.png" alt="乱数生成" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>マップ乱数<span class="formula">C<sub>n</sub></span>の生成式は、</p>
+
+<div style="border: 1px solid gray; padding: .5em;">
+<p class="formula">乱数(8bit) = (<code>X</code> * (($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF) & $00FF0000) / $10000<br>
+C<sub>n</sub> = ($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF</p>
+
+<p>※すべて16進数<br>
+※<span class="formula">C<sub>n</sub></span>は16bit<br>
+※<code>X</code>は「<span class="formula">生成したい乱数の最大値-1</span>」（16進数）</p>
+</div>
+
+<p>こんな感じになるだろうか？<br>
+<span class="formula"><code>X</code> = $63</span>を入れれば、「0～98の乱数生成」になるだろう。<br>
+乱数が0～255の時は、<code>X</code>が<span class="formula">$100</span>のために計算式がシンプルになって、</p>
+
+<div style="border: 1px solid gray; padding: .5em;">
+<p class="formula">乱数(8bit) = (($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF) / $100<br>
+C<sub>n</sub> = ($3D09 × (C<sub>n-1</sub> + 1)) & $FFFF</p>
+<p>※すべて16進数<br>
+※<span class="formula">C<sub>n</sub></span>は16bit</p>
+</div>
+
+<p>である。</p>
+
+<p>戦闘中の乱数計算方法と比べるとややシンプルである。<br>
+戦闘乱数は1～4個前の乱数を記録していて3・4個前の乱数を新しい乱数の計算に使っていたが、マップ乱数はひとつ前の乱数が記録されているだけである。<br>
+ただし、形式自体は、戦闘乱数もマップ乱数も漸化式を使っており、擬似乱数列の生成式の一種、線形合同法（<a href="https://ja.wikipedia.org/wiki/%E7%B7%9A%E5%BD%A2%E5%90%88%E5%90%8C%E6%B3%95" target="_blank">線形合同法 - Wikipedia</a>）の考え方を応用したものだろう、と思われる。<br>
+また、マップ乱数の方が計算方法がシンプルなのは、マップ上なら1/60秒毎に計算する値だからであろう。戦闘乱数は必要な時にだけ計算され、戦闘中常に計算し続けているのではない。</p>
+
+<p>おまけとして、<span class="formula">C<sub>n</sub></span>初期値に<span class="formula">$1234</span>をセットした上で、0～255の乱数、0～98の乱数を300個出力するプログラムをJavaScriptで書いてみた。<br>
+なんとなくそれっぽい乱数が出力されているようだ。<br>
+また、0～255の乱数は「0～127: 152個, 128～255: 148個」という結果になったため、確率1/2・1/2に近いし、0～98の乱数は「0～32: 99個, 33～65: 103個, 66～98: 98個」であるから、確率1/3・1/3・1/3に近い。<br>
+該当のJavaScriptはオンラインでプログラムを実行できるpaiza.IOで公開している。</p>
+
+<ul>
+	<li><a href="https://paiza.io/projects/T7K1oRNa7CE_SSPrrCaCfw" target="_blank">マップ乱数（0～255） (JavaScript)</a></li>
+	<li><a href="https://paiza.io/projects/PHHMzplqV48tq_5dq2z2OA" target="_blank">マップ乱数（0～98） (JavaScript)</a></li>
+</ul>
+
+<h4>乱数の幅を決定する箇所</h4>
+
+<p>ついでに、どの時点でXの値がセットされたのか？　も説明する。<br>
+テレポートの説明の際に、マップ乱数生成サブルーチンへ飛ぶアドレスは、</p>
+
+<ul>
+	<li><code><span class="r">$C0/378F</span> <span style="color: #0000FF;">JSR</span> $B900</code></li>
+	<li><code><span class="r">$C0/37AC</span> <span style="color: #0000FF;">JSR</span> $B900</code></li>
+</ul>
+
+<p>の2パターンある、と紹介した。<br>
+この2パターンの前後の処理を見てみると、違いがわかる。</p>
+
+<p><code><span class="r">$C0/378F</span> <span style="color: #0000FF;">JSR</span> $B900</code>からジャンプする時：</p>
+
+<div class="code-container"><pre>
+$C0/3787 PHB                  ;DBレジスタの値をスタックにプッシュ
+$C0/3788 LDA #$4800           ;Aに$4800をロード
+$C0/378B PLB                  ;DBレジスタにスタックから値をプル
+$C0/378C LDX #$0100           ;Xに$0100をセット
+$C0/378F JSR $B900  [$C0:B900];$C0:B900（マップ乱数計算サブルーチン）にジャンプ
+;（マップ乱数計算サブルーチン、Xに計算した乱数をセット）
+$C0/3792 PLB                  ;DBレジスタにスタックから値をプル
+$C0/3793 CPX #$0080           ;Xと$0080(10進数の128)を減算比較（X - $0080）
+$C0/3796 BCS $05    [$379D]   ;Cフラグが立っているなら[$C0:379D]へ
+$C0/3798 INY                  ;Yをインクリメント
+$C0/3799 INY                  ;Yをインクリメント
+$C0/379A BRL $E404  [$1BA1]   ;[$C0:1BA1]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/378F</span> <span style="color: #0000FF;">JSR</span> $B900</code><br>
+の1つ前に<br>
+<code><span class="r">$C0/378C</span> <span style="color: #0000FF;">LDX</span> #$0100</code><br>
+という処理がある。<br>
+ここが「<code>X</code>に<span class="formula">$0100</span>（10進数の<span class="formula">256</span>）をセット」にあたり、乱数生成サブルーチンで<span class="formula">0～255</span>の乱数を算出するということになる。<br>
+乱数生成してからは、<br>
+<code><span class="r">$C0/3793</span> <span style="color: #0000FF;">CPX</span> #$0080</code><br>
+で生成した乱数が<span class="formula">$80</span>（10進数<span class="formula">128</span>）未満か以上かを判定するので、このあたりのサブルーチンは<br>
+「生成した乱数から1/2の確率を判定するサブルーチン」<br>
+である。</p>
+
+<p><code><span class="r">$C0/37AC</span> <span style="color: #0000FF;">JSR</span> $B900</code>からジャンプする時：</p>
+
+<div class="code-container"><pre>
+$C0/37A4 PHB                  ;DBレジスタの値をスタックにプッシュ
+$C0/37A5 LDA #$4800           ;Aに$4800をロード
+$C0/37A8 PLB                  ;DBレジスタにスタックから値をプル
+$C0/37A9 LDX #$0063           ;Xに$0063をセット
+$C0/37AC JSR $B900  [$C0:B900];$C0:B900（マップ乱数計算サブルーチン）にジャンプ
+;（マップ乱数計算サブルーチン、Xに計算した乱数をセット）
+$C0/37AF PLB                  ;DBレジスタにスタックから値をプル
+$C0/37B0 CPX #$0042           ;Xと$0042(10進数の66)を減算比較（X - $0042）
+$C0/37B3 BCS $0C    [$37C1]   ;Cフラグが立っているなら[$C0/37C1]へジャンプ
+$C0/37B5 INY                  ;Yをインクリメント
+$C0/37B6 INY                  ;Yをインクリメント
+$C0/37B7 CPX #$0021           ;Xと$0021(10進数の33)を減算比較（X - $0021）
+$C0/37BA BCS $05    [$37C1]   ;Cフラグが立っているなら[$C0/37C1]へジャンプ
+$C0/37BC INY                  ;Yをインクリメント
+$C0/37BD INY                  ;Yをインクリメント
+$C0/37BE BRL $E3E0  [$1BA1]   ;[$C0:1BA1]へジャンプ
+</pre></div>
+
+<p>一方で、<br>
+<code><span class="r">$C0/37AC</span> <span style="color: #0000FF;">JSR</span> $B900</code><br>
+の1つ前に<br>
+<code><span class="r">$C0/37A9</span> <span style="color: #0000FF;">LDX</span> #$0063</code><br>
+という処理がある。<br>
+これは「<code>X</code>に<span class="formula">$0063</span>をセット」の意味であり、先に述べた通りに、「0～98の乱数生成」になる。<br>
+乱数生成してからは、<br>
+<code><span class="r">$C0/37B0</span> <span style="color: #0000FF;">CPX</span> #$0042</code><br>
+<code><span class="r">$C0/37B7</span> <span style="color: #0000FF;">CPX</span> #$0021</code><br>
+の2ヶ所の分岐で、「乱数が0～32」「33～65」「66～98」を判定するため、このあたりのサブルーチンは<br>
+「生成した乱数から各1/3の確率を判定するサブルーチン」<br>
+である。</p>
+
+<p>まとめると、</p>
+
+<ul>
+	<li><code><span class="r">$C0/378F</span> <span style="color: #0000FF;">JSR</span> $B900</code>からジャンプする時は、<code>X</code> = 16進数<span class="formula">$0100</span> = 10進数の<span class="formula">256</span>なので、<span class="formula">0～255($FF)</span>の乱数を生成する。</li>
+	<li><code><span class="r">$C0/37AC</span> <span style="color: #0000FF;">JSR</span> $B900</code>からジャンプする時は、<code>X</code> = 16進数<span class="formula">$63</span> = 10進数の<span class="formula">99</span>なので、<span class="formula">0～98($62)</span>の乱数を生成する。</li>
+</ul>
+
+<p>と、いうことになる。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program6_5.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program8.html"><span class="button">&#9654;次　ドロップアイテム判定</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script><div style="display:none;"><script type="text/javascript" src="//x7.shinobi.jp/ufo/07424540q"></script></div>
+</body>
+</html>

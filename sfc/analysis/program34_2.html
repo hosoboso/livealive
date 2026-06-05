@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ステータス変動 &gt; 復元処理</head>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ステータス変動 &gt; 復元処理">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ステータス変動 &gt; 復元処理</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program34.html">ステータス変動</a> &gt; 復元処理</h1>
+<h2>ステータス変動 &gt; 復元処理</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><span class="tri"><a href="program34.html">前ページ</a></span>の続き。</p>
+
+<p>ステータス変動が起きた場合、その後元の値へと復元処理をしていくのだが、その処理は何かしらの行動のタイミングで行われる。<br>
+いわゆる、1ターンでの時間経過や、向き変え・移動・Yボタン足踏みによる時間経過、または誰も行動できる状態ではない場合（味方全員が技のタメ時間中で敵も行動できない時など）で復元処理が挟まる。<br>
+レベルと、力・速・体・知とでは、復元処理のサブルーチンが変わる。</p>
+
+<p>また、復元に際して重要なアドレスが、<code>[$00:036C]</code><code>[$00:036D]</code>である。<br>
+これらアドレスが時間経過の値になる。<br>
+処理の解説をしながら合わせて説明していく。</p>
+
+<h3>レベル復元</h3>
+
+<p>味方キャラは以下のサブルーチンでレベル復元が行われる。</p>
+
+<div class="code-container"><pre>
+$C1/21C1 LDY $0002,x[$00:1C02]   ;Yに[$00:1C0x]をロード
+$C1/21C4 LDA $0006,y[$00:0E46]   ;Aに[$0006,y](シナリオ別キャラデータ06　LV(通常値))をロード
+$C1/21C7 STA $20    [$00:0320]   ;A(LV(通常値))を[$00:0320]に書き込み
+$C1/21C9 LDA $6D    [$00:036D]   ;Aに[$00:036D]をロード
+$C1/21CB BIT #$F0                ;Aと$F0で論理積（ステータスフラグ変更のみ）
+$C1/21CD BEQ $11    [$21E0]      ;ゼロフラグが立っているとき[$21E0]分岐
+$C1/21CF PHA                     ;Aをスタックにプッシュ
+$C1/21D0 LDA #$01                ;Aに$01をロード
+$C1/21D2 STA $6D    [$00:036D]   ;A($01)を[$00:036D]に書き込み
+$C1/21D4 LDA $0038,x[$00:1C38]   ;Aに[$00:1C38](LV(現在値))をロード
+$C1/21D7 JSR $20CD  [$C1:20CD]   ;[$C1:20CD]へジャンプ
+;
+$C1/20CD CMP $20    [$00:0320]   ;A(LV(現在値))と[$00:0320](LV(通常値))を減算比較（ステータスレジスタ変更のみ）
+$C1/20CF BCS $0D    [$20DE]      ;キャリーフラグが立っているとき[$20DE]分岐
+;キャリーフラグOFF デバフまたはバフ・デバフなし
+$C1/20D1 ADC $6D    [$00:036D]   ;A(LV(現在値)) + [$00:036D]($01)
+$C1/20D3 BCS $04    [$20D9]      ;キャリーフラグが立っているとき[$20D9]分岐
+;キャリーフラグOFF
+$C1/20D5 CMP $20    [$00:0320]   ;Aと[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20D7 BCC $0D    [$20E6]      ;キャリーフラグが立っていないとき[$20E6]分岐
+;キャリーフラグON
+$C1/20DE SBC $6D    [$00:036D]   ;A(LV(現在値)) - [$00:036D]($01)
+$C1/20E0 BCC $F7    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+;キャリーフラグOFF
+$C1/20E2 CMP $20    [$00:0320]   ;A((LV(現在値))-1)と[$00:0320](LV(通常値))を減算比較（ステータスレジスタ変更のみ）
+$C1/20E4 BCC $F3    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+;キャリーフラグON
+$C1/20D9 LDA $20    [$00:0320]   ;Aに[$00:0320](LV(通常値))をロード
+$C1/20DB CMP $20    [$00:0320]   ;A(LV(通常値))と[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20DD RTS                     ;サブルーチン戻り
+;
+$C1/20E6 CMP $20    [$00:0320]   ;Aと[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20E8 RTS                     ;サブルーチン戻り
+;
+$C1/21DA STA $0038,x[$00:1C38]   ;Aを[$00:1C38](LV(現在値))に書き込み
+$C1/21DD PLA                     ;Aレジスタに値をプル
+$C1/21DE STA $6D    [$00:036D]   ;Aを[$00:036D]に書き込み
+$C1/21E0 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>レベル処理の説明の前に、<code>[$00:036D]</code>の処理だけ追いかけてみると、</p>
+
+<ol>
+	<li><code><span class="r">$C1/21C9</span></code>で<code>[$00:036D]</code>をロード、<span class="formula">$F0</span>と論理積を取った値が0なら、処理は<code><span class="r">$C1/21E0</span></code>までスキップ。そうでない場合は一度スタックにプッシュ</li>
+	<li><code><span class="r">$C1/21D2</span></code>で<code>[$00:036D]</code>に<span class="formula">$01</span>を書き込み、計算処理に使う</li>
+	<li><code><span class="r">$C1/21DE</span></code>で1.の値をプルして<code>[$00:036D]</code>に書き戻し</li>
+</ol>
+
+<p>と、なっている。<br>
+つまり<code><span class="r">$C1/21C9</span></code>の時点での<code>[$00:036D]</code>は、<code><span class="r">$C1/21CF</span></code>～<code><span class="r">$C1/21DE</span></code>で一時的に退避している状態で、<code><span class="r">$C1/21DE</span></code>で書き戻される。<br>
+では<code><span class="r">$C1/21C9</span></code>の時点での<code>[$00:036D]</code>はどこから来た数値なのか？　ということは、ひとまず横に置いておく。<br>
+ここではレベル処理だけ絞って説明する。</p>
+
+<p><code><span class="r">$C1/21C4</span></code>で、味方キャラのシナリオ別キャラデータ06からLV(通常値)の値をロードし、<code>[$00:0320]</code>にコピーする。<br>
+LV(通常値)は戦闘中には変動しない元々のキャラのレベルである。つまり、戦闘中、ステータス変動が起きても変動しない。<br>
+続いて、<code>[$00:036D]</code>に<span class="formula">$01</span>を書き込む。<br>
+<code><span class="r">$C1/21D4</span></code>で、<code>A</code>に<code>[$00:1C38]</code>(LV(現在値))をロードし、<code><span class="r">$C1/20CD</span></code>で<code>[$00:0320]</code>(LV(通常値))と減算比較する。<br>
+レベル(現在値)がステータス変動中だったら、LV(通常値)の値と減算比較した時、<span class="formula">0</span>以外の値になる。<br>
+レベル(現在値)がデバフされていてLV(通常値)より低ければ、減算の結果は負の値だし、バフ状態でLV(通常値)より高ければ、減算の結果は正の値になる。<br>
+<code><span class="r">$C1/20CF</span></code>でキャリーフラグが立つのは、減算の結果が正か<span class="formula">0</span>の時だから、デバフまたはバフ・デバフなしの状態。<br>
+キャリーフラグが立たないのは、減算の結果が負の時だから、バフの状態。<br>
+……というように、現在のレベルの状況で処理が分岐していく。<br>
+ポイントは<code>[$00:036D]</code>に入っている<span class="formula">$01</span>で、例えばバフ状態だけ追いかけていくと、<code><span class="r">$C1/20CF</span></code>でキャリーフラグONだから<code><span class="r">$C1/20DE</span></code>に飛び、<span class="formula"><code>A</code>(LV(現在値)) - <code>[$00:036D]</code></span>(<span class="formula">$01</span>)を計算、負の値になっていなければ最終的に<code><span class="r">$C1/21DA</span></code>でそのまま<code>[$00:1C38]</code>(LV(現在値))に上書きしている。<br>
+デバフ状態だったら、<code><span class="r">$C1/20D1</span></code>で<span class="formula"><code>A</code>(LV(現在値)) + <code>[$00:036D]</code></span>(<span class="formula">$01</span>)を計算、LV(通常値)と計算値を比較して、計算値がLV(通常値)を上回っていない時には<code><span class="r">$C1/21DA</span></code>でそのまま<code>[$00:1C38]</code>(LV(現在値))に上書きしている。<br>
+つまり、</p>
+
+<ul>
+	<li>バフ状態ならLV(現在値)を<span class="formula">-1</span>し、LV(通常値)の値以下になっていなければLV(現在値)に上書き</li>
+	<li>デバフ状態ならLV(現在値)を<span class="formula">+1</span>し、LV(通常値)の値以上になっていなければLV(現在値)に上書き</li>
+</ul>
+
+<p>と、レベルの値がLV(通常値)へと<span class="formula">1</span>ずつ復元していくことがわかる。<br>
+レベルに対する割合ではなく、必ず<span class="formula">1</span>ずつ復元していく。</p>
+
+<p>敵の処理もほぼ同じである。</p>
+
+<div class="code-container"><pre>
+$C1/2111 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/2114 LDA $000B,y[$00:1A0B]   ;Aに[$00:1A0B](敵種類$0B LV(通常値))をロード
+$C1/2117 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/2119 LDA $6D    [$00:036D]   ;Aに[$00:036D]をロード
+$C1/211B BIT #$F0                ;Aと$F0で論理積（ステータスフラグ変更のみ）
+$C1/211D BEQ $13    [$2132]      ;ゼロフラグが立っているとき[$2132]分岐
+$C1/211F PHA                     ;Aをスタックにプッシュ
+$C1/2120 LDA #$01                ;Aに$01をロード
+$C1/2122 STA $6D    [$00:036D]   ;Aを[$00:036D]に書き込み
+$C1/2124 LDA $7E9000,x[$7E:AB00] ;Aに[$7E:AB00](LV(現在値))をロード
+$C1/2128 JSR $20CD  [$C1:20CD]   ;[$C1:20CD]へジャンプ
+;
+$C1/20CD CMP $20    [$00:0320]   ;A(LV(現在値))と[$00:0320](LV(通常値))を減算比較（ステータスレジスタ変更のみ）
+$C1/20CF BCS $0D    [$20DE]      ;キャリーフラグが立っているとき[$20DE]分岐
+$C1/20D1 ADC $6D    [$00:036D]   ;A(LV(現在値)) + [$00:036D]($01)
+$C1/20D3 BCS $04    [$20D9]      ;キャリーフラグが立っているとき[$20D9]分岐
+$C1/20D5 CMP $20    [$00:0320]   ;Aと[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20D7 BCC $0D    [$20E6]      ;キャリーフラグが立っていないとき[$20E6]分岐
+$C1/20DE SBC $6D    [$00:036D]   ;A(LV(現在値)) - [$00:036D]($01)
+$C1/20E0 BCC $F7    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+$C1/20E2 CMP $20    [$00:0320]   ;A((LV(現在値))-1)と[$00:0320](LV(通常値))を減算比較（ステータスレジスタ変更のみ）
+$C1/20E4 BCC $F3    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+$C1/20D9 LDA $20    [$00:0320]   ;Aに[$00:0320](LV(通常値))をロード
+$C1/20DB CMP $20    [$00:0320]   ;A(LV(通常値))と[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20DD RTS                     ;サブルーチン戻り
+;
+$C1/212B STA $7E9000,x[$7E:AB00] ;Aを[$7E:AB00](LV(現在値))に書き込み
+$C1/212F PLA                     ;Aレジスタに値をプル
+$C1/2130 STA $6D    [$00:036D]   ;Aを[$00:036D]に書き込み
+$C1/2132 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>LV(通常値)は敵種類データのLV(通常値)からロード、LV(現在値)は敵番号nの<code>$7E:ABn0</code>からロードするだけで、<code>[$00:036D]</code>に<span class="formula">$01</span>を書き込むことや、<code><span class="r">$C1/20CD</span></code>～<code><span class="r">$C1/20DD</span></code>の処理が共通であるため、敵でも同じく、</p>
+
+<ul>
+	<li>バフ状態ならLV(現在値)を<span class="formula">-1</span>し、LV(通常値)の値以下になっていなければLV(現在値)に上書き</li>
+	<li>デバフ状態ならLV(現在値)を<span class="formula">+1</span>し、LV(通常値)の値以上になっていなければLV(現在値)に上書き</li>
+</ul>
+
+<p>という処理を行うことがわかった。</p>
+
+
+<h3>力・速・体・知の復元</h3>
+
+<p>それぞれのステータスがループ処理で復元される。<br>
+味方キャラは以下のサブルーチン。<br>
+以下処理は味方キャラ1とする。</p>
+
+<div class="code-container"><pre>
+$C1/21E1 LDA #$04                ;Aに$04をロード
+$C1/21E3 STA $08    [$00:0308]   ;A($04)を[$00:0308]に書き込み
+$C1/21E5 LDA $0030,x[$00:1C30]   ;Aに[$00:1C30](味方1 力(通常値))をロード
+$C1/21E8 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/21EA LDA $0034,x[$00:1C34]   ;Aに[$00:1C34](味方1 力(現在値))をロード
+$C1/21ED JSR $20CD  [$C1:20CD]   ;[$C1:20CD]へジャンプ
+;
+;ループ処理ここから
+;ループ回数は[$00:0308] = $04
+$C1/20CD CMP $20    [$00:0320]   ;A(ステータス(現在値))と[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20CF BCS $0D    [$20DE]      ;キャリーフラグが立っているとき[$20DE]分岐
+$C1/20D1 ADC $6D    [$00:036D]   ;A(ステータス(現在値)) + [$00:036D]
+$C1/20D3 BCS $04    [$20D9]      ;キャリーフラグが立っているとき[$20D9]分岐
+$C1/20D5 CMP $20    [$00:0320]   ;Aと[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20D7 BCC $0D    [$20E6]      ;キャリーフラグが立っていないとき[$20E6]分岐
+$C1/20DE SBC $6D    [$00:036D]   ;A(ステータス(現在値)) - [$00:036D]
+$C1/20E0 BCC $F7    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+$C1/20E2 CMP $20    [$00:0320]   ;A((ステータス(現在値))-1)と[$00:0320](ステータス(通常値))を減算比較（ステータスレジスタ変更のみ）
+$C1/20E4 BCC $F3    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+$C1/20D9 LDA $20    [$00:0320]   ;Aに[$00:0320](ステータス(通常値))をロード
+$C1/20DB CMP $20    [$00:0320]   ;A(ステータス(通常値))と[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20DD RTS                     ;サブルーチン戻り
+;
+$C1/21F0 STA $0034,x[$00:1C34]   ;Aを[$00:1C3n]に書き込み
+$C1/21F3 INX                     ;Xをインクリメント +1
+$C1/21F4 DEC $08    [$00:0308]   ;[$00:0308](ループ回数)をデクリメント -1
+$C1/21F6 BNE $ED    [$21E5]      ;ゼロフラグが立っていないとき[$21E5]分岐
+$C1/21E5 LDA $0030,x[$00:1C31]   ;Aに[$00:1C3n](ステータス(通常値))をロード
+$C1/21E8 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/21EA LDA $0034,x[$00:1C35]   ;Aに[$00:1C3n+4](ステータス(現在値))をロード
+$C1/21ED JSR $20CD  [$C1:20CD]   ;[$C1:20CD]へジャンプ
+;ループ処理ここまで
+</pre></div>
+
+<p>味方キャラ1だと、各ステータスは以下アドレスに入っている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1C30</code></td><td>力(通常値)</td></tr>
+	<tr><td><code>$00:1C31</code></td><td>速(通常値)</td></tr>
+	<tr><td><code>$00:1C32</code></td><td>体(通常値)</td></tr>
+	<tr><td><code>$00:1C33</code></td><td>知(通常値)</td></tr>
+	<tr><td><code>$00:1C34</code></td><td>力(現在値)</td></tr>
+	<tr><td><code>$00:1C35</code></td><td>速(現在値)</td></tr>
+	<tr><td><code>$00:1C36</code></td><td>体(現在値)</td></tr>
+	<tr><td><code>$00:1C37</code></td><td>知(現在値)</td></tr>
+</tbody>
+</table>
+
+<p>よって、ループ処理にて、<code>$00:1C30</code>以降を<span class="formula">+1</span>しながらステータス(通常値)、<code>$00:1C34</code>以降を<span class="formula">+1</span>しながらステータス(現在値)をロードしていくことで、力・速・体・知の処理が行えることになる。<br>
+そして、<code><span class="r">$C1/20CD</span></code>～<code><span class="r">$C1/20DD</span></code>のサブルーチンは、レベル復元処理と共通である。<br>
+つまり、</p>
+
+<ul>
+	<li>バフ状態ならステータス(現在値)を<code>[$00:036D]</code>の値だけ減らし、ステータス(通常値)の値以下になっていなければステータス(現在値)に上書き</li>
+	<li>デバフ状態ならステータス(現在値)を<code>[$00:036D]</code>の値だけ増やし、ステータス(通常値)の値以上になっていなければステータス(現在値)に上書き</li>
+</ul>
+
+<p>というサブルーチンである。<br>
+レベルの時は<code>[$00:036D]</code>の値が<span class="formula">$01</span>で固定になっていたが、上のサブルーチンでは固定値ではない。<br>
+上サブルーチン前に<code>[$00:036D]</code>に入った値により、増減量が変動する。</p>
+
+<p>敵の場合は以下。</p>
+
+<div class="code-container"><pre>
+$C1/2133 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/2136 LDA #$04                ;Aに$04をロード
+$C1/2138 STA $08    [$00:0308]   ;A($04)を[$00:0308]に書き込み
+$C1/213A LDA $0025,y[$00:1A25]   ;Aに[$00:1A25](敵データ05　力)をロード
+$C1/213D STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/213F LDA $7E8F03,x[$7E:AA03] ;Aに[$7E:AA03](力(現在値))をロード
+$C1/2143 JSR $20CD  [$C1:20CD]   ;[$C1:20CD]へジャンプ
+;
+;ループ処理ここから
+;ループ回数は[$00:0308] = $04
+$C1/20CD CMP $20    [$00:0320]   ;A(ステータス(現在値))と[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20CF BCS $0D    [$20DE]      ;キャリーフラグが立っているとき[$20DE]分岐
+$C1/20D1 ADC $6D    [$00:036D]   ;A(ステータス(現在値)) + [$00:036D]
+$C1/20D3 BCS $04    [$20D9]      ;キャリーフラグが立っているとき[$20D9]分岐
+$C1/20D5 CMP $20    [$00:0320]   ;Aと[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20D7 BCC $0D    [$20E6]      ;キャリーフラグが立っていないとき[$20E6]分岐
+$C1/20DE SBC $6D    [$00:036D]   ;A(ステータス(現在値)) - [$00:036D]
+$C1/20E0 BCC $F7    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+$C1/20E2 CMP $20    [$00:0320]   ;A((ステータス(現在値))-1)と[$00:0320](ステータス(通常値))を減算比較（ステータスレジスタ変更のみ）
+$C1/20E4 BCC $F3    [$20D9]      ;キャリーフラグが立っていないとき[$20D9]分岐
+$C1/20D9 LDA $20    [$00:0320]   ;Aに[$00:0320](ステータス(通常値))をロード
+$C1/20DB CMP $20    [$00:0320]   ;A(ステータス(通常値))と[$00:0320]を減算比較（ステータスレジスタ変更のみ）
+$C1/20DD RTS                     ;サブルーチン戻り
+;
+$C1/2146 STA $7E8F03,x[$7E:AA03] ;Aを[$7E:AAnn]に書き込み
+$C1/214A INX                     ;Xをインクリメント +1
+$C1/214B INY                     ;Yをインクリメント +1
+$C1/214C DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/214E BNE $EA    [$213A]      ;ゼロフラグが立っていないとき[$213A]分岐
+$C1/213A LDA $0025,y[$00:1A26]   ;Aに[$00:1A2n]をロード
+$C1/213D STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/213F LDA $7E8F03,x[$7E:AA04] ;Aに[$7E:AAnn+1]をロード
+$C1/2143 JSR $20CD  [$C1:20CD]   ;[$C1:20CD]へジャンプ
+;ループ処理ここまで
+</pre></div>
+
+<p>やはり、ステータスのアドレスが異なるだけで、味方キャラと処理は変わらない。<br>
+敵1体目であれば以下アドレスから、ステータスの通常値と現在値を取って計算を行っている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1A25</code></td><td>敵データ05　力</td></tr>
+	<tr><td><code>$00:1A26</code></td><td>敵データ06　速</td></tr>
+	<tr><td><code>$00:1A27</code></td><td>敵データ07　体</td></tr>
+	<tr><td><code>$00:1A28</code></td><td>敵データ08　知</td></tr>
+	<tr><td><code>$7E:AA03</code></td><td>力(現在値)</td></tr>
+	<tr><td><code>$7E:AA04</code></td><td>速(現在値)</td></tr>
+	<tr><td><code>$7E:AA05</code></td><td>体(現在値)</td></tr>
+	<tr><td><code>$7E:AA06</code></td><td>知(現在値)</td></tr>
+</tbody>
+</table>
+
+<h3><code>[$00:036C]</code><code>[$00:036D]</code>の算出</h3>
+
+<p>では、ステータスの増減量にあたる<code>[$00:036D]</code>はどのように計算されるのか。<br>
+まず、技使用時だが、敵味方共通して、技名が出たあたりで以下処理が入る。</p>
+
+<div class="code-container"><pre>
+$C1/7F1C LDA $86    [$00:0386]   ;Aに[$00:0386]をロード
+$C1/7F1E BEQ $01    [$7F21]      ;ゼロフラグが立っているとき[$7F21]分岐
+$C1/7F20 RTS                     ;サブルーチン戻り
+$C1/7F21 LDA #$10                ;Aに$10をロード
+$C1/7F23 STA $6D    [$00:036D]   ;Aを[$00:036D]に書き込み
+$C1/7F25 JSR $20F2  [$C1:20F2]   ;[$C1:20F2]へジャンプ
+</pre></div>
+
+<p>タメ時間のある技も、技名が出たタイミングで処理が入るので、どの技でも技発動時の処理になる。<br>
+もちろん、アイテム使用時も技使用扱いだから同じ処理が入る。</p>
+
+<p><code>[$00:0386]</code>に<span class="formula">$00</span>が入っている場合は<code>[$00:036D]</code>に<span class="formula">$10</span>を書き込んでいる。<br>
+<code>[$00:0386]</code>の処理は横に置いておくとして、技名が出てから上のステータス変動処理が終わる0.5秒程度？　の間だけ<code>[$00:036D]</code>は<span class="formula">$10</span>が入ったままになる。<br>
+上の処理の通り、レベルの増減処理の最中だけ一時的にスタックに値が避難されて<span class="formula">$01</span>が入るが、それ以外だと<code>[$00:036D]</code>=<span class="formula">$10</span>で処理される。</p>
+
+<p>では、技使用時以外では<code>[$00:036D]</code>はどう計算されているか。<br>
+戦闘中タイマー（<code>$7E:FEF0</code>～<code>$7E:FEF1</code>）の計算の少し後、つまり1フレーム毎に下の処理が入るようだ。</p>
+
+<div class="code-container"><pre>
+$C1/9357 LDA $6C    [$00:036C]   ;Aに[$00:036C]をロード
+$C1/9359 LSR A                   ;Aを論理右シフト　(/2)
+$C1/935A LSR A                   ;Aを論理右シフト　(/2)
+$C1/935B LSR A                   ;Aを論理右シフト　(/2)
+$C1/935C LSR A                   ;Aを論理右シフト　(/2)
+$C1/935D STA $6D    [$00:036D]   ;Aを[$00:036D]に書き込み
+$C1/935F JSR $7A42  [$C1:7A42]   ;[$C1:7A42]へジャンプ
+</pre></div>
+
+<p><code>[$00:036C]</code>を論理右シフト4回した値が、<code>[$00:036D]</code>に書き込まれることがわかる。<br>
+つまり、<code>[$00:036C]</code>に入っている1バイトの値の上1桁が<code>[$00:036D]</code>と同値になる、ということである。</p>
+
+<p>では、<code>[$00:036C]</code>は何なのか。<br>
+<code>[$00:036C]</code>の処理を見てみると、直前の行動で入る値が変わっていることがわかる。</p>
+
+<p>まず、直前の行動の判定のため、プレイヤーがコントローラの何のボタンを押したか、または何も押していないかを判断する。<br>
+ボタン判定は1フレームに1回行われている。<br>
+詳細は<span class="tri"><a href="program1.html">ボタン判定</a></span>を見ていただきたい。</p>
+
+<p>戦闘において、メニュー画面を開いていない時、十字キーでマス移動したり、Yボタンで足踏み、LRボタンで向き変えをすると時間経過する。<br>
+メニュー画面を開いている場合、パスを決定した時に時間経過である。<br>
+どのボタンを押したか、判定するためのサブルーチンの説明まですると長くなってしまうため、ボタン判定後の分岐先で、<code>[$00:036C]</code>の値を書き込む処理だけ紹介する。</p>
+
+<div class="code-container"><pre>
+;十字キー（1マス移動）
+$C1/96CE LDA #$40                ;Aに$40をロード
+$C1/96D0 STA $B8    [$00:03B8]   ;A($40)を[$00:03B8]に書き込み
+$C1/96D2 STA $6C    [$00:036C]   ;A($40)を[$00:036C]に書き込み
+</pre></div><br>
+<div class="code-container"><pre>
+;Yボタン
+$C1/9575 LDA #$40                ;Aに$40をロード
+$C1/9577 STA $6C    [$00:036C]   ;A($40)を[$00:036C]に書き込み
+$C1/9579 STA $B8    [$00:03B8]   ;A($40)を[$00:03B8]に書き込み
+$C1/957B LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/957D JSR $2CB9  [$C1:2CB9]   ;[$C1:2CB9]へジャンプ
+</pre></div><br>
+<div class="code-container"><pre>
+;Lボタン・Rボタン
+$C1/9920 LDA #$40                ;Aに$40をロード
+$C1/9922 STA $B8    [$00:03B8]   ;A($40)を[$00:03B8]に書き込み
+$C1/9924 LSR A                   ;Aを論理右シフト　(/2)
+$C1/9925 STA $6C    [$00:036C]   ;A($20)を[$00:036C]に書き込み
+$C1/9927 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>更に、何のボタンも押されず、味方全員が技のタメ時間など、敵も行動できない状況下、つまりプレイヤーも行動不能な状況下で入る処理が以下の通り。</p>
+
+<div class="code-container"><pre>
+$C1/7A42 LDA $6C    [$00:036C]   ;Aに[$00:036C]をロード
+$C1/7A44 BNE $1D    [$7A63]      ;ゼロフラグが立っていないとき[$7A63]分岐
+$C1/7A46 LDA $F0    [$00:03F0]   ;Aに[$00:03F0]をロード
+$C1/7A48 CMP #$80                ;Aと$80を減算比較（ステータスレジスタ変更のみ）
+$C1/7A4A BNE $17    [$7A63]      ;ゼロフラグが立っていないとき[$7A63]分岐
+$C1/7A4C LDA #$10                ;Aに$10をロード
+$C1/7A4E STA $6C    [$00:036C]   ;A($10)を[$00:036C]に書き込み
+$C1/7A50 LDA #$01                ;Aに$01をロード
+$C1/7A52 STA $6D    [$00:036D]   ;A($01)を[$00:036D]に書き込み
+;（省略）
+$C1/7A63 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>これ以外の状況では時間経過せず、<code>[$00:036C]</code><code>[$00:036D]</code>には<span class="formula">$00</span>が入った状態である。<br>
+また、先に説明した通り、技発動時なら、<code>[$00:036D]</code>には<code>[$00:036C]</code>を<span class="formula">$10</span>で割った値、上1桁が入る。<br>
+まとめると、</p>
+
+<table>
+<thead>
+	<tr><th>行動</th><th><code>[$00:036C]</code></th><th><code>[$00:036C]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>技発動時</td><td><span class="formula">$00</span></td><td><span class="formula">$10</span></td></tr>
+	<tr><td>十字キー（1マス移動）</td><td><span class="formula">$40</span></td><td><span class="formula">$04</span></td></tr>
+	<tr><td>Yボタン</td><td><span class="formula">$40</span></td><td><span class="formula">$04</span></td></tr>
+	<tr><td>Lボタン・Rボタン</td><td><span class="formula">$20</span></td><td><span class="formula">$02</span></td></tr>
+	<tr><td>行動不能</td><td><span class="formula">$10</span></td><td><span class="formula">$01</span></td></tr>
+</tbody>
+</table>
+
+<p>このようになる。<br>
+そして、<code>[$00:036C]</code>に入った値が、ステータス変動からの力・速・体・知の復元の値になる。<br>
+行動不能の時だけは、<code><span class="r">$C1/7A42</span></code>～<code><span class="r">$C1/7A63</span></code>が1フレームに1回入るから、1フレームで<span class="formula">1</span>ずつ復元ということになる。<br>
+全員が技をタメている時、ステータスやタメ時間が1フレームで<span class="formula">1</span>ずつ変動（復元）する仕組みはここにある。</p>
+
+<p>ステータス復元量を10進数でまとめると以下のようになる。</p>
+
+
+<table>
+<thead>
+	<tr><th>行動</th><th>レベル復元</th><th>力速体知 復元</th></tr>
+</thead>
+<tbody>
+	<tr><td>技発動時</td><td><span class="formula">1</span></td><td><span class="formula">16</span></td></tr>
+	<tr><td>1マス移動</td><td><span class="formula">0</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>Yボタン足踏み</td><td><span class="formula">0</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>LR向き変え</td><td><span class="formula">0</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>敵味方行動不能※</td><td><span class="formula">0</span></td><td><span class="formula">1</span></td></tr>
+</tbody>
+</table>
+
+<p>※1フレームにつき<span class="formula">1</span>復元</p>
+
+<p>以上がステータス復元処理となる。<br>
+ステータス変動は割合だが、復元は固定値なので、レベルやステータスが高いほど変動は大きくなり、元の数値に戻るまで時間がかかる。<br>
+現代編の高原が「気合いため」を使ってステータス変動が起きても、すぐ復元するため、実質HP回復の効果しかないのは、高原がレベル2なので、割合で増加してもごくわずか、そしてすぐに復元してしまう、という理屈である。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program34.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program35.html"><span class="button">&#9654;次</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; レベルアップ処理 &gt; 技習得">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; レベルアップ処理 &gt; 技習得">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; レベルアップ処理 &gt; 技習得</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program10.html">レベルアップ処理</a> &gt; 技習得</h1>
+<h2>レベルアップ時の技習得</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>技の習得方法はシナリオによって複数あるが、ここではレベルアップ時における技の習得の処理について紹介する。<br>
+現代編・幕末編のラーニングや、功夫編の修行、幕末編のイベント習得は除く。</p>
+
+<p>また、レベルアップによる技習得処理を見ていくと、功夫編における技習得バグの原因も理解できるので、一緒に解説する。</p>
+
+<p>レベルアップ時には、キャラ毎に設定された上昇値分、ステータスがアップする<span class="tri"><a href="program10_2.html">レベルアップ時のステータス上昇値</a></span>の処理が行われるが、その直後から、技習得の処理を行っている。</p>
+
+<p>まず、技関係のデータが格納されているアドレスについて説明する。</p>
+
+<h3>味方キャラデータの習得可能技アドレス</h3>
+
+<p>味方キャラデータ（<code>$D5:00C0</code>～<code>$D5:04CA</code>）は1キャラにつき00～44の45バイト分のデータが格納されているが、05～20番目の16バイト分に、習得可能な技IDが格納されている。<br>
+味方キャラデータには習得可能な技IDが入っているだけで、キャラが既に習得した技のデータではないことに注意。</p>
+
+<p>下表における、「技レベル」の後の数値が、キャラが通常のレベルアップで覚える場合のレベルと対応している。<br>
+味方は全キャラレベル1以上で各シナリオを開始するから、技レベル00にあたる技はどのキャラも必ず習得している。<br>
+そして、技レベル「15」にあたる値は存在していないので、どの味方キャラもレベル15にレベルアップした時、何の技も習得しない。</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>05</td><td>技レベル00の技ID</td></tr>
+	<tr><td>06</td><td>技レベル01の技ID</td></tr>
+	<tr><td>07</td><td>技レベル02の技ID</td></tr>
+	<tr><td>08</td><td>技レベル03の技ID</td></tr>
+	<tr><td>09</td><td>技レベル04の技ID</td></tr>
+	<tr><td>10</td><td>技レベル05の技ID</td></tr>
+	<tr><td>11</td><td>技レベル06の技ID</td></tr>
+	<tr><td>12</td><td>技レベル07の技ID</td></tr>
+	<tr><td>13</td><td>技レベル08の技ID</td></tr>
+	<tr><td>14</td><td>技レベル09の技ID</td></tr>
+	<tr><td>15</td><td>技レベル10の技ID</td></tr>
+	<tr><td>16</td><td>技レベル11の技ID</td></tr>
+	<tr><td>17</td><td>技レベル12の技ID</td></tr>
+	<tr><td>18</td><td>技レベル13の技ID</td></tr>
+	<tr><td>19</td><td>技レベル14の技ID</td></tr>
+	<tr><td>20</td><td>技レベル16の技ID</td></tr>
+</tbody>
+</table>
+
+<p>各アドレスには技IDが入るが、覚える技が16種以下のキャラの場合、何も覚えないレベルのアドレスに入っている値は<span class="formula">$00</span>である。<br>
+たとえば、サモのように16種類の技を覚えるキャラであれば、全ての枠が<span class="formula">$00</span>以外の技IDで埋まっているが、オルステッドはレベル13とレベル14で習得する技がないので、該当箇所だけ<span class="formula">$00</span>が記録されている。</p>
+
+<table>
+<thead>
+	<tr><th rowspan="2">技レベル</th><th colspan="2">サモ</th><th colspan="2">オルステッド</th></tr>
+	<tr><th>技ID</th><th>技名</th><th>技ID</th><th>技名</th></tr>
+</thead>
+<tbody>
+	<tr><td>00</td><td><span class="formula">$A5</span></td><td>クマの手</td><td><span class="formula">$76</span></td><td>カットワンウェイ</td></tr>
+	<tr><td>01</td><td><span class="formula">$A9</span></td><td>ほいこーろー</td><td><span class="formula">$02</span></td><td>Ｖシャイン</td></tr>
+	<tr><td>02</td><td><span class="formula">$A7</span></td><td>とうばんじゃん</td><td><span class="formula">$03</span></td><td>プラスリンク</td></tr>
+	<tr><td>03</td><td><span class="formula">$A8</span></td><td>ばんばんじー</td><td><span class="formula">$06</span></td><td>ハンマーパワー</td></tr>
+	<tr><td>04</td><td><span class="formula">$A6</span></td><td>トン足</td><td><span class="formula">$07</span></td><td>ソードビュー</td></tr>
+	<tr><td>05</td><td><span class="formula">$AA</span></td><td>ちんじゃおろーす</td><td><span class="formula">$05</span></td><td>インケイジ</td></tr>
+	<tr><td>06</td><td><span class="formula">$8D</span></td><td>竜虎両破腕</td><td><span class="formula">$08</span></td><td>ムーンダウン</td></tr>
+	<tr><td>07</td><td><span class="formula">$8E</span></td><td>百里道一歩脚</td><td><span class="formula">$04</span></td><td>ミラードライブ</td></tr>
+	<tr><td>08</td><td><span class="formula">$8F</span></td><td>獅子の手</td><td><span class="formula">$1B</span></td><td>スピンドル</td></tr>
+	<tr><td>09</td><td><span class="formula">$90</span></td><td>山猿拳</td><td><span class="formula">$0A</span></td><td>ドラゴンソウル</td></tr>
+	<tr><td>10</td><td><span class="formula">$91</span></td><td>シマリス脚</td><td><span class="formula">$19</span></td><td>レイザーソニック</td></tr>
+	<tr><td>11</td><td><span class="formula">$92</span></td><td>老狐の舞</td><td><span class="formula">$1A</span></td><td>ジャンプショット</td></tr>
+	<tr><td>12</td><td><span class="formula">$93</span></td><td>不射の射</td><td><span class="formula">$09</span></td><td>ヘキサフランジ</td></tr>
+	<tr><td>13</td><td><span class="formula">$AB</span></td><td>まんがんぜんせき</td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td>14</td><td><span class="formula">$AC</span></td><td>おにくまん</td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td>16</td><td><span class="formula">$94</span></td><td>旋牙連山拳</td><td><span class="formula">$1C</span></td><td>デストレイル</td></tr>
+</tbody>
+</table>
+
+<p>ちなみにタロイモとキューブは、技レベル08～技レベル16に、メカ用装備で技が使用可能になる技（「昭和ヒヨコッコ砲」で「ヒヨコ弾」が追加になるなど）が登録されている。<br>
+ただしタロイモもキューブもレベルアップせず、レベル8以上になることがないので、自力習得はできない。<br>
+心山拳老師も実は技レベル16に「旋牙連山拳」が登録されているものの、タロイモらと同じ理由で使用できない。</p>
+
+<h3>シナリオ別キャラデータの習得済み技アドレス</h3>
+
+<p>セーブデータなどにも記録される、シナリオ別キャラデータは1キャラにつき64バイト分のデータが格納されているが、<span class="formula">$0D</span>番目と<span class="formula">$0E</span>番目のアドレスに、最大16種の技を習得したかどうかが記録される。<br>
+実質2バイト分の領域で16種類の技を記録していることになる。<br>
+覚えているかどうかを1ビットのON・OFFで記録している。</p>
+
+<table>
+<thead>
+	<tr><th>2進法の位</th><th>2<sup>7</sup></th><th>2<sup>6</sup></th><th>2<sup>5</sup></th><th>2<sup>4</sup></th><th>2<sup>3</sup></th><th>2<sup>2</sup></th><th>2<sup>1</sup></th><th>2<sup>0</sup></th></tr>
+</thead>
+<tbody>
+	<tr><th><span class="formula">$0D</span></th><td>技レベル07</td><td>技レベル06</td><td>技レベル05</td><td>技レベル04</td><td>技レベル03</td><td>技レベル02</td><td>技レベル01</td><td>技レベル00</td></tr>
+	<tr><th><span class="formula">$0E</span></th><td>技レベル16</td><td>技レベル14</td><td>技レベル13</td><td>技レベル12</td><td>技レベル11</td><td>技レベル10</td><td>技レベル09</td><td>技レベル08</td></tr>
+</tbody>
+</table>
+
+<p>例えばオルステッドなら、シナリオ別キャラデータの<code>$00:0D0D</code>と<code>$00:0D0E</code>が習得済みの技のアドレスになる。<br>
+そして初期レベルは1なので、中世編開始時は、技レベル00と技レベル01の技を習得済みである。<br>
+<code>$00:0D0E</code>・<code>$00:0D0D</code>を繋げて2バイトの2進法で表記すると、</p>
+
+<p><span class="formula">%0000 0000 0000 0011</span></p>
+
+<p>というように、一番下の2桁、技レベル00と技レベル01だけ<span class="formula">1</span>が入り、他は<span class="formula">0</span>である。</p>
+
+<p>技レベルに入っているIDが<span class="formula">$00</span>、つまり該当のレベルにレベルアップ時に覚える技がない場合でも「技ID<span class="formula">$00</span>の技を覚えた」という扱いになって、該当のビットに<span class="formula">1</span>が立つようになっている。<br>
+先に記した通り、オルステッドはレベル13とレベル14で習得する技がないが、該当レベルでは「技ID<span class="formula">$00</span>の技を覚えた」という扱いになっており、オルステッドをレベル14まで上げると、</p>
+
+<p><span class="formula">%0111 1111 1111 1111</span></p>
+
+<p><code>$00:0D0D</code>に<span class="formula">%1111 1111 = $FF</span>が入り、<code>$00:0D0E</code>に<span class="formula">%0111 1111 = $7F</span>が入っている。<br>
+つまり、レベル16以外の技をすべて覚えているということである。<br>
+技レベル14・技レベル13も「覚えた」という扱いになっているのである。<br>
+この場合は、該当レベルにレベルアップした際、技習得処理をした、というチェックのようなものだと考えれば良いのだろう。</p>
+
+<p>なお、<span style="font-weight:bold;">「キャラのレベル以下の技レベルの技はすべて習得済みになる」という意味ではない</span>ことに注意。<br>
+功夫編の修行では例外が生じる。<br>
+上で技一覧を掲載したサモの場合、レベル5で修行を開始し、かつ、修行で「竜虎両破腕」を覚えさせずに「シマリス脚」を習得させてレベル6になったとする。<br>
+この時、修行以外でレベルアップしたのなら、「竜虎両破腕」をレベルアップ習得する。<br>
+だが、修行の場合は、レベル6に上がった時に「シマリス脚」を習得したので、</p>
+
+<p><span class="formula">%0000 0100 0011 1111</span></p>
+
+<p>このように、既に習得済みの下6桁＋「シマリス脚」の部分だけ<span class="formula">1</span>が立ち、シナリオ別キャラデータに記録される。<br>
+修行後は通常のレベルアップで技を覚えていくが、修行終了時のレベルが6で、レベルが7に上がった時、本来レベル7で覚える「百里道一歩脚」ではなく、「<span class="formula">0</span>が入っている一番下の桁に対応した技」を覚える。<br>
+つまり、本来レベル6で覚える「竜虎両破腕」を覚えて、</p>
+
+<p><span class="formula">%0000 0100 0111 1111</span></p>
+
+<p>となる。<br>
+レベル7になったからといって、レベル6・レベル7に対応した技2種を同時に習得はしてくれない。<br>
+このズレが最終的に、功夫編の修行バグに繋がる。</p>
+
+<p>話が少々ずれたが、とにかく、<br>
+「シナリオ別キャラデータの<span class="formula">$0D</span>番目と<span class="formula">$0E</span>番目に、習得済み技が記録されている」<br>
+ということが重要である。</p>
+
+<h3>サブルーチン</h3>
+
+<p><span class="tri"><a href="program10_2.html">レベルアップ時のステータス上昇値</a></span>では、ステータスアップ処理として<code><span class="r">$C1/24C5</span></code>まで紹介したが、その直後から、レベルアップ時における技習得の処理を行っている。</p>
+
+<div class="code-container"><pre>
+$C1/24C5 STA $0010,y[$00:0F59]   ;Aを[$0010,y](シナリオ別キャラデータ 該当ステータス（ステータス+装備上昇分）)に書き込み
+;ここまでステータスアップ処理
+;
+$C1/24C8 INX                     ;Xをインクリメント +1
+$C1/24C9 INY                     ;Yをインクリメント +1
+$C1/24CA INY                     ;Yをインクリメント +1
+$C1/24CB INY                     ;Yをインクリメント +1
+$C1/24CC DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/24CE BNE $BB    [$248B]      ;ゼロフラグが立っていないとき[$248B]分岐
+$C1/24D0 PLY                     ;Yレジスタにスタックからプル
+$C1/24D1 PLX                     ;Xレジスタにスタックからプル
+$C1/24D2 STX $1E    [$00:031E]   ;Xを[$00:031E]に書き込み
+$C1/24D4 LDA $0006,y             ;Aに[$0006,y](シナリオ別キャラデータ$06	レベル)をロード
+$C1/24D7 CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C1/24D9 BCC $26    [$2501]      ;キャリーフラグが立っていないとき[$2501]分岐
+</pre></div>
+
+<p><code><span class="r">$C1/24C8</span></code>～<code><span class="r">$C1/24D2</span></code>は、シナリオ別キャラデータのレベルの値が入ったアドレスの計算用の処理なので、説明は省く。<br>
+<code><span class="r">$C1/24D4</span></code>で呼び出された<code>[$0006,y]</code>は、シナリオ別キャラデータのレベルの値が入ったアドレスであり、既にレベルアップ処理の後なので、戦闘前のレベル<span class="formula">+1</span>にあたる、レベルアップ後の値が入っている。<br>
+<code><span class="r">$C1/24D7</span></code>は、レベルアップ後の値と<span class="formula">$10</span>を比較している。10進数だと「<span class="formula">16</span>」である。<br>
+キャリーフラグが立つのは、減算の結果が<span class="formula">0</span>か正の数の時なので、レベルが16以上の時。<br>
+キャリーフラグが立たないのはレベルが15以下の時である。<br>
+つまりレベルアップ後のレベルが16以上と16未満とでは処理が分岐するのだが、まずはレベルが16以上の場合を見てみよう。</p>
+
+<div class="code-container"><pre>
+;キャリーフラグON時分岐（レベルが16以上）
+$C1/24DB LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]（プレイ中のシナリオ）をロード
+$C1/24DE CMP #$03                ;Aと$03（功夫編）を減算比較（ステータスレジスタ変更のみ）
+$C1/24E0 BEQ $1E    [$2500]      ;ゼロフラグが立っているとき[$C1/2500]分岐
+$C1/24E2 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/24E4 LDA #$8000              ;Aに$8000をロード
+$C1/24E7 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/24E9 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/24EA ADC #$000F              ;A + $000F
+$C1/24ED TAX                     ;Aレジスタの値をXレジスタに転送
+$C1/24EE SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/24F0 LDA $D50005,x           ;Aに[$D50005,x]（レベル16で覚える技ID）をロード
+$C1/24F4 STA $6A    [$00:036A]   ;Aを[$00:036A]に書き込み
+$C1/24F6 BEQ $08    [$2500]      ;ゼロフラグが立っているとき[$2500]分岐
+$C1/24F8 LDA $000E,y             ;Aに[$000E,y]（覚えた技（上位バイト））をロード
+$C1/24FB BMI $03    [$2500]      ;ネガティブフラグが立っているとき[$2500]分岐
+$C1/24FD BRL $0037  [$2537]      ;フラグにかかわりなく常に分岐[$2537]
+$C1/2500 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>まず、<code>[$00:0A00]</code>の値をロードしているが、このアドレスにはプレイ中のシナリオの値が入っている。<br>
+次で<span class="formula">$03</span>と比較しているが、<span class="formula">$03</span>は功夫編のことである。<br>
+もし功夫編だったらゼロフラグが立つので、<code><span class="r">$C1/2500</span></code>にジャンプする。<br>
+その<code><span class="r">$C1/2500</span></code>は上の処理の一番最後にあることからわかるとおり、<code><span class="r">$C1/24DE</span></code>～<code><span class="r">$C1/24FD</span></code>の処理を飛ばしている。<br>
+これは、「功夫編では、レベル16以上にレベルアップしても、技を習得する処理を行わない」ということを意味している。<br>
+要するに、功夫編で弟子3人がレベル16以上にレベルアップしても「旋牙連山拳」を習得させないための処理になる。</p>
+
+<p>功夫編以外のシナリオでは<code><span class="r">$C1/24E2</span></code>～の処理が入る。<br>
+レベルアップしたキャラがレベル16で覚える技IDが、<code><span class="r">$C1/24F0</span></code>で<code>[$D50005,x]</code>から<code>A</code>にロードされ、更に<code>[$00:036A]</code>に書き込まれる。<br>
+もしレベル16で覚える技IDが<span class="formula">$00</span>なら、レベル16で覚える技はなしと設定されているキャラになるため、<code><span class="r">$C1/24F6</span></code>でゼロフラグが立って処理終了、<code><span class="r">$C1/2500</span></code>へジャンプする。</p>
+
+<p>更に、<code><span class="r">$C1/24F8</span></code>で、シナリオ別キャラデータの、覚えた技が入っているアドレスの中で上位バイトのアドレスをロードする。<br>
+ここには、技08～15の習得状態が8ビットに入っており、一番上の1ビットが、レベル16で覚える最後の技15の習得状況で、覚えていれば<span class="formula">1</span>が入っている。<br>
+つまり、レベル16で覚える技を既に覚えている場合、8ビットの一番上の桁は<span class="formula">1</span>であるから、符号つき8ビットで考えると負の数であり、ネガティブフラグが立つ。<br>
+要するに、<code><span class="r">$C1/24FB</span></code>でネガティブフラグが立っているかどうか判定しているのは、「レベル16で覚える技を覚えているかどうか」の判定である。現代編や幕末編で、レベル16に対応した技をラーニング済みであれば、ネガティブフラグが立つことになる。<br>
+ネガティブフラグが立っていれば<code><span class="r">$C1/2500</span></code>にジャンプ。<br>
+ここまでで、「レベルが16以上に上がった」かつ「功夫編ではない」かつ「レベル16で覚えている技を未習得」である場合は、レベル16で習得できる技IDを<code>[$00:0320]</code>に書き込んだ上で、<code><span class="r">$C1/24FD</span></code>にたどりついて、<code><span class="r">$C1/2537</span></code>にジャンプすることがわかる。<br>
+一方、それ以外だと、<code><span class="r">$C1/2500</span></code>でサブルーチンが終了する。つまりレベルアップ時に新たな技を覚えない。</p>
+
+<p>この処理から、シナリオは関係なく、「レベルアップでレベル16以上になった時、レベル16で覚える技を覚えていなかった場合は、レベル16で覚える技を習得する」ということもわかる。<br>
+この仕組みがあるため、功夫編で弟子をレベル16以上に育成した上で最終編に再登場した際、最終編でレベル17以上にレベルアップした時に、「旋牙連山拳」を覚えることが可能なのである。<br>
+ただし功夫編でレベルを99まで上げていると、最終編でレベルアップの機会がないので、「旋牙連山拳」は覚えられない。<br>
+（功夫編でレベルを99まで上げるケースは通常プレイの範囲ではまずないため、このような処理にしたのだろう）</p>
+
+<p>問題は、<br>
+「レベルアップでレベル16以上になった時、レベル16<span style="font-weight:bold;">未満</span>で覚える技を覚えていなかった場合は、該当する技を習得する」<br>
+という処理は残念ながらない、ということである。<br>
+功夫編の修行で技の習得に抜けがあると、この罠のためにすべての技を覚えられないことになる。</p>
+
+<p>では、話を戻して、<code><span class="r">$C1/24D9</span></code>でキャリーフラグが立たない、つまりレベルアップ後のレベルが15以下の時の処理にあたる<code><span class="r">$C1/2501</span></code>～を見てみる。<br>
+<code>A</code>にはレベルの値が入った状態である。<br>
+上で<code><span class="r">$C1/2500</span></code>に到達した分岐は、ここ以降の処理には飛ばない。</p>
+
+<div class="code-container"><pre>
+$C1/2501 CMP #$0F                ;Aと$0Fを減算比較（ステータスレジスタ変更のみ）
+$C1/2503 BCC $03    [$2508]      ;キャリーフラグが立っていないとき[$2508]分岐
+;キャリーフラグON = レベル15
+$C1/2505 BRL $004B  [$2553]      ;フラグにかかわりなく常に分岐[$2553]
+;キャリーフラグOFF
+$C1/2508 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+$C1/250A STZ $09    [$00:0309]   ;[$00:0309]に$00を書き込み
+$C1/250C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/250E LDA $000D,y             ;Aに[$000D,y+1][$000D,y]（覚えた技・2バイト）をロード
+$C1/2511 ORA #$8000              ;Aと$8000で論理和
+$C1/2514 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/2516 LDA #$0001              ;Aに$0001をロード
+$C1/2519 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/2501</span></code>は<span class="formula">$0F</span>、つまり10進数<span class="formula">15</span>との減算比較である。<br>
+先に<span class="formula">$10</span>と減算比較しており、この処理に進んでいる時点でレベル15以下ということだから、ここでキャリーフラグが立つのはレベル15の時のみである。<br>
+キャリーフラグが立たないのはレベル14以下である。<br>
+設定上、どのキャラもレベル15で覚える技はない（設定自体ない）。<br>
+よってキャリーフラグが立つ場合は<code><span class="r">$C1/2505</span></code>に進み、<code><span class="r">$C1/2553</span></code>にジャンプすることで、これ以降の技習得処理をスキップする。<br>
+ちなみに飛び先は</p>
+
+<div class="code-container"><pre>
+$C1/2553 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>なので、現在のサブルーチンが終了になる。</p>
+
+<p><code><span class="r">$C1/2508</span></code>以降は、レベルにより覚える技を計算するための前準備になる。<br>
+<code><span class="r">$C1/2508</span></code>で、レベルの値が<code>[$00:0308]</code>に入る。<br>
+<code>[$00:0309]</code>には<span class="formula">$00</span>が入り、<code><span class="r">$C1/250C</span></code>で16bitモードになるので、<code>[$00:0308]</code>をロードする場合は<code>[$00:0309]</code><code>[$00:0308]</code>と、上に<span class="formula">00</span>がついたレベルの値を呼び出すことになる。</p>
+
+<p><code><span class="r">$C1/250E</span></code>で、シナリオ別キャラデータから、キャラが既に覚えている技（シナリオ別キャラデータ<span class="formula">$0D</span>番目と<span class="formula">$0E</span>番目）を2バイトで呼び出す。<br>
+<code><span class="r">$C1/2511</span></code>で、この値と<span class="formula">$8000 = %1000 0000 0000 0000</span>で論理和を取っている。<br>
+習得済みの技2バイトは、2進数16ビットだと、下の位から順にレベル00、レベル01、……の技に対応している。<br>
+最初にも紹介したサモの場合なら、初期レベルが5で、最初から6種類の技を使えるから、シナリオ別キャラデータの習得技は</p>
+
+<p><span class="formula">%0000 0000 0011 1111</span></p>
+
+<p>である。<br>
+<span class="formula">$8000</span>と論理和を取ると、既に覚えている技＋レベル16にあたる一番上の桁に「<span class="formula">1</span>」が立つことになる。<br>
+サモの場合は、</p>
+
+<p><span class="formula">%1000 0000 0011 1111</span></p>
+
+<p>になる。<br>
+この値は<code>[$00:0311]</code><code>[$00:0310]</code>に書き込まれる。<br>
+更に、<span class="formula">$0001</span>が、<code>[$00:0321]</code><code>[$00:0320]</code>に書き込まれて、ループ処理が開始になる。</p>
+
+<div class="code-container"><pre>
+;ループ処理ここから
+$C1/251B LSR $10    [$00:0310]   ;[$00:0311][$00:0310]を論理右シフト　(/2)
+$C1/251D BCC $0E    [$252D]      ;キャリーフラグが立っていないとき[$252D]分岐
+$C1/251F INX                     ;Xをインクリメント +1
+$C1/2520 ASL $20    [$00:0320]   ;[$00:0321][$00:0320]を算術左シフト *2
+$C1/2522 DEC $08    [$00:0308]   ;[$00:0309][$00:0308]をデクリメント -1
+$C1/2524 BNE $F5    [$251B]      ;ゼロフラグが立っていないとき[$251B]分岐
+;ループ処理ここまで
+</pre></div>
+
+<p>ループ処理では、まず、<code>[$00:0311]</code><code>[$00:0310]</code>を論理右シフトしている。<br>
+つまり<span class="formula">÷2</span>であり、2進数でみれば右に値が1つずつずれる。<br>
+先のサモの例でいえば、</p>
+
+<p><span class="formula">%1000 0000 0011 1111</span></p>
+
+<p>が、論理右シフトにより、</p>
+
+<p><span class="formula">%0100 0000 0001 1111</span></p>
+
+<p>このようになり、一番下の桁が<span class="formula">1</span>の時に<span class="formula">÷2</span>したので、余りが出てキャリーフラグが立つ。<br>
+つまり、一番下の桁が<span class="formula">0</span>なら、<code><span class="r">$C1/251D</span></code>でキャリーフラグが立っていないという判定になるから、<code><span class="r">$C1/252D]</span></code>にジャンプしてループを抜ける。<br>
+<span class="formula">1</span>が立っていないということは該当レベルの技を覚えていないということである。</p>
+
+<p>一方、<span class="formula">1</span>が立つ場合は該当レベルの技は習得済みである。<br>
+ループ1回目の判定は、レベル00の技を習得しているかどうかだから、通常、どのキャラも習得済み扱いで、<code><span class="r">$C1/251F</span></code>に進むはずである。</p>
+
+<p><code><span class="r">$C1/251F</span></code>で<code>X</code>をインクリメントした後、<code>[$00:0321]</code><code>[$00:0320]</code>を算術左シフトしている。<br>
+<code>[$00:0321]</code><code>[$00:0320]</code>の初期値は<span class="formula">$0001 = %0000 0000 0000 0001</span>だから、この処理を通ると、一番右に立っていた<span class="formula">1</span>が左へ1つずつ移動していくことになる。<br>
+つまりループ処理回数分、「<span class="formula">1</span>」が左に動く。<br>
+更に、<code>[$00:0309]</code><code>[$00:0308]</code>をデクリメントする。ここに入っているのはレベルの値であり、<span class="formula">-1</span>してゼロフラグが立つまでループを繰り返す、ということが上の処理からわかる。</p>
+
+<p>結局、この判定で何をしているかというと、習得済みの技一覧から、未習得の技の中で一番低いレベルの技を検索しているのである。<br>
+また、ループ回数=レベルの値と決まっているから、例えばサモが修行以外で初期レベルの5から6に上がった時は<code><span class="r">$C1/2524</span></code>でループを抜ける。<br>
+だが、例えば、ユンが修行で「竜虎両破腕」（通常のレベルアップだと、レベル2で習得）を覚えないまま修行を終えて、修行後にレベルが5から6に上がった時はどうなるか。<br>
+修行で「百里道一歩脚」「獅子の手」「山猿拳」を覚えていたら、ユンの習得状況に<span class="formula">$8000</span>との論理和を取っていたら、</p>
+
+<p><span class="formula">%1000 0000 0011 1011</span></p>
+
+<p>こうなっているはずだ。<br>
+このため、上のループの処理を通ると、ループ2周目で<code><span class="r">$C1/251D</span></code>のキャリーフラグがOFFだから、ループを抜ける。<br>
+この後に、ユンはレベル6に上がったのに、レベル2で覚える「竜虎両破腕」の習得処理を行うことになる。</p>
+
+<p>このループ処理がレベル16以上でも行われるのなら、修行で覚えそこねた技があっても、レベル16以上のレベルアップ時に習得できる。<br>
+だが、先に記した通りに、</p>
+
+<ul>
+	<li>レベル15：本来レベル15で覚える技がどのキャラにもないので、全キャラ技習得処理をスキップ。</li>
+	<li>レベル16：上ループで処理した技を習得。</li>
+	<li>レベル17以上：功夫編でなければ、レベル16で覚える技を覚えていなかった時のみ、レベル16の技を習得（実質、最終編の「旋牙連山拳」用の処理）</li>
+</ul>
+
+<p>このように処理されるので、心山拳師範は、修行で技の習得抜けがあると、「旋牙連山拳」以外の上位の技が覚えられなくなる。<br>
+「旋牙連山拳」以外は、レベルに対応した技を覚えるのではなく、下位レベルの技から順に習得する処理が入るためである。</p>
+
+<p>何はともあれ、以下にループ以降の処理を記す。</p>
+
+<div class="code-container"><pre>
+;$C1/2524でゼロフラグが立った時の処理
+$C1/2526 LDA $10    [$00:0310]   ;Aに[$00:0311][$00:0310]をロード
+$C1/2528 BIT #$0001              ;Aと$0001で論理積（ステータスフラグ変更のみ）
+$C1/252B BNE $24    [$2551]      ;ゼロフラグが立っていないとき[$2551]分岐
+;$C1/251Dでキャリーフラグが立たない時の飛び先（ここで合流）
+$C1/252D SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/252F LDA $D50005,x           ;Aに[$D50005,x]をロード
+$C1/2533 STA $6A    [$00:036A]   ;Aを[$00:036A]に書き込み
+$C1/2535 BEQ $00    [$2537]      ;ゼロフラグが立っているとき[$2537]分岐
+$C1/2537 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/2539 LDA $000D,y             ;Aに[$000D,y+1][$000D,y]（覚えた技・2バイト）をロード
+$C1/253C ORA $20    [$00:0320]   ;Aと[$00:0321][$00:0320]で論理和
+$C1/253E STA $000D,y             ;Aを[$000D,y+1][$000D,y]（覚えた技・2バイト）に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/2526</span></code>～は、ループ処理回数がレベルの値と同じだった時にあたる。<br>
+先のサモの例でいえば、修行以外でレベル5から6に上がる時、</p>
+
+<p><span class="formula">%1000 0000 0011 1111</span></p>
+
+<p>が、6回右シフトして、</p>
+
+<p><span class="formula">%0000 0010 0000 0000</span></p>
+
+<p>このようになっている。<br>
+つまり、レベル6で覚える値が入るビットが一番右に来ており、未習得なら<span class="formula">0</span>が入っているはずである。<br>
+だが、例えば高原が現代編にてラーニングで技を習得していた場合、最終編にてレベル6で覚えるのは「Ｃ．Ｈ．ホールド」だが、ラーニング済みなら一番右のビットは<span class="formula">1</span>が入っていることになる。<br>
+そして、次の<code><span class="r">$C1/2528</span></code>で<span class="formula">$0001</span>と論理積をとり、ゼロフラグが立つか確認をしているから、<br>
+「レベルアップしたレベルで覚える技を、既に習得しているかどうか」<br>
+という判断がされていて、既に習得済みならゼロフラグが立たないので、この後の技習得処理が飛ばされる。<br>
+これは同じくラーニングやイベントで技を覚えられる、幕末編のおぼろ丸やカラクリ丸でも起こる処理である。</p>
+
+<p>だが、条件からして、功夫編の修行で技を覚え損なった場合には関係がない。<br>
+ユンが本来レベル2で覚える「竜虎両破腕」を修行で覚えずにレベル2以上に上がった場合、それ以上のレベルでは「竜虎両破腕」の判定をしてくれなくなるからである。<br>
+そもそも、この場合はループ途中の<code><span class="r">$C1/251D</span></code>でキャリーフラグが立たないために<code><span class="r">$C1/252D</span></code>にジャンプしているため、処理自体関係がない。</p>
+
+<p>その<code><span class="r">$C1/252D</span></code>～は、<code><span class="r">$C1/252B</span></code>でゼロフラグが立った時及び、ループ途中の<code><span class="r">$C1/251D</span></code>でキャリーフラグが立たない時の飛び先になる。<br>
+ここからが技習得処理である。<br>
+計算は端折るが、この時点で<code>[$D50005,x]</code>に、これから習得する技のIDが入っている。ループ回数によってインクリメントされた<code>X</code>の値が対応している。<br>
+ただし、該当のレベルで覚える技がないキャラだと、<code>[$D50005,x]</code>には<span class="formula">$00</span>が入っている。<br>
+技を16種類覚えないキャラが該当し、例えばサンダウンならレベル12では何も覚えないし、ポゴはレベル10、12～14は習得技がないので<span class="formula">$00</span>で埋まる。</p>
+
+<p><code><span class="r">$C1/2535</span></code>でゼロフラグ判定をしているため、本来なら、該当のレベルで覚える技がない、つまり<span class="formula">$00</span>だと、何か別処理をするつもりだったのかもしれない。<br>
+なのだが、<code><span class="r">$C1/2535</span></code>でのニーモニックが、<code>BEQ $00</code>である。<br>
+これは「ゼロフラグが立っているとき、現在のアドレスに+<span class="formula">$00</span>したアドレスに分岐」という意味である。つまり飛び先アドレスは、現在のアドレスに何も加算していないのと同じである。<br>
+実質分岐先がないので、<code><span class="r">$C1/2535</span></code>は「何もせず次の処理に進む」と同義なのである。</p>
+
+<p>ということで、結局、技IDが<span class="formula">$00</span>でも<span class="formula">$00</span>でなくても、<code><span class="r">$C1/2537</span></code>に進む。</p>
+
+<p><code><span class="r">$C1/2539</span></code>～で、既に習得した技2バイト分のデータ<code>[$000D,y+1]</code><code>[$000D,y]</code>に、<code>[$00:0321]</code><code>[$00:0320]</code>を加算する。<br>
+<code>[$00:0321]</code><code>[$00:0320]</code>は初期値が<span class="formula">%0000 0000 0000 0001</span>で、ループ回数分、左シフトしている。<br>
+レベルアップしたレベルで覚える技を習得するなら、該当レベルのビットに1が立っていることになる。<br>
+サモの例でいえば、修行以外でレベル5から6に上がるなら、</p>
+
+<p><span class="formula"><code>[$00:0321]</code><code>[$00:0320]</code> = %0000 0000 0100 0000</span></p>
+
+<p>下から7桁目に1が立っており、技レベル06「竜虎両破腕」にあたる。<br>
+よって、<code><span class="r">$C1/253C</span></code>で<code>[$000D,y+1]<code></code>[$000D,y]</code>と<code>[$00:0321]</code><code>[$00:0320]</code>で論理和をとる（実質加算にあたる）と、技レベル06「竜虎両破腕」の部分に1が立って習得したことになる。<br>
+最後にこの論理和を<code>[$000D,y+1]</code><code>[$000D,y]</code>に新たにセットして、レベルアップによる習得技処理が終了する。</p>
+
+<p>よって、覚えた技IDが<span class="formula">$00</span>、つまり「該当レベルに習得技がなかった」時でも、該当レベル部分に「<span class="formula">1</span>」が立つ。<br>
+最初にも記したが、オルステッドはレベル13とレベル14で習得する技がないにもかかわらず、該当レベルでは「技ID<span class="formula">$00</span>の技を覚えた」という扱いになっており、オルステッドをレベル14まで上げると、<code>[$000D,y+1]</code><code>[$000D,y]</code>に<span class="formula">%0111 1111 1111 1111</span>、つまりそれぞれのアドレスに<span class="formula">$FF</span>と<span class="formula">$7F</span>が入るという仕組みである。</p>
+
+<hr>
+
+<p>以上の仕様から、功夫編での技習得バグがなぜ起こるのかが理解できる。<br>
+これまでの繰り返しになるが、まとめておく。</p>
+
+<p>現代編や幕末編のラーニングでも、功夫編の修行のように、キャラの現在のレベルよりも高レベルで覚える技をラーニングで習得できる。<br>
+おぼろ丸が、本来レベル12で習得する「忍法火の鳥」を、ラーニング習得して、レベル10で幕末編をクリアしたとしても、最終編ではレベル11以降の技を順に覚えていく（レベル12に上がった時の技習得処理が飛ばされるのみ）。<br>
+高原の場合、現代編でラーニング可能な技は最終編でレベルアップした時でも覚えるが、現代編クリア時のレベルが必ず2であり、ラーニングできなかった技はレベル3以上のレベルアップで順に覚えていくことになる。<br>
+というように、ラーニングやイベント習得以外の技は該当レベルできちんと覚えていくので、問題は起こらない。</p>
+
+<p>だが、功夫編の弟子たちの場合、修行中にレベルアップが起きた時に、レベルアップによる技習得が行われず、逆ラーニングの技習得しか行われない。<br>
+修行が終わった後のレベルアップでは、「レベルアップしたレベルよりも下位で覚える技を習得していない時、最も下位の技から1つずつ習得」という処理が、レベル14まで行われる。<br>
+レベル15に上がった時には、全キャラ共通で、レベルアップによる技習得処理がスキップ。<br>
+レベル16以上では、「旋牙連山拳を覚えていない場合、旋牙連山拳を習得」という処理しか行われない。</p>
+
+<p>このため、修行中、レベルアップ時に必ず何かの技を覚えておかないと、最終的にレベル14に上がった時に、本来レベル14（修行次第ではそれ以下のレベルも）で覚える技が覚えられない、という事態が生じる。<br>
+しかも、ユンとサモは、修行で反撃専用の「不射の射」を覚えられないこともあり、特にユンは低レベルで修行を開始し修行を集中させた場合、修行終了までに「レベルアップ時、何の技も覚えられない」という事態に陥りやすい。<br>
+最終編でユンが「西安破裏拳」を覚えてくれなかったが「旋牙連山拳」は使える、というような場合は修行バグに引っかかっていることになる。</p>
+
+<p>リメイク版では、功夫編の修業後は、レベルアップ時に、「レベルアップ時、キャラのレベルより低いレベルで覚える技を覚えていないのならそれを1種類、更に本来そのレベルで覚える技を1種類」というように習得できるようになった。<br>
+これにより、技習得バグは起こらないようになった。<br>
+また、功夫編をレベル16以上でクリアすると、最終編を開始した直後に「旋牙連山拳」を習得している。<br>
+通常プレイではまずない事態ではあったが、レベル99で功夫編をクリアすると「旋牙連山拳」が習得できないというバグも発生しないようになっている。<br>
+リメイク版はそもそも、修業後に竹林で虎が出現しなくなるため、高レベルクリアがかなりやりにくい環境になっている。レベル99で功夫編をクリアを目指すのなら、修業前に弟子のレベルを98くらいまでは上げなければならなくなるため、SFC版以上の難易度のやりこみと化している。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program10_2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program9_1.html"><span class="button">&#9654;次　マップタイマー</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

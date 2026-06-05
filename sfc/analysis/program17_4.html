@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 行動異常 &gt; 戦闘開始時行動異常">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 行動異常 &gt; 戦闘開始時行動異常">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 行動異常 &gt; 戦闘開始時行動異常</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program17.html">行動異常</a> &gt; カウンター行動異常</h1>
+<h2>戦闘開始時行動異常</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="program17_2.html">前ページ</a>の続き。<br>
+前ページではカウンター行動異常の説明を行ったが、このページでは、味方が特定の装備品を身に着けている時に、戦闘開始時、特定の種族に発生する行動異常について説明する。</p>
+
+<p>まず、特定の装備品や特定の種族などについて説明する。<br>
+戦闘開始時に行動異常を引き起こす装備品は5種類である。<br>
+アイテムデータは、1アイテムにつき0～15の16バイト分の容量を使っているが、戦闘開始時の行動異常のデータはアイテムデータ13に入っている。<br>
+上1桁が敵種類の値、下1桁が行動異常の値になる。</p>
+
+<table>
+<thead>
+	<tr><th>アイテムID</th><th>装備品</th><th>敵種族</th><th>行動異常</th><th>アイテムデータ13</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$21</span></td><td>マーベラーソード</td><td>魔法生命(E)</td><td><span class="formula">$9</span></td><td><span class="formula">$E9</span></td></tr>
+	<tr><td><span class="formula">$25</span></td><td>勇者のたて</td><td>魔法生命(E)</td><td><span class="formula">$3</span></td><td><span class="formula">$E9</span></td></tr>
+	<tr><td><span class="formula">$35</span></td><td>メラメラこんぼう</td><td>大型動物(A)</td><td><span class="formula">$3</span></td><td><span class="formula">$A3</span></td></tr>
+	<tr><td><span class="formula">$37</span></td><td>ペシペシムチ</td><td>小型動物(8)</td><td><span class="formula">$4</span></td><td><span class="formula">$84</span></td></tr>
+	<tr><td><span class="formula">$FA</span></td><td>パラサイトソード</td><td>小型動物(8)</td><td><span class="formula">$C</span></td><td><span class="formula">$8C</span></td></tr>
+</tbody>
+</table>
+
+<p>上装備品には右と左両方に装備できるものが含まれるが、左に装備しなければ行動異常が発生しない。<br>
+というのは、戦闘開始時の行動異常を引き起こすかどうかは、味方キャラの左装備をチェックして判定作業を行うからである。<br>
+左以外に装備していても判定自体が行われないので、戦闘開始時の行動異常が発生しないことになる。<br>
+また、後述するが、敵種族の「小型動物」は原始編と中世編しか出現せず、「パラサイトソード」は最終編でしか獲得できないので、「パラサイトソード」が戦闘開始時に行動異常を引き起こす機会はない。<br>
+（いかにも小型動物っぽい、最終編のおイヌ様やケルベロは、大型動物に分類されている）</p>
+
+<p>敵種類だが、敵データ23の下位4ビットにデータが入っている。<br>
+敵データ16～23には、敵のカウンター行動異常の値が属性ごとに入っていて、敵データ23の上位4ビットは悪属性、下位4ビットは無属性に対応しているのだが、この無属性のカウンター行動異常の値がそのまま、敵種類の値も兼ねているという、少し特殊な値なのである。<br>
+上表の「小型動物(8)」などのカッコ内数値は、敵データ23の下位4ビットの値である。</p>
+
+<table>
+<thead>
+	<tr><th>下位<br>4ビット</th><th>種族</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td>（なし）</td></tr>
+	<tr><td>1</td><td>超人</td></tr>
+	<tr><td>2</td><td>妖怪</td></tr>
+	<tr><td>3</td><td>悪魔</td></tr>
+	<tr><td>4</td><td>猛禽</td></tr>
+	<tr><td>5</td><td>虫</td></tr>
+	<tr><td>6</td><td>機械</td></tr>
+	<tr><td>7</td><td>植物</td></tr>
+	<tr><td>8</td><td>小型動物</td></tr>
+	<tr><td>9</td><td>（なし）</td></tr>
+	<tr><td>A</td><td>大型動物</td></tr>
+	<tr><td>B</td><td>宇宙人</td></tr>
+	<tr><td>C</td><td>軟体動物</td></tr>
+	<tr><td>D</td><td>物質</td></tr>
+	<tr><td>E</td><td>魔法生命</td></tr>
+	<tr><td>F</td><td>恐竜</td></tr>
+</tbody>
+</table>
+
+<p>魔法生命(E)・大型動物(A)・小型動物(8)の敵の一覧を掲載しておく。<br>
+大雑把には、魔法生命(E)は中世編終盤のフォビア系の敵など、大型動物(A)と小型動物(8)は見た目通りに大型・小型の野生動物が主で原始編に多く出現する。<br>
+隠呼大仏も魔法生命(E)だが、ブリキ大王は装備品が装備できないため、装備品による戦闘開始時の行動異常を発生させることは不可能。<br>
+また、功夫・幕末編の敵に対しても、該当装備が存在しないため、同じく装備品による戦闘開始時の行動異常を発生させることは不可能。</p>
+
+<table>
+<caption>魔法生命(E)</caption>
+<thead>
+	<tr><th>シナリオ</th><th>敵名</th></tr>
+</thead>
+<tbody>
+	<tr><td>近未来</td><td>隠呼大仏</td></tr>
+	<tr><td>中世</td><td>アヌビノフォビア</td></tr>
+	<tr><td>中世</td><td>アラクノフォビア</td></tr>
+	<tr><td>中世</td><td>エントモフォビア</td></tr>
+	<tr><td>中世</td><td>ドラグノフォビア</td></tr>
+	<tr><td>中世</td><td>クラウストロＰＨ</td></tr>
+	<tr><td>中世</td><td>スコトフォビア</td></tr>
+	<tr><td>中世</td><td>アクロフォビア</td></tr>
+	<tr><td>中世</td><td>アクロフォビア器</td></tr>
+	<tr><td>最終</td><td>イシュタール</td></tr>
+	<tr><td>最終</td><td>エントモパイラム</td></tr>
+	<tr><td>最終</td><td>ブラキオペルタ</td></tr>
+	<tr><td>最終</td><td>バロクレスト</td></tr>
+</tbody>
+</table>
+
+
+
+<table>
+<caption>大型動物(A)</caption>
+<thead>
+	<tr><th>シナリオ</th><th>敵名</th></tr>
+</thead>
+<tbody>
+	<tr><td>原始</td><td>サーベルタイガー</td></tr>
+	<tr><td>原始</td><td>サーベルタイガ♀</td></tr>
+	<tr><td>原始</td><td>ブロントテリウム</td></tr>
+	<tr><td>原始</td><td>ブロント♀</td></tr>
+	<tr><td>原始</td><td>ナウマンゾウ</td></tr>
+	<tr><td>原始</td><td>ナウマンゾウ♀</td></tr>
+	<tr><td>原始</td><td>マンモス</td></tr>
+	<tr><td>原始</td><td>マンモス♀</td></tr>
+	<tr><td>原始</td><td>キングマンモー</td></tr>
+	<tr><td>功夫</td><td>虎</td></tr>
+	<tr><td>功夫</td><td>猛虎</td></tr>
+	<tr><td>幕末</td><td>虎(幕末)</td></tr>
+	<tr><td>中世</td><td>ナギーベア</td></tr>
+	<tr><td>最終</td><td>ベアナックル</td></tr>
+	<tr><td>最終</td><td>ケルベロ</td></tr>
+	<tr><td>最終</td><td>デスプロフェット</td></tr>
+	<tr><td>最終</td><td>グラングラス</td></tr>
+	<tr><td>最終</td><td>おイヌ様</td></tr>
+</tbody>
+</table>
+
+
+
+<table>
+<caption>小型動物(8)</caption>
+<thead>
+	<tr><th>シナリオ</th><th>敵名</th></tr>
+</thead>
+<tbody>
+	<tr><td>原始</td><td>ころワン</td></tr>
+	<tr><td>原始</td><td>ちびマンモス</td></tr>
+	<tr><td>原始</td><td>ケケモグラ</td></tr>
+	<tr><td>原始</td><td>アーケオテリウム</td></tr>
+	<tr><td>原始</td><td>アーケオ♀</td></tr>
+	<tr><td>原始</td><td>原始バイソン</td></tr>
+	<tr><td>原始</td><td>原始バイソン♀</td></tr>
+	<tr><td>原始</td><td>シンテトラケス</td></tr>
+	<tr><td>原始</td><td>シンテトラケス♀</td></tr>
+	<tr><td>中世</td><td>ライトライダー</td></tr>
+</tbody>
+</table>
+
+<p>装備品と敵種類の設定からも、原始編・中世編メインで考えられた行動異常の発生方法なのだろう。</p>
+
+<p>では、実際に戦闘開始時にどのような処理が行われているのかを見てみる。<br>
+味方キャラ番号1・敵種類1の敵番号0の判定を行うものとする。<br>
+まず、味方キャラ番号1の左装備と、敵種類1の敵番号0の種族から、戦闘開始時に行動異常を発生させる判定を行うかどうか判断しているサブルーチンを紹介する。</p>
+
+<div class="code-container"><pre>
+$C1/3546 PHX                     ;Xをスタックにプッシュ
+$C1/3547 LDA $0000,x[$00:1C00]   ;Aに[$00:1C00]（味方キャラ番号1のキャラID）をロード
+$C1/354A CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/354C BEQ $59    [$35A7]      ;ゼロフラグが立っているとき[$35A7]分岐
+$C1/354E LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]（味方キャラ番号1の戦闘状態）をロード
+$C1/3551 BIT #$40                ;Aと$40で論理積（ステータスレジスタ変更のみ）
+$C1/3553 BEQ $52    [$35A7]      ;ゼロフラグが立っているとき[$35A7]分岐
+$C1/3555 LDY $0002,x[$00:1C02]   ;Yに[$00:1C02]（シナリオ別キャラデータ呼び出し用数値）をロード
+$C1/3558 LDA $0026,y             ;Aに[$0026,y]（シナリオ別キャラデータの左装備ID）をロード
+$C1/355B BEQ $4A    [$35A7]      ;ゼロフラグが立っているとき[$35A7]分岐
+$C1/355D JSR $3505  [$C1:3505]   ;[$C1:3505]へジャンプ
+</pre></div>
+
+<p>まずは味方キャラ番号1のデータのチェックから開始になっている。<br>
+<code><span class="r">$C1/354E</span></code>の、キャラの戦闘状態のチェックだが、このアドレスには、</p>
+
+<ul>
+	<li><span class="formula">$00</span>:戦闘離脱（またはパーティにいない）</li>
+	<li><span class="formula">$40</span>:敵操作状態</li>
+	<li><span class="formula">$FF</span>:通常</li>
+</ul>
+
+<p>という値が入る。<br>
+<code><span class="r">$C1/3551</span></code>で、<span class="formula">$40</span>で論理積を取っているため、<span class="formula">$00</span>（戦闘離脱）の時のみゼロフラグが立つ。<br>
+つまり、該当キャラが戦闘離脱状態（または味方キャラ番号1がパーティにはいない）の時は以降の判定がスキップになる。<br>
+味方キャラ番号1は通常主人公なので、戦闘開始時には<span class="formula">$00</span>が入ることはまずないはずだが、番号2以降はパーティ人数によっては<span class="formula">$00</span>が入っていることになる。<br>
+該当キャラがいることが判定されたら、シナリオ別キャラデータから、該当キャラの左装備のアイテムIDをロードする。<br>
+<code><span class="r">$C1/355B</span></code>ではゼロフラグの判定をしているが、アイテムIDが<span class="formula">$00</span>、つまり左に何も装備していない場合も、以降の判定がスキップになる。<br>
+ここまでで「味方キャラ番号1が左に何かを装備している」ことが判定されて、次の判定に進むことになる。</p>
+
+<div class="code-container"><pre>
+$C1/3505 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/3507 AND #$00FF              ;A（左装備アイテムID）と$00FFで論理積
+$C1/350A ASL A                   ;算術左シフト *2
+$C1/350B ASL A                   ;算術左シフト *2
+$C1/350C ASL A                   ;算術左シフト *2
+$C1/350D ASL A                   ;算術左シフト *2
+$C1/350E ADC $D50068[$D5:0068]   ;左装備アイテムID*10 + [$D5:0069][$D5:0068]($71C4)
+$C1/3512 TAX                     ;Aレジスタの値をXレジスタに転送
+$C1/3513 SEP #$20                ;MフラグON Aレジスタは8bit幅
+$C1/3515 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>続けて、左装備アイテムIDから、左装備のアイテムデータ13を読み込むためのアドレス計算が行われている。<br>
+結論だけ書いてしまうと、16bit幅で、<span class="formula">「左装備アイテムID」*10 + $71C4</span>を計算し、その値を<code>X</code>レジスタに送っている。</p>
+
+<div class="code-container"><pre>
+$C1/3560 LDA $D5000D,x[$D5:7541] ;Aに[$D5000D,x]（左装備のアイテムデータ13）を読み込み
+$C1/3564 AND #$0F                ;Aと$0Fで論理積（=左装備の戦闘開始時行動異常）
+$C1/3566 BEQ $3F    [$35A7]      ;ゼロフラグが立っているとき[$35A7]分岐
+$C1/3568 STA $11    [$00:0311]   ;A（=左装備の戦闘開始時行動異常）を[$00:0311]に書き込み
+$C1/356A LDA $D5000D,x[$D5:7541] ;Aに[$D5000D,x]（左装備のアイテムデータ13）を読み込み
+$C1/356E LSR A                   ;Aを論理右シフト /2
+$C1/356F LSR A                   ;Aを論理右シフト /2
+$C1/3570 LSR A                   ;Aを論理右シフト /2
+$C1/3571 LSR A                   ;Aを論理右シフト /2（左装備のアイテムデータ13÷$10）
+$C1/3572 STA $10    [$00:0310]   ;A（=左装備の戦闘開始時行動異常を起こす敵種類）を[$00:0310]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/3560</span></code>で、先に計算し<code>X</code>レジスタに入れた値と<span class="formula">$D5000D</span>を加算することで、該当の左装備のアイテムデータ13のアドレスになる。<br>
+既に説明した通り、アイテムデータ13の上1桁が敵種類の値、下1桁が行動異常の値である。<br>
+<code><span class="r">$C1/3564</span></code>では、<span class="formula">$0F</span>と論理積を取っているので、下1桁の行動異常の値が取り出されたことになる。<br>
+<code><span class="r">$C1/3566</span></code>はゼロフラグ判定で、ここでゼロフラグが立つ場合は、該当の装備品には戦闘開始時行動異常が設定されていないということになるから、以降の処理をスキップする。<br>
+ここで、戦闘開始時行動異常判定を行うことが決定になり、行動異常の値は<code>[$00:0311]</code>に書き込みされた。</p>
+
+<p>ついで、今度はアイテムデータ13の上1桁を取り出すため、アイテムデータ13を論理右シフト4回、つまり<span class="formula">÷$10</span>で小数点を左に1個ずらす計算を行っている。これで、上1桁の値が下1桁に移動したことになり、アイテムデータ13の上1桁・敵種類の値を取り出せた。<br>
+敵種類の値は<code>[$00:0310]</code>に書き込みされている。</p>
+
+<div class="code-container"><pre>
+$C1/3574 LDY #$1A00              ;Yに$1A00をロード
+$C1/3577 LDA $0001,y[$00:1A01]   ;Aに[$00:1A01]（敵種類1のデータ01・敵の状態）をロード
+$C1/357A BIT #$40                ;Aと$40で論理積（ステータスレジスタ変更のみ）
+$C1/357C BEQ $1B    [$3599]      ;ゼロフラグが立っているとき[$3599]分岐
+$C1/357E LDA $0037,y[$00:1A37]   ;Aに[$00:1A37]（敵データ23・下4ビット敵種類）をロード
+$C1/3581 AND #$0F                ;Aと$0Fで論理積（= 敵データ23の敵種類）
+$C1/3583 CMP $10    [$00:0310]   ;Aと[$00:0310]（=左装備の戦闘開始時行動異常を起こす敵種類）を減算比較
+$C1/3585 BNE $12    [$3599]      ;ゼロフラグが立っていないとき[$3599]分岐
+$C1/3587 LDA $000A,y[$00:1A0A]   ;Aに[$00:1A0A]（戦闘開始時に$00が入る）をロード
+$C1/358A BEQ $08    [$3594]      ;ゼロフラグが立っているとき[$3594]分岐
+$C1/3594 LDA $11    [$00:0311]   ;Aに[$00:0311]（=左装備の戦闘開始時行動異常）をロード
+$C1/3596 STA $000A,y[$00:1A0A]   ;A（=左装備の戦闘開始時行動異常）を[$00:1A0A]に書き込み
+$C1/3599 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/359B TYA                     ;Yレジスタの値をAレジスタに転送
+$C1/359C ADC #$0040              ;A + #$0040（敵種類2のアドレス呼び出し用）
+$C1/359F TAY                     ;Aレジスタの値をYレジスタに転送
+$C1/35A0 SEP #$20                ;MフラグON Aレジスタは8bit幅
+$C1/35A2 CPY #$1B00              ;Yと$1B00を減算比較（ステータスレジスタ変更のみ）
+$C1/35A5 BNE $D0    [$3577]      ;ゼロフラグが立っていないとき[$3577]分岐
+</pre></div>
+
+<p>ここから、左装備の戦闘開始時行動異常を起こす敵種類の値<code>[$00:0310]</code>と、敵種類1の敵種類の値が一致しているかどうかの判定である。<br>
+<code><span class="r">$C1/357E</span></code>で、敵種類1の敵データ23<code>[$00:1A37]</code>を<code>A</code>にロードしている。敵データ23の下1桁が敵種類の値である。<br>
+<code><span class="r">$C1/3581</span></code>で、<span class="formula">$0F</span>と論理積を取り、下1桁の敵種類の値を取り出している。<br>
+<code><span class="r">$C1/3583</span></code>で、敵データの敵種類の値と、<code>[$00:0310]</code>を減算比較している。<br>
+ここでゼロフラグが立つのなら、敵データの敵種類の値 = <code>[$00:0310]</code>であり、敵種類1は左装備の戦闘開始時行動異常を起こす敵種類である、という判定になる。<br>
+更に、<code>[$00:0311]</code>（=左装備の戦闘開始時行動異常）は<code>[$00:1A0A]</code>に書き込まれる。<br>
+以上で、敵種類1に対しての処理は終了となり、敵種類2以降に同様の判定を行うことになる。ここでは敵種類2以降の処理は掲載しない。</p>
+
+<p>さて、実際に行動異常を発生させるかどうかは、乱数で判定する。<br>
+技による行動異常は必ず発生していたのだが、左装備による戦闘開始時の行動異常は、確率で発生するということになる。<br>
+<code>[$00:1A0A]</code>には上の通りに、左装備の戦闘開始時行動異常の値が入っているが、それ以前、戦闘開始直後に必ず<span class="formula">$00</span>が書き込まれるようになっている。<br>
+よって、乱数判定は、<code>[$00:1A0A]</code>に<span class="formula">$00</span>が入っていない時にだけ起こる。</p>
+
+<div class="code-container"><pre>
+$C1/35A9 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]（敵番号0のアドレス用数値）をロード
+$C1/35AC LDA $000A,y[$00:1A0A]   ;Aに[$00:1A0A]（=左装備の戦闘開始時行動異常）をロード
+$C1/35AF BEQ $12    [$35C3]      ;ゼロフラグが立っているとき[$35C3]分岐
+$C1/35B1 CMP #$FF                ;Aと$FFを減算比較
+$C1/35B3 BEQ $0E    [$35C3]      ;ゼロフラグが立っているとき[$35C3]分岐
+$C1/35B5 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+$C1/6150 PHX                     ;戦闘乱数計算
+$C1/6151 PHB                     ;↓
+$C1/6152 LDA #$00                ;↓
+$C1/6154 PHA                     ;↓
+$C1/6155 PLB                     ;↓
+$C1/6156 LDA $38    [$00:0338]   ;↓
+$C1/6158 ORA $39    [$00:0339]   ;↓
+$C1/615A ORA $3A    [$00:033A]   ;↓
+$C1/615C ORA $3B    [$00:033B]   ;↓
+$C1/615E BNE $24    [$6184]      ;↓
+$C1/6184 LDX $38    [$00:0338]   ;↓
+$C1/6186 STX $4204  [$00:4204]   ;↓
+$C1/6189 LDA #$0D                ;↓
+$C1/618B STA $4206  [$00:4206]   ;↓
+$C1/618E JSR $46C8  [$C1:46C8]   ;↓
+;
+$C1/46C8 NOP                     ;↓
+$C1/46C9 RTS                     ;↓
+;
+$C1/6191 LDA $39    [$00:0339]   ;↓
+$C1/6193 STA $38    [$00:0338]   ;↓
+$C1/6195 LDA $3A    [$00:033A]   ;↓
+$C1/6197 STA $39    [$00:0339]   ;↓
+$C1/6199 LDA $3B    [$00:033B]   ;↓
+$C1/619B STA $3A    [$00:033A]   ;↓
+$C1/619D LDA $4214  [$00:4214]   ;↓
+$C1/61A0 STA $3B    [$00:033B]   ;↓
+$C1/61A2 PLB                     ;↓
+$C1/61A3 PLX                     ;↓
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/35B8 CMP #$80                ;A（乱数）と$80を減算比較
+$C1/35BA BCS $07    [$35C3]      ;キャリーフラグが立っているとき[$35C3]分岐
+$C1/35BC LDA $000A,y[$00:1A0A]   ;Aに[$00:1A0A]（=左装備の戦闘開始時行動異常）をロード
+$C1/35BF STA $7E8F02,x[$7E:AA02] ;Aを[$7E:AA02]（敵番号0の行動異常）に書き込み
+$C1/35C3 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/35AC</span></code>で<code>[$00:1A0A]</code>をロードし、ゼロフラグが立たなかった場合、かつ<span class="formula">$FF</span>と減算比較してゼロフラグが立たなかった場合は、戦闘乱数（<span class="formula">$00</span>～<span class="formula">$FF</span>）の計算に入る。<br>
+戦闘乱数生成の<code><span class="r">$C1/6150</span></code>～<code><span class="r">$C1/61A4</span></code>の説明は省略する。<br>
+生成した乱数は、<code><span class="r">$C1/35B8</span></code>で、<span class="formula">$80</span>と減算比較している。<br>
+キャリーフラグが立たない場合、つまり、乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>だと、行動異常が発生することになり、<code><span class="r">$C1/35BC</span></code>で行動異常の値<code>[$00:1A0A]</code>を<code>A</code>にロードし、その値を敵番号0の敵の行動異常のアドレス<code>[$7E:AA02]</code>に書き込みして、処理終了である。<br>
+キャリーフラグが立つ、つまり乱数が<span class="formula">$80</span>～<span class="formula">$FF</span>の場合は、行動異常書き込み処理をスキップしているので、行動異常は発生しない。<br>
+以上から、戦闘開始時の行動異常発生確率は<span class="formula">128/256</span>、<span class="formula">1/2</span>であることがわかる。<br>
+発生後の行動異常の処理は、技で発生させた場合と同じなので省く。</p>
+
+<p>以上は味方キャラ番号1の左装備が戦闘開始時行動異常を起こす装備だった場合である。<br>
+では、2人以上の味方キャラの左装備が戦闘開始時行動異常を起こす装備だったら、判定はどうなるのか？<br>
+実は、2人目以降は、装備自体のチェックは行われるものの、判定は1人分しか行われない。<br>
+例えば原始編で、ポゴもべるも左に「ペシペシムチ」を装備して、小型動物(8)が含まれる敵パーティと戦闘を行う場合、戦闘開始時に「ペシペシムチ」による行動異常$4が起こるかどうかは、ポゴの分、つまり1回しか判定が行われないのである。<br>
+もし、ポゴが左に「ペシペシムチ」を装備せず、べるだけ左に「ペシペシムチ」を装備している場合は、べるの分で判定を行うので、キャラによってスキップされたということではなく、単純に、味方キャラ番号の最も小さいキャラの装備分しか行動異常判定を行わない、というだけである。<br>
+複数キャラに該当の装備を装備させておいても、行動異常の発生確率を上げられるということは残念ながらない。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program17.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program18.html"><span class="button">&#9654;次　状態異常</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

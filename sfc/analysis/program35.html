@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; セーブデータのセーブ・ロード</head>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; セーブデータのセーブ・ロード">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; セーブデータのセーブ・ロード</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; セーブデータのセーブ・ロード</h1>
+<h2>セーブデータのセーブ・ロード</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>本作のセーブデータのセーブ・ロード関係のサブルーチンを紹介する。<br>
+まず、「ライブ・ア・ライブ」だけでなく、スーパーファミコンのゲーム全般のバッテリーバックアップ式のセーブについて、簡単に説明する。</p>
+
+<p>スーパーファミコンのゲームでは、カセットの中に別途、ボタン電池で電力を供給するメモリを入れてセーブデータを保存することができる。<br>
+いわゆるバッテリーバックアップであり、ボタン電池が切れると、スーパーファミコンに接続していない限り、セーブデータが保存できなくなる。<br>
+このセーブデータ保存用メモリをSRAM（Static Random Access Memory）という。</p>
+
+<p>SRAMはスーパーファミコンを起動した時、規定のRAM（Random-Access Memory）領域に展開される。<br>
+スーパーファミコンのゲームソフトにおいて、メモリ領域の規格はHiROMとLoROMの2種類あり、データの割り当て方が異なる。<br>
+「ライブ・ア・ライブ」はHiROMという規格を採用している。<br>
+HiROMにおけるSRAMは、バンク<code>$30</code>～<code>$3F</code>のアドレス<code>$6000</code>～<code>$7FFF</code>に割り当てられている。</p>
+
+<p>「ライブ・ア・ライブ」では、セーブデータ領域にバンク<code>$30</code>のみ使用している。<br>
+セーブデータは4個あるが、データ領域は以下のように割り振られている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>セーブデータ</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$30:6000</code>～<code>$30:67F7</code></td><td>セーブデータ1</td></tr>
+	<tr><td><code>$30:67F8</code>～<code>$30:6FEF</code></td><td>セーブデータ2</td></tr>
+	<tr><td><code>$30:6FF0</code>～<code>$30:77E7</code></td><td>セーブデータ3</td></tr>
+	<tr><td><code>$30:77E8</code>～<code>$30:7FEF</code></td><td>セーブデータ4</td></tr>
+</tbody>
+</table>
+
+<p>1つのセーブデータに<span class="formula">$7F8</span>バイトの領域が割り振られていることがわかる。<br>
+（これらとは別に、各シナリオをクリアすると対応した楽曲がサウンドルームで聞けるようになり、それらは4つのセーブデータで共有だが、ここでは触れない）</p>
+
+<p>また、サブルーチンを見るとわかるのだが、1つのセーブデータにセーブされるのは、<code>$00:0A00</code>～<code>$00:11F7</code>の領域にあたる。<br>
+<code>$00:0A00</code>はプレイ中のシナリオIDが記録されており、以降、キャラのいる座標、マップタイマーイベント、持ち物欄、シナリオ別キャラデータなどが続く。<br>
+どれもセーブしておく必要がある重要なデータばかりであるが、問題は、<code>$00:11F7</code>より後にも重要なデータが入っているということである。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1200</code>～<code>$00:12FF</code></td><td>シナリオ進行フラグ</td></tr>
+	<tr><td><code>$00:1300</code>～<code>$00:1301</code></td><td>心山拳伝承者のデータ</td></tr>
+	<tr><td><code>$00:1303</code></td><td>初期値<span class="formula">$00</span>、西部編最後のマッドドッグとの戦闘で逃げると<span class="formula">$01</span></td></tr>
+	<tr><td><code>$00:1304</code></td><td>初期値<span class="formula">$00</span>、幕末編最後の選択肢で「面白い」を選ぶと<span class="formula">$01</span></td></tr>
+</tbody>
+</table>
+
+<p>以上のデータはセーブデータに記録しておかなければならないが、<code>$00:0A00</code>～<code>$00:11F7</code>の中にはない。<br>
+どのようにして、データを格納しているのか。</p>
+
+<h3>データの圧縮</h3>
+
+<p><code>$00:1200</code>～からのデータだが、1バイトあたり、<span class="formula">$00</span>か<span class="formula">$01</span>しか入らないようにプログラムが組まれている。<br>
+<span class="tri"><a href="flag.html">シナリオ進行フラグ</a></span>一覧を見ていただければわかるが、例えば幕末編なら、パーティにとらわれの男がいたら<code>$00:1200</code>に<span class="formula">$01</span>が入り、パーティに加入する前なら<span class="formula">$00</span>が入っている、というようにONとOFFの切り替えに使っている。</p>
+
+<p>1バイトあたり8ビットのデータを格納できるのだから、<span class="formula">0</span>か<span class="formula">1</span>かを記録するだけなら、1バイト中にフラグを8個分格納可能である。<br>
+実際、状態異常など、石化・酔い・眠り・マヒ・毒・腕かため・足かため・首かための状況を1バイトにまとめて戦闘中に読み書きしているサブルーチンもある。<br>
+容量の節約にはなるが、その分、1バイトのデータからどの状態異常になっているかを取り出したり書き込むためのサブルーチンの処理量は増える。<br>
+ということで、容量と処理時間のバランスを見た上で、<code>$00:1200</code>～からのデータは1バイトあたり<span class="formula">$00</span>か<span class="formula">$01</span>のみ記録するようにしたのだろう、と思われる（おそらく）。</p>
+
+<p>とはいえセーブデータの容量は限りがあるので、<code>$00:1200</code>～については、1バイト（8ビット）に、8バイト分の<span class="formula">$00</span>または<span class="formula">$01</span>のデータを詰め込んで圧縮し保存する、という仕組みを使っている。<br>
+データ圧縮のサブルーチンが<code><span class="r">$CE/CD7A</span></code>～<code><span class="r">$CE/CE61</span></code>になる。</p>
+
+<div class="code-container"><pre>
+$CE/CD7A LDX #$1200              ;Xに$1200をロード
+$CE/CD7D LDY #$11D0              ;Yに$11D0をロード
+$CE/CD80 LDA #$20                ;Aに$20をロード
+$CE/CD82 STA $24    [$00:0024]   ;A($20)を[$00:0024]に書き込み
+$CE/CD84 STZ $20    [$00:0020]   ;[$00:0020]に$00を書き込み
+$CE/CD86 LDA #$08                ;Aに$08をロード
+$CE/CD88 STA $22    [$00:0022]   ;A($08)を[$00:0022]に書き込み
+;
+;[$00:1200]～[$00:12FF]を8ビット区切りで[$00:11D0]～[$00:11EF]に書き込みループ
+;[$00:1200]～を8ビット分[$00:0020]に書き込むループ
+$CE/CD8A LDA $00,x               ;Aに[$00:1200~]をロード
+$CE/CD8C LSR A                   ;Aを論理右シフト　(/2)
+$CE/CD8D ROR $20    [$00:0020]   ;[$00:0020]をキャリーフラグを含めた9bitで右ローテート
+$CE/CD8F INX                     ;Xをインクリメント +1
+$CE/CD90 DEC $22    [$00:0022]   ;[$00:0022]をデクリメント -1
+$CE/CD92 BNE $F6    [$CD8A]      ;ゼロフラグが立っていないとき[$CD8A]分岐
+;[$00:1200]～[$00:12FF]を8ビット分[$00:0020]に書き込むループここまで
+;
+$CE/CD94 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$CE/CD96 STA $0000,y             ;Aを[$00:11EF~]に書き込み
+$CE/CD99 INY                     ;Yをインクリメント +1
+$CE/CD9A DEC $24    [$00:0024]   ;[$00:0024]をデクリメント -1
+$CE/CD9C BNE $E6    [$CD84]      ;ゼロフラグが立っていないとき[$CD84]分岐
+;[$00:1200]～[$00:12FF]を8ビット区切りで[$00:11D0]～[$00:11EF]に書き込みループここまで
+;
+$CE/CD9E LDX #$1300              ;Xに$1300をロード
+$CE/CDA1 LDY #$10FE              ;Yに$10FEをロード
+$CE/CDA4 LDA #$02                ;Aに$02をロード
+$CE/CDA6 STA $24    [$00:0024]   ;A($02)を[$00:0024]に書き込み
+$CE/CDA8 STZ $20    [$00:0020]   ;[$00:0020]に$00を書き込み
+$CE/CDAA LDA #$08                ;Aに$08をロード
+$CE/CDAC STA $22    [$00:0022]   ;A($08)を[$00:0022]に書き込み
+;
+;[$00:1300]～[$00:130F]を8ビット区切りで[$00:10FE]～[$00:10FF]に書き込みループ
+;[$00:1300]～を8ビット分[$00:0020]に書き込むループ
+$CE/CDAE LDA $00,x               ;Aに[$00:1300~]をロード
+$CE/CDB0 LSR A                   ;Aを論理右シフト　(/2)
+$CE/CDB1 ROR $20    [$00:0020]   ;A[$00:0020]をキャリーフラグを含めた9bitで右ローテート
+$CE/CDB3 INX                     ;Xをインクリメント +1
+$CE/CDB4 DEC $22    [$00:0022]   ;[$00:0022]をデクリメント -1
+$CE/CDB6 BNE $F6    [$CDAE]      ;ゼロフラグが立っていないとき[$CDAE]分岐
+;[$00:1300]～を8ビット分[$00:0020]に書き込むループここまで
+
+$CE/CDB8 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$CE/CDBA STA $0000,y             ;Aを[$00:10FF~]に書き込み
+$CE/CDBD INY                     ;Yをインクリメント +1
+$CE/CDBE DEC $24    [$00:0024]   ;[$00:0024]をデクリメント -1
+$CE/CDC0 BNE $E6    [$CDA8]      ;ゼロフラグが立っていないとき[$CDA8]分岐
+;[$00:1300]～[$00:130F]を8ビット区切りで[$00:10FE]～[$00:10FF]に書き込みループここまで
+</pre></div>
+
+<p>まずここまでで、ループ処理により、<code>[$00:1200]</code>～<code>[$00:1207]</code>8バイトのデータを1ビットずつに収めた値を<code>[$00:11D0]</code>へコピー、……を繰り返し、</p>
+
+<ul>
+	<li><code>[$00:1200]</code>～<code>[$00:12FF]</code>を8ビット区切りで<code>[$00:11D0]</code>～<code>[$00:11EF]</code>に書き込む</li>
+	<li><code>[$00:1300]</code>～<code>[$00:130F]</code>を8ビット区切りで<code>[$00:10FE]</code>～<code>[$00:10FF]</code>に書き込む</li>
+</ul>
+
+<p>というデータ圧縮を行う。<br>
+これで、<code>$00:1200</code>～<code>$00:130F</code>（<span class="formula">272</span>バイト）が、セーブデータに記録される<code>$00:10FE</code>～<code>$00:10FF</code>・<code>$00:11D0</code>～<code>$00:11EF</code>(<span class="formula">34</span>バイト)の領域に収まったことになる。</p>
+
+<p><code><span class="r">$CE/CDC2</span></code>～はシナリオによる分岐があり、どれが何なのか、詳細は未確認なので省略。<br>
+<code><span class="r">$CE/CDC2</span></code>～<code><span class="r">$CE/CE30</span></code>あたりが分岐で、<code><span class="r">$CE/CE32</span></code>～<code><span class="r">$CE/CE61</span></code>で転送処理を行う。<br>
+例えば最終編だと、</p>
+
+<table>
+<thead>
+	<tr><th>コピー元</th><th>コピー先</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:132E</code>～<code>$00:1336</code></td><td><code>$00:0FC0</code>～<code>$00:0FC7</code></td></tr>
+	<tr><td><code>$00:133F</code>～<code>$00:1347</code></td><td><code>$00:0FC8</code>～<code>$00:0FCF</code></td></tr>
+	<tr><td><code>$00:1350</code>～<code>$00:1357</code></td><td><code>$00:0FD0</code>～<code>$00:0FD7</code></td></tr>
+</tbody>
+</table>
+
+<p>というようにコピーが行われる。<br>
+シナリオ別キャラデータが<code>$00:0FBF</code>まで入っているので、その直後の<code>$00:0FC0</code>～に<code>$00:13??</code>の重要なデータをコピーしているようだ。</p>
+
+
+<h3>セーブ処理</h3>
+
+<p>実際のセーブのサブルーチンは<code><span class="r">$C2/3D4D</span></code>～<code><span class="r">$C2/3D98</span></code>になる。<br>
+その前に、4つあるセーブスロットの中でどれにセーブするかの判定が必要である。<br>
+セーブ先のSRAMの領域のどこからデータを書き込むかを決めなければならないからである。<br>
+ここでは処理の紹介は省くが、セーブデータ一覧画面で、<code><span class="r">$C2/069E</span></code>～あたりの処理により、カーソルで示した位置のセーブデータの番号（<span class="formula">$00</span>～<span class="formula">$03</span>）が<code>$00:0544</code>に入る仕組みがある。セーブスロットの上から順に<span class="formula">$00, $01, $02, $03</span>である。</p>
+
+<div class="code-container"><pre>
+$C2/15C9 LDA $44    [$00:0544]   ;Aに[$00:0544]をロード
+$C2/15CB STA $65    [$00:0565]   ;Aを[$00:0565]に書き込み
+$C2/15CD AND #$0003              ;Aと$0003で論理積
+$C2/15D0 STA $2B00  [$7E:2B00]   ;Aを[$7E:2B00]に書き込み
+$C2/15D3 JSR $408B  [$C2:408B]   ;[$C2:408B]へジャンプ
+</pre></div>
+
+<p>上の処理で、<code>[$00:0544]</code>に入ったセーブデータの番号（<span class="formula">$00</span>～<span class="formula">$03</span>）が<code>[$00:0565]</code>と<code>[$7E:2B00]</code>に入る。<br>
+ここから少し飛んで<code><span class="r">$C2/3D4D</span></code>以降の処理が以下から。</p>
+
+<div class="code-container"><pre>
+$C2/3D4D LDA $0AB4  [$7E:0AB4]   ;Aに[$7E:0AB5][$7E:0AB4](セーブ回数2バイト)をロード
+$C2/3D50 AND #$7FFF              ;Aと$7FFFで論理積
+$C2/3D53 INC A                   ;Aをインクリメント +1
+$C2/3D54 CMP #$03E8              ;Aと$03E8(10進数1000)を減算比較（ステータスレジスタ変更のみ）
+$C2/3D57 BMI $03    [$3D5C]      ;ネガティブフラグが立っているとき[$3D5C]分岐
+;ネガティブフラグOFF（セーブ回数1000回）
+$C2/3D59 LDA #$0000              ;Aに$0000をロード
+;ネガティブフラグON
+$C2/3D5C BIT $0AB4  [$7E:0AB4]   ;Aと[$7E:0AB5][$7E:0AB4]で論理積（ステータスフラグ変更のみ）
+$C2/3D5F BPL $03    [$3D64]      ;ネガティブフラグが立っていないとき[$3D64]分岐
+;ネガティブフラグOFF
+$C2/3D61 ORA #$8000              ;Aと$8000で論理和
+;ネガティブフラグOFF
+$C2/3D64 STA $0AB4  [$7E:0AB4]   ;Aを[$7E:0AB5][$7E:0AB4]に書き込み
+</pre></div>
+
+<p>上はセーブ回数の処理である。<br>
+本作はセーブデータにセーブ回数を記録しており、セーブ回数は<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>の2バイトで記録している。<br>
+セーブ回数は<span class="formula">999</span>回（<span class="formula">$03E7</span>）まで記録されるが、1000回セーブするとリセットされて0回に戻る仕組みなので、セーブ回数を<span class="formula">+1</span>した後、<span class="formula">$03E8</span>(10進数<span class="formula">1000</span>)と減算比較し、ネガティブフラグ判定で分岐させて、<span class="formula">$03E8</span>を越えていたら<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>に<span class="formula">$0000</span>を書き込む、という仕組みになる。</p>
+
+<div class="code-container"><pre>
+$C2/3D67 LDA #$E41B              ;Aに$E41Bをロード
+$C2/3D6A STA $307FF0[$30:7FF0]   ;A($E41B)を[$30:7FF1][$30:7FF0]に書き込み
+$C2/3D6E LDA $65    [$00:0565]   ;Aに[$00:0566][$00:0565](セーブデータの番号$00～$03)をロード
+$C2/3D70 AND #$0003              ;A(セーブデータ番号)と$0003で論理積
+$C2/3D73 STA $307FF2[$30:7FF2]   ;A(セーブデータ番号)を[$30:7FF3][$30:7FF2]に書き込み
+$C2/3D77 ASL A                   ;Aを算術左シフト *2 (セーブデータ番号*2)
+$C2/3D78 TAX                     ;A(セーブデータ番号*2)の値をXレジスタに転送
+$C2/3D79 LDA #$E41B              ;Aに$E41Bをロード
+$C2/3D7C STA $307FE0,x           ;A($E41B)を[$30:7FE1+x][$30:7FE0+x]に書き込み
+$C2/3D80 LDA $C278C2,x           ;Aに[$C2:78C3+x][$C2:78C2+x]をロード
+$C2/3D84 STA $9F    [$00:059F]   ;Aを[$00:05A0][$00:059F]に書き込み
+$C2/3D86 TAY                     ;Aの値をYレジスタに転送
+$C2/3D87 LDA #$0030              ;Aに$0030をロード
+$C2/3D8A STA $A1    [$00:05A1]   ;Aを[$00:05A1]に書き込み
+$C2/3D8C PHX                     ;Xをスタックにプッシュ
+$C2/3D8D LDX #$0A00              ;Xに$0A00をロード
+$C2/3D90 LDA #$07F7              ;Aに$07F7をロード
+$C2/3D93 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/3D94 MVN 00 30               ;データ転送MVN
+;
+;セーブデータ番号0なら
+;A:転送したいデータサイズ-1 $07F7
+;X:転送元の最初の16bitアドレス $00:0A00-$00:11F7
+;Y:転送先の最初の16bitアドレス $30:6000-$30:67F8
+;オペランド:転送元と転送先バンク 00,30
+;
+$C2/3D94 MVN 00 30               ;データ転送ここまで
+$C2/3D97 PLB                     ;DBレジスタに値をプル
+$C2/3D98 JSR $40BA  [$C2:40BA]   ;[$C2:40BA]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/3D94</span></code>で、データ転送<code>MVN</code>を使い、セーブデータのアドレスに書き込みを行う。<br>
+<code><span class="r">$C2/3D67</span></code>～<code><span class="r">$C2/3D93</span></code>までがデータ転送<code>MVN</code>を行うための準備になる。<br>
+セーブデータ番号により変わってくるのは、<code><span class="r">$C2/3D6E</span></code>で呼び出すセーブデータ番号以降である。<br>
+処理をおっていくと、<code><span class="r">$C2/3D78</span></code>で、<span class="formula">セーブデータ番号*2</span>の値が<code>X</code>レジスタに入る。<br>
+更に、<code><span class="r">$C2/3D80</span></code>で<code>A</code>に呼び出す<code>$C278C2,x</code>（2バイトで呼び出すので、<code>[$C2:78C3+x]</code><code>[$C2:78C2+x]</code>）が<code><span class="r">$C2/3D86</span></code>で<code>Y</code>レジスタに転送され、この時の<code>Y</code>の値がそのまま、データ転送<code>MVN</code>における「Y:転送先の最初の16bitアドレス」になる。<br>
+では、<code>[$C2:78C3+x]</code><code>[$C2:78C2+x]</code>はどんな値なのか。<br>
+実際に値を確認してみると以下のようになっている。</p>
+
+<table>
+<thead>
+	<tr><th>セーブデータ<br>番号</th><th><code>X</code></th><th><code>[$C2:78C3+x]</code><code>[$C2:78C2+x]</code></th><th>値（=<code>Y</code>）</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td><span class="formula">$0000</span></td><td><code>[$C2:78C3]</code><code>[$C2:78C2]</code></td><td><span class="formula">$6000</span></td></tr>
+	<tr><td>1</td><td><span class="formula">$0002</span></td><td><code>[$C2:78C5]</code><code>[$C2:78C4]</code></td><td><span class="formula">$67F8</span></td></tr>
+	<tr><td>2</td><td><span class="formula">$0004</span></td><td><code>[$C2:78C7]</code><code>[$C2:78C6]</code></td><td><span class="formula">$6FF0</span></td></tr>
+	<tr><td>3</td><td><span class="formula">$0006</span></td><td><code>[$C2:78C9]</code><code>[$C2:78C8]</code></td><td><span class="formula">$77E8</span></td></tr>
+</tbody>
+</table>
+
+<p><code><span class="r">$C2/3D94</span></code>のデータ転送<code>MVN</code>の処理で異なるのは、上の<code>Y</code>の値だけになる。<br>
+整理してみると、</p>
+
+<table>
+<thead>
+	<tr><th>セーブデータ<br>番号</th><th>転送元</th><th>転送先</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td><code>$00:0A00</code>～<code>$00:11F7</code></td><td><code>$30:6000</code>～<code>$30:67F7</code></td></tr>
+	<tr><td>1</td><td><code>$00:0A00</code>～<code>$00:11F7</code></td><td><code>$30:67F8</code>～<code>$30:6FEF</code></td></tr>
+	<tr><td>2</td><td><code>$00:0A00</code>～<code>$00:11F7</code></td><td><code>$30:6FF0</code>～<code>$30:77E7</code></td></tr>
+	<tr><td>3</td><td><code>$00:0A00</code>～<code>$00:11F7</code></td><td><code>$30:77E8</code>～<code>$30:7FEF</code></td></tr>
+</tbody>
+</table>
+
+<p>セーブデータ先スロットにより転送先を変えて、データをコピーしていることがわかる。<br>
+また、上の処理などの間にゲームを強制的に終了させたりすると、セーブデータが破損することになる。</p>
+
+
+<h3>ロード処理＆データの解凍</h3>
+
+<p>セーブデータのロードは、基本的にセーブの逆の手順の実行と考えて良い。<br>
+ただしセーブ時と異なり、セーブ回数の処理は必要ない。</p>
+
+<div class="code-container"><pre>
+$C2/18CB LDA $44    [$00:0544]   ;Aに[$00:0544]をロード
+$C2/18CD STA $65    [$00:0565]   ;Aを[$00:0565]に書き込み
+$C2/18CF LDA #$0004              ;Aに$0004をロード
+$C2/18D2 JMP $0677  [$C2:0677]   ;[$C2:0677]へジャンプ(レジスタをスタックに積まない)
+</pre></div>
+
+<p>上の処理で、<code>[$00:0544]</code>に入ったセーブデータの番号（<span class="formula">$00</span>～<span class="formula">$03</span>）が<code>[$00:0565]</code>に入る。<br>
+ここから少し飛んで<code><span class="r">$C2/3CB4</span></code>以降の処理が以下から。</p>
+
+<div class="code-container"><pre>
+$C2/3CB4 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3CB5 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3CB7 LDA $65    [$00:0565]   ;Aに[$00:0566][$00:0565](セーブデータの番号)をロード
+$C2/3CB9 AND #$0003              ;Aと$0003で論理積
+$C2/3CBC ASL A                   ;Aを算術左シフト *2
+$C2/3CBD TAX                     ;Aの値をXレジスタに転送
+$C2/3CBE LDA $C278C2,x           ;Aに[$C2:78C2,x+1][$C2:78C2,x]をロード
+$C2/3CC2 TAX                     ;Aの値をXレジスタに転送
+$C2/3CC3 LDY #$0A00              ;Yに$0A00をロード
+$C2/3CC6 LDA #$07F7              ;Aに$07F7をロード
+$C2/3CC9 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/3CCA MVN 30 00               ;データ転送
+;
+;セーブデータ番号0なら
+;A:転送したいデータサイズ-1 $07F7
+;X:転送元の最初の16bitアドレス $30:6000-$30:67F8
+;Y:転送先の最初の16bitアドレス $00:0A00-$00:11F7
+;オペランド:転送元と転送先バンク 30,00
+;
+$C2/3CCD PLB                     ;DBレジスタに値をプル
+$C2/3CCE JSR $3D0F  [$C2:3D0F]   ;[$C2:3D0F]へジャンプ
+</pre></div>
+
+<p>セーブデータの番号によって、転送元のアドレスのみ変更し、データ転送<code>MVN</code>でセーブデータをバンク<span class="formula">$00</span>に書き込んでいることがわかる。</p>
+
+<table>
+<thead>
+	<tr><th>セーブデータ<br>番号</th><th>転送元</th><th>転送先</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td><code>$30:6000</code>～<code>$30:67F7</code></td><td><code>$00:0A00</code>～<code>$00:11F7</code></td></tr>
+	<tr><td>1</td><td><code>$30:67F8</code>～<code>$30:6FEF</code></td><td><code>$00:0A00</code>～<code>$00:11F7</code></td></tr>
+	<tr><td>2</td><td><code>$30:6FF0</code>～<code>$30:77E7</code></td><td><code>$00:0A00</code>～<code>$00:11F7</code></td></tr>
+	<tr><td>3</td><td><code>$30:77E8</code>～<code>$30:7FEF</code></td><td><code>$00:0A00</code>～<code>$00:11F7</code></td></tr>
+</tbody>
+</table>
+
+<p>この時点では、<code>[$00:1200]</code>～<code>[$00:130F]</code>は圧縮されて<code>[$00:10FE]</code>～<code>[$00:10FF]</code>と<code>[$00:11D0]</code>～<code>[$00:11EF]</code>に入っている状態なので、元に戻す処理も行う。<br>
+まず、<code>[$00:10FE]</code>～<code>[$00:10FF]</code>に入った8ビット区切りデータを<code>[$00:1300]</code>～<code>[$00:130F]</code>に1バイトずつ戻す。<br>
+サブルーチンは<code><span class="r">$C0/0308</span></code>～<code><span class="r">$C0/032C</span></code>。</p>
+
+<div class="code-container"><pre>
+$C0/0308 LDX #$1300              x;Xに$1300をロード
+$C0/030B LDY #$10FE              x;Yに$10FEをロード
+$C0/030E LDA #$02                x;Aに$02をロード
+$C0/0310 STA $24    [$00:0024]   x;A($02)を[$00:0024]に書き込み
+;
+;[$00:10FE],[$00:10FF]を8ビット区切りで[$00:1300]～に書き戻すループ(ループ回数$02)
+$C0/0312 LDA $0000,y             ;Aに[$00:10FE~]をロード
+$C0/0315 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/0317 LDA #$08                ;Aに$08をロード
+$C0/0319 STA $22    [$00:0022]   ;A($08)を[$00:0022]に書き込み
+;
+;[$00:0020]をローテートしながら[$00:1300]～を1バイトずつ書き込むループ(ループ回数$08)
+$C0/031B LDA #$00                ;Aに$00をロード
+$C0/031D LSR $20    [$00:0020]   ;A[$00:0020]を論理右シフト　(/2)
+$C0/031F ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/0320 STA $00,x               ;Aを[$00:1300~]に書き込み
+$C0/0322 INX                     ;Xをインクリメント +1
+$C0/0323 DEC $22    [$00:0022]   ;[$00:0022]をデクリメント -1
+$C0/0325 BNE $F4    [$031B]      ;ゼロフラグが立っていないとき[$031B]分岐
+;[$00:0020]をローテートしながら[$00:1300]～を1バイトずつ書き込むループここまで
+;
+$C0/0327 INY                     ;Yをインクリメント +1
+$C0/0328 DEC $24    [$00:0024]   ;[$00:0024]をデクリメント -1
+$C0/032A BNE $E6    [$0312]      ;ゼロフラグが立っていないとき[$0312]分岐
+;[$00:10FE],[$00:10FF]を8ビット区切りで[$00:1300]～に書き戻すループここまで
+;
+$C0/032C JSR $035F  [$C0:035F]   ;[$C0:035F]へジャンプ
+</pre></div>
+
+<p>続いて、<code>[$00:11D0]</code>～<code>[$00:11EF]</code>に入った8ビット区切りデータを<code>[$00:1200]</code>～<code>[$00:12FF]</code>に1バイトずつ戻す。<br>
+サブルーチンは<code><span class="r">$CE/CEEF</span></code>～<code><span class="r">$CE/CF13</span></code>。</p>
+
+<div class="code-container"><pre>
+$CE/CEEF LDX #$1200              ;Xに$1200をロード
+$CE/CEF2 LDY #$11D0              ;Yに$11D0をロード
+$CE/CEF5 LDA #$20                ;Aに$20をロード
+$CE/CEF7 STA $24    [$00:0024]   ;A($20)を[$00:0024]に書き込み
+;
+;[$00:11D0]～[$00:11EF]を8ビット区切りで[$00:1300]～に書き戻すループ(ループ回数$20)
+$CE/CEF9 LDA $0000,y             ;Aに[$00:11D0~]をロード
+$CE/CEFC STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$CE/CEFE LDA #$08                ;Aに$08をロード
+$CE/CF00 STA $22    [$00:0022]   ;A($08)を[$00:0022]に書き込み
+;
+;[$00:0020]をローテートしながら[$00:1200]～を1バイトずつ書き込むループ(ループ回数$08)
+$CE/CF02 LDA #$00                ;Aに$00をロード
+$CE/CF04 LSR $20    [$00:0020]   ;A[$00:0020]を論理右シフト　(/2)
+$CE/CF06 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$CE/CF07 STA $00,x               ;Aを[$00:1200~]に書き込み
+$CE/CF09 INX                     ;Xをインクリメント +1
+$CE/CF0A DEC $22    [$00:0022]   ;[$00:0022]をデクリメント -1
+$CE/CF0C BNE $F4    [$CF02]      ;ゼロフラグが立っていないとき[$CF02]分岐
+;[$00:0020]をローテートしながら[$00:1200]～を1バイトずつ書き込むループここまで
+;
+$CE/CF0E INY                     ;Yをインクリメント +1
+$CE/CF0F DEC $24    [$00:0024]   ;[$00:0024]をデクリメント -1
+$CE/CF11 BNE $E6    [$CEF9]      ;ゼロフラグが立っていないとき[$CEF9]分岐
+;[$00:11D0]～[$00:11EF]を8ビット区切りで[$00:1300]～に書き戻すループここまで
+;
+$CE/CF13 RTL                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上が大まかな処理である。<br>
+シナリオによりまだ処理が続くが、とりあえず紹介はここまで。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program34_2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program36.html"><span class="button">&#9654;次 回復技</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

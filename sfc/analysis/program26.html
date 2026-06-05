@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージフィールド">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージフィールド">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージフィールド</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ダメージフィールド</h1>
+<h2>ダメージフィールド</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここでは、戦闘における4種類のダメージフィールド（毒、火炎、電撃、水）関係の仕様を解説する。<br>
+攻略上における解説は、<span class="tri"><a href="../battle07.html">戦闘関係の知識 &gt; フィールドダメージ</a></span>で行っているので参照していただきたい。</p>
+
+<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様に、ダメージフィールドについて説明がある。以下引用。</p>
+
+<blockquote><p>■特殊フィールド<br>
+火炎ぼたる等の技によって生成される、特殊フィールド<br>
+ダメージ発動は毒→火炎→電撃→水→の順の４周期で、敵か味方の技使用で発動ターンが進む<br>
+戦闘をまたいでも発動ターンは維持されるが、<br>
+メニューを開くかデータロード時にリセットされ、毒からになる<br>
+（例えば、メニュー開いた次の戦闘で、ウキッを使えば直後に毒フィールドのダメージが出る）</p>
+
+<p>ダメージ発動時に、特殊フィールドの消去判定が入る<br>
+消去率は各マスで1/16<br>
+判定は横書き順（左上から左→右で端まで行ったら次の行）で、<br>
+最後のマスの判定で消去となった場合、フィールドダメージ・エフェクトが不発となる<br>
+フィールドの消去もその時点では見た目変わらず、次の敵か味方の技使用直前にフィールドの見た目も変わる</p></blockquote>
+
+<p>仕様は上で説明している通りだが、</p>
+
+<ul>
+	<li>複数マスにまたがる敵がフィールドダメージを受ける時の仕様（ダメージを受ける時は1マス分のダメージだが、ダメージ吸収時は踏んでいるマスの合計値分回復する、しかし画面表示は1マス分の回復量のみ）</li>
+	<li>最終編ラストバトル（オディオモール/アイ/マウス～ピュアオディオ戦）では、ダメージフィールドを発生させる技を使っても、ダメージフィールドが表示されない</li>
+</ul>
+
+<p>などは説明がないので、ここでサブルーチンを見つつ説明をする。<br>
+なお、解説は長くなるので、結論だけ先にまとめておく。</p>
+
+<div class="place"><h5>フィールドダメージとキャラのサイズについて</h5>
+
+<p>ダメージフィールドが発動した時、7×7マスの戦闘フィールドにおいて、1マスずつ、</p>
+
+<ol>
+	<li>そのマスにダメージフィールドがあるか</li>
+	<li>ダメージフィールドがある場合、敵または味方キャラが乗っているか</li>
+</ol>
+
+<p>という判定を行うが、キャラが複数マスにまたがるサイズで、かつ、ダメージフィールドマスも複数踏んでいる場合、1マス毎に判定をしているから、同じキャラでもマス目の数だけ判定を行うことになる。<br>
+例えばキングマンモー（3×3マスサイズ）なら、火炎フィールドを吸収し、他フィールドはダメージをくらうが、</p>
+
+<ul>
+	<li>火炎フィールドを3×3マス踏んでいたら、3×3マス＝9回のダメージフィールド判定を行うので、火炎フィールドでの回復<span class="formula">+24</span>を9回繰り返すことにより、HPが<span class="formula">24×9=216</span>回復する。</li>
+	<li>毒フィールドを3×3マス踏んでいたら、一番最初の判定（左上マス）を行った時に特定のフラグが立ち、2マス目からの毒フィールド判定をスキップするので、ダメージ量は<span class="formula">16×1=16</span>となる。</li>
+</ul>
+
+<p>このように、「敵がフィールドでダメージをくらう時だけ、1マス分のダメージを食らった後は、他のマスのダメージ処理をスキップ」という処理を行っている。<br>
+味方キャラの場合は、ダメージフィールド吸収でもダメージでも、全てのマスの判定分吸収またはダメージとなるが、味方キャラは1×1マスサイズなので、必ず1マス分の吸収またはダメージとなる。</p>
+
+<p>味方キャラの例外は最終編オルステッド主人公時で、操作キャラが本来敵の各シナリオラストボスだから、サイズが1×1ではない。<br>
+ただし味方キャラ扱いなので、ダメージフィールド吸収でもダメージでも、全てのマスの判定分吸収またはダメージとなる。<br>
+このため、おーでぃーおー戦では、ゴリが毒フィールドを発生させた場合、おーでぃーおーが毒フィールドで受けるダメージは1マス分ではなく、おーでぃーおーが乗っているマス全てとなる。つまりダメージ量が増加する。</p>
+
+<h5>最終編ラストバトル（オディオモール/アイ/マウス～ピュアオディオ戦）</h5>
+
+<p>戦闘開始時に戦闘背景関係の値が<code>[$00:0041]</code>に入り、更にその上6ビットが<code>[$00:0354]</code>に入るのだが、この値で「現在何の戦闘が行われているか」を判定するようになっている。<br>
+<code>[$00:0354]</code>の値から最終編ラストバトルだと判定されると、ダメージフィールドを発生させる技において、ダメージフィールド発生処理だけスキップするという分岐があるため、ダメージフィールドを発生させる技を使っても、ダメージフィールドだけ発生しない（その他の処理は行われる）。</p></div>
+
+<p>以降は解説になる。<br>
+以下のように各段階に分けてサブルーチンと共に説明していく。<br>
+また、長くなるので2ページに分けている。</p>
+
+<div style="border: 1px solid #999; padding: .1em;background-color: #eee;">
+<ul>
+	<li><a href="#01">ダメージフィールド関連のメモリアドレス</a></li>
+	<li><a href="#02">ダメージフィールドの発生</a></li>
+	<li><a href="#03">フィールドダメージの発動</a></li>
+	<li><a href="program26_2.html#04">ダメージフィールドの消去</a></li>
+	<li><a href="program26_2.html#05">ダメージ計算</a></li>
+	<ul>
+		<li><a href="program26_2.html#05_1">味方キャラのダメージ計算</a></li>
+		<li><a href="program26_2.html#05_2">敵キャラのダメージ計算</a></li>
+	</ul>
+	<li><a href="program26_2.html#06">例外について</a></li>
+</ul>
+</div>
+
+<h3 id="01">ダメージフィールド関連のメモリアドレス</h3>
+
+<p>ダメージフィールド関係の処理を見る上で重要なメモリアドレスを記しておく。</p>
+
+<h4>戦闘フィールドの状態</h4>
+
+<p>戦闘フィールドは7×7マスで構成されているが、各マスの状態を<code>$00:04C8</code>～<code>$00:04FE</code>に記録している。<br>
+対応したアドレスは以下の通りで、<code>$00:04??</code>の<code>??</code>の値部分のみ記している。<br>
+各アドレスに、現在居るキャラクターと、ダメージフィールドの状態が記録される。</p>
+
+<table>
+<tbody>
+	<tr><td>C8</td><td>C9</td><td>CA</td><td>CB</td><td>CC</td><td>CD</td><td>CE</td><td style="background: #ccc;">CF</td></tr>
+	<tr><td>D0</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td style="background: #ccc;">D7</td></tr>
+	<tr><td>D8</td><td>D9</td><td>DA</td><td>DB</td><td>DC</td><td>DD</td><td>DE</td><td style="background: #ccc;">DF</td></tr>
+	<tr><td>E0</td><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td><td style="background: #ccc;">E7</td></tr>
+	<tr><td>E8</td><td>E9</td><td>EA</td><td>EB</td><td>EC</td><td>ED</td><td>EE</td><td style="background: #ccc;">EF</td></tr>
+	<tr><td>F0</td><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td><td style="background: #ccc;">F7</td></tr>
+	<tr><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td><td style="background: #ccc;">FF</td></tr>
+</tbody>
+</table>
+
+<p>数字の通り、アドレスは左上から始まり、左方向1行分の次は2列目の左から……という順になっている。<br>
+このため、戦闘フィールドに関する計算や処理は、上のアドレス順、つまり左上から開始され右方向へ、そして下方向へ……という順番で行われる。</p>
+
+<p>一番右の<span style="background: #ccc;">灰色背景部分</span>は実際には戦闘フィールドではないため、<span class="formula">$00</span>が入っている。<br>
+プログラミング上、7という数字はキリが悪いので、横8×縦7でアドレスを設定しているようである（行の区切りとしても利用されている）。</p>
+
+<p>各アドレスに入る数値は、何もなければ<span class="formula">$00</span>、それ以外はキャラクターの数値＋ダメージフィールド状態の合計値になる。<br>
+敵が複数マスにまたがっている場合は、該当マスに同じ数値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula"><span class="formula">$01</span></span></td><td>味方キャラ1</td></tr>
+	<tr><td><span class="formula"><span class="formula">$02</span></span></td><td>味方キャラ2</td></tr>
+	<tr><td><span class="formula"><span class="formula">$03</span></span></td><td>味方キャラ3</td></tr>
+	<tr><td><span class="formula"><span class="formula">$04</span></span></td><td>味方キャラ4</td></tr>
+	<tr><td><span class="formula"><span class="formula">$11</span></span></td><td>敵キャラ1</td></tr>
+	<tr><td><span class="formula"><span class="formula">$12</span></span></td><td>敵キャラ2</td></tr>
+	<tr><td><span class="formula"><span class="formula">$13</span></span></td><td>敵キャラ3</td></tr>
+	<tr><td><span class="formula"><span class="formula">$14</span></span></td><td>敵キャラ4</td></tr>
+	<tr><td><span class="formula"><span class="formula">$15</span></span></td><td>敵キャラ5</td></tr>
+	<tr><td><span class="formula"><span class="formula">$16</span></span></td><td>敵キャラ6</td></tr>
+	<tr><td><span class="formula"><span class="formula">$17</span></span></td><td>敵キャラ7</td></tr>
+	<tr><td><span class="formula"><span class="formula">$18</span></span></td><td>敵キャラ8</td></tr>
+	<tr><td><span class="formula"><span class="formula">$19</span></span></td><td>敵キャラ9</td></tr>
+	<tr><td><span class="formula"><span class="formula">$1A</span></span></td><td>敵キャラA</td></tr>
+	<tr><td><span class="formula"><span class="formula">$1B</span></span></td><td>敵キャラB</td></tr>
+	<tr><td><span class="formula"><span class="formula">$1C</span></span></td><td>敵キャラC</td></tr>
+	<tr><td><span class="formula"><span class="formula">$1D</span></span></td><td>敵キャラD</td></tr>
+	<tr><td><span class="formula"><span class="formula">$1E</span></span></td><td>敵キャラE</td></tr>
+	<tr><td><span class="formula"><span class="formula">$80</span></span></td><td>水フィールド</td></tr>
+	<tr><td><span class="formula"><span class="formula">$A0</span></span></td><td>毒フィールド</td></tr>
+	<tr><td><span class="formula"><span class="formula">$C0</span></span></td><td>火炎フィールド</td></tr>
+	<tr><td><span class="formula"><span class="formula">$E0</span></span></td><td>電撃フィールド</td></tr>
+</tbody>
+</table>
+
+<p>つまり、</p>
+
+<ul>
+	<li>上1～3ビット：フィールドの状態、<span class="formula">%000</span>ならダメージフィールドなし</li>
+	<li>上4ビット：敵キャラなら<span class="formula">1</span>、それ以外は<span class="formula">0</span></li>
+	<li>下4ビット：<span class="formula">%0000</span>ならキャラなし</li>
+</ul>
+
+<p>と、各ビットに値が入っているので、特定の値と論理積を取ると、ダメージフィールドの有無やキャラの有無などを判定できることになる。</p>
+
+<p>例えば、フィールドの一番左上のマスに味方キャラ1がいて、かつ、そのマスが火炎フィールドになっていたら、<code><code>$00:04C8</code></code>には<span class="formula">$01 + $C0 = $C1</span>が入る。</p>
+
+<h5>戦闘フィールド計算値</h5>
+
+<p>上で紹介した<code>$00:04C8</code>～<code>$00:04FE</code>は戦闘フィールドの現在の状況が入るアドレスだが、ダメージフィールドを発生させる技の処理中など、計算途中の値を入れるアドレスが別に存在している。<br>
+それが<code>$00:0488</code>～<code>$00:04BE</code>で、下には<code>$00:04??</code>の<code>??</code>の値部分のみ記している。</p>
+
+<table>
+<tbody>
+	<tr><td>88</td><td>89</td><td>8A</td><td>8B</td><td>8C</td><td>8D</td><td>8E</td></tr>
+	<tr><td>90</td><td>91</td><td>92</td><td>93</td><td>94</td><td>95</td><td>96</td></tr>
+	<tr><td>98</td><td>99</td><td>9A</td><td>9B</td><td>9C</td><td>9D</td><td>9E</td></tr>
+	<tr><td>A0</td><td>A1</td><td>A2</td><td>A3</td><td>A4</td><td>A5</td><td>A6</td></tr>
+	<tr><td>A8</td><td>A9</td><td>AA</td><td>AB</td><td>AC</td><td>AD</td><td>AE</td></tr>
+	<tr><td>B0</td><td>B1</td><td>B2</td><td>B3</td><td>B4</td><td>B5</td><td>B6</td></tr>
+	<tr><td>B8</td><td>B9</td><td>BA</td><td>BB</td><td>BC</td><td>BD</td><td>BE</td></tr>
+</tbody>
+</table>
+
+<h4>ターン数</h4>
+
+<p><code>$7E:FEFD</code>には、フィールドダメージの発動タイミング用に、戦闘開始時からのターン数が記録されている。<br>
+ただし、<code>$7E:FEFD</code>は戦闘開始時に毎回リセットされるのではない。<br>
+ゲーム開始時に<span class="formula">$00</span>がセットされるが、メニュー画面を開くか、ゲームがリセットされない限りターン数が累積していく。<br>
+このため、例えば、ゲームを開始して最初の戦闘が2ターンで終わると<code>$7E:FEFD</code>には<span class="formula">$02</span>が記録され、次の戦闘までメニューを開かない場合、<code>$7E:FEFD</code>に<span class="formula">$02</span>が入った状態で戦闘開始になり、<span class="formula">$03</span>, <span class="formula">$04</span>,……と増えていくことになる。<br>
+<span class="formula">$FF</span>まで増えたとしても、増加時の処理にキャリーオーバーの分岐処理が見られないため、次ターンは<span class="formula">+1</span>されて<code>$7E:FEFD</code>に<span class="formula">$00</span>が入りキャリーフラグが立つはずだが、これにより特に問題は起こらないはずである。実際の処理の説明時に解説する。</p>
+
+<h4>キャラクターのいるマスの位置</h4>
+
+<p>戦闘フィールドの状態とは別に、キャラ毎に現在どのマスにいるかが記録される。<br>
+味方キャラ1であれば、<code>$00:1C00</code>～の戦闘中の味方キャラデータに以下のように値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code><span class="formula">$18</span></code></td><td>キャラ位置のマス目のX座標（左から<span class="formula"><span class="formula">$00</span></span>～<span class="formula"><span class="formula">$06</span></span>）</td></tr>
+	<tr><td><code><span class="formula">$19</span></code></td><td>キャラ位置のマス目のY座標（上から<span class="formula"><span class="formula">$00</span></span>～<span class="formula"><span class="formula">$06</span></span>）</td></tr>
+	<tr><td><code><span class="formula">$28</span></code></td><td>技の範囲指定～使用中、キャラ位置のマス目のX座標</td></tr>
+	<tr><td><code><span class="formula">$29</span></code></td><td>技の範囲指定～使用中、キャラ位置のマス目のY座標</td></tr>
+</tbody>
+</table>
+
+<p><code>$00:1C28</code>と<code>$00:1C29</code>は、味方の技一覧で技を選んだ時点で値が更新される。</p>
+
+<h4>技の範囲</h4>
+
+<p>何かしらのダメージフィールドを発生させる場合、技の範囲に関するデータも必要になる。<br>
+技の射程や範囲に関する値は技データ内に散らばっているので、判定が少々ややこしい。<br>
+判定順は技データ13→技データ21→技データ12になる。<br>
+具体的な処理方法は後で説明する。</p>
+
+<ul>
+	<li>技データ13<br>上4ビット：周囲攻撃2、反撃専用4、回復8/下4ビット：技の属性</li>
+	<li>技データ21<br>上4ビット：特殊なタイプ/下3ビット：効果範囲（2）</li>
+	<li>技データ12<br>上2～4ビット：必中状態異常（腕・足・首）/下2ビット：効果範囲（1）</li>
+</ul>
+
+<h4>技データ22</h4>
+
+<p>技にはダメージフィールドを発生させるかどうかが設定されているが、技データ22の上2～4ビットの値が該当する。<br>
+（なお、下4ビットは上1ビットが1の時、発生させる行動異常の値が記録される）</p>
+
+<table>
+<thead>
+	<tr><th colspan="2">上4ビット</th><th>フィールド</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$4</span></td><td><span class="formula">%0100</span></td><td>水</td></tr>
+	<tr><td><span class="formula">$5</span></td><td><span class="formula">%0101</span></td><td>毒</td></tr>
+	<tr><td><span class="formula">$6</span></td><td><span class="formula">%0110</span></td><td>火炎</td></tr>
+	<tr><td><span class="formula">$7</span></td><td><span class="formula">%0111</span></td><td>電撃</td></tr>
+</tbody>
+</table>
+
+<p>例えばおぼろ丸の技「忍法火炎ぼたる」は火炎フィールドを発生させるが、技データ22の値は「<span class="formula">$60</span>(<span class="formula">%0110 0000</span>)」である。<br>
+（「忍法火炎ぼたる」の技データ22は、<code>$D5:2D2E</code>に入っている）<br>
+味方キャラが技を使っている最中は、味方キャラ番号が1なら<code>$7E:9010</code>～<code>$7E:9028</code>、番号2なら<code>$7E:9050</code>～<code>$7E:9068</code>……に該当の技データがそのまま入る。<br>
+おぼろ丸が番号1だったら、「忍法火炎ぼたる」を使用する時、技データ22が<code>$7E:9026</code>にコピーされる。</p>
+
+<p>少しややこしいのは、ダメージフィールドと行動異常どちらも発生可能な技の時で、「プラズマボール」の技データ22は「<span class="formula">$F3</span>」だが、2進数で見ると<span class="formula">%1111 0011</span>であり、上2～4ビットが「<span class="formula">111</span>」だから電撃フィールドを発生させる。<br>
+かつ、上1ビットが1なので、下4ビットが行動異常に対応し、行動異常<span class="formula">%0011 = $03</span>を発生させる、ということになる。</p>
+
+<h4>味方キャラのフィールド吸収</h4>
+
+<p>味方キャラは、フィールド吸収能力がある装備を身に着けていないとフィールドダメージを吸収できない。<br>
+シナリオ別キャラデータの<span class="formula">$31</span>番目の下4ビットに、フィールド吸収の値が入っている。<br>
+たとえばおぼろ丸なら、シナリオ別キャラデータは<code>$00:0EC0</code>から開始だが、<span class="formula">$31</span>を加算した<code>$00:0EF1</code>の下4ビットがフィールド吸収の値である。</p>
+
+<table>
+<thead>
+	<tr><th colspan="2">下4ビット</th><th>フィールド吸収</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$8</span></td><td><span class="formula">%1000</span></td><td>水</td></tr>
+	<tr><td><span class="formula">$4</span></td><td><span class="formula">%0100</span></td><td>毒</td></tr>
+	<tr><td><span class="formula">$2</span></td><td><span class="formula">%0010</span></td><td>火炎</td></tr>
+	<tr><td><span class="formula">$1</span></td><td><span class="formula">%0001</span></td><td>電撃</td></tr>
+</tbody>
+</table>
+
+<p>フィールド吸収は複数のフィールドを吸収できる場合もあるため、以上の合計値が<code>$00:0EF1</code>の下4ビットに入ることになる。<br>
+たとえばおぼろ丸が「水神のたび」のみ装備であれば、水フィールド吸収だけであるから、<code>$00:0EF1</code>には<span class="formula">$08</span>が入る。<br>
+「げんじのタビ」だと火炎フィールド吸収だけであるから、<code>$00:0EF1</code>には<span class="formula">$02</span>が入る。<br>
+「コイツぁタマゲタ」だと全フィールド吸収可能なので、<code>$00:0EF1</code>には<span class="formula">$0F</span>が入る。</p>
+
+<p>味方キャラの場合、他にフィールド吸収能力がつくのは「サンゴのゆびわ」「マーメイドボトム」だけ、しかもどちらも水フィールド吸収だから、味方キャラのフィールド吸収の値は、何も吸収しない<span class="formula">$00</span>以外だと、<span class="formula">$02</span>, <span class="formula">$08</span>, <span class="formula">$0F</span>のいずれかだけということになる。</p>
+
+<h4>敵キャラのフィールド吸収／無効</h4>
+
+<p>敵の場合は、敵データ01の上4ビットがフィールド吸収の値になる。<br>
+入る値は味方キャラのフィールド吸収の値と同じである。<br>
+味方キャラとの違いは、敵データ31の下1ビットにダメージフィールド無効かどうかが入ること。ダメージフィールド無効だと<span class="formula">%1</span>である。<br>
+戦闘中は、敵種類データの<span class="formula">$21</span>番目に敵データ01が、<span class="formula">$3F</span>番目に敵データ31が入る。<br>
+例えば敵が1体だけなら、敵種類1のデータは<code>$00:1A00</code>～<code>$00:1A3F</code>に入るから、<code>$00:1A21</code>が敵データ01、<code>$00:1A3F</code>が敵データ31である。<br>
+その他、必要な値はその都度解説していく。</p>
+
+<h3 id="02">ダメージフィールドの発生</h3>
+
+<p>ここでは例として、おぼろ丸が「忍法火炎ぼたる」で火炎フィールドを発生させた場合の処理を紹介する。<br>
+手順としては、</p>
+
+<ol>
+	<li>「忍法火炎ぼたる」の範囲を、<code>$00:0488</code>～<code>$00:04BE</code>に仮値として書き込み（範囲に当たるアドレスには<span class="formula">$0F</span>を書き込む）</li>
+	<li><code>$00:0488</code>～<code>$00:04BE</code>に書き込まれた値から、火炎フィールドであることを<code>$00:04C8</code>～<code>$00:04FE</code>に書き込み</li>
+</ol>
+
+<p>となる。<br>
+先に説明した通り、戦闘中の戦闘フィールドの状態は最終的に<code>$00:04C8</code>～<code>$00:04FE</code>に記録されていくのだが、そこに書き込むまでの計算値を記録するために<code>$00:0488</code>～<code>$00:04BE</code>が確保されている。</p>
+
+<p>「忍法火炎ぼたる」を使う前はダメージフィールドはなく、<code>$00:04C8</code>～<code>$00:04FE</code>には、味方キャラと敵キャラの値のみが入っているものとする。</p>
+
+<p>戦闘フィールドは7×7マスだが、左上マスを<span class="formula">(0,0)</span>とした時に右方向をX軸、下方向をY軸とする。<br>
+<code>$00:04C8</code>～<code>$00:04FE</code>をマス目に対応させると以下のようになる。</p>
+
+<table>
+<tbody>
+	<tr><td>C8</td><td>C9</td><td>CA</td><td>CB</td><td>CC</td><td>CD</td><td>CE</td></tr>
+	<tr><td>D0</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td></tr>
+	<tr><td>D8</td><td>D9</td><td>DA</td><td>DB</td><td>DC</td><td>DD</td><td>DE</td></tr>
+	<tr><td>E0</td><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td></tr>
+	<tr><td>E8</td><td>E9</td><td>EA</td><td>EB</td><td>EC</td><td>ED</td><td>EE</td></tr>
+	<tr><td>F0</td><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td></tr>
+	<tr><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td></tr>
+</tbody>
+</table>
+
+<p>この戦闘では、おぼろ丸（味方キャラ1）、とらわれの男（味方キャラ2）、カラクリ丸（味方キャラ3）、浪人（敵キャラ1）がいるとして、</p>
+
+<table>
+<thead>
+	<tr><th>キャラ</th><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>おぼろ丸（味方キャラ1）</td><td><code>$00:04E4</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td>とらわれの男（味方キャラ2）</td><td><code>$00:04EB</code></td><td><span class="formula">$02</span></td></tr>
+	<tr><td>カラクリ丸（味方キャラ3）</td><td><code>$00:04ED</code></td><td><span class="formula">$03</span></td></tr>
+	<tr><td>浪人（敵キャラ1）</td><td><code>$00:04E0</code>・<code>$00:04E8</code></td><td><span class="formula">$11</span></td></tr>
+</tbody>
+</table>
+
+<p>このように配置されているものとする。</p>
+
+<p>おぼろ丸のいるマスは上の「E4」の位置で、ここで「忍法火炎ぼたる」を使う。<br>
+「忍法火炎ぼたる」の範囲は、使用者を中心とした5×5マス（下の<span style="background-color:#ffafa0;">背景赤色部分</span>）になる。</p>
+
+<table>
+<tbody>
+	<tr><td>C8</td><td>C9</td><td>CA</td><td>CB</td><td>CC</td><td>CD</td><td>CE</td></tr>
+	<tr><td>D0</td><td>D1</td><td style="background-color:#ffafa0;">D2</td><td style="background-color:#ffafa0;">D3</td><td style="background-color:#ffafa0;">D4</td><td style="background-color:#ffafa0;">D5</td><td style="background-color:#ffafa0;">D6</td></tr>
+	<tr><td>D8</td><td>D9</td><td style="background-color:#ffafa0;">DA</td><td style="background-color:#ffafa0;">DB</td><td style="background-color:#ffafa0;">DC</td><td style="background-color:#ffafa0;">DD</td><td style="background-color:#ffafa0;">DE</td></tr>
+	<tr><td>E0</td><td>E1</td><td style="background-color:#ffafa0;">E2</td><td style="background-color:#ffafa0;">E3</td><td style="background-color:#ff9c87;font-weight: bold;">E4</td><td style="background-color:#ffafa0;">E5</td><td style="background-color:#ffafa0;">E6</td></tr>
+	<tr><td>E8</td><td>E9</td><td style="background-color:#ffafa0;">EA</td><td style="background-color:#ffafa0;">EB</td><td style="background-color:#ffafa0;">EC</td><td style="background-color:#ffafa0;">ED</td><td style="background-color:#ffafa0;">EE</td></tr>
+	<tr><td>F0</td><td>F1</td><td style="background-color:#ffafa0;">F2</td><td style="background-color:#ffafa0;">F3</td><td style="background-color:#ffafa0;">F4</td><td style="background-color:#ffafa0;">F5</td><td style="background-color:#ffafa0;">F6</td></tr>
+	<tr><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td></tr>
+</tbody>
+</table>
+
+<p>今回は5×5マス範囲がフィールド内に収まるが、おぼろ丸がもう1マス右にいるなどすると5×5マス範囲がはみ出すから、別途処理が入ることになる。</p>
+
+<p>先に述べた通り、フィールド関係の値を計算するため、<code>$00:0488</code>～<code>$00:04BE</code>の領域が確保されているが、この領域は技を使う時に毎回、一度すべて<span class="formula">$00</span>で埋める処理をしてから、計算値が入る。<br>
+その<span class="formula">$00</span>で埋める処理は<code><span class="r">$C1/3D2B</span></code>～<code><span class="r">$C1/3D38</span></code>にあたるのだが、ここでは詳細は省略する。</p>
+
+<p><code><span class="r">$C1/3D38</span></code>の後は、<code><span class="r">$C1/D2E4</span></code>→<code><span class="r">$C1/380E</span></code>とジャンプするので、<code><span class="r">$C1/380E</span></code>以降からサブルーチンを紹介する。<br>
+このあたりの処理は、ダメージフィールド発生技に限らず、範囲攻撃における範囲の計算を行うサブルーチンとして共通で使われる。</p>
+
+<div class="code-container"><pre>
+$C1/380E LDY $5A    [$00:035A]   ;Yに[$00:035A]をロード
+$C1/3810 LDA $0001,y[$00:1C01]   ;Aに[$00:1C01](キャラ1　戦闘状態)をロード
+$C1/3813 CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/3815 BNE $05    [$381C]      ;ゼロフラグが立っていないとき[$381C]分岐
+$C1/381C LDA $0028,y[$00:1C28]   ;Aに[$00:1C28](X座標 $04)をロード
+$C1/381F STA $16    [$00:0316]   ;Aを[$00:0316](X座標 $04)に書き込み
+$C1/3821 LDA $0029,y[$00:1C29]   ;Aに[$00:1C29](Y座標 $03)をロード
+$C1/3824 STA $17    [$00:0317]   ;Aを[$00:0317](Y座標 $03)に書き込み
+$C1/3826 CPY #$1C00              ;Yと$1C00を減算比較（ステータスレジスタのみ変更）
+$C1/3829 BCS $05    [$3830]      ;キャリーフラグが立っているとき[$3830]分岐
+$C1/3830 STZ $0A    [$00:030A]   ;[$00:030A]に$00を書き込み
+$C1/3832 STZ $09    [$00:0309]   ;[$00:0309]に$00を書き込み
+$C1/3834 LDX $68    [$00:0368]   ;Xに[$00:0368]をロード
+$C1/3836 LDA $D5000D,x[$D5:2D25] ;Aに[$D5:2D25](技データ13 $28)をロード
+$C1/383A BIT #$20                ;Aと$20で論理積（ステータスフラグ変更のみ）
+$C1/383C BEQ $0B    [$3849]      ;ゼロフラグが立っているとき[$3849]分岐
+$C1/383E LDA $D50015,x[$D5:2D2D] ;Aに[$D5:2D2D](技データ21 $60)をロード
+$C1/3842 AND #$0F                ;Aと$0Fで論理積
+$C1/3844 BEQ $07    [$384D]      ;ゼロフラグが立っているとき[$384D]分岐
+$C1/384D LDA $D5000C,x[$D5:2D24] ;Aに[$D5:2D24](技データ12 $02)をロード
+$C1/3851 AND #$03                ;Aと$03で論理積
+$C1/3853 BEQ $0C    [$3861]      ;ゼロフラグが立っているとき[$3861]分岐→範囲：全体
+$C1/3855 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/3857 BEQ $1D    [$3876]      ;ゼロフラグが立っているとき[$3876]分岐→範囲：3×3
+$C1/3859 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C1/385B BEQ $2E    [$388B]      ;ゼロフラグが立っているとき[$388B]分岐→範囲：5×5
+</pre></div>
+
+<p>以上は、おぼろ丸のいる座標及び、使用した「忍法火炎ぼたる」の射程・範囲確認の処理である。<br>
+<code>[$00:1C28]</code><code>[$00:1C29]</code>には、技を選択して範囲が表示された時点で、技使用者の座標X,Yが順に入る。<br>
+今回で言えば<span class="formula">$04</span>,<span class="formula">$03</span>が入っているが、<code><span class="r">$C1/381C</span></code>～<code><span class="r">$C1/3824</span></code>で<code>[$00:0316]</code><code>[$00:0317]</code>にそれぞれコピーされる。</p>
+
+<p><code><span class="r">$C1/3836</span></code>からが射程・範囲の確認である。<br>
+必要となるのは技データ13、技データ21、技データ12である。<br>
+上の処理を見ると、</p>
+
+<ol>
+	<li>技データ13と<span class="formula">$20</span>で論理積をとり、<span class="formula">$00</span>なら<code>[<span class="r">$C1/3849</span>]</code>へジャンプ</li>
+	<li>技データ21と<span class="formula">$0F</span>で論理積をとり、<span class="formula">$00</span>なら<code>[<span class="r">$C1/384D</span>]</code>へジャンプ</li>
+	<li>技データ12と<span class="formula">$03</span>で論理積をとり、<span class="formula">$00</span>なら<code>[<span class="r">$C1/3861</span>]</code>へジャンプ</li>
+	<li>技データ12と<span class="formula">$03</span>の論理積が<span class="formula">$01</span>なら<code>[<span class="r">$C1/3876</span>]</code>へジャンプ</li>
+	<li>技データ12と<span class="formula">$03</span>の論理積が<span class="formula">$02</span>なら<code>[<span class="r">$C1/388B</span>]</code>へジャンプ</li>
+</ol>
+
+<p>という順序で判定を行っている。</p>
+
+<h5>技データ13</h5>
+
+<p><span class="formula">$20</span> (<span class="formula">%0010 0000</span>)との論理積をとって判定を行っているが、上から3ビット目に<span class="formula">1</span>が立っている時は周囲攻撃になる。<br>
+よってここでゼロフラグが立つのは周囲攻撃以外、ゼロフラグが立たないのは周囲攻撃である。<br>
+「忍法火炎ぼたる」の技データ13の値は<span class="formula">$28</span>で、ゼロフラグが立たない、つまり周囲攻撃なので、次の判定に進む。</p>
+
+<h5>技データ21</h5>
+
+<p><span class="formula">$0F</span> (<span class="formula">%0000 1111</span>)との論理積をとって判定を行っている。<br>
+つまり技データ21の下4ビットについての判定である。<br>
+技データ21の下3ビットは以下のように値が入っている。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>効果範囲</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%000</span></td><td>(技データ12に効果範囲が入る)</td></tr>
+	<tr><td><span class="formula">%001</span></td><td>縦&#xb1;0×横全体</td></tr>
+	<tr><td><span class="formula">%010</span></td><td>縦&#xb1;1×横全体</td></tr>
+	<tr><td><span class="formula">%011</span></td><td>縦&#xb1;2×横全体</td></tr>
+	<tr><td><span class="formula">%100</span></td><td>縦全体×横&#xb1;0</td></tr>
+	<tr><td><span class="formula">%101</span></td><td>縦全体×横&#xb1;1</td></tr>
+	<tr><td><span class="formula">%111</span></td><td>縦全体×横&#xb1;2</td></tr>
+</tbody>
+</table>
+
+<p>ゼロフラグが立つ場合、つまり技データ21の下3ビットに<span class="formula">%000</span>が入っている時は、周囲攻撃かつ、技データ12に効果範囲の値が入っている。<br>
+ゼロフラグが立たない場合は、上の法則で効果範囲が決まる。つまり周囲攻撃かつ、範囲の縦と横の幅が異なる時である。<br>
+「忍法火炎ぼたる」は使用者の周囲5×5マスが範囲であり、技データ21の値は<span class="formula">$60</span>で、下4ビットは<span class="formula">0</span>のため、次の判定に進む。</p>
+
+<h5>技データ12</h5>
+
+<p>技データ21の下3ビットが<span class="formula">%000</span>の時のみ、技データ12の下2ビットが以下のように範囲を示す。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>効果範囲</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td>1×1</td></tr>
+	<tr><td><span class="formula">%01</span></td><td>3×3</td></tr>
+	<tr><td><span class="formula">%10</span></td><td>5×5</td></tr>
+	<tr><td><span class="formula">%11</span></td><td>全体</td></tr>
+</tbody>
+</table>
+
+<p>技データ12と<span class="formula">$03</span>で論理積を取ると、下2ビットが取得できる。<br>
+「忍法火炎ぼたる」の技データ12の値は<span class="formula">$02</span>(<span class="formula">%10</span>)で、上の通りに範囲が5×5になる。</p>
+
+<p>ということで、「忍法火炎ぼたる」の場合、<code><span class="r">$C1/3836</span></code>以降の分岐で、<code><span class="r">$C1/385B</span></code>でゼロフラグが立ち<code>[<span class="r">$C1/388B</span>]</code>へジャンプする。</p>
+
+<div class="code-container"><pre>
+$C1/388B LDA #$05                ;Aに$05をロード
+$C1/388D CLC                     ;キャリーフラグクリア
+$C1/388E ADC $0A    [$00:030A]   ;A + [$00:030A](初期値$00)
+$C1/3890 STA $0A    [$00:030A]   ;A($05)を[$00:030A]に書き込み
+$C1/3892 LDA #$05                ;Aに$05をロード
+$C1/3894 ADC $09    [$00:0309]   ;A + [$00:0309](初期値$00)
+$C1/3896 STA $09    [$00:0309]   ;A($05)を[$00:0309]に書き込み
+$C1/3898 LDA #$02                ;Aに$02をロード
+$C1/389A STA $10    [$00:0310]   ;A($02)を[$00:0310]に書き込み
+$C1/389C STA $11    [$00:0311]   ;A($02)を[$00:0311]に書き込み
+$C1/389E BRA $00    [$38A0]      ;フラグにかかわりなく常に分岐[$38A0]
+</pre></div>
+
+<p>飛び先の<code><span class="r">$C1/388B</span></code>～の処理は範囲が5×5の場合専用で、範囲の横幅と縦幅である<span class="formula">$05</span>を、<code>[$00:030A]</code><code>[$00:0309]</code>に書き込んでいる。<br>
+更に、<code>[$00:0310]</code><code>[$00:0311]</code>に書き込んだ<span class="formula">$02</span>だが、これは技使用者から2マスの距離までが範囲、という意味での<span class="formula">$02</span>である。</p>
+
+<div class="code-container"><pre>
+$C1/38A0 LDA $16    [$00:0316]   ;Aに[$00:0316](X座標 $04)をロード
+$C1/38A2 SEC                     ;キャリーフラグON
+$C1/38A3 SBC $10    [$00:0310]   ;A - [$00:0310]($04 - $02) ※範囲左端
+$C1/38A5 STA $12    [$00:0312]   ;A($02)を[$00:0312]に書き込み
+$C1/38A7 LDA $17    [$00:0317]   ;Aに[$00:0317](Y座標 $03)をロード
+$C1/38A9 SEC                     ;キャリーフラグON
+$C1/38AA SBC $11    [$00:0311]   ;A - [$00:0311]($03 - $02) ※範囲上端
+$C1/38AC STA $11    [$00:0311]   ;A($01)を[$00:0311]に書き込み
+$C1/38AE STZ $15    [$00:0315]   ;[$00:0315]に$00を書き込み
+</pre></div>
+
+<p>このあたりから、範囲の座標位置の算出である。<br>
+7×7のフィールドに座標を書き込むとこのような図になり、おぼろ丸は<span class="formula">(4,3)</span>にいて、薄い赤色をつけた部分が「忍法火炎ぼたる」の範囲である。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/range.png" class="modal-link">
+		<img src="img/range.png" alt="「忍法火炎ぼたる」の範囲" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p><code><span class="r">$C1/38A0</span></code>～<code><span class="r">$C1/38A5</span></code>では、おぼろ丸がいるX座標から<span class="formula">$02</span>を引いているから、「忍法火炎ぼたる」の範囲の一番左のXの値「<span class="formula">$02</span>」を計算し、<code>[$00:0312]</code>に書き込んでいる。<br>
+<code><span class="r">$C1/38A7</span></code>～<code><span class="r">$C1/38AC</span></code>では、おぼろ丸がいるY座標から<span class="formula">$02</span>を引いているから、「忍法火炎ぼたる」の範囲の一番上のYの値「<span class="formula">$01</span>」を計算し、<code>[$00:0311]</code>に書き込んでいる。<br>
+技範囲の最も左上のマスである<span class="formula">(2,1)</span>が記録されたことになる。<br>
+今回は引き算した値が<span class="formula">0</span>以上だったが、おぼろ丸がいるマス次第で、引き算すると<span class="formula">0</span>以下の負の値（符号付き8ビット整数の<span class="formula">$FF</span>以下）になる場合もあり得る。<br>
+とりあえずここでは、負の値になったからといって分岐はない。</p>
+
+<div class="code-container"><pre>
+;$00:0492～$00:0496の処理開始位置
+$C1/38B0 LDA $11    [$00:0311]   ;Aに[$00:0311]($01)をロード
+$C1/38B2 CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/38B4 BCS $27    [$38DD]      ;キャリーフラグが立っているとき[$38DD]分岐
+$C1/38B6 ASL A                   ;Aを算術左シフト *2
+$C1/38B7 ASL A                   ;Aを算術左シフト *2
+$C1/38B8 ASL A                   ;Aを算術左シフト *2
+$C1/38B9 STA $13    [$00:0313]   ;Aを[$00:0313]($01*8)に書き込み
+$C1/38BB LDA $0A    [$00:030A]   ;Aに[$00:030A]($05)をロード
+$C1/38BD STA $08    [$00:0308]   ;A($05)を[$00:0308]に書き込み
+$C1/38BF LDA $12    [$00:0312]   ;Aに[$00:0312]($02)をロード
+$C1/38C1 STA $10    [$00:0310]   ;A($02)を[$00:0310]に書き込み
+;
+;$00:0492の処理
+$C1/38C3 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/38C5 CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/38C7 BCS $0E    [$38D7]      ;キャリーフラグが立っているとき[$38D7]分岐
+$C1/38C9 ADC $13    [$00:0313]   ;A + [$00:0313]
+$C1/38CB STA $14    [$00:0314]   ;Aを[$00:0314]に書き込み
+$C1/38CD LDX $14    [$00:0314]   ;Xに[$00:0314]をロード
+$C1/38CF LDA $0488,x[$00:0492]   ;Aに[$00:0492]をロード
+$C1/38D2 ORA #$0F                ;Aと$0Fで論理和
+$C1/38D4 STA $0488,x[$00:0492]   ;Aを[$00:0492]に書き込み
+$C1/38D7 INC $10    [$00:0310]   ;[$00:0310]をインクリメント +1
+$C1/38D9 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/38DB BNE $E6    [$38C3]      ;ゼロフラグが立っていないとき[$38C3]分岐
+;
+;$00:0493～$00:0496の処理省略
+;
+$C1/38DD INC $11    [$00:0311]   ;[$00:0311]をインクリメント +1
+$C1/38DF DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/38E1 BNE $CD    [$38B0]      ;ゼロフラグが立っていないとき[$38B0]分岐
+;
+;$00:049A～$00:049Eの処理に続く
+</pre></div>
+
+<p><code><span class="r">$C1/38B0</span></code>が、計算値を書き込む<code>$00:0488</code>～<code>$00:04BE</code>の5×5範囲のアドレスのみに、「<span class="formula">$0F</span>」を加算するというループ処理の開始位置になる。</p>
+
+<table>
+<tbody>
+	<tr><td>88</td><td>89</td><td>8A</td><td>8B</td><td>8C</td><td>8D</td><td>8E</td></tr>
+	<tr><td>90</td><td>91</td><td>92</td><td>93</td><td>94</td><td>95</td><td>96</td></tr>
+	<tr><td>98</td><td>99</td><td>9A</td><td>9B</td><td>9C</td><td>9D</td><td>9E</td></tr>
+	<tr><td>A0</td><td>A1</td><td>A2</td><td>A3</td><td>A4</td><td>A5</td><td>A6</td></tr>
+	<tr><td>A8</td><td>A9</td><td>AA</td><td>AB</td><td>AC</td><td>AD</td><td>AE</td></tr>
+	<tr><td>B0</td><td>B1</td><td>B2</td><td>B3</td><td>B4</td><td>B5</td><td>B6</td></tr>
+	<tr><td>B8</td><td>B9</td><td>BA</td><td>BB</td><td>BC</td><td>BD</td><td>BE</td></tr>
+</tbody>
+</table>
+
+<p>この中の、5×5範囲内にあたる、</p>
+
+<p><code>$00:0492</code>～<code>$00:0496</code><br>
+<code>$00:049A</code>～<code>$00:049E</code><br>
+<code>$00:04A2</code>～<code>$00:04A6</code><br>
+<code>$00:04AA</code>～<code>$00:04AE</code><br>
+<code>$00:04B2</code>～<code>$00:04B6</code></p>
+
+<p>に、元から入っている値<span class="formula">+$0F</span>を論理和という形で書き込む、という処理である。<br>
+横一列（5マス分）の処理を5行分繰り返すループ処理になる。<br>
+上で紹介したサブルーチンは、一番上の行である<code>$00:0492</code>～<code>$00:0496</code>の抜粋である。<br>
+簡単に言えば、おぼろ丸の居る位置と、技の効果範囲から、対応する<code>$00:0488</code>～<code>$00:04BE</code>のアドレスを計算し、該当アドレスの値と<span class="formula">$0F</span>で論理和を取ってから、その値をそのまま該当アドレスに上書きする、という処理である。<br>
+<code>$00:0488</code>～<code>$00:04BE</code>は、予め<span class="formula">$00</span>で埋めてあるため、実質、「技の範囲のアドレスだけ<span class="formula">$0F</span>を入れる」という処理である。</p>
+
+<div class="code-container"><pre>
+$C1/DFAF LDX #$1B00              ;Xに$1B00をロード
+$C1/DFB2 STX $10    [$00:0310]   ;Xを[$00:0310]に書き込み
+$C1/DFB4 LDY #$0000              ;Yに$0000をロード
+$C1/DFB7 LDA #$07                ;Aに$07をロード
+$C1/DFB9 STA $09    [$00:0309]   ;Aを[$00:0309]に書き込み
+$C1/DFBB LDA #$07                ;Aに$07をロード
+$C1/DFBD STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+;
+;ループここから
+;1マス毎に、技範囲と敵がいるか判定
+$C1/DFBF LDA $0488,y             ;Aに[$00:0488～$00:04BE]をロード
+$C1/DFC2 BEQ $21    [$DFE5]      ;ゼロフラグが立っているとき[$DFE5]分岐
+;ゼロフラグOFF（技の範囲内）
+$C1/DFC4 LDA $04C8,y             ;Aに[$00:04C8～$00:04FE]をロード
+$C1/DFC7 BIT #$10                ;Aと$10で論理積（ステータスフラグ変更のみ）
+$C1/DFC9 BEQ $1A    [$DFE5]      ;ゼロフラグが立っているとき[$DFE5]分岐
+;ゼロフラグOFF（該当マスに敵がいる）
+$C1/DFCB AND #$0F                ;Aと$0Fで論理積
+$C1/DFCD DEC A                   ;Aをデクリメント -1
+$C1/DFCE CLC                     ;キャリーフラグクリア
+$C1/DFCF ASL A                   ;Aを算術左シフト *2
+$C1/DFD0 ASL A                   ;Aを算術左シフト *2
+$C1/DFD1 ASL A                   ;Aを算術左シフト *2
+$C1/DFD2 ASL A                   ;Aを算術左シフト *2
+$C1/DFD3 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/DFD5 LDX $10    [$00:0310]   ;Xに[$00:0310]をロード
+$C1/DFD7 LDA $7E9001,x[$7E:AB01] ;Aに[$7E:AB01]をロード
+$C1/DFDB BNE $08    [$DFE5]      ;ゼロフラグが立っていないとき[$DFE5]分岐
+$C1/DFDD LDA $7B    [$00:037B]   ;Aに[$00:037B]をロード
+$C1/DFDF STA $7E9001,x[$7E:AB01] ;Aを[$7E:AB01]に書き込み
+$C1/DFE3 INC $7B    [$00:037B]   ;[$00:037B]をインクリメント +1
+;分岐合流
+$C1/DFE5 INY                     ;Yをインクリメント +1
+$C1/DFE6 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/DFE8 BNE $D5    [$DFBF]      ;ゼロフラグが立っていないとき[$DFBF]分岐
+;ループここまで
+</pre></div>
+
+<p>続いて、「技の範囲内に敵がいるか」の判定が入る。<br>
+<code>$00:0488</code>～<code>$00:04BE</code>の中で、5×5範囲内なら<span class="formula">$0F</span>が入っているが、<span class="formula">$0F</span>が入っているマスに対応した、フィールドの状態が記録されている<code>$00:04C8</code>～<code>$00:04FE</code>をロードし、<span class="formula">$10</span>と論理積を取っている。<br>
+フィールドの状態が記録されている<code>$00:04C8</code>～<code>$00:04FE</code>には、味方キャラと敵キャラの値が書き込まれているが、味方キャラだったら<span class="formula">$01</span>～<span class="formula">$04</span>、敵キャラだったら<span class="formula">$11</span>～<span class="formula">$1E</span>、ダメージフィールドがあるなら<span class="formula">$80</span>以上が入っている。<br>
+よって、<span class="formula">$10</span>と論理積を取ってゼロフラグが立たないのは、該当マスに敵キャラが居る、<span class="formula">$11</span>～<span class="formula">$1E</span>が入っている時のみである。<br>
+その場合は<code><span class="r">$C1/DFCB</span></code>～<code><span class="r">$C1/DFE3</span></code>の処理が入って、<code>[$7E9001,x]</code>に<span class="formula">$01</span>～を書き込む処理が行われる。<br>
+<code>[$7E9001,x]</code>は、敵番号により変わるが、例えば敵番号0なら上のように<code>[$7E:AB01]</code>が該当する。<br>
+このアドレスには、<span class="tri"><a href="program6_5.html">敵ターゲット決定方法</a></span>で紹介した通り、攻撃/回復技の対象の範囲内にいる敵には順に<span class="formula">$01</span>～が入り、範囲外だと<span class="formula">$FF</span>が入る。<br>
+<code>$7E:AB?1</code>の値により、範囲攻撃の技の命中判定などが行われるのだが、上処理で数値を入れていたことがわかる。</p>
+
+<p id="odio">以上の処理の後、今回の本題である、フィールドの状態が記録されている<code>$00:04C8</code>～<code>$00:04FE</code>に火炎フィールドの値を加算するサブルーチンに入る。</p>
+
+<div class="code-container"><pre>
+$C1/10B3 LDA $54    [$00:0354]   ;Aに[$00:0354]をロード
+$C1/10B5 CMP #$23                ;Aと$23を減算比較（ステータスレジスタ変更のみ）
+$C1/10B7 BEQ $0B    [$10C4]      ;ゼロフラグが立っているとき[$10C4]分岐
+$C1/10B9 LDX $68    [$00:0368]   ;Xに[$00:0368]をロード
+</pre></div>
+
+<p>上の処理は、<code>[$00:0354]</code>の値と<span class="formula">$23</span>を減算比較して、ゼロフラグが立たないなら先に進むという意味になる。<br>
+つまり、この先のフィールドダメージ関係のサブルーチンに入るのは、<code>[$00:0354]</code>の値が<span class="formula">$23</span>ではない場合になる。<br>
+<code>[$00:0354]</code>の値は、戦闘に入った直後に計算される、その戦闘固有の値になる。<br>
+その処理は以下の通り。</p>
+
+<div class="code-container"><pre>
+$C1/F575 LDA $0041  [$00:0041]   ;Aに[$00:0041]をロード
+$C1/F578 AND #$FC                ;Aと$FCで論理積
+$C1/F57A LSR A                   ;Aを論理右シフト　(/2)
+$C1/F57B LSR A                   ;Aを論理右シフト　(/2)
+$C1/F57C STA $54    [$00:0354]   ;Aを[$00:0354]に書き込み
+</pre></div>
+
+<p>以前にも紹介したが、<code>[$00:0041]</code>は戦闘の背景番号だと思われる（詳細は未調査）。<br>
+処理を追ってみると、<code>[$00:0041]</code>と<span class="formula">$FC</span>で論理積を取ってから、論理右シフトを2回、つまり<span class="formula">÷4</span>した値が<code>[$00:0354]</code>になることがわかる。<br>
+つまり、<code>[$00:0354]</code>は、<code>[$00:0041]</code>の上6ビットの値ということである。<br>
+この値は戦闘の背景番号から計算されているので、戦闘による固有値と見て良いことになるのだが、では、先の処理の「<code>[$00:0354]</code>が<span class="formula">$23</span>」とは何の戦闘なのか。<br>
+実は、<code>[$00:0354]</code>が<span class="formula">$23</span>の戦闘は最終編ラストバトル（オディオモール/アイ/マウス～ピュアオディオ戦）である。<br>
+この戦闘では、ダメージフィールドを発生させる技を使っても、ダメージフィールドが発生しない仕様があるが、上のサブルーチンにより、ダメージフィールド発生処理をスキップするためである。</p>
+
+<p>では改めて、最終編ラストバトル以外、ダメージフィールドが発生する戦闘の処理を見ていこう。</p>
+
+<div class="code-container"><pre>
+$C1/10BB LDA $D50016,x[$D5:2D2E] ;Aに[$D5:2D2E](「忍法火炎ぼたる」の技データ22 = $60)をロード
+$C1/10BF ASL A                   ;Aを算術左シフト *2($60*2 = $C0)
+$C1/10C0 AND #$E0                ;Aと$E0で論理積
+$C1/10C2 BMI $01    [$10C5]      ;ネガティブフラグが立っているとき[$10C5]分岐
+;
+$C1/10C5 STA $1F    [$00:031F]   ;A($C0)を[$00:031F]に書き込み
+$C1/10C7 LDX #$0000              ;Xに$0000をロード
+$C1/10CA STA $1C    [$00:031C]   ;A($C0)を[$00:031C]に書き込み
+$C1/10CC LDA #$07                ;Aに$07をロード
+$C1/10CE STA $09    [$00:0309]   ;A($07)を[$00:0309]に書き込み
+$C1/10D0 LDA #$07                ;Aに$07をロード
+$C1/10D2 STA $08    [$00:0308]   ;A($07)を[$00:0308]に書き込み
+</pre></div>
+
+<p>ここで、「忍法火炎ぼたる」の技データ22をロードする。<br>
+ダメージフィールドを発生させる場合、技データ22の上2～4ビットに、以下のような値が入っている。</p>
+
+<table>
+<thead>
+	<tr><th colspan="2">上4ビット</th><th>フィールド</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$4</span></td><td><span class="formula">%0100</span></td><td>水</td></tr>
+	<tr><td><span class="formula">$5</span></td><td><span class="formula">%0101</span></td><td>毒</td></tr>
+	<tr><td><span class="formula">$6</span></td><td><span class="formula">%0110</span></td><td>火炎</td></tr>
+	<tr><td><span class="formula">$7</span></td><td><span class="formula">%0111</span></td><td>電撃</td></tr>
+</tbody>
+</table>
+
+<p>「忍法火炎ぼたる」の技データ22は<span class="formula">$60</span>であり、火炎フィールドを発生させる。<br>
+呼び出した<span class="formula">$60</span>は算術左シフトで2倍になり、<span class="formula">$C0</span>となる。</p>
+
+<p>「忍法火炎ぼたる」の技データ22の場合は、下4ビットが<span class="formula">0</span>で何の値も入っていないが、「上1ビットが1の時、下4ビットは発生させる行動異常の値」となっている。<br>
+<code><span class="r">$C1/10C0</span></code>で<span class="formula">$E0</span>と論理積を取ることで、行動異常の値が入っていたとしても、フィールドの値のみ取り出せる。<br>
+<code><span class="r">$C1/10C0</span></code>の処理の時点で、何かのフィールドを発生させる場合、<code>A</code>に入っているのは<span class="formula">$80</span>, <span class="formula">$A0</span>, <span class="formula">$C0</span>, <span class="formula">$E0</span>のいずれかになったはずである。<br>
+そして、必ずネガティブフラグが立つ（2進数で一番上の桁に1が立つ）ため、<code><span class="r">$C1/10C2</span></code>のネガティブフラグ判定で<code>[$10C5]</code>にジャンプする。<br>
+<code><span class="r">$C1/10C5</span></code>～の処理は、技により何かしらのフィールドが発生する場合ということになる。</p>
+
+<p><code><span class="r">$C1/10C5</span></code>～<code><span class="r">$C1/10D2</span></code>は、この後のループ処理用の値のセットになる。</p>
+
+<div class="code-container"><pre>
+;ループここから
+;1マス毎に、技範囲かどうか判定
+$C1/10D4 LDA $0488,x             ;Aに[$00:0488～$00:04BE]をロード
+$C1/10D7 AND #$0F                ;Aと$0Fで論理積
+$C1/10D9 BEQ $0A    [$10E5]      ;ゼロフラグが立っているとき[$10E5]分岐
+;$0Fが入っている時（5×5範囲内のマス
+$C1/10DB LDA $04C8,x             ;Aに[$00:04C8～$00:04FE]をロード
+$C1/10DE AND #$1F                ;Aと$1Fで論理積
+$C1/10E0 ORA $1F    [$00:031F]   ;Aと[$00:031F]($C0)で論理和
+$C1/10E2 STA $04C8,x             ;Aを[$00:04C8～$00:04FE]に書き込み
+;分岐合流
+$C1/10E5 INX                     ;Xをインクリメント +1
+$C1/10E6 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/10E8 BNE $EA    [$10D4]      ;ゼロフラグが立っていないとき[$10D4]分岐
+;ループここまで
+</pre></div>
+
+<p><code>$00:0488</code>～<code>$00:04BE</code>の5×5範囲内なら<span class="formula">$0F</span>が入っているので、1マス毎のループ処理ではまず、<code><span class="r">$C1/10D4</span></code>～<code><span class="r">$C1/10D9</span></code>で<span class="formula">$0F</span>が入っているかどうかを論理積で判定する。<br>
+入っている場合は<code><span class="r">$C1/10DB</span></code>に進み、該当の<code>$00:04C8</code>～<code>$00:04FE</code>をロードする。<br>
+敵や味方キャラがいるマスだったり、既にダメージフィールドが存在している場合もあるが、既にダメージフィールドがあるマスだった場合、そのマスからダメージフィールドを消して、新たなダメージフィールド（今回は火炎フィールド）で上書きする、という処理をする。<br>
+よって一度、<code>$00:04C8</code>～<code>$00:04FE</code>から既に入っているダメージフィールドの値を消してから、新たなダメージフィールドの値を加算、というのが<code><span class="r">$C1/10DE</span></code>～<code><span class="r">$C1/10E2</span></code>の処理である。<br>
+ダメージフィールドの値は以下のようになっている。<br>
+先の処理で、<code>[$00:031F]</code>と<code>[$00:031C]</code>に入った値に対応していることにも注目。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula"><span class="formula">$80</span></span></td><td>水フィールド</td></tr>
+	<tr><td><span class="formula"><span class="formula">$A0</span></span></td><td>毒フィールド</td></tr>
+	<tr><td><span class="formula"><span class="formula">$C0</span></span></td><td>火炎フィールド</td></tr>
+	<tr><td><span class="formula"><span class="formula">$E0</span></span></td><td>電撃フィールド</td></tr>
+</tbody>
+</table>
+
+<p>2進数で見ると上3ビットがフィールドの値に対応しているので、上3ビット分の値を<span class="formula">%000</span>に変えるため、<code><span class="r">$C1/10DE</span></code>で<span class="formula">$1F</span>と論理積を取っているのである。<br>
+たとえば、もし該当のマスに味方キャラ1がいて（<span class="formula">$01</span>）、かつ毒フィールド（<span class="formula">$A0</span>）だと、合計した<span class="formula">$A1</span>という値が該当アドレスに入っているのだが、<span class="formula">$A1</span>と<span class="formula">$1F</span>で論理積を取ると<span class="formula">$01</span>になる。つまり味方キャラ1の値だけ残る、という仕組みである。<br>
+その上で、<code><span class="r">$C1/10E0</span></code>では、<code>[$00:031F]</code>に入った、各フィールドの対応値との論理和を取る、つまり加算するので、「マスに乗っているキャラの状況はそのままで、フィールドのみ火炎フィールドに書き換え」という処理を行ったことになる。</p>
+
+<p>これで、ダメージフィールドの発生の処理終了である。</p>
+
+<h3 id="03">フィールドダメージの発動</h3>
+
+<p>フィールドダメージの発動タイミングだが、敵か味方が技を出した直後、ダメージ量計算など諸々の処理が行われた後に、フィールドダメージの判定・発動処理が入る（味方の場合アイテム使用時も技として扱われる）。<br>
+まずは<code>$7E:FEFD</code>に記録されていく、戦闘のターン数増加時、4種類のフィールドの中でどのフィールドダメージを発生させるかを決定する。</p>
+
+<p><code>$7E:FEFD</code>は初期値が<span class="formula">$00</span>で、戦闘をまたいでも値は保持される。<br>
+敵または味方キャラが何かの技を出す、アイテムを使うなどした直後に、値が<span class="formula">1</span>ずつ加算されていく。<br>
+つまり1ターン終了時に値が加算される。<br>
+移動やパスのみでは増えないので、例えば幕末編のひとだまのように、使用技がなく戦闘中は移動しかしないような敵だと、ダメージフィールドを作って味方がパスや移動で時間経過させたとしても、ダメージフィールドはいつまでたっても発動しない。<br>
+（行動ポイントの増加などとは関係なく、単純に誰かが技を出した後に<code>$7E:FEFD</code>を増加する処理が入る、という仕組みのようだ）</p>
+
+<p>ゲームがリセットされるか、メニュー画面を開くと<code>$7E:FEFD</code>の値は<span class="formula">$00</span>に上書きされる。<br>
+つまりセーブデータに保存される値ではない。<br>
+下のサブルーチンを見るとわかるが、オーバーフローは考慮されておらず、<span class="formula">$FF</span>まで増えた状態で更に<span class="formula">+1</span>されると<span class="formula">$00</span>が入る（+キャリーフラグが立つ）。<br>
+だが、仕様上、オーバーフローしても問題は生じない。</p>
+
+<p>以下では引き続き、おぼろ丸が「忍法火炎ぼたる」で発生させた、火炎フィールドの発動時についての処理で説明を進める。</p>
+
+<div class="code-container"><pre>
+$C1/1F06 LDA $7EFEFD[$7E:FEFD]   ;Aに[$7E:FEFD]をロード
+$C1/1F0A INC A                   ;Aをインクリメント +1
+$C1/1F0B STA $7EFEFD[$7E:FEFD]   ;Aを[$7E:FEFD]に書き込み
+$C1/1F0F AND #$03                ;Aと$03で論理積
+$C1/1F11 BEQ $12    [$1F25]      ;ゼロフラグが立っているとき[$1F25]分岐→水フィールド
+$C1/1F13 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/1F15 BEQ $18    [$1F2F]      ;ゼロフラグが立っているとき[$1F2F]分岐→毒フィールド
+$C1/1F17 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C1/1F19 BEQ $1E    [$1F39]      ;ゼロフラグが立っているとき[$1F39]分岐→火炎フィールド
+;ゼロフラグOFFで電撃フィールド
+</pre></div>
+
+<p>ここが、<code>$7E:FEFD</code>に値が加算される処理と、その値によりどのダメージフィールドを発動させるかを判断するサブルーチンである。<br>
+<code><span class="r">$C1/1F06</span></code>～<code><span class="r">$C1/1F0B</span></code>で、<code>$7E:FEFD</code>の値を<span class="formula">+1</span>している。<br>
+オーバーフロー時の分岐はない。</p>
+
+<p>その後、<code><span class="r">$C1/1F0F</span></code>で、<code>A</code>に入ったままの<code>$7E:FEFD</code>の値と<span class="formula">$03</span>で論理積を取り、論理積の値により分岐している。<br>
+何かの値と<span class="formula">$03</span>で論理積を取る場合、値は<span class="formula">$00</span>～<span class="formula">$03</span>のいずれかであり、実質、「<span class="formula">4</span>で割った余り」と同値である。<br>
+後の処理を追いかけてみるとわかるが、論理積の値こと、「<span class="formula">4</span>で割った余り」によって発動するフィールドダメージは以下の通り。</p>
+
+<table>
+<thead>
+	<tr><th>論理積</th><th>フィールドダメージ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>水フィールド</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>毒フィールド</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>火炎フィールド</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>電撃フィールド</td></tr>
+</tbody>
+</table>
+
+<p>ゲーム開始時の<code>$7E:FEFD</code>の初期値は<span class="formula">$00</span>であり、戦闘に入って、誰かが技を出すなどして1ターン経過すると、<code>[$7E:FEFD]</code>には<span class="formula">$01</span>が入る。<br>
+<span class="formula">$01</span>に対応しているのは、上表より毒フィールドである。<br>
+つまり、1ターン目に毒フィールドを出せる技を使っておくと、技を出した直後、毒フィールドが発動することになる。<br>
+その後は1ターン経過毎に火炎→電撃→水→と続いて、毒に戻る。<br>
+これが、4ターン毎に各フィールドダメージが発動する仕組みである。<br>
+この仕組みのため、異なる種類のダメージフィールドが場にあったとしても、4種類の中のどれかしか一度に発動しないことになる。</p>
+
+<p>また、フィールドでメニュー画面を開かない限り、<code>$7E:FEFD</code>の値は蓄積され続けるため、ターン数をカウントし調整すれば、任意の戦闘で初めて発動するダメージフィールドをプレイヤー側でコントロール可能であることもわかる。タイムアタックなど制限プレイでフィールドダメージを活用する場合、時短に繋がるかもしれない。</p>
+
+<p>なお、<code>$7E:FEFD</code>が<span class="formula">$FF</span>の時は、<span class="formula">$FF</span>と<span class="formula">$03</span>の論理積が<span class="formula">$03</span>だから、電撃フィールドの発動ターンにあたる。<br>
+次のターンでは<code>$7E:FEFD</code>がオーバーフローして<span class="formula">$00</span>が入るが、<span class="formula">$00</span>と<span class="formula">$03</span>の論理積が<span class="formula">$00</span>なので水フィールドが発動する。<br>
+このように、オーバーフローしたとしても、4ターン毎に各フィールドが発動する法則は崩れないので、オーバーフローに関する処理を入れていないのだろう、と推測される。</p>
+
+<p>分岐先のフィールド毎の処理は以下のようになる。</p>
+
+<div class="code-container"><pre>
+;電撃フィールド
+$C1/1F1B LDY #$2001              ;Yに$2001をロード
+$C1/1F1E LDX #$3FFF              ;Xに$3FFFをロード
+$C1/1F21 LDA #$E0                ;Aに$E0をロード
+$C1/1F23 BRA $1C    [$1F41]      ;フラグにかかわりなく常に分岐[$1F41]
+;
+;水フィールド
+$C1/1F25 LDY #$0808              ;Yに$0808をロード
+$C1/1F28 LDX #$7FE0              ;Xに$7FE0をロード
+$C1/1F2B LDA #$80                ;Aに$80をロード
+$C1/1F2D BRA $12    [$1F41]      ;フラグにかかわりなく常に分岐[$1F41]
+;
+;毒フィールド
+$C1/1F2F LDY #$1004              ;Yに$1004をロード
+$C1/1F32 LDX #$7C1F              ;Xに$7C1Fをロード
+$C1/1F35 LDA #$A0                ;Aに$A0をロード
+$C1/1F37 BRA $08    [$1F41]      ;フラグにかかわりなく常に分岐[$1F41]
+;
+;火炎フィールド
+$C1/1F39 LDY #$1802              ;Yに$1802をロード
+$C1/1F3C LDX #$001F              ;Xに$001Fをロード
+$C1/1F3F LDA #$C0                ;Aに$C0をロード
+;
+;処理合流
+$C1/1F41 STY $06    [$00:0306]   ;Yを[$00:0307][$00:0306]に書き込み※[$00:0307]にダメージ量
+$C1/1F43 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み
+$C1/1F45 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/1F47 JSR $3D2B  [$C1:3D2B]   ;[$C1:3D2B]へジャンプ
+</pre></div>
+
+<p>分岐先では4種類のフィールド毎にレジスタに読み込む数値が異なるが、実質、<code>Y</code>レジスタに読み込む2バイトの値の上1桁が、ダメージフィールドのダメージ量になっている。<br>
+処理合流後、<code><span class="r">$C1/1F41</span></code>で、<code>Y</code>の値2バイト分が<code>[$00:0307]</code><code>[$00:0306]</code>に分かれて入るため、この時点で<code>[$00:0307]</code>にダメージフィールドのダメージ量が記録されたことになる。<br>
+<code>[$00:0306]</code>も後々で重要な値なので併記しておく。<br>
+以下、カッコ内は10進数。</p>
+
+<table>
+<thead>
+	<tr><th>フィールド</th><th><code>[$00:0307]</code></th><th><code>[$00:0306]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>電撃</td><td><span class="formula">$20(32)</span></td><td><span class="formula">$01</span></td></tr>
+	<tr><td>水</td><td><span class="formula">$08(8)</span></td><td><span class="formula">$08</span></td></tr>
+	<tr><td>毒</td><td><span class="formula">$10(16)</span></td><td><span class="formula">$04</span></td></tr>
+	<tr><td>火炎</td><td><span class="formula">$18(24)</span></td><td><span class="formula">$02</span></td></tr>
+</tbody>
+</table>
+
+<p>また、<code>A</code>は<code>[$00:0310]</code>に書き込まれるが、この値は該当マスに書き込まれるフィールドの値と同一である。</p>
+
+<p>今回は「忍法火炎ぼたる」で火炎フィールドが発生しており、かつ、火炎フィールドが発動した前提で後の処理を見ていく。<br>
+実は発動が決まった直後に、発動後該当のダメージフィールドが消去されるかどうか、1マス毎の判定が入ることになる。</p>
+
+<p><a href="program26_2.html">次ページ</a>で、ダメージフィールドの消去以降の処理について続ける。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program24_4.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program26_2.html"><span class="button">&#9654;次</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

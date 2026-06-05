@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージフィールド(2)">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージフィールド(2)">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージフィールド(2)</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ダメージフィールド(2)</h1>
+<h2>ダメージフィールド(2)</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="program26.html">前ページ</a>の続き。</p>
+
+<h3 id="04">ダメージフィールドの消去</h3>
+
+<p>ダメージフィールドは、発動後に一定確率で消去されて通常マスに戻るようになっている。<br>
+消去するかどうかは、1マス毎に判定される。<br>
+発動時に、ダメージフィールドマスにキャラがいるかどうかは関係ない。<br>
+このため、「ダメージフィールドがあるが、発動ターンに誰もダメージフィールドの上に乗っていなかったため、一瞬フィールドが光って一部のダメージフィールドが消える」という現象が起こることもある。本作をプレイしていると時々見かける現象である。</p>
+
+<p>消去判定のサブルーチンは以下の通り。<br>
+前ページでの処理の通りに、<span class="formula"><code>[$00:0310]</code> = $C0</span>（火炎フィールド）が入った状態で開始になる。</p>
+
+<div class="code-container"><pre>
+$C1/1ECE STZ $0A    [$00:030A]   ;[$00:030A]に$00を書き込み
+$C1/1ED0 LDX #$0000              ;Xに$0000をロード
+$C1/1ED3 STZ $09    [$00:0309]   ;[$00:0309]に$00を書き込み
+$C1/1ED5 STZ $08    [$00:0308]   ;[$00:0308]に$00を書き込み
+;
+;ループここから
+;1マス毎に、ダメージフィールドがあるか判定
+$C1/1ED7 LDA $04C8,x             ;Aに[$00:04C8～$00:04FE]をロード
+$C1/1EDA AND #$E0                ;Aと$E0で論理積(ダメージフィールドありだと00以外)
+$C1/1EDC CMP $10    [$00:0310]   ;Aと[$00:0310](=$C0 火炎)を減算比較（ステータスレジスタ変更のみ）
+$C1/1EDE BNE $11    [$1EF1]      ;ゼロフラグが立っていないとき[$1EF1]分岐
+;ダメージフィールドあり判定
+$C1/1ED7 LDA $04C8,x             ;Aに[$00:04C8～$00:04FE](火炎フィールド$C0)をロード
+$C1/1EDA AND #$E0                ;Aと$E0で論理積
+$C1/1EDC CMP $10    [$00:0310]   ;Aと[$00:0310]($C0)を減算比較（ステータスレジスタ変更のみ）
+$C1/1EDE BNE $11    [$1EF1]      ;ゼロフラグが立っていないとき[$1EF1]分岐
+$C1/1EE0 LDA #$0F                ;Aに$0Fをロード
+$C1/1EE2 STA $0488,x             ;A($0F)を[$00:0488～$00:04BE]に書き込み
+$C1/1EE5 INC $0A    [$00:030A]   ;[$00:030A](初期値00)をインクリメント +1
+$C1/1EE7 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/1EEA BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/1EEC BNE $03    [$1EF1]      ;ゼロフラグが立っていないとき[$1EF1]分岐
+;ゼロフラグON
+$C1/1EEE JSR $1F5C  [$C1:1F5C]   ;[$C1:1F5C]にジャンプ
+;ゼロフラグOFF
+$C1/1EF1 INX                     ;Xをインクリメント +1
+$C1/1EF2 INC $08    [$00:0308]   ;[$00:0308]をインクリメント +1
+$C1/1EF4 LDA $08    [$00:0308]   ;Aに[$00:0308]をロード
+$C1/1EF6 CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/1EF8 BNE $DD    [$1ED7]      ;ゼロフラグが立っていないとき[$1ED7]分岐
+;ループここまで
+;
+$C1/1EFA INX                     ;Xをインクリメント +1
+$C1/1EFB INC $09    [$00:0309]   ;[$00:0309]をインクリメント +1
+$C1/1EFD LDA $09    [$00:0309]   ;Aに[$00:0309]をロード
+$C1/1EFF CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/1F01 BNE $D2    [$1ED5]      ;ゼロフラグが立っていないとき[$1ED5]分岐
+$C1/1F03 LDA $0A    [$00:030A]   ;Aに[$00:030A]をロード
+$C1/1F05 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>戦闘フィールドの状態が入っている<code>$00:04C8</code>～<code>$00:04FE</code>をループ処理で1マスずつチェックしていくことになるが、もし該当のマスにダメージフィールドがない場合、<code><span class="r">$C1/1EDE</span></code>の判定でゼロフラグが立って<code><span class="r">$C1/1EF1</span></code>までジャンプする。実質、何の処理もせず次のマスの処理に進むことになる。<br>
+ダメージフィールドの有無のみの判定なので、キャラがいるかどうかは関係ない。</p>
+
+<p><code><span class="r">$C1/1EDC</span></code>～<code><span class="r">$C1/1EDE</span></code>で、該当マスにダメージフィールドがある場合（<code><span class="r">$C1/1EDE</span></code>でゼロフラグON）、<code><span class="r">$C1/1ED7</span></code>～の処理に進む。<br>
+<code><span class="r">$C1/1EDC</span></code>では、<code>[$00:0310]</code>（火炎フィールドの値<span class="formula">$C0</span>が入っている）と比較している。現在、火炎フィールド発動ターンのため、火炎フィールドがあるかどうかの判定を行うということである。他フィールドの場合は<code><span class="r">$C1/1EF1</span></code>にジャンプ、つまりループを抜ける。</p>
+
+<p><code><span class="r">$C1/1EE2</span></code>で、計算用のフィールド状態アドレス<code>$00:0488</code>～<code>$00:04BE</code>に<span class="formula">$0F</span>を書き込んでから、戦闘乱数計算用のサブルーチン<code><span class="r">$C1/6150</span></code>～<code><span class="r">$C1/61A4</span></code>で、戦闘乱数を取得する（サブルーチンの解説は省略）。<br>
+<code><span class="r">$C1/1EEA</span></code>では、計算した戦闘乱数<span class="formula">$00</span>～<span class="formula">$FF</span>と<span class="formula">$0F</span>で論理積を取り、<code><span class="r">$C1/1EEC</span></code>でゼロフラグ分岐がある。<br>
+ゼロフラグが立つ場合は<code>[$C1:1F5C]</code>にジャンプするが、このジャンプ先で該当マスからダメージフィールドを消去するため、<br>
+「乱数<span class="formula">$00</span>～<span class="formula">$FF</span>と<span class="formula">$0F</span>の論理積が<span class="formula">0</span>の時、ダメージフィールドを消去する」<br>
+ということがわかる。<br>
+ゼロフラグが立つのは乱数の下1桁が<span class="formula">0</span>の時、つまり<span class="formula">$00</span>, <span class="formula">$10</span> ,<span class="formula">$20</span>, ... <span class="formula">$F0</span>の時であり、消去される確率は<span class="formula">16/256</span>（<span class="formula">1/16</span>）であることがわかる。</p>
+
+<p>ゼロフラグが立たない場合は該当マスには何の処理もせず、<code><span class="r">$C1/1EF1</span></code>へ進んでループを抜ける。つまりダメージフィールドのマスは維持される。</p>
+
+<p>では、<code>$C1:1F5C</code>以降、ダメージフィールドを消去する処理を見てみよう。</p>
+
+<div class="code-container"><pre>
+;ダメージフィールドを消去
+$C1/1F5C LDA $04C8,x[$00:04EC]   ;Aに[$00:04C8～$00:04FE]（消去するマス）をロード
+$C1/1F5F AND #$1F                ;Aと$1Fで論理積
+$C1/1F61 STA $04C8,x[$00:04EC]   ;Aを[$00:04C8～$00:04FE]（消去するマス）に書き込み
+（中略）
+$C1/1FAB RTS                     ;サブルーチン戻り
+;
+;($C1/1EF1に戻る)
+</pre></div>
+
+<p>消去だけなら最初の3行で処理が終わる。<br>
+前にも、マス目の処理で、<span class="formula">$1F</span>との論理積を取るとフィールドの値だけ消してキャラの値だけ残すことができる、と書いたが、そのままの処理をして該当マスに値を入れ直すというだけである。<br>
+その後の処理も続いているが、とりあえず今回の話には関係がないので省略する。<br>
+最終的には<code><span class="r">$C1/1EF1</span></code>に戻って、ループ処理が終了する。</p>
+
+<p>今回はこれで問題ないのだが、フィールドの一番右下のマス、つまり最後に判定を行うマスで消去処理が入った時だけ、その後に本来発生するはずのフィールドダメージ発生処理が入らない。<br>
+（消去されない場合は通常通りにダメージ発生処理などが入る）<br>
+上のサブルーチンの処理自体は通常通りなのだが、後でフィールドダメージ発生時のサブルーチンを通らなくなるのである。</p>
+
+<p>この後なのだが、マス目の消去処理判定をした後に、フィールドダメージの計算を行う。<br>
+もちろん、消去される前についてのダメージ計算になる。</p>
+
+<h3 id="05">ダメージ計算</h3>
+
+<p>先にダメージフィールドの消去処理をしてから、フィールドダメージの計算を行うという、普通に考えると逆ではないかと思われる順で処理が入る。<br>
+現時点では、<code>$00:04C8</code>～<code>$00:04FE</code>では既に、発動後にダメージフィールドが消えたことになっている。<br>
+消える前のフィールドの状態が残っているのは、計算値が入る<code>$00:0488</code>～<code>$00:04BE</code>である。フィールドが存在していた（している）場合<span class="formula">$0F</span>が入っている。<br>
+よって、<code>$00:0488</code>～<code>$00:04BE</code>の値から、ダメージフィールド上にキャラが乗っている場合、ダメージを与えるか、無効化か、吸収かという計算を行うことになる。</p>
+
+<div class="code-container"><pre>
+$C1/D1EA CPX #$1CC0              ;Xと$1CC0を減算比較（ステータスレジスタ変更のみ）
+$C1/D1ED BNE $F5    [$D1E4]      ;ゼロフラグが立っていないとき[$D1E4]分岐
+$C1/D1EF RTS                     ;サブルーチン戻り
+;
+;フィールド右下マス消去時のみ、ここから先の処理に入らない
+$C1/1FB2 LDA #$07                ;Aに$07をロード
+$C1/1FB4 STA $09    [$00:0309]   ;A($07)を[$00:0309]に書き込み
+$C1/1FB6 LDY #$0000              ;Yに$0000をロード
+$C1/1FB9 LDA #$07                ;Aに$07をロード
+$C1/1FBB STA $08    [$00:0308]   ;A($07)を[$00:0308]に書き込み
+;
+;ループ処理開始
+;1マス毎に判定
+$C1/1FBD STY $1A    [$00:031A]   ;Y(初期値$0000)を[$00:031A]に書き込み
+$C1/1FBF LDA $0488,y             ;Aに[$00:0488～$00:04BE]をロード
+$C1/1FC2 BEQ $15    [$1FD9]      ;ゼロフラグが立っているとき[$1FD9]分岐
+;ゼロフラグOFF
+$C1/1FC4 LDA $04C8,y             ;Aに[$00:04C8～$00:04FE]をロード
+$C1/1FC7 STY $1A    [$00:031A]   ;Yを[$00:031A]に書き込み
+$C1/1FC9 BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/1FCB BEQ $0C    [$1FD9]      ;ゼロフラグが立っているとき[$1FD9]分岐
+;ゼロフラグOFF
+$C1/1FCD BIT #$10                ;Aと$10で論理積（ステータスフラグ変更のみ）
+$C1/1FCF BNE $05    [$1FD6]      ;ゼロフラグが立っていないとき[$1FD6]分岐
+$C1/1FD1 JSR $1FEA  [$C1:1FEA]   ;[$C1:1FEA]へジャンプ→味方キャラのフィールド処理へ
+$C1/1FD6 JSR $2029  [$C1:2029]   ;[$C1:2029]へジャンプ→敵キャラのフィールド処理へ
+;ゼロフラグON
+$C1/1FD9 LDY $1A    [$00:031A]   ;Yに[$00:031A]をロード
+$C1/1FDB INY                     ;Yをインクリメント +1
+$C1/1FDC DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/1FDE BNE $DD    [$1FBD]      ;ゼロフラグが立っていないとき[$1FBD]分岐
+;ループここまで
+;
+$C1/1FE0 INY                     ;Yをインクリメント +1
+$C1/1FE1 DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/1FE3 BNE $D4    [$1FB9]      ;ゼロフラグが立っていないとき[$1FB9]分岐
+$C1/1FE5 LDA #$10                ;Aに$10をロード
+$C1/1FE7 STA $85    [$00:0385]   ;Aを[$00:0385]に書き込み
+$C1/1FE9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>例によって、左上のマスから右下方向へ順に1マスずつの判定をループ処理で行う。<br>
+<code><span class="r">$C1/1FB2</span></code>～<code><span class="r">$C1/1FE9</span></code>の処理が、フィールドの一番右下のマスの消去判定が入った直後だとサブルーチンに入らず、処理してくれないので、ダメージフィールド上にキャラがいてもダメージ処理が抜けてしまうようである。<br>
+単純にスキップされるだけのようであり、重大な不具合は発生しない。</p>
+
+<p>それはさておき、上のループ内処理を見てみる。<br>
+<code>$00:0488</code>～<code>$00:04BE</code>には消去処理前にダメージフィールドが入っていたマスに<span class="formula">$0F</span>が入っており、その場合は<code><span class="r">$C1/1FC4</span></code>に進む。<br>
+<code><span class="r">$C1/1FC4</span></code>では、<code>$00:0488</code>～<code>$00:04BE</code>に対応した<code>$00:04C8</code>～<code>$00:04FE</code>を呼び出す。<br>
+<span class="formula">$0F</span>と論理積を取った時、味方または敵キャラがいるマスなら、ゼロフラグが立たず<code><span class="r">$C1/1FCD</span></code>に進む。<br>
+<code><span class="r">$C1/1FCD</span></code>では、<span class="formula">$10</span>と論理積を取っているが、ここでゼロフラグが立つ場合、該当マスには味方キャラが居ることになる（<span class="formula">$01</span>～<span class="formula">$04</span>）。<br>
+ゼロフラグが立たない場合は、敵キャラが居ることになる（<span class="formula">$11</span>～<span class="formula">$1E</span>）。<br>
+よって、それぞれの飛び先が、味方キャラまたは敵キャラがダメージフィールドに乗っている場合のダメージ処理ということになる。<br>
+ここまでで該当しない場合は、ループ処理の最後<code><span class="r">$C1/1FDE</span></code>までたどりつく仕組みである。<br>
+最終的に全てのマスのチェックと計算が終わると、<code><span class="r">$C1/1FE9</span></code>に到達して処理終了となる。</p>
+
+<h4 id="05_1">味方キャラのフィールドダメージ計算</h4>
+
+<p>では、ダメージフィールドに乗っている場合のダメージ処理を見てみる。<br>
+味方キャラと敵キャラで処理が分岐しているので、まずは味方キャラの場合、<code>$C1:1FEA</code>～の処理を見てみる。</p>
+
+<div class="code-container"><pre>
+;味方キャラのフィールドダメージ処理
+$C1/1FEA AND #$0F                ;Aと$0Fで論理積
+$C1/1FEC DEC A                   ;Aをデクリメント -1
+$C1/1FED CLC                     ;キャリーフラグクリア
+$C1/1FEE ROR A                   ;Aをキャリーフラグを含めた9bitで右ローテート
+$C1/1FEF ROR A                   ;Aをキャリーフラグを含めた9bitで右ローテート
+$C1/1FF0 ROR A                   ;Aをキャリーフラグを含めた9bitで右ローテート
+$C1/1FF1 STA $1C    [$00:031C]   ;Aを[$00:031C]に書き込み
+$C1/1FF3 LDA #$1C                ;Aに$1Cをロード
+$C1/1FF5 STA $1D    [$00:031D]   ;A($1C)を[$00:031D]に書き込み
+$C1/1FF7 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/1FF9 LDA $07    [$00:0307]   ;Aに[$00:0307]($18)をロード
+$C1/1FFB STA $10    [$00:0310]   ;A($18)を[$00:0310]に書き込み
+$C1/1FFD STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/1FFF LDY $0002,x[$00:1C02]   ;Yに[$00:1C02]をロード
+$C1/2002 LDA $0031,y[$00:0EF1]   ;Aに[$00:0EF1](フィールド吸収 下4ビット)をロード
+$C1/2005 AND $06    [$00:0306]   ;Aと[$00:0306]($02)で論理積
+$C1/2007 BNE $10    [$2019]      ;ゼロフラグが立っていないとき[$2019]分岐
+;ゼロフラグON（フィールド吸収不可）
+$C1/2009 LDY $08    [$00:0308]   ;Yに[$00:0308]をロード
+$C1/200B PHY                     ;Yをスタックへプッシュ
+$C1/200C LDY $1A    [$00:031A]   ;Yに[$00:031A]をロード
+$C1/200E PHY                     ;Yをスタックへプッシュ
+$C1/200F JSR $1DF8  [$C1:1DF8]   ;[$C1:1DF8]へジャンプ
+;ゼロフラグOFF（フィールド吸収可能）
+$C1/2019 LDY $08    [$00:0308]   ;Yに[$00:0308]をロード
+$C1/201B PHY                     ;Yをスタックへプッシュ
+$C1/201C LDY $1A    [$00:031A]   ;Yに[$00:031A]をロード
+$C1/201E PHY                     ;Yをスタックへプッシュ
+$C1/201F JSR $1E26  [$C1:1E26]   ;[$C1:1E26]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/1FF9</span></code>～で、<code>[$00:0307]</code>を<code>[$00:0310]</code>に書き込んでいるが、<code>[$00:0307]</code>はフィールドダメージ量が入った状態である。<br>
+火炎フィールドなら<span class="formula">$18</span>で、<code>[$00:0310]</code>に書き込まれたことになる。</p>
+
+<table>
+<thead>
+	<tr><th>フィールド</th><th><code>[$00:0307]</code></th><th><code>[$00:0306]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>電撃</td><td><span class="formula">$20(32)</span></td><td><span class="formula">$01</span></td></tr>
+	<tr><td>水</td><td><span class="formula">$08(8)</span></td><td><span class="formula">$08</span></td></tr>
+	<tr><td>毒</td><td><span class="formula">$10(16)</span></td><td><span class="formula">$04</span></td></tr>
+	<tr><td>火炎</td><td><span class="formula">$18(24)</span></td><td><span class="formula">$02</span></td></tr>
+</tbody>
+</table>
+
+<p><code><span class="r">$C1/2002</span></code>では、該当マスに居る味方キャラのシナリオ別キャラデータ<span class="formula">$31</span>、フィールド吸収の値をロードしている。<br>
+今回は「おぼろ丸が水神のたび装備で水フィールドのみ吸収」という前提で上の処理を記しているが、おぼろ丸ならシナリオ別キャラデータ<span class="formula">$31</span><code>[$00:0EF1]</code>に、水フィールドのみ吸収の「<span class="formula">$08</span>」が入っている。<br>
+この値と、<code>[$00:0306]</code>とで論理積を取るのだが、現在<code>[$00:0306]</code>には上のように値が入っている。<br>
+つまり、<code>[$00:0306]</code>に入っていた値は、フィールド吸収の値に対応していたことになる。<br>
+論理積を取ってゼロフラグが立つ時は、マス目のフィールドと、フィールド吸収の値が一致していない。今回で言えば火炎フィールドの上に水フィールドのみ吸収でいるから一致せず、ダメージを受けることになる。<br>
+一方、ゼロフラグが立たない時は、マス目のフィールドと、フィールド吸収の値が一致だから、ダメージ量を吸収する。</p>
+
+<p><code><span class="r">$C1/2007</span></code>～の分岐後の処理を見ると、フィールド吸収ができない（ダメージをくらう）場合は、<code>[$C1:1DF8]</code>へ、フィールド吸収ができる場合は<code>[$C1:1E26]</code>へジャンプしている。<br>
+つまりここで処理が分岐になる。</p>
+
+<p>まずはフィールド吸収ができない、ダメージをくらう場合のサブルーチン<code>$C1:1DF8</code>～を見てみる。</p>
+
+<div class="code-container"><pre>
+;フィールド吸収ができない場合の処理（おぼろ丸）
+$C1/1DF8 LDA #$01                ;Aに$01をロード
+$C1/1DFA STA $003A,x[$00:1C3A]   ;A($01)を[$00:1C3A]に書き込み
+$C1/1DFD STA $003B,x[$00:1C3B]   ;A($01)を[$00:1C3B]に書き込み
+$C1/1E00 LDA #$00                ;Aに$00をロード
+$C1/1E02 STA $7ECE33,x[$7E:EA33] ;A($00)を[$7E:EA33]に書き込み
+$C1/1E06 STA $7ECE35,x[$7E:EA35] ;A($00)を[$7E:EA35]に書き込み
+$C1/1E0A REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/1E0C LDA $10    [$00:0310]   ;Aに[$00:0311][$00:0310](火炎ダメージ $0018)をロード
+$C1/1E0E STA $003C,x[$00:1C3C]   ;A($0018)を[$00:1C3D][$00:1C3C]に書き込み
+$C1/1E11 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1E13 LDA #$01                ;Aに$01をロード
+$C1/1E15 STA $10    [$00:0310]   ;A($01)を[$00:0310]に書き込み
+$C1/1E17 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み
+$C1/1E19 JSR $CBA6  [$C1:CBA6]   ;[$C1:CBA6]へジャンプ
+;
+$C1/CBA6 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/CBA8 LDA $003C,x[$00:1C3C]   ;Aに[$00:1C3D][$00:1C3C]($0018)をロード
+$C1/CBAB AND #$7FFF              ;Aと$7FFFで論理積
+;符号付16bit x 8bit $0018*$01
+$C1/CBAE SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CBB0 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト
+$C1/CBB3 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C1/CBB4 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト
+$C1/CBB7 LDA $10    [$00:0310]   ;Aに[$00:0310]($01)をロード
+$C1/CBB9 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CBBC STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CBBF JSR $CD72  [$C1:CD72]   ;[$C1:CD72]へジャンプ
+;
+$C1/CD72 LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
+$C1/CD74 AND #$0F                ;Aと$0Fで論理積
+$C1/CD76 BEQ $20    [$CD98]      ;ゼロフラグが立っているとき[$CD98]分岐
+$C1/CD98 STZ $20    [$00:0320]   ;[$00:0320]に$00を書き込み
+$C1/CD9A STZ $21    [$00:0321]   ;[$00:0321]に$00を書き込み
+$C1/CD9C JSR $CDE7  [$C1:CDE7]   ;[$C1:CDE7]へジャンプ
+;ここで合流
+</pre></div>
+
+<p>分岐部分は上で、<code><span class="r">$C1/1DF8</span></code>～<code><span class="r">$C1/1E19</span></code>、<code><span class="r">$C1/CBA6</span></code>～<code><span class="r">$C1/CBBF</span></code>、<code><span class="r">$C1/CD72</span></code>～<code><span class="r">$C1/CD9C</span></code>と処理してから<code>[$C1:CDE7]</code>へジャンプするが、<code>$C1:CDE7</code>からはフィールド吸収可能処理と合流する。<br>
+また、合流してからしばらく処理が続き、<code><span class="r">$C1/CDE6</span></code>まで処理が終わった直後に、ゲーム画面ではフィールドダメージが発動して、フィールドが光り、キャラが乗っていればダメージ処理が行われる。<br>
+<code><span class="r">$C1/CDE6</span></code>の処理は<code>RTS</code>、つまりサブルーチンの戻りなので、ひとつ前のサブルーチンの続きに飛ぶのだが、その飛び先は、上の<code><span class="r">$C1/CBBF</span></code>の続きなのである。<br>
+フィールド吸収可能な場合は<code><span class="r">$C1/CBA6</span></code>～<code><span class="r">$C1/CBBF</span></code>ではなく、<code>$C1:CB62</code>～<code><span class="r">$C1/CB84</span></code>という処理を通る。<br>
+そして<code><span class="r">$C1/CDE6</span></code>の後は、<code><span class="r">$C1/CB84</span></code>の後に戻るため、フィールドダメージでダメージを食らう場合と吸収する場合での処理が別になる、という手順である。</p>
+
+<p>と、少し先の処理まで説明してみたが、上のサブルーチン、肝心の<code><span class="r">$C1/CBA6</span></code>～<code><span class="r">$C1/CBBF</span></code>で何を行っているのか。<br>
+少し前から追いかけてみると、火炎フィールドのダメージ量<span class="formula">$18</span>が入った<code>[$00:0310]</code>を、ひとつ前のアドレス<code>[$00:0311]</code>(=<span class="formula">$00</span>)も含めて、<code>[$00:1C3D]</code><code>[$00:1C3C]</code>にコピーした後、<code>[$00:0310]</code>に<span class="formula">$01</span>を入れてから、<code>[$00:1C3D]</code><code>[$00:1C3C]</code>×<code>[$00:0310]</code>(<span class="formula">$01</span>)という符号付16bit x 8bitの乗算を行っていることがわかる。<br>
+つまり<span class="formula">$0018 * $01</span>だから、答えは<span class="formula">$18</span>のままである。<br>
+乗算をしたので、答えは<code>[$00:2134]</code>～<code>[$00:2136]</code>に入っているが、上の処理では特に読み込みはしていない（答えは24bit、つまり3個のアドレスに1バイトずつ分かれて入るため、<code>[$00:2134]</code>に<span class="formula">$18</span>、他アドレスは<span class="formula">$00</span>となる）。</p>
+
+<p>なお、<code><span class="r">$C1/1E0E</span></code>は<code>STA $003C,x</code>というニーモニックで、味方キャラ1人目のおぼろ丸は<span class="formula"><code>X</code> = $1C00</span>であるから、<code>[$00:1C3D]</code><code>[$00:1C3C]</code>というアドレスに<span class="formula">$0018</span>が入ったという点に注意。<br>
+また、以下のように値が書き込まれてもいるが、<code>X</code>により書き込むアドレスが変わる、つまり味方キャラの何人目かでアドレスが変わる（2人目以降は<span class="formula">+$40</span>）。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス指定</th><th>おぼろ丸のアドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$003A,x</code></td><td><code>[$00:1C3A]</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$003B,x</code></td><td><code>[$00:1C3B]</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$7ECE33,x</code></td><td><code>[$7E:EA33]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7ECE35,x</code></td><td><code>[$7E:EA35]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>では、フィールド吸収が可能な場合の処理<code>$C1:1E26</code>～はどうなるか。<br>
+ここでは、とらわれの男が「げんじのタビ」を装備していて、火炎フィールドを吸収可能として処理を追いかけてみよう。</p>
+
+<div class="code-container"><pre>
+;フィールド吸収ができる場合の処理（とらわれの男）
+$C1/1E26 LDA #$FF                ;Aに$FFをロード
+$C1/1E28 STA $003A,x[$00:1C7A]   ;A($FF)を[$00:1C7A]に書き込み
+$C1/1E2B INC A                   ;Aをインクリメント +1
+$C1/1E2C STA $7ECE35,x[$7E:EA75] ;A($00)を[$7E:EA75]に書き込み
+$C1/1E30 STA $003B,x[$00:1C7B]   ;A($00)を[$00:1C7B]に書き込み
+$C1/1E33 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/1E35 LDA $10    [$00:0310]   ;Aに[$00:0311][$00:0310](火炎ダメージ $0018)をロード
+$C1/1E37 STA $003C,x[$00:1C7C]   ;A($0018)を[$00:1C7D][$00:1C7C]に書き込み
+$C1/1E3A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1E3C LDA #$01                ;Aに$01をロード
+$C1/1E3E STA $10    [$00:0310]   ;A($01)を[$00:0310]に書き込み
+$C1/1E40 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み
+$C1/1E42 JSR $CB62  [$C1:CB62]   ;[$C1:CB62]へジャンプ
+;
+$C1/CB62 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/CB64 LDA $003C,x[$00:1C7C]   ;Aに[$00:1C7D][$00:1C7C]($0018)をロード
+$C1/CB67 AND #$7FFF              ;Aと$7FFFで論理積
+$C1/CB6A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+;符号付16bit x 8bit $0018*$01
+$C1/CB6C STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト
+$C1/CB6F XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C1/CB70 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト
+$C1/CB73 LDA $10    [$00:0310]   ;Aに[$00:0310]($01)をロード
+$C1/CB75 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CB78 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CB7B LDY $2134  [$00:2134]   ;Yに[$00:2134](乗算の解・下1バイト)をロード
+$C1/CB7E LDA #$00                ;Aに$00をロード
+$C1/CB80 STA $7ECE35,x[$7E:EA75] ;A($00)を[$7E:EA75]に書き込み
+$C1/CB84 JSR $CD98  [$C1:CD98]   ;[$C1:CD98]へジャンプ
+;
+$C1/CD98 STZ $20    [$00:0320]   ;[$00:0320]に$00を書き込み
+$C1/CD9A STZ $21    [$00:0321]   ;[$00:0321]に$00を書き込み
+$C1/CD9C JSR $CDE7  [$C1:CDE7]   ;[$C1:CDE7]へジャンプ
+;ここで合流
+</pre></div>
+
+<p>実は処理自体はほとんど変わらないのである。<br>
+違いは、<span class="formula">$0018 * $01</span>の解である<code>$00:2134</code>を<code><span class="r">$C1/CB7B</span></code>で<code>Y</code>にロードしていることと、以下のように各アドレスに値が入ることである。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス指定</th><th>とらわれの男のアドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$003A,x</code></td><td><code>[$00:1C7A]</code></td><td><span class="formula">$FF</span></td></tr>
+	<tr><td><code>$003B,x</code></td><td><code>[$00:1C7B]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7ECE35,x</code></td><td><code>[$7E:EA75]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>おぼろ丸、つまりフィールド吸収不可の時と見比べると、<code>[$003A,x]</code><code>[$003B,x]</code>に入る値が異なることがわかる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス指定</th><th>おぼろ丸のアドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$003A,x</code></td><td><code>[$00:1C3A]</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$003B,x</code></td><td><code>[$00:1C3B]</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$7ECE33,x</code></td><td><code>[$7E:EA33]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7ECE35,x</code></td><td><code>[$7E:EA35]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>さて、ジャンプ先の<code>$C1:CDE7</code>なのだが、このアドレス以降のサブルーチンは既に<span class="tri"><a href="program6_2.html">「ほいこーろー」の仕様</a></span>で紹介している。</p>
+
+<div class="code-container"><pre>
+$C1/CDE7 STZ $22    [$00:0322]   ;[$00:0322]に$00を書き込み
+$C1/CDE9 STZ $23    [$00:0323]   ;[$00:0323]に$00を書き込み
+$C1/CDEB LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
+$C1/CDED AND #$0F                ;Aと$0Fで論理積
+$C1/CDEF CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/CDF1 BNE $17    [$CE0A]      ;ゼロフラグが立っていないとき[$CE0A]分岐
+$C1/CE0A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/CDF1</span></code>でゼロフラグが立つ時は「ほいこーろー」の処理に続くことになる。<br>
+今回は<code><span class="r">$C1/CE0A</span></code>にジャンプして分岐になるが、この<code><span class="r">$C1/C???</span></code>あたりの処理は、ダメージ量計算関係のサブルーチンが集中しているようである。</p>
+
+<div class="code-container"><pre>
+$C1/CD9F REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CDA1 LDA $2134  [$00:2134]   ;Aに[$00:2135][$00:2134]($0018)をロード
+$C1/CDA4 SEC                     ;キャリーフラグON
+$C1/CDA5 SBC $20    [$00:0320]   ;A($0018) - [$00:0321][$00:0320]($0000)
+$C1/CDA7 BCS $03    [$CDAC]      ;キャリーフラグが立っているとき[$CDAC]分岐
+$C1/CDAC STA $20    [$00:0320]   ;A($0018)を[$00:0321][$00:0320]に書き込み
+$C1/CDAE LDA $7ECE35,x[$7E:EA35] ;Aに[$7E:EA36][$7E:EA35]($0000)をロード
+$C1/CDB2 AND #$00FF              ;Aと$00FFで論理積
+$C1/CDB5 BEQ $04    [$CDBB]      ;ゼロフラグが立っているとき[$CDBB]分岐
+$C1/CDBB LDA $20    [$00:0320]   ;Aに[$00:0321][$00:0320]($0018)をロード
+$C1/CDBD CLC                     ;キャリーフラグクリア
+$C1/CDBE ADC $22    [$00:0322]   ;A($0018) + [$00:0323][$00:0322]($0000)
+$C1/CDC0 CMP #$03E7              ;Aと$03E7(10進数999)を減算比較（ステータスレジスタ変更のみ）
+$C1/CDC3 BCC $03    [$CDC8]      ;キャリーフラグが立っていないとき[$CDC8]分岐
+$C1/CDC8 STA $7ECE2E,x[$7E:EA2E] ;A($18)を[$7E:EA2E]に書き込み
+$C1/CDCC STA $4204  [$00:4204]   ;符号付16bit / 8bit 被除数
+$C1/CDCF SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CDD1 JSR $CE0B  [$C1:CE0B]   ;[$C1:CE0B]へジャンプ
+</pre></div>
+
+<p>上処理の最後のあたり、<code>[$7ECE2E,x]</code>（おぼろ丸なら<code>[$7E:EA2E]</code>）が、ダメージ吸収不可の場合は後で必要になる。<br>
+どういう計算をしているか追いかけてみると、</p>
+
+<ol>
+	<li><span class="formula"><code>[$00:2135]</code><code>[$00:2134]</code>($0018*$01の乗算結果2バイト) - <code>[$00:0321]</code><code>[$00:0320]</code>($0000) = $0018</span></li>
+	<li>上の結果を<code>[$00:0321]</code><code>[$00:0320]</code>に書きこみ(<span class="formula">$0018</span>)</li>
+	<li><span class="formula"><code>[$00:0321]</code><code>[$00:0320]</code> + <code>[$00:0323]</code><code>[$00:0322]</code>($0000) = $0018</span></li>
+	<li>上の結果<span class="formula">$0018</span>と<span class="formula">$03E7</span>(10進数<span class="formula">999</span>)を減算比較、負の値なら<code>[$7E:EA2E]</code>に<span class="formula">$18</span>書き込み</li>
+</ol>
+
+<p>結局のところ、火炎フィールドのダメージ量<span class="formula">$18</span>が<code>[$7E:EA2E]</code>に書き込まれたことになる。<br>
+一見してよく意味がわからない処理になっているが、ダメージ量関係の処理が兼用になっているサブルーチンになっていると思われ、本来ならダメージ量が<span class="formula">999</span>になったら値の処理を分岐させるなどが入るはずだが、フィールドダメージは1マスずつ計算しているので、1回のダメージ量は最大でも電撃フィールドの<span class="formula">32</span>であり、カンストに関する計算は必要ない。</p>
+
+<p>とにかく、<code>[$7E:EA2E]</code>にフィールドダメージの値が入った、ということが重要である。<br>
+この後の処理は実際にフィールドダメージが発動する箇所まで省略する。<br>
+先に記したが、この先、<code><span class="r">$C1/CDE6</span></code>まで、ダメージ吸収かどうか問わず、処理は共通である。<br>
+<code><span class="r">$C1/CDE6</span></code>の<code>RTS</code>の処理直後にダメージフィールドが発動するが、その先は、</p>
+
+<ul>
+	<li>ダメージフィールド吸収不可：<code><span class="r">$C1/CBC2</span></code></li>
+	<li>ダメージフィールド吸収可能：<code><span class="r">$C1/CB87</span></code></li>
+</ul>
+
+<p>と、分岐する。<br>
+まず、ダメージフィールド吸収不可（おぼろ丸の場合）を紹介する。</p>
+
+<div class="code-container"><pre>
+$C1/CDE6 RTS                     ;サブルーチン戻り
+;
+;※ここで火炎フィールド発動
+;ダメージフィールド吸収不可
+$C1/CBC2 LDY $2134  [$00:2134]   ;Yに[$00:2134]をロード
+$C1/CBC5 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/CBC7 LDY $0002,x[$00:1C02]   ;Yに[$00:1C03][$00:1C02](計算用アドレス)をロード
+$C1/CBCA LDA $0008,y[$00:0EC8]   ;Aに[$00:0EC9][$00:0EC8](おぼろ丸現在HP $0165)をロード
+$C1/CBCD SEC                     ;キャリーフラグON
+$C1/CBCE SBC $7ECE2E,x[$7E:EA2E] ;A($0165) - [$7E:EA2F][$7E:EA2E](火炎フィールド$18) = $014D
+$C1/CBD2 BCS $03    [$CBD7]      ;キャリーフラグが立っているとき[$CBD7]分岐
+$C1/CBD4 LDA #$0000              ;（キャリーフラグOFF）Aに$0000をロード
+$C1/CBD7 JSR $CE60  [$C1:CE60]   ;[$C1:CE60]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/CBCA</span></code>で呼び出しているのは、シナリオ別キャラデータの現在HP（2バイト）にあたる。<br>
+おぼろ丸であれば<code>[$00:0EC9]</code><code>[$00:0EC8]</code>が該当する。<br>
+<code><span class="r">$C1/CBCE</span></code>では、<span class="formula"><code>[$00:0EC9]</code><code>[$00:0EC8]</code> - <code>[$7E:EA2F]</code><code>[$7E:EA2E]</code></span>を計算していることになる。<br>
+<code>[$7E:EA2E]</code>は、先の計算で、火炎フィールドのダメージ量<span class="formula">$18</span>が入っている。<br>
+つまり、「<span class="formula">現在HP（2バイト） - 火炎フィールドのダメージ量$18</span>」の計算である。<br>
+火炎フィールドでダメージを受けた後のおぼろ丸のHPを計算したことになる。<br>
+現在HPの方が火炎フィールドダメージより低い場合は減算で負になるので、キャリーフラグが立たない場合、つまり減算結果が負の時は<code>A</code>に<span class="formula">$0000</span>をロードしている。<br>
+つまり負の値になったら、減算結果を<span class="formula">0</span>に修正している。HPが負の値になることはないからだろう。<br>
+要するに、<code>A</code>には、火炎フィールドダメージをくらった場合のおぼろ丸の残りHPが入った状態で<code>[$C1:CE60]</code>へジャンプする。</p>
+
+<p>一方、ダメージフィールド吸収可能（とらわれの男の場合）は以下のようになる。</p>
+
+<div class="code-container"><pre>
+;※ここで火炎フィールド発動
+;ダメージフィールド吸収可能
+$C1/CB87 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/CB89 LDY $0002,x[$00:1C42]   ;Yに[$00:1C43][$00:1C42](計算用アドレス)をロード
+$C1/CB8C LDA $0008,y[$00:0F08]   ;Aに[$00:0F09][$00:0F08](とらわれの男 現在HP 2バイト $00EF)をロード
+$C1/CB8F ADC $2134  [$00:2134]   ;A + [$00:2135][$00:2134]($0018*$01の乗算結果2バイト/$0018)
+$C1/CB92 CMP $000A,y[$00:0F0A]   ;Aと[$00:0F0B][$00:0F0A](最大HP 2バイト $00F0)を減算比較（ステータスレジスタ変更のみ）
+$C1/CB95 BCC $03    [$CB9A]      ;キャリーフラグが立っていないとき[$CB9A]分岐
+$C1/CB97 LDA $000A,y[$00:0F0A]   ;（キャリーフラグOFF）Aに[$00:0F0B][$00:0F0A](最大HP 2バイト $00F0)をロード
+$C1/CB9A JSR $CE60  [$C1:CE60]   ;[$C1:CE60]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/CB8C</span></code>で呼び出しているのは、シナリオ別キャラデータの現在HP（2バイト）で、とらわれの男なら<code>[$00:0F09]</code><code>[$00:0F08]</code>である。<br>
+ダメージフィールド吸収不可処理と異なるのは次で、前に計算した<span class="formula">$0018 * $01</span>の解が入った状態の<code>[$00:2135]</code><code>[$00:2134]</code>を、とらわれの男の現在HPと加算している。<br>
+つまり、「<span class="formula">現在HP（2バイト） + 火炎フィールドのダメージ量$18</span>」の計算である。<br>
+火炎フィールドダメージ量を吸収（加算）した後のとらわれの男のHPを計算したことになる。<br>
+<code><span class="r">$C1/CB92</span></code>では、計算値ととらわれの男の最大HP<code>[$00:0F0B]</code><code>[$00:0F0A]</code>を減算比較している。<br>
+<span class="formula">現在HP + 吸収分</span>が、最大HPを越えていたら、<code><span class="r">$C1/CB95</span></code>でキャリーフラグが立つので、<code>A</code>に最大HPの値<code>[$00:0F0B]</code><code>[$00:0F0A]</code>を書き込む。<br>
+キャリーフラグが立っていない、つまり最大HPを越えていなければそのままである。<br>
+ダメージを吸収して最大HPを越えていたら、HPを最大HPの値に戻す、という処理である。<br>
+要するに、<code>A</code>には、火炎フィールドダメージを吸収した場合のとらわれの男の残りHPが入った状態で<code>[$C1:CE60]</code>へジャンプする。<br>
+<br>
+さて、この後の処理は<code>[$C1:CE60]</code>に飛ぶから、フィールドダメージ吸収かどうか関係ない共通処理になる。<br>
+どちらも<code>A</code>に「火炎フィールド発生時のキャラのHPの計算値」が入った状態で<code>[$C1:CE60]</code>に飛ぶ。</p>
+
+<div class="code-container"><pre>
+$C1/CE60 STA $20    [$00:0320]   ;A(=$014D)を[$00:0321][$00:0320]に書き込み
+$C1/CE62 SEC                     ;キャリーフラグON
+（中略）
+$C1/CE83 STA $7E9EF0[$7E:9EF0]   ;Aを[$7E:9EF1][$7E:9EF0]に書き込み
+$C1/CE87 LDA $20    [$00:0320]   ;Aに[$00:0321][$00:0320]をロード
+$C1/CE89 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>A</code>に入っていた、「火炎フィールド発生時のキャラのHPの計算値」は、<code>[$00:0321]</code><code>[$00:0320]</code>に書き込まれる。<br>
+そして上の最後のあたりの<code><span class="r">$C1/CE87</span></code>で、<code>[$00:0321]</code><code>[$00:0320]</code>をロードしている。<br>
+実はこの後の<code><span class="r">$C1/CE89</span></code>の処理で、<code>[$00:0321]</code><code>[$00:0320]</code>を現在HPのアドレスに上書きするので、今回の解説において<code><span class="r">$C1/CE62</span></code>～<code><span class="r">$C1/CE83</span></code>の処理は特に関係ないため、説明は端折る。<br>
+<code><span class="r">$C1/CE89</span></code>でサブルーチンが戻るが、戻り先はダメージフィールド吸収不可か可能かで変わる。</p>
+
+<div class="code-container"><pre>
+;ダメージフィールド吸収不可
+$C1/CBDA STA $0008,y[$00:0EC8]   A:014D X:1C00 Y:0EC0 P:envmxdIzc;Aを[$00:0EC9][$00:0EC8](現在HP)に書き込み
+$C1/CBDD TAY                     A:014D X:1C00 Y:0EC0 P:envmxdIzc;Aレジスタの値をYレジスタに転送
+$C1/CBDE SEP #$20                A:014D X:1C00 Y:014D P:envmxdIzc;MフラグON　Aレジスタは8bit幅
+$C1/CBE0 LDA #$FF                A:014D X:1C00 Y:014D P:envMxdIzc;Aに$FFをロード
+$C1/CBE2 RTS                     A:01FF X:1C00 Y:014D P:eNvMxdIzc;サブルーチン戻り
+
+;ダメージフィールド吸収可能
+$C1/CB9D STA $0008,y[$00:0F08]   A:00F0 X:1C40 Y:0F00 P:envmxdIzc;Aを[$00:0F09][$00:0F08](現在HP)に書き込み
+$C1/CBA0 TAY                     A:00F0 X:1C40 Y:0F00 P:envmxdIzc;Aレジスタの値をYレジスタに転送
+$C1/CBA1 SEP #$20                A:00F0 X:1C40 Y:00F0 P:envmxdIzc;MフラグON　Aレジスタは8bit幅
+$C1/CBA3 LDA #$FF                A:00F0 X:1C40 Y:00F0 P:envMxdIzc;Aに$FFをロード
+$C1/CBA5 RTS                     A:00FF X:1C40 Y:00F0 P:eNvMxdIzc;サブルーチン戻り
+</pre></div>
+
+<p>戻り先が変わるといっても、上のように、アドレスが異なるだけで処理は同じである。<br>
+「火炎フィールド発生時のキャラのHPの計算値」が<code>[$00:0321]</code><code>[$00:0320]</code>を経由して、シナリオ別キャラデータの現在HP2バイト分に書き込まれており、これでダメージフィールド発生時の処理が終了になる。</p>
+
+<p>以上が味方キャラの場合の処理である。<br>
+では、敵ではどうなるか。</p>
+
+<h4 id="05_2">敵キャラのフィールドダメージ計算</h4>
+
+<p>かなり前に戻るが、マス目毎のサブルーチンのループ処理中、<code>[$C1:2029]</code>へジャンプしてからが、敵キャラのフィールドダメージ処理になる。<br>
+説明を簡略化するため、ここでは、敵種類1、敵番号0の敵に対する処理とする。</p>
+
+<div class="code-container"><pre>
+$C1/2029 AND #$0F                ;Aと$0Fで論理積
+$C1/202B DEC A                   ;Aをデクリメント -1
+$C1/202C CLC                     ;キャリーフラグクリア
+$C1/202D ASL A                   ;Aを算術左シフト *2
+$C1/202E ASL A                   ;Aを算術左シフト *2
+$C1/202F ASL A                   ;Aを算術左シフト *2
+$C1/2030 ASL A                   ;Aを算術左シフト *2
+$C1/2031 STA $1E    [$00:031E]   ;Aを[$00:031E]に書き込み
+$C1/2033 LDA #$1B                ;Aに$1Bをロード
+$C1/2035 STA $1F    [$00:031F]   ;Aを[$00:031F]に書き込み
+$C1/2037 LDX $1E    [$00:031E]   ;Xに[$00:031E]をロード
+$C1/2039 LDA $07    [$00:0307]   ;Aに[$00:0307]をロード
+$C1/203B STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/203D STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/203F LDA $7E9003,x[$7E:AB03] ;Aに[$7E:AB03](ヒット数)をロード
+$C1/2043 BNE $24    [$2069]      ;ゼロフラグが立っていないとき[$2069]分岐
+$C1/2045 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/2048 LDA $003F,y[$00:1A3F]   ;Aに[$00:1A3F](敵データ31)をロード
+;敵データ31の下1ビットはダメージフィールド無効だと%1
+$C1/204B BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C1/204D BNE $1A    [$2069]      ;ゼロフラグが立っていないとき[$2069]分岐
+;ゼロフラグOFFは、ダメージフィールド無効時
+$C1/204F LDA $0021,y[$00:1A21]   ;Aに[$00:1A21](敵データ01　上4ビット：フィールド吸収)をロード
+$C1/2052 LSR A                   ;Aを論理右シフト　(/2)
+$C1/2053 LSR A                   ;Aを論理右シフト　(/2)
+$C1/2054 LSR A                   ;Aを論理右シフト　(/2)
+$C1/2055 LSR A                   ;Aを論理右シフト　(/2)
+$C1/2056 AND $06    [$00:0306]   ;Aと[$00:0306]($02)で論理積
+$C1/2058 BNE $10    [$206A]      ;ゼロフラグが立っていないとき[$206A]分岐
+;ゼロフラグOFFはフィールド吸収
+$C1/205A LDY $08    [$00:0308]   ;Yに[$00:0308]をロード
+$C1/205C PHY                     ;Yをスタックへプッシュ
+$C1/205D LDY $1A    [$00:031A]   ;Yに[$00:031A]をロード
+$C1/205F PHY                     ;Yをスタックへプッシュ
+$C1/2060 JSR $1E71  [$C1:1E71]   ;[$C1:1E71]へジャンプ
+;
+;$C1/2043と$C1/204Dの飛び先
+$C1/2069 RTS                     ;サブルーチン戻り
+;
+;$C1/2058でゼロフラグOFF
+$C1/206A LDY $08    [$00:0308]   ;Yに[$00:0308]をロード
+$C1/206C PHY                     ;Yをスタックへプッシュ
+$C1/206D LDY $1A    [$00:031A]   ;Yに[$00:031A]をロード
+$C1/206F PHY                     ;Yをスタックへプッシュ
+$C1/2070 JSR $1EA3  [$C1:1EA3]   ;[$C1:1EA3]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/203D</span></code>まではアドレス呼び出しなどになるが、<code><span class="r">$C1/203F</span></code>の<code>[$7E9003,x]</code>のロードは、該当の敵番号の被ヒット数である。<br>
+敵番号0なら<code>[$7E:AB03]</code>になる。<br>
+フィールドダメージにヒット数の概念はないので、現状では<span class="formula">$00</span>が入っており、ゼロフラグが立つ。<br>
+実はこのヒット数こそが後々で重要になる。</p>
+
+<p>火炎フィールドのダメージ量が入っている<code>[$00:0307]</code>は、<code><span class="r">$C1/203B</span></code>で<code>[$00:0310]</code>にコピーされている。</p>
+
+<p><code><span class="r">$C1/2048</span></code>で<code>[$003F,y]</code>をロードするが、これは該当の敵種類の敵データ31である。敵種類0なら<code>[$00:1A3F]</code>である。<br>
+敵データ31は上7ビットに回避属性、下1ビットはダメージフィールド無効だと<span class="formula">%1</span>で、有効なら<span class="formula">%0</span>が入る。<br>
+<code><span class="r">$C1/204B</span></code>で<span class="formula">$01</span>と論理積を取ってゼロフラグが立つかどうか判定しているから、ここでダメージフィールドが有効な敵か無効な敵か分岐になる。<br>
+ダメージフィールドが有効であるなら、<code><span class="r">$C1/204F</span></code>に処理が続く。</p>
+
+<p><code><span class="r">$C1/204F</span></code>で<code>[$0021,y]</code>をロードするが、これは該当の敵種類の敵データ01である。敵種類0なら<code>[$00:1A21]</code>である。<br>
+上4ビットにフィールド吸収かどうか、合計値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>フィールド</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$1</span></td><td>電</td></tr>
+	<tr><td><span class="formula">$2</span></td><td>火</td></tr>
+	<tr><td><span class="formula">$4</span></td><td>毒</td></tr>
+	<tr><td><span class="formula">$8</span></td><td>水</td></tr>
+</tbody>
+</table>
+
+<p><code><span class="r">$C1/2052</span></code>～<code><span class="r">$C1/2055</span></code>で論理右シフトを4回行っているから、上4ビットを下4ビット位置まで移動させていることがわかる。<br>
+<code><span class="r">$C1/2056</span></code>で<code>[$00:0306]</code>と論理積を取るが、ダメージフィールド発生の時点で以下のように値が入ったままである。</p>
+
+<table>
+<thead>
+	<tr><th>フィールド</th><th><code>[$00:0306]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>電撃</td><td><span class="formula">$01</span></td></tr>
+	<tr><td>水</td><td><span class="formula">$08</span></td></tr>
+	<tr><td>毒</td><td><span class="formula">$04</span></td></tr>
+	<tr><td>火炎</td><td><span class="formula">$02</span></td></tr>
+</tbody>
+</table>
+
+<p>要するに、敵データ01の上4ビットのフィールド吸収の値に対応した値が入った状態である。<br>
+今回は火炎フィールド発生状態という前提なので<code>[$00:0306]</code>に<span class="formula">$02</span>が入っているが、<code><span class="r">$C1/2056</span></code>の時点で<code>A</code>に<span class="formula">$02</span>が入っていればダメージフィールド吸収、それ以外ならダメージフィールドでダメージ、ということになる。<br>
+よって、<code><span class="r">$C1/2058</span></code>のゼロフラグ分岐は、フィールド吸収なら<code><span class="r">$C1/206A</span></code>へジャンプする、という意味になる。<br>
+敵キャラの場合、ここでフィールド吸収かどうかの分岐が起きている。<br>
+以降の処理を見ると、フィールド吸収ができない（ダメージをくらう）場合は、<code>[$C1:1E71]</code>へ、フィールド吸収ができる場合は<code>[$C1:1EA3]</code>へジャンプしている。<br>
+味方キャラの時と同じく処理の分岐が起こることがわかる。</p>
+
+<div class="code-container"><pre>
+;フィールド吸収ができない場合の処理
+$C1/1E71 LDA #$01                ;Aに$01をロード
+$C1/1E73 STA $7E9002,x[$7E:AB02] ;A($01)を[$7E:AB02](被ダメージ/回復量のヒット数)に書き込み
+$C1/1E77 STA $7E9003,x[$7E:AB03] ;A($01)を[$7E:AB03](ヒット数)に書き込み
+$C1/1E7B LDA #$00                ;Aに$00をロード
+$C1/1E7D STA $7E9202,x[$7E:AD02] ;A($00)を[$7E:AD02]に書き込み
+$C1/1E81 STA $7E920A,x[$7E:AD0A] ;A($00)を[$7E:AD0A]に書き込み
+</pre></div>
+
+<p><code>$C1:1E71</code>に飛んだ直後に、重要な処理がある。<br>
+<code><span class="r">$C1/1E77</span></code>で<code>[$7E:AB03]</code>(ヒット数)に<span class="formula">$01</span>を書き込んでいる。<br>
+この少し前の処理<code><span class="r">$C1/203F</span></code>で、<code>[$7E:AB03]</code>(ヒット数)が<span class="formula">$00</span>だったから、フィールドダメージの計算をする処理に進んでいた。<br>
+だが、ここで<code>[$7E:AB03]</code>に<span class="formula">$01</span>を書き込んでいる。<br>
+もしこの敵が、2マス以上にまたがる敵で、かつ複数マスがダメージフィールドに乗っている状態であったら、他のマスの処理の時、敵がいると判定した時に、<br>
+「<code>[$7E:AB03]</code>(ヒット数)が<span class="formula">$01</span>」<br>
+という判断・分岐でフィールドダメージの計算を行わない。<br>
+この仕様により、マス目毎の判定で、大型の敵の最も左上のマスでのみフィールドダメージの計算をして、他のマスでは計算をしないということになる。<br>
+これが、「大型の敵であっても、フィールドダメージでのダメージ量は1マス分になる」という仕組みの正体なのである。<br>
+ヒット数が書き込まれるアドレスは、敵番号により、<code>$7E:AB03</code>, <code>$7E:AB13</code>, <code>$7E:AB23</code>……と+<span class="formula">$10</span>ずつされるため、個々の敵で判定がなされることになる。</p>
+
+<div class="code-container"><pre>
+$C1/1E85 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/1E87 LDA $10    [$00:0310]   ;Aに[$00:0311][$00:0310](火炎ダメージ $0018)をロード
+$C1/1E89 STA $7E9004,x[$7E:AB04] ;Aを[$7E:AB05][$7E:AB04](被ダメージ量)に書き込み
+$C1/1E8D LDA #$0000              ;Aに$0000をロード
+$C1/1E90 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1E92 LDA #$01                ;Aに$01をロード
+$C1/1E94 STA $10    [$00:0310]   ;A($01)を[$00:0310]に書き込み
+$C1/1E96 STZ $81    [$00:0381]   ;[$00:0381]に$00を書き込み
+$C1/1E98 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み
+$C1/1E9A JSR $CC72  [$C1:CC72]   ;[$C1:CC72]へジャンプ
+;
+$C1/CC72 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/CC74 LDA $7E9004,x[$7E:AB04] ;Aに[$7E:AB05][$7E:AB04](火炎ダメージ $0018)をロード
+$C1/CC78 AND #$7FFF              ;Aと$7FFFで論理積
+;符号付16bit x 8bit $0018*$01
+$C1/CC7B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CC7D STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト
+$C1/CC80 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C1/CC81 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト
+$C1/CC84 LDA $10    [$00:0310]   ;Aに[$00:0310]($01)をロード
+$C1/CC86 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CC89 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CC8C LDY $2134  [$00:2134]   ;Yに[$00:2134](乗算の解・下1バイト)をロード
+$C1/CC8F LDA $7E920A,x[$7E:AD0A] ;Aに[$7E:AD0A]($00)をロード
+$C1/CC93 AND $81    [$00:0381]   ;Aと[$00:0381]で論理積
+$C1/CC95 STA $7E920A,x[$7E:AD0A] ;Aを[$7E:AD0A]($00)に書き込み
+$C1/CC99 JSR $CD2F  [$C1:CD2F]   ;[$C1:CD2F]へジャンプ
+;
+$C1/CD2F JSR $CDE7  [$C1:CDE7]   ;[$C1:CDE7]へジャンプ
+;味方キャラとの処理と合流
+;（中略）
+$C1/CD32 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CD34 LDA $2134  [$00:2134]   ;Aに[$00:2134]($18)をロード
+$C1/CD37 STA $20    [$00:0320]   ;A($18)を[$00:0320]に書き込み
+$C1/CD39 LDA $7E920A,x[$7E:AD0A] ;Aに[$7E:AD0A]($00)をロード
+$C1/CD3D AND #$00FF              ;Aと$00FFで論理積
+$C1/CD40 BEQ $04    [$CD46]      ;ゼロフラグが立っているとき[$CD46]分岐
+$C1/CD46 LDA $20    [$00:0320]   ;Aに[$00:0320]($18)をロード
+$C1/CD48 CLC                     ;キャリーフラグクリア
+$C1/CD49 ADC $22    [$00:0322]   ;A + [$00:0322]
+$C1/CD4B CMP #$03E7              ;Aと$03E7を減算比較（ステータスレジスタ変更のみ）
+$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$CD53]分岐
+$C1/CD53 STA $7E9200,x[$7E:AD00] ;A($18)を[$7E:AD00]に書き込み
+$C1/CD57 STA $4204  [$00:4204]   ;A($18)を[$00:4204]に書き込み
+$C1/CD5A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CD5C JSR $CE0B  [$C1:CE0B]   ;[$C1:CE0B]へジャンプ
+</pre></div>
+
+<p>このあたりは、アドレスこそ異なるが、実のところは味方側の処理と大きな違いはない。<br>
+<code>[$00:0311]</code><code>[$00:0310]</code>に入っている火炎フィールドのダメージ量<span class="formula">$0018</span>を、敵番号0の被ダメージ量<code>[$7E:AB05]</code><code>[$7E:AB04]</code>に書き込み、<code><span class="r">$C1/CC72</span></code>～は<span class="formula">$0018 * $01</span>を計算している。乗算結果は<code>[$00:2134]</code>～<code>[$00:2136]</code>に入っている。<br>
+乗算結果の下1バイト、つまり<span class="formula">$18</span>は、<code>[$00:2134]</code>→<code>[$00:0320]</code>→<code>[$7E:AD00]</code>→<code>[$00:4204]</code>とコピーされ、この後の計算に使われる。</p>
+
+<p>最終的に<code>$C1:CDE7</code>にジャンプするが、これは味方キャラの処理との合流である。<br>
+途中まではだいたい同じ処理なのだが、途中で行動異常による順序ポイント関係の処理<code><span class="r">$C1/1CF7</span></code>～<code><span class="r">$C1/1D1D</span></code>が入る。<br>
+該当の処理の詳細は<span class="tri"><a href="program17.html">行動異常</a></span>にて説明しているので参照のこと。</p>
+
+<div class="code-container"><pre>
+$C1/CCA5 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CCA7 LDA $7E8F00,x[$7E:AA00] ;Aに[$7E:AA01][$7E:AA00](敵番号0現在HP)をロード
+$C1/CCAB SEC                     ;キャリーフラグON
+$C1/CCAC SBC $7E9200,x[$7E:AD00] ;A(現在HP) - [$7E:AD01][$7E:AD00]($0018)　※火炎ダメージ後の残りHP
+$C1/CCB0 BCS $03    [$CCB5]      ;キャリーフラグが立っているとき[$CCB5]分岐
+;キャリーフラグOFF
+$C1/CCB2 LDA #$0000              ;Aに$0000をロード
+;処理合流
+$C1/CCB5 JSR $CE70  [$C1:CE70]   ;[$C1:CE70]へジャンプ
+;
+$C1/CE70 STA $20    [$00:0320]   ;A(残りHP)を[$00:0320]に書き込み
+;（中略）
+$C1/CE87 LDA $20    [$00:0320]   ;Aに[$00:0320](残りHP)をロード
+$C1/CE89 RTS                     ;サブルーチン戻り
+;
+$C1/CCB8 STA $7E8F00,x[$7E:AA00] ;A(残りHP)を[$7E:AA01][$7E:AA00](現在HP)に書き込み
+$C1/CCBC TAY                     ;Aレジスタの値をYレジスタに転送
+$C1/CCBD SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CCBF JSR $0C14  [$C1:0C14]   ;[$C1:0C14]へジャンプ
+</pre></div>
+
+<p>少し処理を飛ばして、最終的にHPの計算をしている部分だけ抜粋した。<br>
+敵の現在HPが入っている、<code>[$7E:AAx1]</code><code>[$7E:AAx0]</code>（<code>x</code>は敵番号）から、<code>[$7E:AD00]</code>に入った火炎フィールドダメージ量を引いて、減算結果が負の値だったら<span class="formula">$0000</span>を残りHPとし、<code><span class="r">$C1/CCB8</span></code>で<code>[$7E:AA01]</code><code>[$7E:AA00]</code>に書き込み、という処理である。<br>
+大型の敵であっても、この処理が1回しか行われず、他のマスでは行われないため、大型の敵がどれだけダメージフィールドマスを踏んでいても、ダメージ量は1マス分、となることがわかった。</p>
+
+<h4>敵のフィールド吸収処理</h4>
+
+<p>敵についての問題はHP吸収処理である。<br>
+大型の敵だと、1マス分のダメージ量×ダメージフィールドマスを踏んでいる数だけHPが回復する仕様である。ただし画面に表示される回復量の数値は1マス分という、ミスなのか、わざとなのかわからない仕様になっている。</p>
+
+<p>以下では、キングマンモー戦で、キングマンモーが発生させた火炎フィールドでキングマンモーが回復する処理を見てみよう。<br>
+キングマンモーは3×3サイズだが、3×3すべてに火炎フィールドがある、つまりキングマンモーは9マスの火炎フィールドを踏んでいる状態とする。<br>
+敵がフィールドダメージを吸収する場合の飛び先<code>[$C1:1EA3]</code>以降を見ていく。</p>
+
+<div class="code-container"><pre>
+;フィールド吸収が可能な場合の処理
+$C1/1EA3 LDA #$FF                ;Aに$FFをロード
+$C1/1EA5 STA $7E9002,x[$7E:AB02] ;A($FF)を[$7E:AB02](被ダメージ/回復量のヒット数)に書き込み
+$C1/1EA9 LDA #$00                ;Aに$00をロード
+$C1/1EAB STA $7E9003,x[$7E:AB03] ;A($00)を[$7E:AB03](ヒット数)に書き込み
+$C1/1EAF STA $7E920A,x[$7E:AD0A] ;A($00)を[$7E:AD0A]に書き込み
+$C1/1EB3 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/1EB5 LDA $10    [$00:0310]   ;Aに[$00:0310](火炎フィールドのダメージ$18)をロード
+$C1/1EB7 STA $7E9004,x[$7E:AB04] ;A($18)を[$7E:AB04](被ダメージの単発値)に書き込み
+$C1/1EBB LDA #$0000              ;Aに$0000をロード
+$C1/1EBE SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1EC0 LDA #$80                ;Aに$80をロード
+$C1/1EC2 STA $81    [$00:0381]   ;Aを[$00:0381]に書き込み
+$C1/1EC4 LDA #$01                ;Aに$01をロード
+$C1/1EC6 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/1EC8 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み
+$C1/1ECA JSR $CC72  [$C1:CC72]   ;[$C1:CC72]へジャンプ
+</pre></div>
+
+<p>フィールド吸収ができない場合は、<code>[$7E:AB03]</code>(ヒット数)に<span class="formula">$01</span>を書き込んでいたが、フィールド吸収が可能な場合は<code>[$7E:AB03]</code>(ヒット数)に<span class="formula">$00</span>を書き込んでいる。<br>
+このため、フィールド吸収が可能な場合、敵が乗っているマス全てでフィールド吸収処理が入る。<br>
+これがフィールド吸収ができない場合との大きな相違点であり、今回であればキングマンモーは自身が乗っている3×3マス全てでダメージ吸収計算を行うことになるから、<span class="formula">$18×9</span>で10進数<span class="formula">216</span>ものHP回復を行うことになってしまう。<br>
+ただ、HP回復は1マスずつ行うので、最後のマスの回復量<span class="formula">$18</span>をゲーム画面に表示することになる。合計値の表示ではないのである。</p>
+
+<p>「ミスなのかわざとなのかわからない仕様」と上に書いたが、この処理を見る限り意図した仕様なのは間違いないようだ。<br>
+回復量の表示については、わざとなのか、うまく処理ができなかったのか、よくわからないが。</p>
+
+<div class="code-container"><pre>
+;フィールド吸収不可と共通処理
+$C1/CC72 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/CC74 LDA $7E9004,x[$7E:AB04] ;Aに[$7E:AB04](火炎フィールドのダメージ$18)をロード
+$C1/CC78 AND #$7FFF              ;Aと$7FFFで論理積
+;符号付16bit x 8bit $0018*$01
+$C1/CC7B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CC7D STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の下位バイト
+$C1/CC80 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C1/CC81 STA $211B  [$00:211B]   ;符号付16bit x 8bit 被乗数の上位バイト
+$C1/CC84 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/CC86 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CC89 STA $211C  [$00:211C]   ;符号付16bit x 8bit 乗数
+$C1/CC8C LDY $2134  [$00:2134]   ;Yに[$00:2134](乗算の解・下1バイト)をロード
+$C1/CC8F LDA $7E920A,x[$7E:AD0A] ;Aに[$7E:AD0A]($00)をロード
+$C1/CC93 AND $81    [$00:0381]   ;Aと[$00:0381]で論理積
+$C1/CC95 STA $7E920A,x[$7E:AD0A] ;Aを[$7E:AD0A]($00)に書き込み
+$C1/CC99 JSR $CD2F  [$C1:CD2F]   ;[$C1:CD2F]へジャンプ
+;
+$C1/CD2F JSR $CDE7  [$C1:CDE7]   ;[$C1:CDE7]へジャンプ
+;味方キャラとの処理と合流
+;（中略）
+$C1/CD32 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CD34 LDA $2134  [$00:2134]   ;Aに[$00:2134]をロード
+$C1/CD37 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/CD39 LDA $7E920A,x[$7E:AD0A] ;Aに[$7E:AD0A]をロード
+$C1/CD3D AND #$00FF              ;Aと$00FFで論理積
+$C1/CD40 BEQ $04    [$CD46]      ;ゼロフラグが立っているとき[$CD46]分岐
+$C1/CD46 LDA $20    [$00:0320]   ;Aに[$00:0320]をロード
+$C1/CD48 CLC                     ;キャリーフラグクリア
+$C1/CD49 ADC $22    [$00:0322]   ;A + [$00:0322]
+$C1/CD4B CMP #$03E7              ;Aと$03E7を減算比較（ステータスレジスタ変更のみ）
+$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$CD53]分岐
+$C1/CD53 STA $7E9200,x[$7E:AD00] ;Aを[$7E:AD00]に書き込み
+$C1/CD57 STA $4204  [$00:4204]   ;Aを[$00:4204]に書き込み
+$C1/CD5A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CD5C JSR $CE0B  [$C1:CE0B]   ;[$C1:CE0B]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/CC72</span></code>～からはフィールド吸収不可と共通処理である。<br>
+敵番号0の被ダメージ量<span class="formula">$0018</span>を<code>[$7E:AB05]</code><code>[$7E:AB04]</code>に書き込み、<code><span class="r">$C1/CC72</span></code>～は<span class="formula">$0018 * $01</span>を計算している。乗算結果は<code>[$00:2134]</code>～<code>[$00:2136]</code>に入る。<br>
+乗算結果の下1バイト、つまり<span class="formula">$18</span>は、<code>[$00:2134]</code>→<code>[$00:0320]</code>→<code>[$7E:AD00]</code>→<code>[$00:4204]</code>とコピーされる。<br>
+その先は再びフィールド吸収不可とは処理が分岐する。<br>
+フィールド吸収不可の時にはあった、途中の行動異常の処理は入らないようである。<br>
+以下、重要な部分だけ抜粋していく。</p>
+
+<div class="code-container"><pre>
+$C1/03F1 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/03F4 LDA $002F,y[$00:1A2F]   ;Aに[$00:1A2F](敵データ15　タイプ)をロード
+$C1/03F7 BIT #$04                ;Aと$04(OBJECT)で論理積（ステータスフラグ変更のみ）
+$C1/03F9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上は、フィールド吸収不可時には通らなかった処理である。<br>
+<code><span class="r">$C1/03F4</span></code>でロードしている<code>[$00:1A2F]</code>は、敵種類1の敵データ15にあたり、BREAKDOWNやLEADERなど敵のタイプが入っている。<br>
+次の<code><span class="r">$C1/03F7</span></code>で<span class="formula">$04</span>と論理積を取っているが、タイプの値が<span class="formula">$04</span>なのは「OBJECT」である。<br>
+「OBJECT」は西部編の岩や幕末編のしょく台のような、自発的に行動しない障害物の敵の分類になる。</p>
+
+<div class="code-container"><pre>
+$C1/CD09 BEQ $01    [$CD0C]      ;ゼロフラグが立っているとき[$CD0C]分岐
+;ゼロフラグON
+$C1/CD0B RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>続きの処理だが、タイプの値が<span class="formula">$04</span>の場合はゼロフラグ分岐で<code><span class="r">$C1/CD0B</span></code>に進み、サブルーチンを抜けていることがわかる。<br>
+この後のゼロフラグが立たない場合の処理は、HP吸収時の計算になるため、「タイプがOBJECTだと、フィールドダメージ吸収設定があっても、フィールドダメージを吸収しない」ということがわかる。<br>
+ただ、本作の敵の設定を見る限り、タイプがOBJECTの敵の中に、何らかのダメージフィールドを吸収する敵はいない。<br>
+よって実際のゲームでは、OBJECTによる分岐は起きないはずである。<br>
+開発中の何らかの名残なのかもしれない。</p>
+
+<div class="code-container"><pre>
+;ゼロフラグOFF
+$C1/CD0C REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/CD0E LDA $0010,y[$00:1A10]   ;Aに[$00:1A11][$00:1A10](敵種類1最大HP)をロード
+$C1/CD11 STA $12    [$00:0312]   ;A(最大HP)を[$00:0313][$00:0312]に書き込み
+$C1/CD13 TAY                     ;Aレジスタの値をYレジスタに転送
+$C1/CD14 LDA $7E8F00,x[$7E:AA00] ;Aに[$7E:AA01][$7E:AA00](敵番号0現在HP)をロード
+$C1/CD18 ADC $7E9200,x[$7E:AD00] ;A + [$7E:AD01][$7E:AD00](火炎フィールド$0018)
+$C1/CD1C CMP $12    [$00:0312]   ;Aと[$00:0313][$00:0312](最大HP)を減算比較（ステータスレジスタ変更のみ）
+$C1/CD1E BCC $02    [$CD22]      ;キャリーフラグが立っていないとき[$CD22]分岐
+;キャリーフラグON
+$C1/CD20 LDA $12    [$00:0312]   ;Aに[$00:0313][$00:0312](最大HP)をロード
+;キャリーフラグOFF
+$C1/CD22 JSR $CE70  [$C1:CE70]   ;[$C1:CE70]へジャンプ
+;
+$C1/CE70 STA $20    [$00:0320]   ;Aを[$00:0321][$00:0320]に書き込み
+;（中略）
+$C1/CE87 LDA $20    [$00:0320]   ;Aに[$00:0321][$00:0320]をロード
+$C1/CE89 RTS                     ;サブルーチン戻り
+
+$C1/CD25 STA $7E8F00,x[$7E:AA00] ;Aを[$7E:AA01][$7E:AA00](敵番号0現在HP)に書き込み
+$C1/CD29 TAY                     ;Aレジスタの値をYレジスタに転送
+$C1/CD2A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CD2C LDA #$FF                ;Aに$FFをロード
+$C1/CD2E RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>タイプがOBJECTではない場合、つまり実際のゲームではおそらく上の処理を必ず通ることになるはずである。<br>
+まず、敵の最大HP2バイト分<code>[$00:1A11]</code><code>[$00:1A10]</code>を<code>[$00:0313]</code><code>[$00:0312]</code>に書き込む。<br>
+<code><span class="r">$C1/CD18</span></code>で敵番号0の現在のHP<code>[$7E:AA01]</code><code>[$7E:AA00]</code>と、火炎フィールドのダメージ量<code>[$7E:AD01]</code><code>[$7E:AD00]</code>(<span class="formula">$0018</span>)を加算することでHPが回復することになるが、単純に足し算するだけでは、最大HPを越えてしまう可能性がある。<br>
+<code><span class="r">$C1/CD1C</span></code>で<code>[$00:0313]</code><code>[$00:0312]</code>(最大HP)と減算比較し、キャリーフラグが立つ、つまり最大HP以上に回復して減算が負の時は、<code><span class="r">$C1/CD20</span></code>で<code>A</code>に<code>[$00:0313]</code><code>[$00:0312]</code>(最大HP)を読み込み、「最大HPの値をHP吸収後のHPの値」としている。<br>
+こうして計算された回復後のHPは<code><span class="r">$C1/CE70</span></code>で<code>[$00:0321]</code><code>[$00:0320]</code>に書き込まれ、<code><span class="r">$C1/CD25</span></code>で更に<code>[$7E:AA01]</code><code>[$7E:AA00]</code>(敵番号0現在HP)に書き込まれて処理終了である。<br>
+サブルーチンのアドレスこそ異なるが、味方キャラのHP吸収処理と手順としては変わらない。</p>
+
+<p>以上が、火炎フィールド1マス分の処理である。<br>
+これを9マス分繰り返すので、キングマンモーのHPは<span class="formula">$18×9</span>マス、最大<span class="formula">216</span>回復ということになる。</p>
+
+<h3 id="06">例外について</h3>
+
+<p>ダメージフィールドの仕様は以上の通りなのだが、いくつか例外があるため、紹介しておく。<br>
+最終編ラストバトル（オディオ戦）ではダメージフィールドが発生しない例外については、<a href="program26.html#odio">前ページで説明した通り</a>である。<br>
+オディオ戦と判定するフラグがあって、ダメージフィールド発生処理のみスキップされるのである。</p>
+
+<h4>最終編オルステッドルート</h4>
+
+<p>最終編オルステッド主人公時は、各シナリオのラストボスを操作して各シナリオの味方キャラを倒していくが、この時は操作キャラがダメージフィールド吸収能力を持っていない場合、フィールドマスの数だけダメージをくらう。<br>
+おーでぃーおー戦において、ゴリが「ウキッ」で毒フィールドを発生させた場合、おーでぃーおーが毒フィールドに乗っていると、ダメージ量＝毒フィールドダメージ×踏んだマスの数と計算されるのが有名だろう。<br>
+上の通り、通常、敵キャラならば、踏んでいる1マスだけがダメージ計算に使われ、他のマスは計算がスキップされるはずだが、最終編オルステッドルートではどうなっているのだろうか？</p>
+
+<p>最終編オルステッド主人公時だと、おーでぃーおーは「味方キャラ」扱いである。<br>
+よって、ダメージフィールドでダメージをくらう場合、味方キャラとしてダメージ量を計算・処理する。<br>
+そして、味方キャラは1×1マスサイズなので、ダメージを食らう場合も吸収する場合も1マス分のみ計算することになる。敵のダメージ時のように「複数マスにまたがっていたら、最初の1マスだけダメージ計算をする」という処理は、あってもなくても問題はない。<br>
+なのだが、最終編オルステッド主人公時だけは、味方キャラが複数マスにまたがる上、戦闘でダメージフィールドも発生する。<br>
+（ブリキ大王操作時はダメージフィールドを発生させる戦闘がないから、考慮しなくても良かったのだが）</p>
+
+<p>ということで、味方キャラのダメージフィールド処理は、キャラが複数マスにまたがっている場合、敵キャラの吸収処理と同じく、1マス毎にすべて行う。<br>
+敵キャラがダメージを食らう場合の処理だけがむしろ例外だった、と見ることもできるのだ。<br>
+よって、おーでぃーおー戦では毒フィールドのダメージをおーでぃーおーが踏んでいるマス分くらうし、ガマヘビ変化戦の毒フィールドは、ガマヘビ変化が踏んでいるマス分吸収となる。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program26.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program27.html"><span class="button">&#9654;次 反撃</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

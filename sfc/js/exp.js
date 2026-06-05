@@ -27,6 +27,7 @@ d.getElementById("expcal").addEventListener("click", () => {
 	re = /^[1-9][0-9]?$/;
 
 	let expText = "";
+	let tempText = "";
 
 	if ( /^0$/.test(enemyLvValue) || Number(enemyLvValue) === 0 ) {
 		expText = `<p>敵パーティレベル0の時の取得経験値：0</p>`;
@@ -40,18 +41,23 @@ d.getElementById("expcal").addEventListener("click", () => {
 		aLvN = Number(allyLvValue),
 		eLvN = Number(enemyLvValue),
 		// 経験値計算式
-		calc1 = (eLvN - aLvN) * 16 + 8,
-		calc2 = Math.floor(eLvN/2) + Math.floor(16/aLvN),
+		calc1 = (eLvN - aLvN) * 16 + 8;
+		
+		let temp = Math.floor(eLvN/2) + Math.floor(16/aLvN);
+		calc2 = Math.max(temp,1);
+		if (temp === 0) {
+			tempText = `<br>※計算結果が0のため、取得経験値 = 1`;
+		}
 		// 割り切れない時のイコール切り替え
 		eSign = ((eLvN % 2) != 0)||((16 % aLvN) != 0) ? "&#x2252;" : "＝";
 		if (eLvN - aLvN > 0) {	//敵パーティレベル＞味方キャラレベル
 			const str = calc1 >= 100 ? "100<br>※取得経験値の上限は100" : calc1;
 			expText = 
-			`<p>経験値が増える行動を取った場合：<br>(${eLvN} &#x2212; ${aLvN} ) × 16 ＋ 8 ＝ ${calc1}<br>取得経験値：${str}</p><p>経験値が増えない行動を取った場合：<br>${eLvN} ÷ 2 ＋ 16 ÷ ${aLvN} ${eSign} ${calc2}　※小数点以下切り捨て<br>取得経験値：${calc2}</p>`;
+			`<p>経験値が増える行動を取った場合：<br>(${eLvN} &#x2212; ${aLvN} ) × 16 ＋ 8 ＝ ${calc1}<br>取得経験値：${str}</p><p>経験値が増えない行動を取った場合：<br>${eLvN} ÷ 2 ＋ 16 ÷ ${aLvN} ${eSign} ${temp}　※小数点以下切り捨て<br>取得経験値：${calc2}${tempText}</p>`;
 		//敵パーティレベル≦味方キャラレベル
 		} else {
 			expText = 
-			`<p>${eLvN} ÷ 2 ＋ 16 ÷ ${aLvN} ${eSign} ${calc2}　※小数点以下切り捨て<br>取得経験値：${calc2}</p>`;
+			`<p>${eLvN} ÷ 2 ＋ 16 ÷ ${aLvN} ${eSign} ${temp}　※小数点以下切り捨て<br>取得経験値：${calc2}${tempText}</p>`;
 		}
 	}
 	d.getElementById("view1").insertAdjacentHTML("afterbegin", expText);

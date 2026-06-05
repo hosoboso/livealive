@@ -82,7 +82,11 @@ d.addEventListener("DOMContentLoaded", function () {
 	const links = d.querySelectorAll('a[target="_blank"]');
 
 	//ファイル名を取得
-	const fileName = w.location.href.split('/').pop();
+	// "/"で分割し最後を取った後に、後ろに"#～"がついていた時は削除
+	let fileName = w.location.href.split('/').pop().split('#').shift();
+	if (fileName == "") {
+		fileName = "index.html";
+	}
 
 	// サイドバーの中のaタグの配列SideTagList
 	const SideTagList = d.querySelectorAll('.option > .content > ul > li > a');

@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 文字入力と判定">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 文字入力と判定">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 文字入力と判定</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 文字入力と判定</h1>
+<h2>文字入力と判定</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>本作は、各シナリオの主人公の名前（功夫編は拳法名）などを決定する際、文字一覧表から文字を入力して決定する。<br>
+ＳＦ編では文字入力を利用した仕掛けや謎解きも存在する。<br>
+この「文字一覧から文字を選択・決定」に関係する処理と、ＳＦ編で「入力した文字列が、規定の文字列と一致した時に正解とする」処理がどのように行われているのかを紹介する。</p>
+
+<p>まず、文字入力に関係するメモリアドレスを紹介する。<br>
+どのシナリオでも、文字入力に関係するメモリアドレスは共通である。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:2F3C</code></td><td>文字入力画面　ページ数（<span class="formula">$00</span>～、シナリオなどにより最大ページ数は変動）</td></tr>
+	<tr><td><code>$7E:2F40</code></td><td>文字入力画面　X軸のカーソル位置　左上座標を(0,0)とする。横方向は11文字。<span class="formula">$00</span>～<span class="formula">$0A</span></td></tr>
+	<tr><td><code>$7E:2F42</code></td><td>文字入力画面　Y軸のカーソル位置　左上座標を(0,0)とする。縦方向は9文字。<span class="formula">$00</span>～<span class="formula">$08</span</td></tr>
+	<tr><td><code>$7E:2F44</code></td><td>文字入力画面　入力した文字数（1文字で<span class="formula">+$02</span>）　<span class="formula">$00</span>～<span class="formula">$0C</span</td></tr>
+	<tr><td><code>$7E:2F46</code>～<code>$7E:2F47</code></td><td>文字入力画面　入力欄1文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F48</code>～<code>$7E:2F49</code></td><td>文字入力画面　入力欄2文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F4A</code>～<code>$7E:2F4B</code></td><td>文字入力画面　入力欄3文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F4C</code>～<code>$7E:2F4D</code></td><td>文字入力画面　入力欄4文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F4E</code>～<code>$7E:2F4F</code></td><td>文字入力画面　入力欄5文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F50</code>～<code>$7E:2F51</code></td><td>文字入力画面　入力欄6文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:8A00</code>～<code>$7E:8AC6</code></td><td>文字入力画面　文字コード（1文字2バイト、左上から右下へ、横11文字分、縦9文字分）</td></tr>
+</tbody>
+</table>
+
+<p>順に説明する。</p>
+
+<p>文字入力画面は、シナリオなどにより入力できる文字種が変わり、LRボタンで文字一覧ページを切り替えることができる。<br>
+現在表示しているページが入るメモリが<code>$7E:2F3C</code>であり、最初のページを<span class="formula"><span class="formula">$00</span></span>として、Rボタンを押すとページ数を<span class="formula">+1</span>、Lボタンを押すと<span class="formula">-1</span>する。ただしページ数が最大のページから更にRボタンを押すと0ページ目に戻るし、0ページ目でLボタンを押すと最大ページへと移動する。</p>
+
+<p>文字入力画面に表示できる文字は最大90文字。<br>
+中央に区切りとして、空白（スペース）が1文字分ある。<br>
+このスペースを含めると、縦9文字×横11文字分の領域がある。<br>
+以下に例として、カタカナのページの文字一覧を表記する。<br>
+「□」はスペース部分にあたる。中央の区切りとして表示されている「□」にカーソルを合わせてAボタンを押した時も、スペースを入力したとして扱われる。</p>
+
+<div class="mono">
+アイウエオ□ワ□ヲ□ン<br>
+カキクケコ□ガギグゲゴ<br>
+サシスセソ□ザジズゼゾ<br>
+タチツテト□ダヂヅデド<br>
+ナニヌネノ□バビブベボ<br>
+ハヒフヘホ□パピプペポ<br>
+マミムメモ□ァィゥェォ<br>
+ヤ□ユ□ヨ□ャ□ュ□ョ<br>
+ラリルレロ□ッー□□□<br>
+</div>
+
+<p>カタカナのページでいえば左上の「ア」の文字を座標の原点<span class="formula">(0, 0)</span>として、<code>$7E:2F40</code>にカーソルのX軸方向の値、<code>$7E:2F42</code>にカーソルのY軸方向の値が入る。<br>
+右上の「ン」にカーソルが合っているなら、<code>$7E:2F40</code>に<span class="formula">$0A</span>、<code>$7E:2F42</code>に<span class="formula">$00</span>が入る。<br>
+左下の「ラ」にカーソルが合っているなら、<code>$7E:2F40</code>に<span class="formula">$00</span>、<code>$7E:2F42</code>に<span class="formula">$08</span>が入る。</p>
+
+<p><code>$7E:8A00</code>～<code>$7E:8AC6</code>に表示しているページの文字の文字コードが入る。<br>
+2バイトで1文字分の文字データになるのだが、セリフなどの通常の文字列データである、<br>
+<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ76u1DG13aRJetBHMDE6Dp3AccNpdgh7a0jKPPZmiz58svvUkPGFyY2hxs-c4mnfjV-50anNFMnSdD/pubhtml" target="_blank">「ライブ・ア・ライブ」文字エンコード・デコード表</a><br>
+とは少し違う値が入る。<br>
+たとえば、カタカナの「ア」は、上表では「ア」はひらがな/カタカナ/記号一覧の「<span class="formula">$61</span>」、1バイト分で表示できているのだが、文字入力画面においては、<code>$7E:8A00</code>～<code>$7E:8A01</code>の2バイトにデータが入る。<br>
+上一覧の「アイウエオ□」の部分の値だけ抜粋すると、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>文字</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:8A00</code></td><td><span class="formula">$61</span></td><td rowspan="2">ア</td></tr>
+	<tr><td><code>$7E:8A01</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:8A02</code></td><td><span class="formula">$62</span></td><td rowspan="2">イ</td></tr>
+	<tr><td><code>$7E:8A03</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:8A04</code></td><td><span class="formula">$63</span></td><td rowspan="2">ウ</td></tr>
+	<tr><td><code>$7E:8A05</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:8A06</code></td><td><span class="formula">$34</span></td><td rowspan="2">エ</td></tr>
+	<tr><td><code>$7E:8A07</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:8A08</code></td><td><span class="formula">$35</span></td><td rowspan="2">オ</td></tr>
+	<tr><td><code>$7E:8A09</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:8A0A</code></td><td><span class="formula">$20</span></td><td rowspan="2">□</td></tr>
+	<tr><td><code>$7E:8A0B</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>となる。<br>
+ひらがな/カタカナ/記号一覧の文字の場合、最初の1バイトに該当文字1バイト、次の1バイトに<span class="formula">$00</span>となる。</p>
+
+<p>漢字の場合、通常の文字列なら、エンコード・デコード表の法則に従い、「<span class="formula">$1D</span>または<span class="formula">$1E</span>または<span class="formula">$1F</span>」の後に<span class="formula">$00</span>～<span class="formula">$FF</span>の2バイトで表記しているが、文字一覧表の場合は、まず、後ろの「<span class="formula">$00</span>～<span class="formula">$FF</span>」を最初の1バイトに入れ、後ろの1バイトに、「<span class="formula">$1D</span>列の漢字は<span class="formula">$01</span>、<span class="formula">$1E</span>列の漢字は<span class="formula">$02</span>、<span class="formula">$1F</span>列の漢字は<span class="formula">$03</span>」を入れる。<br>
+たとえば、漢字1ページ目は、下のように<span class="formula">$1D</span>列の漢字が並んでいる。</p>
+
+<div class="mono">
+愛悪安暗案□押横王黄岡<br>
+闇以伊位威□沖屋臆俺恩<br>
+意異維違医□音下化何加<br>
+育一員因引□可家科果河<br>
+院隠右宇雨□火荷貨過我<br>
+運雲影永泳□牙画介会解<br>
+英衛鋭液越□回壊怪悔械<br>
+円園宴怨炎□海界皆開外<br>
+猿遠汚奥往□格確覚角嗅<br>
+</div>
+
+<p>最初から6文字目までなら以下のように値が入っている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>文字</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:8A00</code></td><td><span class="formula">$00</span></td><td rowspan="2">愛</td></tr>
+	<tr><td><code>$7E:8A01</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$7E:8A02</code></td><td><span class="formula">$01</span></td><td rowspan="2">悪</td></tr>
+	<tr><td><code>$7E:8A03</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$7E:8A04</code></td><td><span class="formula">$02</span></td><td rowspan="2">安</td></tr>
+	<tr><td><code>$7E:8A05</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$7E:8A06</code></td><td><span class="formula">$03</span></td><td rowspan="2">暗</td></tr>
+	<tr><td><code>$7E:8A07</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$7E:8A08</code></td><td><span class="formula">$04</span></td><td rowspan="2">案</td></tr>
+	<tr><td><code>$7E:8A09</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>$7E:8A0A</code></td><td><span class="formula">$20</span></td><td rowspan="2">□</td></tr>
+	<tr><td><code>$7E:8A0B</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>漢字は<span class="formula">$1D</span>列に256文字、<span class="formula">$1E</span>列に256文字、<span class="formula">$1F</span>列に256文字の合計768文字が収録されており、1ページに表示できる文字数は90文字だから、漢字一覧は9ページ分に渡る。9ページ目は48文字のみ。</p>
+
+<p>以上が文字一覧関係で、一覧で選んでAボタンを押した文字が、画面上部ウィンドウに表示される。表示できる文字数はシナリオなどで異なるが最大で6文字。<br>
+入力した文字数は<code>$7E:2F44</code>に入るが、1文字で<span class="formula">+$02</span>されるため、入る数値は<span class="formula">$00</span>～<span class="formula">$0C</span>である。これは文字一覧表では1文字が2バイトの領域を使っている都合である。<br>
+<code>$7E:2F46</code>～<code>$7E:2F51</code>には、2バイトずつ、入力した文字のデータが入る。<br>
+初期値として、2バイトずつ、空白スペースを意味する「<span class="formula">$20</span> <span class="formula">$00</span>」が入るようになっている。<br>
+実際に文字を入力した場合、文字一覧表の2バイトのデータが入るので、たとえば1文字目に「ア」を入力すると、<code>$7E:2F46</code>に<span class="formula">$61</span>、<code>$7E:2F47</code>に<span class="formula">$00</span>が入る。</p>
+
+<p>まとめると、ページ数の<code>$7E:2F3C</code>、座標の<code>$7E:2F40</code>と<code>$7E:2F42</code>で、カーソルの位置の文字がわかり、入力文字数は<code>$7E:2F44</code>、入力文字列は<code>$7E:2F46</code>～<code>$7E:2F51</code>で判定することになる。</p>
+
+<p>このほかにも、入力中は<code>$7E:2000</code>～に途中計算の値が入ることがあるが、文字一覧切り替えで上書きされたりもする。<br>
+実際にどのような手順で値が入っていくかは、下で説明していく。</p>
+
+<p>以上が基本となる。</p>
+
+<h3>ＳＦ編における文字入力成否判定</h3>
+
+<p>ＳＦ編では、部屋に入力する時に主人公（キューブ）の名前を入力する、特定の文字列やパスワードを入力するなど、シナリオ進行に文字入力が関わる場面がある。<br>
+この時の判定方法などのサブルーチンを紹介していく。<br>
+なお、ＳＦ編での文字入力は、どの場面でも、カタカナとアルファベット・記号しか入力できない。<br>
+文字入力用ページは、1ページ目がカタカナ一覧、2ページ目がアルファベット・記号となる。</p>
+
+<p>まず、入力文字列だが、<code>$02:9380</code>～<code>$02:A695</code>に格納されているシステム関係テキスト内に、ＳＦ編関係の単語がある。<br>
+システム関係テキストのため、頻繁にアクセスする都合か、<code>$02</code>から<code>$22</code>, <code>$42</code>, <code>$62</code>にミラーリングされ、さらにそこから<code>$82</code>, <code>$A2</code>, <code>$C2</code>, <code>$E2</code>にミラーリングされている。<br>
+実際のプログラムではバンク<code>$C2</code>のデータをロードしているので、そちらのアドレスで掲載する。</p>
+
+<table>
+<thead>
+	<tr><th>開始アドレス</th><th>テキスト（デコード済）</th><th>イベント</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$C2:A076</code></td><td>ワープ</td><td>「メモリーカード」入手時</td></tr>
+	<tr><td><code>$C2:A07A</code></td><td>コロ</td><td>偽キューブイベント</td></tr>
+	<tr><td><code>$C2:A07D</code></td><td>ぎ装こう作</td><td>？</td></tr>
+	<tr><td><code>$C2:A085</code></td><td>ＪＵＤＧＥ</td><td>ラストバトル後のメインコンピュータルーム入口パスワード</td></tr>
+	<tr><td><code>$C2:A08B</code></td><td>ＯＡＫＦＤＥ</td><td>ホル船長のパスワード</td></tr>
+</tbody>
+</table>
+
+<p>実際には単語と単語の間には<span class="formula">$00</span>が入って区切られている。<br>
+例えば、「ワープ」と「コロ」だったら、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th><th>テキスト（デコード済）</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$C2:A076</code></td><td><span class="formula">$8C</span></td><td>ワ</td></tr>
+	<tr><td><code>$C2:A077</code></td><td><span class="formula">$40</span></td><td>ー</td></tr>
+	<tr><td><code>$C2:A078</code></td><td><span class="formula">$A8</span></td><td>プ</td></tr>
+	<tr><td><code>$C2:A079</code></td><td><span class="formula">$00</span></td><td>（区切り）</td></tr>
+	<tr><td><code>$C2:A07A</code></td><td><span class="formula">$6A</span></td><td>コ</td></tr>
+	<tr><td><code>$C2:A07B</code></td><td><span class="formula">$8B</span></td><td>ロ</td></tr>
+</tbody>
+</table>
+
+<p>といったようになっている。</p>
+
+<p>主人公・キューブの名前はプレイヤーが変更可能なので、上のテキスト一覧の中にはないが、本作をプレイ済みなら「ワープ」「コロ」「ＪＵＤＧＥ」「ＯＡＫＦＤＥ」がどこで入力されるかわかるだろう。<br>
+だが、3番目の「ぎ装こう作」は何なのか。<br>
+なお、SFC版では「偽」「工」の文字は収録していないため、「偽装工作」は「ぎ装こう作」と表示するしかない。</p>
+
+<p>プレイヤーがつけたＳＦ編主人公の名前が入るアドレスは、シナリオ別キャラデータのＳＦ編主人公のアドレス、<code>$00:0D80</code>～<code>$00:0DBF</code>の64バイトの容量の中で、最後の<code>$00:0DB4</code>～<code>$00:0DBF</code>、12バイト部分にあたる。<br>
+主人公の名前は最大6文字だが、漢字を使うと2バイトの容量が必要なので、12バイト分の領域が確保されている。<br>
+「キューブ」なら、4バイト分の容量なので、<code>$00:0DB4</code>～<code>$00:0DB7</code>に値が入っている。<br>
+文字が入っていない箇所は<span class="formula">$00</span>で埋まっている。空白（スペース）は<span class="formula">$20</span>なので別扱いである。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>文字</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:0DB4</code></td><td><span class="formula">$67</span></td><td>キ</td></tr>
+	<tr><td><code>$00:0DB5</code></td><td><span class="formula">$8F</span></td><td>ュ</td></tr>
+	<tr><td><code>$00:0DB6</code></td><td><span class="formula">$40</span></td><td>ー</td></tr>
+	<tr><td><code>$00:0DB7</code></td><td><span class="formula">$AD</span></td><td>ブ</td></tr>
+	<tr><td><code>$00:0DB8</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+	<tr><td><code>$00:0DB9</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+	<tr><td><code>$00:0DBA</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+	<tr><td><code>$00:0DBB</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+	<tr><td><code>$00:0DBC</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+	<tr><td><code>$00:0DBD</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+	<tr><td><code>$00:0DBE</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+	<tr><td><code>$00:0DBF</code></td><td><span class="formula">$00</span></td><td> </td></tr>
+</tbody>
+</table>
+
+<h3>「キューブ」が正解のパターン</h3>
+
+<p>まずは、ストーリー序盤、寄り道要素ではあるが初めてキューブの名前を入れて扉を開けるであろう、レイチェルの部屋への入室時のサブルーチンを紹介する。<br>
+主人公の名前は「キューブ」とする。よって「キューブ」と入力すると正解扱いで、それ以外の文字だと不正解になり入室できない。<br>
+名前入力画面で「キューブ」と入力してからの処理は以下のようになる。<br>
+<code>X</code>の値が重要なので併記した。<br>
+最初の<code><span class="r">$C2/443C</span></code>～<code><span class="r">$C2/4441</span></code>で、必ず<span class="formula"><code>X</code> = $0000</span>になる。</p>
+
+<div class="code-container"><pre>
+$C2/443A STA $27    [$00:0527]   ;X:0000 Aを[$00:0527]に書き込み 
+$C2/443C LDA #$0000              ;X:0000 Aに$0000をロード
+$C2/443F STA $29    [$00:0529]   ;X:0000 A($0000)を[$00:0529]に書き込み
+$C2/4441 TXA                     ;X:0000 Xレジスタの値をAレジスタに転送
+$C2/4442 CLC                     ;X:0000 キャリーフラグクリア
+$C2/4443 ADC #$000C              ;X:0000 A + $000C
+$C2/4446 STA $2B    [$00:052B]   ;X:0000 Aを[$00:052B]に書き込み
+$C2/4448 JSR $4388  [$C2:4388]   ;X:0000 [$C2:4388]へジャンプ
+;
+$C2/4388 PHP                     ;X:0000 ステータスレジスタをスタックへプッシュ
+$C2/4389 REP #$20                ;X:0000 Aを16bit幅に変更、Mフラグをクリア
+$C2/438B LDY $00    [$00:0500]   ;X:0000 Yに[$00:0500]をロード
+;
+;シナリオ別キャラデータの
+;ＳＦ編主人公の名前呼び出しサブルーチン　ループ1回目
+$C2/438D LDA [$27],y[$00:0DB4]   ;X:0000 Aに[$00:0DB5][$00:0DB4]（名前1文字目、「キ」=$67）をロード
+$C2/438F INY                     ;X:0000 Yをインクリメント +1
+$C2/4390 AND #$00FF              ;X:0000 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0000 ゼロフラグが立っているとき[$43B7]分岐
+$C2/4395 CMP #$0020              ;X:0000 Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;X:0000 ネガティブフラグが立っていないとき[$43A9]分岐
+$C2/43A9 STA $2000,x[$7E:2000]   ;X:0000 Aを[$7E:2001][$7E:2000]に書き込み
+$C2/43AC INX                     ;X:0000 Xをインクリメント（+1）
+$C2/43AD INX                     ;X:0001 Xをインクリメント（+1）
+$C2/43AE CPX #$01FE              ;X:0002 Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;X:0002 ネガティブフラグが立っていないとき[$43B7]分岐 
+$C2/43B3 CPX $2B    [$00:052B]   ;X:0002 Xと[$00:052B]($01FE)を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;X:0002 ネガティブフラグが立っているとき[$438D]分岐
+;ループ1回目　ここまで
+</pre></div>
+
+
+
+<p><code><span class="r">$C2/438D</span></code>～<code><span class="r">$C2/43B5</span></code>が、シナリオ別キャラデータから、ＳＦ編主人公の名前を1文字ずつロードするループ処理である。<br>
+16bitモードなので、<code>A</code>にロードする値は2バイトずつになる。<br>
+2バイト読み込むのは、先に記した通り、漢字が使用されている場合は「<span class="formula">$1D</span>または<span class="formula">$1E</span>または<span class="formula">$1F</span>」の後に<span class="formula">$00</span>～<span class="formula">$FF</span>の2バイトで表記するためである。<br>
+まずは$00FFと論理積をとって、下1バイトのみ、つまり<code><span class="r">$C2/438D</span></code>で呼び出したアドレスの値だけにする。<br>
+<code><span class="r">$C2/4393</span></code>でゼロフラグでの分岐があるが、これはロードした名前の文字が<span class="formula">$00</span>、つまり「存在していない」時である。<br>
+名前の1文字目には、必ず何かの文字が入るので、ループ1回目の時にゼロフラグが立つことはない。<br>
+だが、もし主人公の名前がひらがなやカタカナ1文字などの場合は、2文字目以降はすべて<span class="formula">$00</span>で埋まっている。<br>
+その場合は「名前の読み込みを終了」と判断してループを抜けることになる。<br>
+ここではループを抜けずに<code><span class="r">$C2/4395</span></code>に進む。</p>
+
+<code><span class="r">$C2/4395</span></code>は、呼び出した値と<span class="formula">$0020</span>を減算比較している。
+<p>たとえば「キューブ」の「キ」は文字データだと<span class="formula">$67</span>だから、<span class="formula">$0067 - $0020</span>である。<br>
+次はネガティブフラグの判定だが、ネガティブフラグが立つのは、減算で負の値になる時（2進数表記で、一番上の桁が1の時）である。<br>
+「キ」の場合はネガティブフラグは立たない。<br>
+逆にネガティブフラグが立つのは、値が<span class="formula">$01</span>～<span class="formula">$0F</span>のみである。<br>
+通常、名前入力で、<span class="formula">$01</span>～<span class="formula">$0F</span>が入るのは、漢字を入力した時の上1バイトの「<span class="formula">$1D</span>または<span class="formula">$1E</span>または<span class="formula">$1F</span>」だけである。<br>
+つまり、<code><span class="r">$C2/4398</span></code>の分岐は、「漢字かどうか」の判定である。<br>
+実際、分岐先の<code><span class="r">$C2/439A</span></code>～<code><span class="r">$C2/43A7</span></code>では、実際に何の漢字なのかの処理が入る。<br>
+だが、ＳＦ編は、主人公の名前に漢字が使えない。入力できるのはカタカナと数字・記号類だけである。<br>
+このため、ＳＦ編においては、ここで必ずネガティブフラグが立たずに<code><span class="r">$C2/43A9</span></code>に進む。</p>
+
+<p><code><span class="r">$C2/43A9</span></code>では、ＳＦ編主人公の名前1文字目が、<code>[$7E:2001]</code><code>[$7E:2000]</code>に書き込まれる。<br>
+結局、名前に入っている文字が漢字以外なら、文字データ1バイトがそのまま<code>[$7E:2000]</code>に入り、<code>[$7E:2001]</code>には<span class="formula">$00</span>が入ることになる。<br>
+続いて<code>X</code>を2回インクリメントしているから、+2される。<code>X</code>の初期値が<span class="formula">$0000</span>なので、ループ1回目で<span class="formula">$0002</span>に増えることになる。</p>
+
+<p><code><span class="r">$C2/43AE</span></code>では計算した<code>X</code>(<span class="formula">$0002</span>)から、<span class="formula">$01FE</span>を減算する。<br>
+これは負の値を考慮しなければならない、つまり符号付き16ビット整数の減算になる。<br>
+答えは<span class="formula">$FE04</span>（負の値）で、ネガティブフラグが立つことになる。<br>
+ちなみにネガティブフラグが立たないのは、<code>X</code>が<span class="formula">$01FE</span>以上の時になるから、ループ1回で<code>X</code>が<span class="formula">+2</span>されるこのループでは、おそらく<code><span class="r">$C2/43B1</span></code>で必ずネガティブフラグが立つ。<br>
+また、<code><span class="r">$C2/43B3</span></code>では<code>X</code>と<code>[$00:052B]</code>の減算比較をしているが、<code>[$00:052B]</code>にはこの処理の少し前に<span class="formula">$01FE</span>が入ったので、実質<code><span class="r">$C2/43AE</span></code>と同じ処理になる。<br>
+ただし、<code><span class="r">$C2/43B5</span></code>はネガティブフラグが立っている場合分岐（ループ頭の<code><span class="r">$C2/438D</span></code>に戻る）であるから、ここで必ず<code><span class="r">$C2/438D</span></code>にジャンプする。</p>
+
+<p>つまり、このループから抜けられるのは、<code><span class="r">$C2/4393</span></code>でゼロフラグが立った時、つまり名前をすべてロードしたタイミングでのループになる、ということがわかる。<br>
+名前が「キューブ」なら、4ループ目までですべての文字をロードし、5ループ目の途中でループを抜けることになる。<br>
+ついでなので、ループ処理をそのまま以下に掲載する。</p>
+
+<div class="code-container"><pre>
+;ループ2回目
+$C2/438D LDA [$27],y[$00:0DB5]   ;X:0002 Aに[$00:0DB5]（名前2文字目、「ュ」=$8F）をロード
+$C2/438F INY                     ;X:0002 Yをインクリメント +1
+$C2/4390 AND #$00FF              ;X:0002 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0002 ゼロフラグが立っているとき[$43B7]分岐
+$C2/4395 CMP #$0020              ;X:0002 Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;X:0002 ネガティブフラグが立っていないとき[$43A9]分岐
+$C2/43A9 STA $2000,x[$7E:2002]   ;X:0002 Aを[$7E:2003][$7E:2002]に書き込み
+$C2/43AC INX                     ;X:0002 Xをインクリメント（+1）
+$C2/43AD INX                     ;X:0003 Xをインクリメント（+1）
+$C2/43AE CPX #$01FE              ;X:0004 Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;X:0004 ネガティブフラグが立っていないとき[$43B7]分岐 
+$C2/43B3 CPX $2B    [$00:052B]   ;X:0004 Xと[$00:052B]($01FE)を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;X:0004 ネガティブフラグが立っているとき[$438D]分岐
+;ループ2回目　ここまで
+;
+;ループ3回目
+$C2/438D LDA [$27],y[$00:0DB6]   ;X:0004 Aに[$00:0DB6]（名前3文字目、「ー」=$40）をロード
+$C2/438F INY                     ;X:0004 Yをインクリメント +1
+$C2/4390 AND #$00FF              ;X:0004 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0004 ゼロフラグが立っているとき[$43B7]分岐
+$C2/4395 CMP #$0020              ;X:0004 Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;X:0004 ネガティブフラグが立っていないとき[$43A9]分岐
+$C2/43A9 STA $2000,x[$7E:2004]   ;X:0004 Aを[$7E:2005][$7E:2004]に書き込み
+$C2/43AC INX                     ;X:0004 Xをインクリメント（+1）
+$C2/43AD INX                     ;X:0005 Xをインクリメント（+1）
+$C2/43AE CPX #$01FE              ;X:0006 Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;X:0006 ネガティブフラグが立っていないとき[$43B7]分岐 
+$C2/43B3 CPX $2B    [$00:052B]   ;X:0006 Xと[$00:052B]($01FE)を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;X:0006 ネガティブフラグが立っているとき[$438D]分岐
+;ループ3回目　ここまで
+;
+;ループ4回目
+$C2/438D LDA [$27],y[$00:0DB7]   ;X:0006 Aに[$00:0DB7]（名前4文字目、「ブ」=$AD）をロード
+$C2/438F INY                     ;X:0006 Yをインクリメント +1
+$C2/4390 AND #$00FF              ;X:0006 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0006 ゼロフラグが立っているとき[$43B7]分岐
+$C2/4395 CMP #$0020              ;X:0006 Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;X:0006 ネガティブフラグが立っていないとき[$43A9]分岐
+$C2/43A9 STA $2000,x[$7E:2006]   ;X:0006 Aを[$7E:2007][$7E:2006]に書き込み
+$C2/43AC INX                     ;X:0006 Xをインクリメント（+1）
+$C2/43AD INX                     ;X:0007 Xをインクリメント（+1）
+$C2/43AE CPX #$01FE              ;X:0008 Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;X:0008 ネガティブフラグが立っていないとき[$43B7]分岐 
+$C2/43B3 CPX $2B    [$00:052B]   ;X:0008 Xと[$00:052B]($01FE)を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;X:0008 ネガティブフラグが立っているとき[$438D]分岐
+;ループ4回目　ここまで
+;
+;ループ5回目（$C2/4393で停止）
+$C2/438D LDA [$27],y[$00:0DB8]   ;X:0008 Aに[$00:0DB8]（名前5文字目、$00）をロード
+$C2/438F INY                     ;X:0008 Yをインクリメント +1
+$C2/4390 AND #$00FF              ;X:0008 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0008 ゼロフラグが立っているとき[$43B7]分岐
+$C2/43B7 STZ $2000,x[$7E:2008]   ;X:0008 [$7E:2008] = $00
+$C2/43BA PLP                     ;X:0008 Pレジスタにスタックからプル
+$C2/43BB RTS                     ;X:0008 サブルーチン戻り
+</pre></div>
+
+<p>以上のループ処理で、値が以下のように入ったことになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:2000</code></td><td><span class="formula">$67</span></td></tr>
+	<tr><td><code>$7E:2001</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:2002</code></td><td><span class="formula">$8F</span></td></tr>
+	<tr><td><code>$7E:2003</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:2004</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$7E:2005</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:2006</code></td><td><span class="formula">$AD</span></td></tr>
+	<tr><td><code>$7E:2007</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:2008</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>また、<code>X</code>は<span class="formula">$0008</span>まで増加した。<br>
+この値は<span class="formula">ループ回数×2</span>であり、同時にＳＦ編主人公の名前の<span class="formula">文字数×2</span>にあたる。</p>
+
+<p>では、続きを見てみよう。<br>
+ここからは、<code>$7E:2000</code>～に入った、シナリオ別キャラデータのＳＦ編主人公の名前と、入室時に文字入力画面で入力した文字が一致するかの判断を行う。<br>
+先に説明したが、文字入力画面関係のメモリアドレスには以下のように値が入っている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:2F44</code></td><td>文字入力画面　入力した文字数（1文字で<span class="formula">+$02</span>）　<span class="formula">$00</span>～<span class="formula">$0C</span</td></tr>
+	<tr><td><code>$7E:2F46</code>～<code>$7E:2F47</code></td><td>文字入力画面　入力欄1文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F48</code>～<code>$7E:2F49</code></td><td>文字入力画面　入力欄2文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F4A</code>～<code>$7E:2F4B</code></td><td>文字入力画面　入力欄3文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F4C</code>～<code>$7E:2F4D</code></td><td>文字入力画面　入力欄4文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F4E</code>～<code>$7E:2F4F</code></td><td>文字入力画面　入力欄5文字目（2バイト）</td></tr>
+	<tr><td><code>$7E:2F50</code>～<code>$7E:2F51</code></td><td>文字入力画面　入力欄6文字目（2バイト）</td></tr>
+</tbody>
+</table>
+
+<div class="code-container"><pre>
+$C2/53DB CPX $2F44  [$7E:2F44]   ;X:0008 Xと[$7E:2F44](入力した文字数)を減算比較（ステータスレジスタ変更のみ）
+$C2/53DE BNE $13    [$53F3]      ;X:0008 ゼロフラグが立っていないとき[$53F3]分岐
+$C2/53E0 JSR $5383  [$C2:5383]   ;X:0008 [$C2:5383]へジャンプ
+</pre></div>
+
+<p>まず、<code>X</code>と<code>[$7E:2F44]</code>の値を減算比較している。<br>
+この時点の<code>X</code>には、「ＳＦ編主人公の名前の<span class="formula">文字数×2</span>」の値が入っている。<br>
+そして、<code>[$7E:2F44]</code>には、「文字入力画面で入力した<span class="formula">文字数×2</span>」が入っている。<br>
+入力文字数が一致している場合、減算したら<span class="formula">0</span>になり、ゼロフラグが立つ。<br>
+つまり、ここでまず、「入力文字数がＳＦ編主人公の名前の文字数と一致しているか」が判定され、一致しないなら<code>[$53F3]</code>にジャンプし、文字が一致しているかどうかの判定をしない。つまり、この時点で「入力ミス」と判断されることになる。<br>
+入力文字数が一致している場合は、更に、文字が一致しているかを1文字ずつ判定するサブルーチンに進むことになる。</p>
+
+<p>文字数が合っていなければ、1文字ずつ調べるまでもなく当然不正解ということであるから、ここで分岐するのは合理的であるし、この後の文字一致判定用のループ回数の設定もできるという上で一石二鳥である。</p>
+
+<div class="code-container"><pre>
+$C2/5383 LDY #$0000              ;Yに$0000をロード
+;
+;ＳＦ編主人公の名前と
+;入力文字の一致を確認するループ処理1回目
+$C2/5386 LDA $2000,y[$7E:2000]   ;Aに[$7E:2000]をロード
+$C2/5389 CMP $2F46,y[$7E:2F46]   ;Aと[$7E:2F46]を減算比較（ステータスレジスタ変更のみ）
+$C2/538C BNE $0D    [$539B]      ;ゼロフラグが立っていないとき[$539B]分岐
+$C2/538E CPY $2F44  [$7E:2F44]   ;Yと[$7E:2F44]を減算比較（ステータスレジスタのみ変更）
+$C2/5391 BPL $04    [$5397]      ;ネガティブフラグが立っていないとき[$5397]分岐
+$C2/5393 INY                     ;Yをインクリメント +1
+$C2/5394 INY                     ;Yをインクリメント +1
+$C2/5395 BRA $EF    [$5386]      ;フラグにかかわりなく常に分岐[$5386]
+;ループ1回目　ここまで
+</pre></div>
+
+<p><code>[$7E:2000]</code>（主人公の名前1文字目）と<code>[$7E:2F46]</code>（入力した文字1文字目）を減算比較し、ゼロフラグが立つかどうか、という判定である。<br>
+文字が一致するなら、ゼロフラグが立つことになる。<br>
+一致しない場合は<code>[$539B]</code>に分岐、失敗判定という扱いになる。<br>
+一致してゼロフラグが立ったら、ループ前に<span class="formula">$0000</span>が入った<code>Y</code>と、<span class="formula">入力文字数×2</span>が入っている<code>[$7E:2F44]</code>を減算比較する。<br>
+ネガティブフラグが立つのは、減算で負の値になった時だから、<code>Y</code>と<span class="formula">入力文字数×2</span>が同値になるまでは減算で必ずネガティブフラグが立つことになり、先に進む。<br>
+<code><span class="r">$C2/5393</span></code>～<code><span class="r">$C2/5394</span></code>で<code>Y</code>をインクリメントしているから、<code>Y</code>の値が<span class="formula">+2</span>され、ループの頭<code><span class="r">$C2/5386</span></code>に戻る。<br>
+つまりループ1回で<code>Y</code>が<span class="formula">+2</span>されていくため、ループ4回、「キューブ」の文字数だけループを繰り返せば、ループ5回目の<code><span class="r">$C2/5391</span></code>でループから抜け出せる、という仕組みになる。<br>
+1文字でも一致しなければ<code><span class="r">$C2/538C</span></code>で失敗と判断されてループから抜ける。</p>
+
+<p>成功する場合の続きのループ処理は以下の通り。</p>
+
+<div class="code-container"><pre>
+;ループ2回目
+$C2/5386 LDA $2000,y[$7E:2002]   ;Aに[$7E:2002]をロード
+$C2/5389 CMP $2F46,y[$7E:2F48]   ;Aと[$7E:2F48]を減算比較（ステータスレジスタ変更のみ）
+$C2/538C BNE $0D    [$539B]      ;ゼロフラグが立っていないとき[$539B]分岐
+$C2/538E CPY $2F44  [$7E:2F44]   ;Yと[$7E:2F44]を減算比較（ステータスレジスタのみ変更）
+$C2/5391 BPL $04    [$5397]      ;ネガティブフラグが立っていないとき[$5397]分岐
+$C2/5393 INY                     ;Yをインクリメント +1
+$C2/5394 INY                     ;Yをインクリメント +1
+$C2/5395 BRA $EF    [$5386]      ;フラグにかかわりなく常に分岐[$5386]
+;ループ2回目　ここまで
+;
+;ループ3回目
+$C2/5386 LDA $2000,y[$7E:2004]   ;Aに[$7E:2004]をロード
+$C2/5389 CMP $2F46,y[$7E:2F4A]   ;Aと[$7E:2F4A]を減算比較（ステータスレジスタ変更のみ）
+$C2/538C BNE $0D    [$539B]      ;ゼロフラグが立っていないとき[$539B]分岐
+$C2/538E CPY $2F44  [$7E:2F44]   ;Yと[$7E:2F44]を減算比較（ステータスレジスタのみ変更）
+$C2/5391 BPL $04    [$5397]      ;ネガティブフラグが立っていないとき[$5397]分岐
+$C2/5393 INY                     ;Yをインクリメント +1
+$C2/5394 INY                     ;Yをインクリメント +1
+$C2/5395 BRA $EF    [$5386]      ;フラグにかかわりなく常に分岐[$5386]
+;ループ3回目　ここまで
+;
+;ループ4回目
+$C2/5386 LDA $2000,y[$7E:2006]   ;Aに[$7E:2006]をロード
+$C2/5389 CMP $2F46,y[$7E:2F4C]   ;Aと[$7E:2F4C]を減算比較（ステータスレジスタ変更のみ）
+$C2/538C BNE $0D    [$539B]      ;ゼロフラグが立っていないとき[$539B]分岐
+$C2/538E CPY $2F44  [$7E:2F44]   ;Yと[$7E:2F44]を減算比較（ステータスレジスタのみ変更）
+$C2/5391 BPL $04    [$5397]      ;ネガティブフラグが立っていないとき[$5397]分岐
+$C2/5393 INY                     ;Yをインクリメント +1
+$C2/5394 INY                     ;Yをインクリメント +1
+$C2/5395 BRA $EF    [$5386]      ;フラグにかかわりなく常に分岐[$5386]
+;ループ4回目　ここまで
+;
+;ループ5回目（$C2/5391で停止）
+$C2/5386 LDA $2000,y[$7E:2008]   ;Aに[$7E:2008]をロード
+$C2/5389 CMP $2F46,y[$7E:2F4E]   ;Aと[$7E:2F4E]を減算比較（ステータスレジスタ変更のみ）
+$C2/538C BNE $0D    [$539B]      ;ゼロフラグが立っていないとき[$539B]分岐
+$C2/538E CPY $2F44  [$7E:2F44]   ;Yと[$7E:2F44]を減算比較（ステータスレジスタのみ変更）
+$C2/5391 BPL $04    [$5397]      ;ネガティブフラグが立っていないとき[$5397]分岐
+$C2/5397 LDA #$0001              ;Aに#$0001をロード
+$C2/539A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>主人公の名前4文字がすべて一致したら、<code><span class="r">$C2/539A</span></code>まで到達することになる。</p>
+
+<p>ちなみに文字数自体が異なる場合の飛び先は<code><span class="r">$C2/53F3</span></code>で、文字数が合っていても文字が異なる場合での飛び先は<code><span class="r">$C2/539B</span></code>と異なるのだが、結局失敗と判断されることに変わりはない。<br>
+成功すると上の<code><span class="r">$C2/5397</span></code>のように<code>A</code>に<span class="formula">$0001</span>をロードするのだが、失敗時は、いずれの処理でも<code>A</code>に<span class="formula">$0000</span>が入る、または、入ったままという違いにより処理が変わってくる。</p>
+
+<div class="code-container"><pre>
+;文字数が異なる場合（Aに$0000が入った状態）
+$C2/53F3 RTS                     ;サブルーチン戻り
+$C2/53C8 PLP                     ;Pレジスタにスタックからプル
+$C2/53C9 RTS                     ;サブルーチン戻り
+
+;文字数が合っていても文字が異なる場合
+$C2/539B LDA #$0000              ;Aに#$0000をロード
+$C2/539E RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上が、主人公の名前と入力した文字列が一致するかの判定サブルーチン処理になる。<br>
+順序は、</p>
+
+<ol>
+	<li>主人公の名前をアドレス<code>[$7E:2000]</code>～にロード</li>
+	<li>主人公の名前の文字数と、入力した文字列の文字数が一致するかの判定</li>
+	<li>主人公の名前と、入力した文字列を1文字ずつチェックして一致するか判定</li>
+</ol>
+
+<p>ということがわかった。</p>
+
+<h3>「ワープ」の処理</h3>
+
+<p>主人公の名前以外の固定名詞、「ワープ」「コロ」「ＪＵＤＧＥ」「ＯＡＫＦＤＥ」における判定も、名前一致判定と基本的な手順は変わらない。<br>
+以下では、カークの部屋で「メモリーカード」を回収するためのパスワード「ワープ」を判定する場面を紹介する。<br>
+主人公の名前の入力と異なるのは、正解である「ワープ」の文字列の呼び出しである。</p>
+
+<table>
+<thead>
+	<tr><th>開始アドレス</th><th>テキスト（デコード済）</th><th>イベント</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$C2:A076</code></td><td>ワープ</td><td>「メモリーカード」入手時</td></tr>
+	<tr><td><code>$C2:A07A</code></td><td>コロ</td><td>偽キューブイベント</td></tr>
+	<tr><td><code>$C2:A07D</code></td><td>ぎ装こう作</td><td>？</td></tr>
+	<tr><td><code>$C2:A085</code></td><td>ＪＵＤＧＥ</td><td>ラストバトル後のメインコンピュータルーム入口パスワード</td></tr>
+	<tr><td><code>$C2:A08B</code></td><td>ＯＡＫＦＤＥ</td><td>ホル船長のパスワード</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th><th>テキスト（デコード済）</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$C2:A076</code></td><td><span class="formula">$8C</span></td><td>ワ</td></tr>
+	<tr><td><code>$C2:A077</code></td><td><span class="formula">$40</span></td><td>ー</td></tr>
+	<tr><td><code>$C2:A078</code></td><td><span class="formula">$A8</span></td><td>プ</td></tr>
+	<tr><td><code>$C2:A079</code></td><td><span class="formula">$00</span></td><td>（区切り）</td></tr>
+	<tr><td><code>$C2:A07A</code></td><td><span class="formula">$6A</span></td><td>コ</td></tr>
+	<tr><td><code>$C2:A07B</code></td><td><span class="formula">$8B</span></td><td>ロ</td></tr>
+</tbody>
+</table>
+
+<p>上の通り、<code>$C2:A076</code>～からが「ワープ」の文字列になる。文字コードだと「<span class="formula">8C 40 A8</span>」。<br>
+単語と単語の間のアドレスには<span class="formula">$00</span>が入って区切られている。<br>
+実際の処理は以下のとおり。</p>
+
+<div class="code-container"><pre>
+$C2/42D9 PHX                     ;X:0000 Xをスタックにプッシュ
+$C2/42DA AND #$00FF              ;X:0000 Aと$00FFで論理積
+$C2/42DD ASL A                   ;X:0000 Aを算術左シフト *2 
+$C2/42DE TAX                     ;X:0000 Aレジスタの値をXレジスタに転送
+$C2/42DF LDA $C2A880,x[$C2:A9F0] ;X:0170 Aに[$C2:A9F0]をロード
+$C2/42E3 CLC                     ;X:0170 キャリーフラグクリア
+$C2/42E4 ADC #$9380              ;X:0170 A + $9380
+$C2/42E7 STA $27    [$00:0527]   ;X:0170 Aを[$00:0527]に書き込み
+$C2/42E9 LDA #$00C2              ;X:0170 Aに$00C2をロード
+$C2/42EC STA $29    [$00:0529]   ;X:0170 A($00C2)を[$00:0529]に書き込み
+$C2/42EE LDA #$01FE              ;X:0170 Aに$01FEをロード
+$C2/42F1 STA $2B    [$00:052B]   ;X:0170 A($01FE)を[$00:052B]に書き込み
+$C2/42F3 PLX                     ;X:0170 Xレジスタにスタックからプル
+$C2/42F4 RTS                     ;X:0000 サブルーチン戻り
+;                                
+$C2/42F8 JMP $4386  [$C2:4386]   ;X:0000 [$C2:4386]へ
+$C2/4386 LDX $00    [$00:0500]   ;X:0000 Xに[$00:0500]をロード
+$C2/4388 PHP                     ;X:0000 ステータスレジスタをスタックへプッシュ
+$C2/4389 REP #$20                ;X:0000 Aを16bit幅に変更、Mフラグをクリア
+$C2/438B LDY $00    [$00:0500]   ;X:0000 Yに[$00:0500]をロード
+;
+;「ワープ」呼び出しサブルーチン　ループ1回目
+$C2/438D LDA [$27],y[$C2:A076]   ;X:0000 Aに[$C2:A077][$C2:A076]（「ワープ」1～2文字目、「ワ」=$8C）をロード
+$C2/438F INY                     ;X:0000 Yをインクリメント（+1）
+$C2/4390 AND #$00FF              ;X:0000 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0000 ゼロフラグが立っているとき[$43B7]分岐
+$C2/4395 CMP #$0020              ;X:0000 Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;X:0000 ネガティブフラグが立っていないとき[$43A9]分岐
+$C2/43A9 STA $2000,x[$7E:2000]   ;X:0000 Aを[$7E:2000]に書き込み
+$C2/43AC INX                     ;X:0000 Xをインクリメント（+1）
+$C2/43AD INX                     ;X:0001 Xをインクリメント（+1）
+$C2/43AE CPX #$01FE              ;X:0002 Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;X:0002 ネガティブフラグが立っていないとき[$43B7]分岐
+$C2/43B3 CPX $2B    [$00:052B]   ;X:0002 Xと[$00:052B]($01FE)を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;X:0002 ネガティブフラグが立っているとき[$438D]分岐
+;ループ1回目　ここまで
+</pre></div>
+
+<p><code><span class="r">$C2/4388</span></code>～以降は、名前一致判定における、主人公の名前呼び出しの時と同じサブルーチンになる。<br>
+それより前の処理は、「ワープ」を呼び出すためのアドレス計算などにあたる。<br>
+計算されたアドレスは、<code>[$00:0528]</code><code>[$00:0527]</code><span class="formula"> = A076</span>、<code>[$00:052A]</code><code>[$00:0529]</code><span class="formula"> = $00C2</span>を繋げた「<span class="formula">C2052A</span>」であるが、詳しい説明は省く。<br>
+<code>X</code>については、<code><span class="r">$C2/4386</span></code>で<code>X</code>に<code>[$00:0500]</code>をロードしているが、かなり前の処理で（<code><span class="r">$C2/00C6</span></code>）、<code>[$00:0500]</code>に<span class="formula">$00</span>が書き込まれており、このままループ処理に入るため、名前一致判定の時と同様に<code>X</code>の値が1回のループで<span class="formula">+2</span>されていくことになる。</p>
+
+<p>ループ終わりの<code><span class="r">$C2/43AE</span></code>～<code><span class="r">$C2/43B5</span></code>における、<span class="formula">$01FE</span>との減算比較2回も同じ。<br>
+よってループから抜け出す処理は、名前の処理と同じく、<code><span class="r">$C2/4393</span></code>のゼロフラグしかない。<br>
+単語と単語の間のアドレスには<span class="formula">$00</span>が入って区切られているため、「ワープ」を呼び出した後の次のアドレスに「<span class="formula">$00</span>」が入っており、ループを抜ける仕組みである。<br>
+このあたりも主人公の名前呼び出しの時と処理は変わらない、ということである。</p>
+
+<p>以降のループ処理もそのまま記しておく。</p>
+
+<div class="code-container"><pre>
+;ループ2回目
+$C2/438D LDA [$27],y[$C2:A077]   ;X:0002 Aに[$C2:A078][$C2:A077]（「ワープ」2～3文字目、「ー」=$40）をロード
+$C2/438F INY                     ;X:0002 Yをインクリメント（+1）
+$C2/4390 AND #$00FF              ;X:0002 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0002 ゼロフラグが立っているとき[$43B7]分岐
+$C2/4395 CMP #$0020              ;X:0002 Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;X:0002 ネガティブフラグが立っていないとき[$43A9]分岐
+$C2/43A9 STA $2000,x[$7E:2002]   ;X:0002 Aを[$7E:2002]に書き込み
+$C2/43AC INX                     ;X:0002 Xをインクリメント（+1）
+$C2/43AD INX                     ;X:0003 Xをインクリメント（+1）
+$C2/43AE CPX #$01FE              ;X:0004 Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;X:0004 ネガティブフラグが立っていないとき[$43B7]分岐
+$C2/43B3 CPX $2B    [$00:052B]   ;X:0004 Xと[$00:052B]($01FE)を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;X:0004 ネガティブフラグが立っているとき[$438D]分岐
+;ループ2回目　ここまで
+;
+;ループ3回目
+$C2/438D LDA [$27],y[$C2:A078]   ;X:0004 Aに[$C2:A079][$C2:A078]（「ワープ　」3～4文字目、「プ」=$A8）をロード
+$C2/438F INY                     ;X:0004 Yをインクリメント（+1）
+$C2/4390 AND #$00FF              ;X:0004 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0004 ゼロフラグが立っているとき[$43B7]分岐
+$C2/4395 CMP #$0020              ;X:0004 Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;X:0004 ネガティブフラグが立っていないとき[$43A9]分岐
+$C2/43A9 STA $2000,x[$7E:2004]   ;X:0004 Aを[$7E:2004]に書き込み
+$C2/43AC INX                     ;X:0004 Xをインクリメント（+1）
+$C2/43AD INX                     ;X:0005 Xをインクリメント（+1）
+$C2/43AE CPX #$01FE              ;X:0006 Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;X:0006 ネガティブフラグが立っていないとき[$43B7]分岐
+$C2/43B3 CPX $2B    [$00:052B]   ;X:0006 Xと[$00:052B]($01FE)を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;X:0006 ネガティブフラグが立っているとき[$438D]分岐
+;ループ3回目　ここまで
+;
+;ループ4回目（$C2/4393で停止）
+$C2/438D LDA [$27],y[$C2:A079]   ;X:0006 Aに[$C2:A07A][$C2:A079]（$20）をロード
+$C2/438F INY                     ;X:0006 Yをインクリメント（+1）
+$C2/4390 AND #$00FF              ;X:0006 Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;X:0006 ゼロフラグが立っているとき[$43B7]分岐
+$C2/43B7 STZ $2000,x[$7E:2006]   ;X:0006 [$7E:2006] = $00
+$C2/43BA PLP                     ;X:0006 Pレジスタにスタックからプル
+$C2/43BB RTS                     ;X:0006 サブルーチン戻り
+</pre></div>
+
+<p>以上のループ処理で、値が以下のように入ったことになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:2000</code></td><td><span class="formula">$8C</span></td></tr>
+	<tr><td><code>$7E:2001</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:2002</code></td><td><span class="formula">$40</span></td></tr>
+	<tr><td><code>$7E:2003</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:2004</code></td><td><span class="formula">$A8</span></td></tr>
+	<tr><td><code>$7E:2005</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:2006</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>また、<code>X</code>は<span class="formula">$0006</span>まで増加した。<br>
+この値は<span class="formula">ループ回数×2</span>であり、同時に正解の文字列「ワープ」の<span class="formula">文字数×2</span>にあたる。</p>
+
+<p>続きの処理も、名前処理時と変わらない。<br>
+<code>$7E:2F44</code>には文字入力画面で入力した<span class="formula">文字数×2</span>、<code>$7E:2F46</code>～以降には文字入力画面で入力した文字が1文字につき2バイトの領域を使って入っている。</p>
+
+<div class="code-container"><pre>
+$C2/53DB CPX $2F44  [$7E:2F44]   ;X:0006 Xと[$7E:2F44](入力した文字数)を減算比較（ステータスレジスタ変更のみ）
+$C2/53DE BNE $13    [$53F3]      ;X:0006 ゼロフラグが立っていないとき[$53F3]分岐
+$C2/53E0 JSR $5383  [$C2:5383]   ;X:0006 [$C2:5383]へジャンプ
+</pre></div>
+
+<p>まず、「ワープ」の<span class="formula">文字数×2</span>が入った<code>X</code>と、入力した<span class="formula">文字数×2</span>が入っている<code>[$7E:2F44]</code>の値を比較して、ゼロフラグが立つ、つまり同一の時のみ先の処理へ進む。</p>
+
+<div class="code-container"><pre>
+$C2/5383 LDY #$0000              ;Yに$0000をロード
+;
+;「ワープ」と入力文字の一致を確認するループ処理1回目
+$C2/5386 LDA $2000,y[$7E:2000]   ;Aに[$7E:2000]をロード
+$C2/5389 CMP $2F46,y[$7E:2F46]   ;Aと[$7E:2F46]を減算比較（ステータスレジスタ変更のみ）
+$C2/538C BNE $0D    [$539B]      ;ゼロフラグが立っていないとき[$539B]分岐
+$C2/538E CPY $2F44  [$7E:2F44]   ;Yと[$7E:2F44]を減算比較（ステータスレジスタのみ変更）
+$C2/5391 BPL $04    [$5397]      ;ネガティブフラグが立っていないとき[$5397]分岐
+$C2/5393 INY                     ;Yをインクリメント +1
+$C2/5394 INY                     ;Yをインクリメント +1
+$C2/5395 BRA $EF    [$5386]      ;フラグにかかわりなく常に分岐[$5386]
+;ループ1回目　ここまで
+</pre></div>
+
+<p>この処理も、名前処理と同一である。<br>
+「ワープ」は3文字なので、ループは4回目の<code><span class="r">$C2/5391</span></code>に到達した時点で終了する。</p>
+
+<p>結局、プレイヤーが付けた名前と、決められた文字列とで、呼び出し方が少し異なるだけで処理自体は同一ということがわかった。<br>
+基本は、</p>
+
+<ol>
+	<li>一致したか確認したい文字列をアドレス<code>[$7E:2000]</code>～にロード</li>
+	<li>確認したい文字列の文字数と、入力した文字列の文字数が一致するかの判定</li>
+	<li>確認したい文字列と、入力した文字列を1文字ずつチェックして一致するか判定</li>
+</ol>
+
+<p>こうなる。</p>
+
+<p>気になるのは「正解がない」パターンである。<br>
+ＳＦ編の中盤、ヒューイが亡くなった直後に、カトゥーから端末室で船長室のパスワードを聞いてくるように頼まれる。<br>
+端末室では「ＯＡＫＦＤＥ」がパスワードだと教えてもらえるが、実際には間違いである。<br>
+「ＯＡＫＦＤＥ」を聞いたら、コールドスリープルームでカトゥーと合流するとストーリーが進むのだが、コールドスリープルームに行く前に、実際に船長室の扉横の端末に「ＯＡＫＦＤＥ」を入力してみることも可能。<br>
+だが、「ＯＡＫＦＤＥ」でも、他の言葉でも、間違いであり、「トウロク　エラー　パスワード　ガ　チガイマス＿」と表示されて扉は開かない。</p>
+
+<p>この時は入力文字をいちいち判定することもなく、不正解と表示しているのだろうか？<br>
+実は、上のタイミングでもわざわざ、「ＯＡＫＦＤＥ」と一致しているかの処理自体はしている。<br>
+なのだが、一致してもしなくても、最終的にどちらも間違いという処理にたどり着いて「トウロク　エラー　パスワード　ガ　チガイマス＿」と表示されてしまうのである。</p>
+
+<p>ただし、この行動を行うことで、進行フラグを記録する<code>$00:12??</code>のアドレスの中の<code>$00:129E</code>のフラグがONになり（<span class="formula">$01</span>が立つ）、コールドスリープルームでカトゥーと合流した時に、カトゥーのセリフが少し追加される。</p>
+
+<p>以上が文字入力と文字列一致判定の大まかな説明である。<br>
+<code>$C2:A07D</code>～の「ぎ装こう作」が使われている形跡は、今回調べた範囲ではないようである。<br>
+筆者が見逃しているだけという可能性ももちろんあるが、少なくともパスワードの類ではないだろう。ＳＦ編ではパスワード入力にひらがなと漢字が使えないようになっているからである。</p>
+
+<p>ＳＦ編においては、「偽装工作」であれこれ思い当たる節がありすぎるが、どこかで何かのネタに使おうとしていたものの没となったのだろうか。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program20_2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program22.html"><span class="button">&#9654;次　ラーニング</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

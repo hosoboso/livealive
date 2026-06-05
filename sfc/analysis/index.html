@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+
+#alllinks {
+  max-height: 250px;
+  overflow: hidden;
+  position: relative;
+  transition: max-height 0.5s ease;
+  background:#eee;
+}
+
+/* 下部フェードアウト */
+#alllinks::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%; /* 下部20%をフェード */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 1)
+  );
+  pointer-events: none;
+}
+
+/* 「全て表示する」ボタン */
+#showMore {
+  position: absolute;
+  bottom: 5px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  font-size: smaller;
+  cursor: pointer;
+  border-radius: 5px;
+  z-index: 10;
+}
+
+#showMore::before {
+  content: "▼全て表示する";
+}
+
+/* 展開後にフェードを消す */
+#alllinks.expanded {
+  max-height: 1000px; /* 十分大きくして全体表示 */
+}
+
+#alllinks.expanded::after,
+#alllinks.expanded #showMore {
+  display: none;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="here"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; プログラミング関係解説＆調査</h1>
+<h2>プログラミング関係解説＆調査</h2>
+
+<p>本攻略のトップページでも紹介しているが、本作のデータや各種計算式（ダメージ量の算出方法など）は、以下ウェブサイト様に掲載されており、本攻略でも引用させていただいている。</p>
+
+<ul>
+	<li><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a></li>
+	<li><a href="http://zsnsk.sakura.ne.jp/livealive/battle_system.html" target="_blank">ZsnsK's F**kin' Site</a></li>
+</ul>
+
+<p>見ればわかるとおり、上のふたつのウェブサイト様は、「ライブ・ア・ライブ」関連の知識の教科書兼百科事典と言っても過言ではない。<br>
+当コンテンツは、教科書兼百科事典の副読本程度として、「どうしてそういう計算式になるのか？」「ここに載っている以外の計算方法は？」といった話を紹介することが目的である。</p>
+
+<p>内容の性質上、本作のネタバレを含むことをご了承いただきたい。</p>
+
+<p>計算式を理解する上で必要な数学・プログラミングの基礎知識については、<span class="tri"><a href="../program.html">プログラミング関係の表記及び解説</a></span>で紹介したが、ここでは更に一歩踏み込んで、実際のプログラムではどうなっているのか、という話をする。<br>
+ただし筆者はプログラミングについて大した知識はないため、プログラム内容を見てみてもわからないこともあるし、間違った読み方をしていることもあるかもしれないことをお断りさせていただく。</p>
+
+<div id="alllinks">
+それぞれの解説ページは以下リンクから飛べるが、その前に、<a href="#first">この先の説明</a>にひととおり目を通していただきたい。
+	<ul>
+		<li><a href="datamap.html">「ライブ・ア・ライブ」データマップ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+	<div id="showMore"></div>
+</div>
+<script>{document.getElementById("showMore").addEventListener("click", function () {document.getElementById("alllinks").classList.add("expanded");});}</script>
+
+<p id="first">このページでは、以降の説明を読む上で必要となる基本事項について述べている。</p>
+
+<div id="captiondata"></div>
+
+<h3>スーパーファミコンのプログラムについて</h3>
+
+<p>「ライブ・ア・ライブ」はスーパーファミコンのゲームソフトなので、まず、スーパーファミコンのプログラムの方式についてざっと説明する。</p>
+
+<p>スーパーファミコンのCPU（演算などを行う装置）は、65C816互換16ビットマイクロプロセッサ（厳密には「Ricoh 5A22」というカスタム版CPU）が使われている。<br>
+このCPU向けのプログラム言語はアセンブリ言語という言語が使われており、アセンブリ言語はCPUにより仕様が変わるため、スーパーファミコンのプログラムは65C816向けのアセンブリ言語（以下単に「65C816」とする）で書かれている。<br>
+<a href="https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%BB%E3%83%B3%E3%83%96%E3%83%AA%E8%A8%80%E8%AA%9E" target="_blank">アセンブリ言語 - Wikipedia</a>及び、<a href="https://ja.wikipedia.org/wiki/65816_(%E3%82%B3%E3%83%B3%E3%83%94%E3%83%A5%E3%83%BC%E3%82%BF)" target="_blank">65816 (コンピュータ) - Wikipedia</a>も参照のこと。<br>
+当コンテンツでは、65C816のプログラムの説明をしているため、ある程度のプログラミングの知識がないとわかりにくいと思われる。</p>
+
+<p>リメイク版発売の2020年代に主流となっているプログラミング言語（C系言語、Python、JavaScriptなど）は、人間が読み書きする時に比較的わかりやすい、高水準言語（<a href="https://ja.wikipedia.org/wiki/%E9%AB%98%E6%B0%B4%E6%BA%96%E8%A8%80%E8%AA%9E" target="_blank">高水準言語 - Wikipedia</a>）と呼ばれるものなのだが、アセンブリ言語は人間側にもコンピュータ側にもわかりやすいことを優先した低水準言語（<a href="https://ja.wikipedia.org/wiki/%E4%BD%8E%E6%B0%B4%E6%BA%96%E8%A8%80%E8%AA%9E" target="_blank">低水準言語 - Wikipedia</a>）であるので、高水準言語の知識がある程度あるとしても、アセンブリ言語の読み書きはややハードルが高い。<br>
+また、1980年～90年代のコンピュータの技術であるから、現代から見るとプログラミングにかなり制限があるように見えることも（扱える数字の幅が狭い、乗除算の手間がかかるなど）、ハードルの高さに繋がっている。<br>
+ただし、プログラムの基本構造である、「ある条件で分岐する」や「ある条件を満たすまで繰り返す」という理屈は、どんな言語でもだいたい同じである。<br>
+ここでは、細かいことは抜きにして、「そういう理屈でプログラムが書かれている」という説明を中心にしたつもりである。<br>
+わかりにくいところは飛ばして、結論だけ見る程度でも構わない。</p>
+
+<p>65C816はスーパーファミコンのプログラミング言語として使われているため、検索してみると、それなりに解説や資料が見つかる。<br>
+英語の資料が多いが、日本語での説明もあるため、参考にしていただきたい（筆者も参考にさせていただいた）。</p>
+
+<ul>
+	<li><a href="https://w.atwiki.jp/sm4wiki_mix/pages/36.html" target="_blank">65C816プログラミング - マリオ４改造 @wiki - atwiki（アットウィキ）</a></li>
+	<li><a href="https://donkeyhacks.zouri.jp/html/Ja-jp/snes/cpu/index.html" target="_blank">65C816 プログラミング リファレンス</a></li>
+</ul>
+
+<h3>「ライブ・ア・ライブ」のデータについて</h3>
+
+<p>「ライブ・ア・ライブ」は、容量が「16メガビットロムカセット」のスーパーファミコンソフトであり、内部データはすべてのデータが16進法、<span class="formula">0～9, A, B, C, D, E, F</span>の16文字で記されている。<br>
+1ビットとは2進法での1文字（<span class="formula">0～1</span>）分のデータのこと。<br>
+1ビットだと1桁、<span class="formula">0</span>か<span class="formula">1</span>しか記録できないが、2ビットなら2桁なので、<span class="formula">00, 01, 10, 11</span>の4種類（<span class="formula">2<sup>2</sup></span>）の数が記録できる。<br>
+という理屈で、4ビット、つまり4桁まで増やすと2<sup>4</sup>＝16種類まで記録できる。<br>
+一方16進法は、<span class="formula">0～9, A, B, C, D, E, F</span>の16文字を使えるので、1桁だけで16種類記録できる。16進法1文字で4バイト分のデータを記録可能、ということである。<br>
+<span class="formula">16メガビット＝16,000,000</span>ビットで、16進法の文字では<span class="formula">2,000,000</span>文字分ということになる。<br>
+内部データをパッと見ただけでは、数字と<span class="formula">A～F</span>の文字が<span class="formula">2,000,000</span>文字分、ずらずら並んでいるだけで意味不明である（この状態でもプログラミングに慣れている人はデータを読み取れるそうだが）。<br>
+スーパーファミコンのカセット内に記録された内部データを、スーパーファミコン本体のメモリ領域に読み込み（ロード）して、プログラムを実行しゲームがプレイできるのである。<br>
+バーチャルコンソールの場合は、Wii Uやニンテンドー3DSの本体に、カセット内データを保存してあり、それを読み込んでいるということになる（はずだが、筆者はバーチャルコンソールの仕組みまではわからない）。</p>
+
+<p>16進法で内部データが記されているが、16進法の2ケタ分（2文字分）を1バイト（Byte）として、2文字ずつ区切り、1バイトごとにナンバー（16進法）を振って、場所（アドレス）を決めている。<br>
+たとえば、データが</p>
+
+<div class="code-container"><pre>01 23 45 67 89 AB CD EF 98 76 54 32 10 FE DC BA</pre></div>
+
+<p>こんな感じだったら、10進法で16バイト分のデータとなる。<br>
+<span class="formula">01</span>のアドレスは「<span class="formula">00</span>」（1番目）、<span class="formula">AB</span>のアドレスは「<span class="formula">05</span>」（6番目）、<span class="formula">DC</span>のアドレスは「<span class="formula">0E</span>」（15番目）である。</p>
+
+<p>スーパーファミコンのカセットのデータは、スーパーファミコン本体のメモリ領域に読み込み（ロード）するが、本体のメモリ領域の場所にも番号を振ってアドレスが決められている。<br>
+番号は16進数で6桁であり、上2桁を「バンク」、下4桁を「アドレス」と呼ぶ。<br>
+形式としては、バンクとアドレスで区切り、更に16進数であることを示すために頭に「$」をつけ、<br>
+<code>$00:0000</code><br>
+や、<br>
+<code>$00/0000</code><br>
+としたり、区切りなしで記すこともある。<br>
+また、同一バンク内で、アドレスのみを記す時は下4桁だけ「<code>$0000</code>」とする場合もある。<br>
+最大値は<code>$FF:FFFF</code>になる。<br>
+とりあえず「こんな風に表記していたら、メモリの位置を示したアドレスのこと」だと思ってくだされば問題ない。</p>
+
+<p>ゲームデータの16メガビット内には、キャラクターや敵のデータ、技やアイテムのデータ、グラフィック関連のデータ、効果音やBGMなど音関連のデータ、セリフなどテキストデータ、そしてそれらを実際にゲームとして動かすためのプログラムのデータが詰め込まれている。<br>
+当コンテンツで紹介するのは主に、色々なデータをゲームとして動かすためのプログラム部分である。</p>
+
+<h4>ビット(bit)やバイト(byte)などの単位について</h4>
+
+<p>コンピュータでのデータ容量の単位はビットやバイトなど、似たようなネーミングの単位があって少しややこしい。<br>
+<span class="formula">8ビット = 1バイト</span>であり、2進数なら8文字（<span class="formula">0000 0000</span>～<span class="formula">1111 1111</span>）、16進法であれば2文字（<span class="formula">00</span>～<span class="formula">FF</span>）で表現できる。<br>
+スーパーファミコンのゲームソフトのデータは、16進法の文字で書かれているので、「ビット」より「バイト」を単位にするとわかりやすいことも多いし、「バイト」単位で解説しているウェブサイトも多い。</p>
+
+<h3>2進法・16進法</h3>
+
+<p>プログラミングの話をする上では、中学～高校数学の基本的な知識と共に、コンピュータで扱われる2進法・16進法の知識があることが望ましい。最低限、仕組みについては知っておいた方が良い。<br>
+65C816では、数値はすべて16進数で表記し、2進法や16進法ならではのテクニックで計算を行うことが多いからである。<br>
+また、2進数においては、数値操作やフラグ操作などで頻繁に用いられる、ビット演算における論理演算（論理積や論理和など）、シフト演算の知識も必要である。<br>
+何もわからないまま、いきなり下の説明などを読んでも面食らうだけだと思うので、ゲームのプログラムでは実際にどのように使われているのかから学んでみるのも良いかもしれない。<br>
+例えば「ライブ・ア・ライブ」であれば、8種類の<a href="program18.html">状態異常</a>を2進数8桁のON・OFFで表し、技に設定された状態異常はどれか？　や、現在の敵の状態異常の状況の読み出しなどをビット演算で行っている。</p>
+
+<ul>
+	<li><a href="https://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%B3%E3%83%94%E3%83%A5%E3%83%BC%E3%82%BF%E3%81%AE%E6%95%B0%E5%80%A4%E8%A1%A8%E7%8F%BE" target="_blank">コンピュータの数値表現 - Wikipedia</a></li>
+	<li>2進法・16進法（<a href="https://ja.wikipedia.org/wiki/%E4%BA%8C%E9%80%B2%E6%B3%95" target="_blank">二進法 - Wikipedia</a>・<a href="https://ja.wikipedia.org/wiki/%E5%8D%81%E5%85%AD%E9%80%B2%E6%B3%95" target="_blank">十六進法 - Wikipedia</a>）</li>
+	<li>2進法におけるビット演算（<a href="https://ja.wikipedia.org/wiki/%E3%83%93%E3%83%83%E3%83%88%E6%BC%94%E7%AE%97" target="_blank">ビット演算 - Wikipedia</a>）</li>
+	<ul>
+		<li>ビット単位の<a href="https://ja.wikipedia.org/wiki/%E8%AB%96%E7%90%86%E6%BC%94%E7%AE%97" target="_blank">論理演算</a></li>
+		<li>シフト演算</li>
+	</ul>
+</ul>
+
+<p>数学関連だと、基本的な四則演算（累乗など含む）、中学～高校数学レベルの確率計算と、高校数学で習う、数列・漸化式（<a href="https://ja.wikipedia.org/wiki/%E6%BC%B8%E5%8C%96%E5%BC%8F" target="_blank">漸化式 - Wikipedia</a>）の知識があるのが望ましい。</p>
+
+<p>また、65C816では、頭に<span class="formula">$</span>をつけることで16進数の数値であることを示す。<br>
+つまり「<span class="formula">$12</span>」は16進数表記だから、10進数では「18」である。<br>
+「<span class="formula">$FF</span>」は2桁の16進数の最大値で、10進数だと「<span class="formula">255</span>」である。<br>
+2進数の場合は頭に<span class="formula">%</span>をつけて「<span class="formula">%0101</span>」（10進数の5）とするが、65C816の中ではこの表記をすることはまずない（たぶん）。<br>
+ただ、2進数の考え方が必要な時、説明には使っている。</p>
+
+<h4><span id="nega">正負表現</span></h4>
+
+<p>10進数だと、数字の前に<span class="formula">+</span>や<span class="formula">-</span>の記号をつけることで、正の数か負の数かを区別し表記できる。<br>
+だが、2進数や16進数は、正負の記号を使わずに正負を表現する。<br>
+2進数の一番最初の位に「<span class="formula">1</span>」を立てると負の数、「<span class="formula">0</span>」なら正の数、というのが2進数での負の数の表現である。<br>
+正負の値（符号）がついているので、8ビットなら「符号付き8ビット整数」という。<br>
+2進数の頭の1桁は正負を表現し、残りの7桁が通常の数値（絶対値）である。<br>
+「符号付き8ビット整数」だと、10進数の<span class="formula">-127</span>から<span class="formula">+127</span>までを8ビットで表現できることになる。<br>
+16ビットなら「符号付き16ビット整数」という。頭の1桁は正負を表現し、残りの15桁が通常の数値（絶対値）なので、10進数の<span class="formula">-32767</span>から<span class="formula">+32767</span>までを16ビットで表現できる。</p>
+
+<p>ちょっとややこしいのは負の数の表現方法で、10進法なら<span class="formula">0</span>を原点として、負の方向へ<span class="formula">-1</span>, <span class="formula">-2</span>, <span class="formula">-3</span>, ……と数値（絶対値）は増えていくのだが、符号付き8ビット整数だと、<span class="formula">0</span>を原点とした時に、<span class="formula">%1111 1111</span>, <span class="formula">%1111 1110</span>, <span class="formula">%1111 1101</span>, <span class="formula">%1111 1100</span>, ……と、数値（絶対値）が最大から最小へと減少していくのである。<br>
+よって、10進法「<span class="formula">-1</span>」は「<span class="formula">%1111 1111</span>」=「<span class="formula">$FF</span>」、10進法「<span class="formula">-2</span>」は「<span class="formula">%1111 1110</span>」=「<span class="formula">$FE</span>」……と、通常の16進数で見ると最大の<span class="formula">$FF</span>から減少していくように見える。<br>
+少しわかりにくいので、<span class="formula">$100</span>から符号付き8ビット整数を引くと、10進法っぽくなる。<br>
+たとえば<span class="formula">$FB</span>だったら、<span class="formula">$100 - $FB = $5</span>であり、10進法「<span class="formula">-5</span>」ということになる。</p>
+
+<p>詳しくは以下も参照のこと。</p>
+
+<ul>
+	<li><a href="https://brain.cc.kogakuin.ac.jp/~kanamaru/lecture/prog1/02-intro04.html" target="_blank">コンピュータ上の数値の表現 (2) 負の数を含む整数の2進数による表現～2の補数表現</a></li>
+	<li><a href="https://ja.wikipedia.org/wiki/%E8%A3%9C%E6%95%B0" target="_blank">補数 - Wikipedia</a></li>
+</ul>
+
+<h3>スーパーファミコン＆65C816の基礎知識</h3>
+
+<p>この先、プログラムに関してはその都度説明を付けているが、頻出となる、重要度の高い65C816の仕様についてまとめておく。</p>
+
+<h4>「レジスタ」について</h4>
+
+<p>「レジスタ」は、プログラムの実行中、一時的に様々な値（16進数）を記録しておく場所のことである。<br>
+メインで使うことになるのが、「アキュムレータ」という名前のレジスタで、当コンテンツでは「<code>A</code>レジスタ」としたり、頭文字をとって<code>A</code>と省略表記していることが多い。<br>
+省略表記するくらい頻出という意味でもある。</p>
+
+<p>他に「インデックスレジスタ<code>X</code>」「インデックスレジスタ<code>Y</code>」というレジスタも頻出であり、当コンテンツでは「Xレジスタ」「Yレジスタ」としたり、頭文字をとって<code>X</code>, <code>Y</code>と表記することが多い。</p>
+
+<p>プログラミングの知識がある方なら、レジスタは変数のことだと言えばわかるだろう。<br>
+スーパーファミコンにおいては、スーパーファミコン内のメモリ領域も変数として扱うのだが、それらの値は一度<code>A</code>という変数にロードし、数値計算などの処理をする。<br>
+スーパーファミコン内のメモリ領域の値同士を直接計算することはできず、どちらかを<code>A</code>にロードして処理することになる。<br>
+そしてメモリの出し入れの際、アドレス指定のための計算に<code>X</code>と<code>Y</code>を使うことがほとんどである。<br>
+ループ処理で、アドレスを+1しながら順に計算をする場合などは大抵、<code>X</code>と<code>Y</code>に値を1～2ずつ足して次のアドレスを指定するなどしている。</p>
+
+<p>レジスタには値を一時的に記録しておく、と記したが、65C816で記録できる値（つまり計算などで使える値）には制限がある。<br>
+2バイト（16進数で4文字）分が限度なので、<span class="formula">0</span>から16進数<span class="formula">FFFF</span>（10進数<span class="formula">65535</span>）まで、ということになる。</p>
+
+<p>レジスタには値を「記録する（書き込む）」、記録された値を「読み込む」ことができるが、値の桁数が大きいほど読み書きに時間がかかることになる。<br>
+よって、レジスタの「下2桁だけ読み書きする」「4桁すべて読み書きする」と、読み書きの桁数を切り替えることで、読み書きの時間を変え、プログラム実行時間を変更することができる。要するに基本的な時短テクニックである。<br>
+2桁のみで読み書きするのが「8bitモード」で、4桁すべて使うのが「16bitモード」である。<br>
+「8bitモード」の方が扱う桁が少ないから、読み書きの時間が少なくて済む。<br>
+よって、基本的には、「必要がない限り8bitモードでプログラムを実行する」ことになる。</p>
+
+<p>現在どのモードで計算をしているのかは、次で説明する「プロセッサステータスレジスタ」で判別できる。</p>
+
+<h4>「プロセッサステータスレジスタ」とフラグ</h4>
+
+<p>「レジスタ」には何種類かあり、重要なのは上で紹介した<code>A</code>, <code>X</code>, <code>Y</code>の3種類である。<br>
+それに加えてもうひとつ、「プロセッサステータスレジスタ」というものについても覚えておく方が良い。<br>
+ここには8ビット分、つまり2進法で8文字分のデータの記録しかできないのだが、1文字ずつが重要な意味を持つ。<br>
+8文字がそれぞれ別々の名前を持っており、「ネガティブフラグ」や「ゼロフラグ」、「キャリーフラグ」など、「○○フラグ」という名前がついていて、2進法1文字分の「0か1」しかデータが入っていない。<br>
+言い換えると「そのフラグがONかOFFか」というデータが入っているだけである。<br>
+1ならON、0ならOFFで、ONの時は「フラグが立つ」、OFFにする時は「フラグをクリアする」などという言い方をする。<br>
+また、各フラグは頭文字だけ取ってNフラグやZフラグ、Cフラグと省略表記することもある。</p>
+
+<p>プログラミング用語を使うなら、ONとOFFを記録することから、特定の真偽値(boolean)を記録しておく変数、といえる。</p>
+
+<p>少し前に、2桁のみで読み書きするのが「8bitモード」で、4桁すべて使うのが「16bitモード」である、と説明したが、このモード切り替えも、「プロセッサステータスレジスタ」の中の「メモリモードフラグ（Mフラグ）」「インデクスモードフラグ（Xフラグ）」である。<br>
+「メモリモードフラグ」がONなら、アキュムレータ<code>A</code>は「8bitモード」で、OFFならアキュムレータ<code>A</code>は「16bitモード」である。<br>
+「インデクスモードフラグ」がONなら、インデックスレジスタ<code>X</code>と<code>Y</code>は「8bitモード」で、OFFならインデックスレジスタ<code>X</code>と<code>Y</code>は「16bitモード」である。<br>
+このふたつのフラグを見れば、どのモードで計算をしているのかがすぐわかるということになる。</p>
+
+<p>他に、フラグの中で覚えておくと良いのは、上にも記した「ゼロフラグ」「キャリーフラグ」である。<br>
+数値の判定のみならず、条件分岐で頻繁に登場するフラグだからである。<br>
+「ゼロフラグ」は文字通りに、「何かを計算した結果、0になった」や、「何かの値をロードしたら、その値は0だった」など、結果が0の時にONになる。<br>
+これがどのような時に使われるかというと、例えば、「攻撃した相手がオディオモールだったら、ダメージ量は1に変更する」という条件分岐の時、</p>
+
+<ol>
+	<li><span class="formula">「現在攻撃した敵のID」-「オディオモールのID」</span>を計算する</li>
+	<li>ゼロフラグが立ったら（つまり引き算の結果が0なら）、ダメージ量を1にする</li>
+</ol>
+
+<p>こんな風に使えるし、実際にこんな風に内部で計算されているのである。</p>
+
+<p>「キャリーフラグ」は、繰り上がりに関係したフラグである。ちなみに数学における「繰り上がり」は、英語では「carry」である。<br>
+65C816では、上で記した通り、8bitモード（16進数だと2桁）と16bitモード（16進数だと4桁）で計算ができるが、計算によっては、2桁や4桁では足らなくなったり、桁からあふれることがあるだろう。<br>
+例えば、8bitモードで、16進数で<span class="formula">$40</span>（10進数<span class="formula">64</span>）に<span class="formula">$C0</span>（10進数<span class="formula">192</span>）を足すと、<span class="formula">$100</span>（10進数<span class="formula">256</span>）となり、3桁目に繰り上がる。<br>
+この時、65C816では、8bitモードだから2桁までしか答えを表示できない。そこで<span class="formula">$100</span>の下2桁の「<span class="formula">00</span>」を答えとして表示し、更に「キャリーフラグ」をONにすることで、3桁目に<span class="formula">1</span>が溢れたということを示すのである。<br>
+これは足し算だけではなく、掛け算でも同様である。</p>
+
+<p>また、割り算で余りが出た時も「キャリーフラグ」で表現する。<br>
+<span class="formula">$40</span>（10進数<span class="formula">64</span>）を<span class="formula">2</span>で割ると、答えは<span class="formula">$20</span>（10進数<span class="formula">32</span>）で余りはないためキャリーフラグは立たない。<br>
+だが、<span class="formula">$41</span>（10進数<span class="formula">65</span>）を<span class="formula">2</span>で割ると、商は<span class="formula">$20</span>、余りが<span class="formula">$1</span>、と計算され、「<span class="formula">20</span>」を答えとして表示し、更に「キャリーフラグ」をONにすることで、余りの「<span class="formula">1</span>」を示す。</p>
+
+<p>問題は引き算で、引き算では「繰り下がりが起きなかった」時にキャリーフラグがONになる。<br>
+どうして逆なのかをここで説明すると長くなるので省く。<br>
+<a href="https://donkeyhacks.zouri.jp/databank/65C816/function/carry.html" target="_blank">キャリーフラグとオーバーフロー</a><br>
+に理由が詳しく書かれているが、65C816だと、引き算を「足し算で処理」するために、逆になってしまう。<br>
+ややこしいため、理屈は抜きにして、とりあえずそういうものと思っていただいても問題ない。</p>
+
+<p>さて、この「キャリーフラグ」も、ゼロフラグに近い形で条件分岐に使える。<br>
+たとえば、<span class="formula">0～255</span>の乱数を、疑似乱数計算で作ったとする。<br>
+作った乱数が、<span class="formula">0～127</span>だったら「テレポートコマンドが成功して通常通り逃げられる」、<span class="formula">128～255</span>だったら「テレポートコマンドが失敗しチビッコハウスに飛ばされる」というように分岐させたい場合は、</p>
+
+<ol>
+	<li>「<span class="formula">乱数 - 128</span>」を計算する<br>（実際には2進数の計算なので、乱数は「<span class="formula">00000000～11111111</span>」であり、128は2進数で「<span class="formula">10000000</span>」である）</li>
+	<li>キャリーフラグによって条件分岐させる</li>
+	<ul>
+		<li>キャリーフラグが立つ場合（減算の結果が0か正の数の時）、テレポート成功で逃げられる</li>
+		<li>キャリーフラグが立たない場合（減算の結果が負の数の時）、テレポートコマンド失敗時の飛び先計算に進む</li>
+	</ul>
+</ol>
+
+<p>このように実行可能なプログラムを書けば良い。<br>
+2進数「<span class="formula">10000000</span>」を引く時、一番上の位（2<sup>7</sup>の位）にしか「1」がないから、引き算で繰り下がりが生じるのは、2<sup>7</sup>の位が「0」の数だけである。<br>
+この条件を満たすのは、2進数「<span class="formula">10000000</span>」より小さい、「<span class="formula">0???????</span>」の時のみ、つまり10進数でいえば<span class="formula">127</span>以下の数だけである。<br>
+よって、乱数が<span class="formula">128～255</span>の時、「<span class="formula">乱数 - 128</span>」で繰り下がりが生じず、キャリーフラグが立つのでテレポート成功で逃げられる。<br>
+逆に、乱数が<span class="formula">0～127</span>の時、「<span class="formula">乱数 - 128</span>」で繰り下がりが生じ、キャリーフラグが立たないのでテレポートコマンド失敗判定である。</p>
+
+<p>という判定が、実際にテレポート実行時に行われている。</p>
+
+<p>以上の、ゼロフラグによる分岐と、キャリーフラグによる分岐は、「ライブ・ア・ライブ」のプログラム内で頻繁に行われている。<br>
+上のとおり、ゼロフラグによる分岐は「ある値とある値が同一かどうか」の判断に、キャリーフラグによる分岐は「乱数によって条件分岐する場合」に使用することが多い。</p>
+
+<p>なお上で名前だけ出した「ネガティブフラグ」もそこそこ登場するが、これは「2進数で負の数」の時に立つフラグである。<br>
+上で述べたが、2進数の負の数の表現は「符号付き8ビット整数」や「符号付き16ビット整数」の考え方で、一番上の位を1とすることで負の数を表現するため、「ネガティブフラグ」が立つのは、2進数で一番上の位が1になった時である。<br>
+上のキャリーフラグでの分岐は、2進数「<span class="formula">10000000</span>」より小さいかどうかであったが、2進数「<span class="formula">10000000</span>」は一番上の位が1なので、2進数「<span class="formula">10000000</span>」以上の数はネガティブフラグがONになり、やはり分岐条件で使うことが可能である。</p>
+
+<div class="box-title">オーバーフロー</div>
+<div class="commentbox">
+<p>8bitモードの時、計算結果が16進数2桁の最大値<span class="formula">$FF</span>を越えて3桁目の<span class="formula">$100</span>になると、キャリーフラグが立ち、<span class="formula">$100</span>の下2桁の「<span class="formula">00</span>」を答えとして表示する、と上に記した。<br>
+この話から、レトロゲームのバグの原因のひとつ、「最大値255または65535を越えると0に戻ってループする」という現象を思い浮かべた方も多いだろう。<br>
+いわゆる「オーバーフロー」、桁溢れと呼ばれている現象になる。<br>
+もちろん、レトロゲームであっても、計算結果がオーバーフローした時の対策はなされていることが大半である。ただし「ライブ・ア・ライブ」と同時期のスクウェアのゲームは、特殊な状況下でのオーバーフローが割と見逃されていることがあり、ファイナルファンタジーシリーズなどはファンによる研究も盛んであるため、有名なバグがそこそこ発見されている。詳しくは適当に検索していただきたい。</p>
+
+<p>本作ではオーバーフロー関係のバグはほとんどないようで、オーバーフロー対策されている処理があちこちで見られる。<br>
+例えば「足し算の結果、オーバーフローして<span class="formula">$FF</span>を越え、キャリーフラグが立ったら、この足し算の結果を<span class="formula">$FF</span>に変更する」といった分岐で処理している。<br>
+ただ、どうやらその処理をしていない箇所もあるらしく、それが意図したものかどうなのかがよくわからない。<br>
+一例が「<a href="program18_2.html">武器の追加効果の状態異常</a>」の発生時の処理で、状態異常の継続時間の計算時に、オーバーフローを考慮していないように見受けられる。<br>
+ただ、オーバーフローにより状態異常継続時間の数値がやたらと小さくなることがある程度で、ゲームに致命的な何かが発生している様子はなく（バグってデータが破壊されるなどは起こらない）、意図したものかどうかは不明である。</p>
+</div>
+
+<h3>65C816の命令（ニーモニック）</h3>
+
+<p>65C816のプログラムは、何をするかをアルファベット大文字3文字で命令していくことで成り立っている。<br>
+このアルファベット大文字3文字の命令のことを「ニーモニック」といって、色々な命令があるが、プログラマーでない限り、それらをまるごと暗記する必要はない。<br>
+わからなければ、命令一覧から調べれば良いだけである。<br>
+命令（ニーモニック）は、<br>
+<a href="https://donkeyhacks.zouri.jp/html/Ja-jp/snes/cpu/index.html" target="_blank">65C816 プログラミング リファレンス</a><br>
+ここなどで調べれば良い。</p>
+
+<p>たとえば「<code>LDA</code>」という命令があるが、これは上で説明したアキュムレータ（<code>A</code>）に、指定した値をロード（読み込み）しろ、という意味である。<br>
+値の指定方法が色々とあるのが少しややこしいが、これも命令一覧で何の意味か調べれば良いだけなので、無理に覚える必要はない。<br>
+命令の書き方としては、</p>
+
+<div class="code-container"><pre><span style="color: #0000FF;">LDA</span> #$01</pre></div>
+
+<p>こんな感じで、命令の後に読み込みたい数値や、内部データのアドレスを記す。<br>
+頭に「#」がついている時は数値であり、上の命令は「<code>A</code>に16進数の<span class="formula">01</span>をロードしろ」の意味になる。<br>
+アドレスは先に説明した通り、</p>
+
+<div class="code-container"><pre><span style="color: #0000FF;">LDA</span> $7EFEF0</pre></div>
+
+<p>このようにアドレスの数値を指定し、頭には「#」を付けない。<br>
+上の命令は、「<code>A</code>にアドレス<code>$7E:FEF0</code>の中に入っている数値をロードしろ」の意味になる。<br>
+（$7EFEF0という数値のロードではない）<br>
+他にも色々な指定の方法があるが、どれが何の意味かは、その都度解説しているので参照していただきたい。</p>
+
+<p>また、この先では、</p>
+
+<div class="code-container"><pre><span class="r">$C1/85D9</span> <span style="color: #0000FF;">LDA</span> $7EFEF0 <span style="color: #555;">;Aに[$7EFEF0]をロード</span></pre></div>
+
+<p>このように命令＆解説を記しているが、最初の「<code>$C1/85D9</code>」は、命令「<code>LDA $7EFEF0</code>」が書かれているアドレスのことである（よって、実際にはプログラムには書かれていない）。<br>
+「;」以降は解説で、「;」を付けた後から改行までの文章は、プログラムで読み込まないようになっている。<br>
+（ついでに、色分けはわかりやすさ重視でしてあるだけである）</p>
+
+<p>なお、先に、「内部データはすべてのデータが16進法で書かれている」と述べたのに、「<code>LDA</code>」の「L」のように、16進法では使わない文字が使われているのはどうしてなのか、と思われたかもしれない。<br>
+実は、内部データでは<code>LDA</code>などのニーモニックが、「オペコード」という識別番号（16進数2文字）で表記されている。<br>
+先に紹介した、<a href="https://donkeyhacks.zouri.jp/html/Ja-jp/snes/cpu/index.html" target="_blank">65C816 プログラミング リファレンス</a>にも、ニーモニックに対応したオペコードが掲載されている。<br>
+例えば<code>LDA</code>は、オペコードだと「<code>AF</code>」である。<br>
+<code><span style="color: #0000FF;">LDA</span> $7EFEF0</code>の部分は、内部データだと「<code>AF F0 FE 7E</code>」という16進数8文字で表記してある。<br>
+<code>$7EFEF0</code>部分は<code>LDA</code>を意味する<code>AF</code>の後に、2桁ずつ逆の順序で記す方式である。<br>
+とはいえ、さすがに「<code>AF F0 FE 7E</code>」だけではわかりにくいので、当コンテンツではオペコード表記は省いてニーモニックを記している。</p>
+
+<h4>基本の計算方法</h4>
+
+<p>65C816における基本的な計算方法をまとめておく。<br>
+足し算や引き算は、該当のニーモニックを使えば良いのだが（足し算は<code>ADC</code>、引き算は<code>SBC</code>、他に「<span class="formula">+1</span>」や「<span class="formula">-1</span>」するための専用のニーモニックもある）、他の計算には一工夫必要である。<br>
+また、16進数や2進数の計算であることを利用したテクニックもいくつかある。</p>
+
+<p>なお、<span class="tri"><a href="../program.html">プログラミング関係の表記及び解説</a></span>で記したとおり、65C816での計算では、掛け算や割り算の結果で小数点以下の端数が出たら（基本的に）切り捨ての処理を行う、ということも覚えておくこと。</p>
+
+<h5>ニーモニックを使った記述</h5>
+
+<p>足し算は<code>ADC</code>、引き算は<code>SBC</code>でできる、と書いたが、例えば<code>ADC</code>でできることは、「アキュムレータ<code>A</code>と、指定したメモリの値を足す」ことである。<br>
+何かと何かを足し算したい場合、まず<code>A</code>に数値をロードし、次に<code>ADC</code>でその数値に足したい値を指定する、という方法を使う。<br>
+例えば<span class="formula">2+5</span>（16進数）を計算するなら、</p>
+
+<div class="code-container"><pre>
+<span style="color: #0000FF;">LDA</span> #$02   <span style="color: #555;">;Aに$02をロード</span>
+<span style="color: #0000FF;">ADC</span> #$05   <span style="color: #555;">;A + $05を計算</span>
+</pre></div>
+
+<p>上を実行すると、Aに足し算の答えの<span class="formula">7</span>（16進数）が書き込まれる。<br>
+こんな風に2つのニーモニックが必要となる。<br>
+また、最初にAにロードしていた「<span class="formula">$02</span>」を上書きするため、最初の値を残しておきたい場合は、別途どこかのメモリアドレスに書き込んでから足し算を行う必要もある。<br>
+<code>A</code>に何かをロードして何かの計算、というのが、65C816の基本中の基本である。<br>
+<code>A</code>に入る数値は次々更新されていくことになるので、今何の値が入っていて何の目的の計算をしているのかがわからないと、65C816のプログラムを解読できない。<br>
+と偉そうに言う筆者も、わからないことは多いので、わかる範囲でのみ当コンテンツで解説をしている。</p>
+
+<h5>掛け算と割り算</h5>
+
+<p>65C816には、乗除算、つまり掛け算と割り算の機能はない。<br>
+（実は引き算もできず、足し算しかできないという話は、<a href="https://donkeyhacks.zouri.jp/databank/65C816/function/carry.html" target="_blank">キャリーフラグとオーバーフロー</a>にある通りである）<br>
+乗除算をする方法は、</p>
+<ul>
+	<li><a href="https://donkeyhacks.zouri.jp/databank/65C816/function/65c816timedivide.html" target="_blank">乗除算 - 65C816命令表　ロード･ストア命令</a></li>
+	<li><a href="https://ersanio.gitbook.io/assembly-for-the-snes/mathemathics-and-logic/math" target="_blank">Hardware math | Assembly for the SNES</a>（英語）</li>
+</ul>
+<p>ここなどに記されているとおりである。<br>
+簡単にまとめると、</p>
+
+<ul>
+	<li>2倍する（<span class="formula">×2</span>）：<code>ASL</code>（算術左シフト）を使う</li>
+	<li>2で割る（<span class="formula">÷2</span>）：<code>LSR</code>（論理右シフト）を使う</li>
+	<li>それ以外：コプロセッサというCPUの拡張機能で上サイト様のようなコードを使って行う<br>
+	※上サイト様にある「符号付8bit x 8bit」というのは、正負の値を考慮した「符号付き8ビット整数×符号付き8ビット整数」の掛け算のことである。<br>
+	「ライブ・ア・ライブ」でも、「符号付き8ビット整数×符号付き8ビット整数」「符号付き16ビット整数×符号付き8ビット整数」「符号付き16ビット整数÷符号付き8ビット整数」などは上サイト様の方法で計算を行っている。
+	</li>
+</ul>
+
+<p>となっている。<br>
+※単に割り算のやり方としてこういうものがあると覚えていていただければ良いが、「算術左シフト」や「論理右シフト」について詳しくは、
+<a href="https://ja.wikipedia.org/wiki/%E3%83%93%E3%83%83%E3%83%88%E6%BC%94%E7%AE%97#%E3%83%93%E3%83%83%E3%83%88%E3%82%B7%E3%83%95%E3%83%88" target="_blank">ビット演算 &#x3e;&#x20;ビットシフト - Wikipedia</a>などを参照のこと。</p>
+
+<p>また、特定の数で掛け算や割り算をする時に使える方法もある。<br>
+本作のプログラムでよく出てくるのが、「<span class="formula">256</span>で割る」、16進数でいえば「<span class="formula">$100</span>で割る」方法である。</p>
+
+<p>わかりやすくするため、我々が普段使う10進法の話にする。<br>
+<span class="formula">÷100</span>（<span class="formula">÷10<sup>2</sup></span>）を計算する場合、小数点を2つ左に移動させる。<br>
+例えば、<br>
+<span class="formula">1234.56÷100 = 12.3456</span><br>
+である。この時、動いたのは小数点だけで、数字の並び自体はまったく変化していない。</p>
+
+<p>では16進法だとどうなるかというと、小数点を2つ左にずらすということは<span class="formula">16<sup>2</sup> = 256</span>で割り算をすることと同義である。<br>
+つまり16進法での<span class="formula">÷256</span>の計算とは、16進法において小数点を2つ左にずらすことである。<br>
+例えば16進法で「<span class="formula">$1234</span>」という数に対し<span class="formula">÷256</span>（10進法）を行うと、小数点が2つ左に移るから、上の2桁だけ取り「<span class="formula">$12</span>」が答えなのである（これまでも述べたとおり、65C816での計算で小数点以下の数値が出たら切り捨て処理なので、下2桁の<span class="formula">34</span>は切り捨てられる）。</p>
+
+<p>割り算の時だけではなく、16進法で4桁の数から、上2桁だけを取り出して2桁の数にしたい（上で言えば「<span class="formula">$1234</span>」から上2桁の「<span class="formula">$12</span>」だけ取り出す）という処理も、結局は「256で割る」計算をすれば可能ということである。</p>
+
+<h5>8bitモードと16bitモードの応用</h5>
+
+<p>8bitモードと16bitモードの切り替えで、実質的な割り算をする方法もある。<br>
+8bitモードでは16進数で2桁（1バイト）、16bitモードで4桁（2バイト）の数値をレジスタ（<code>A</code>・<code>X</code>・<code>Y</code>）に出し入れできる。<br>
+だが、出し入れする先のアドレスのメモリには、1バイトしか数値が収まらない。<br>
+16bitモードで2バイトの数値をメモリに入れろ、という命令の時、どうやって1バイト分の容量しかないメモリに値を入れるのだろうか？</p>
+
+<p>こういう時には、「下2桁分の1バイトは、指定先のアドレスに値を入れる」「上2桁分の1バイトは、指定先のアドレスに＋1した場所に値を入れる」という仕様になっている。<br>
+入れる時だけではなく、出す（ロードする）時でも同じである。<br>
+たとえば、16bitモードで、<span class="formula">$1234</span>という値を、メモリのアドレス<code>[$00:0030]</code>に入れろ、という命令があったとしよう。<br>
+この時は、下2桁の<span class="formula">$34</span>が<code>[$00:0030]</code>に入り、上2桁の<span class="formula">$12</span>が<code>[$00:0031]</code>に入る。<br>
+ではこの後に8bitモードに切り替えて、<code>[$00:0031]</code>を<code>A</code>に読み込め、という命令を実行するとどうなるか。<br>
+Aには、<code>[$00:0031]</code>から<span class="formula">$12</span>が読み込まれる。<br>
+最初の数値<span class="formula">$1234</span>から、上2桁の<span class="formula">$12</span>だけ読み込んだので、実質上と同じように「256で割る」計算をしたのと同じである。</p>
+
+<p>ということからもわかる通り、現在8bitモードなのか、それとも16bitモードなのかは、数値の読み書きをする上で重要である。<br>
+8bitモードの時は、レジスタに4桁の値が入っていても、下2桁だけで計算をする、ということも覚えておくこと。</p>
+
+<h5>論理積と「数値の取り出し」</h5>
+
+<p><span class="tri"><a href="../program.html">プログラミング関係の表記及び解説</a></span>の、<a href="../program.html#05">ビット演算</a>で説明したことの繰り返しになるが、これも頻出な計算方法なので紹介しておく。</p>
+
+<p>ダメージ量計算には、敵や味方のステータスが必要になる。<br>
+それら各種データは、スーパーファミコンのカセット内部からスーパーファミコン本体のメモリに読み込まれているのだが、丁寧に「ローキックの属性は足技で、最大2ヒット」などと細かい説明が書かれている訳ではない。<br>
+ひとつの技につき、16進数で50文字分、つまり25バイト分のデータしか書かれていないのである。<br>
+各技には番号が振られていて、その番号の順に、25バイトずつデータがずらずらと並んでいる。<br>
+このコンテンツでは、便宜上、1バイト（16進数2桁）ずつ区切って、「技データ0」から「技データ24」と名前を付けている。<br>
+例えば技データ17は、1桁目の数値が「技が発動するまでの待機時間」で、2桁目の数値が「技LV」となっている。<br>
+ダメージ量計算に必要な、「技LV」だけを取り出したい場合、</p>
+
+<ol>
+	<li>技データ17をアキュムレータ（<code>A</code>）にロードする</li>
+	<li>ロードした値の下1桁だけ取り出す</li>
+</ol>
+
+<p>という、2段階の作業が必要になる。<br>
+この時に役立つのが「論理積」である。<br>
+ビット演算における「論理積」とは、2個の数値を2進数にし、各桁の数値を比較して、共通して「1」なら「1」に、それ以外だったら「0」にする、という計算のことである。</p>
+
+<p>実際に、「忍法矢車草」の技データ17「<span class="formula">$2A</span>」から、「技LV」を取り出すことを考えてみる。<br>
+<span class="formula">$2A</span>は2進数で「<span class="formula">0010 1010</span>」である。<br>
+（プログラマー電卓があれば変換が楽。Windowsパソコン付属の電卓でも可能）<br>
+2進数の上4桁（4ビット）が、16進数での上1桁の部分であり、2進数の下4桁（4ビット）が、16進数での下1桁の部分である。<br>
+技LVのみ、つまり16進数の下1桁を取り出したいのであれば、2進数の下4桁がすべて「1」である、「<span class="formula">0000 1111</span>」との論理積を取れば良い。<br>
+「<span class="formula">0010 1010</span>」と「<span class="formula">0000 1111</span>」の論理積を取ると、上4ビット分がすべて0、下4ビット分はそのままの、「<span class="formula">0000 1010</span>」となる。<br>
+これを16進数に戻すと、「<span class="formula">$2A</span>」と「<span class="formula">$0F</span>」の論理積をとって「<span class="formula">$0A</span>」になった、という計算になる。</p>
+
+<p>なお、「<span class="formula">$0A</span>」は10進数の<span class="formula">10</span>だから、「忍法矢車草」の技LVは10である。<br>
+また、上の桁の「<span class="formula">$20</span>」は「技が発動するまでの待機時間」なので、「忍法矢車草」の待機時間は10進数で<span class="formula">32</span>となる。</p>
+
+<p>というのが「論理積」の使い方である。<br>
+結局のところ、特定の桁を取り出したい時、16進数なら、取り出したい桁は<span class="formula">F</span>、それ以外は<span class="formula">0</span>の2進数で論理積を取れば良い、というのが結論になる。<br>
+アキュムレータと指定の値で論理積を取るニーモニックは「<code>AND</code>」なので、「<code>AND #$0F</code>」という命令が出てきたら、「<code>A</code>に入っている数値の下1桁だけ取り出したいのだな」とわかる。</p>
+
+<p>なお、技データの中には、2進数にした時に上2ビット分だけ取り出して計算する値なども存在する。<br>
+そういう時は「<span class="formula">1100 0000</span>」との論理積を取れば良いことになる。<br>
+とりあえず、「論理積を取っている時は、何かの数値を取り出したいのだろう」と見当がつくということである（他の場合ももちろんある）。</p>
+
+<p>論理積で取り出した値で、何かのフラグが立つかどうか（ゼロフラグなど）で分岐判定をすることもある。<br>
+「<code>BIT</code>」というニーモニックも、アキュムレータと指定の値で論理積を取る命令なのだが、こちらの命令は計算結果をアキュムレータに書き込まず、フラグ変化だけ書き込む。例えば論理積を取ってゼロフラグが立つか確認したいが、アキュムレータの値はそのままにしておきたい、という場合は<code>BIT</code>を使う。</p>
+
+<h3>用語集</h3>
+
+<p>その他、当コンテンツでよく使う用語について記しておく。</p>
+
+<h4>サブルーチン</h4>
+
+<p>プログラミング用語における「サブルーチン」について説明する。<br>
+この用語は、65C816やアセンブリ言語だけではなく、他のプログラミング言語でも使われる一般的な用語なので、知っている方は飛ばして構わない。</p>
+
+<p>プログラム内におけるひとまとまりの計算手順のことを、プログラミング用語で「Subroutine/サブルーチン」という。<br>
+先程の、テレポートの話であれば、</p>
+
+<ol>
+	<li>「<span class="formula">乱数 - 128</span>」を計算する<br>（実際には2進数の計算なので、乱数は「<span class="formula">00000000～11111111</span>」であり、<span class="formula">128</span>は2進数で「<span class="formula">10000000</span>」である）</li>
+	<li>キャリーフラグによって条件分岐させる</li>
+	<ul>
+		<li>キャリーフラグが立ったらテレポート成功で逃げられる</li>
+		<li>キャリーフラグが立たない場合はテレポートコマンド失敗時の飛び先計算に進む</li>
+	</ul>
+</ol>
+
+<p>この一連の手順（プログラム）は、「テレポート」コマンドを選ぶ度に毎回実行される。<br>
+「テレポートの成功・失敗判断用サブルーチン」という言い方ができる。<br>
+また、このテレポート判断用サブルーチンの前には、乱数を生成する計算をしている。<br>
+乱数生成用の一連の手順もまたサブルーチンであり、いわば「乱数生成用サブルーチン」である。<br>
+本作ではテレポートだけではなく、籐兵衛のアイテム改造が成功するか失敗するか、また、2～3種類から改造先が選ばれる時に何が選ばれるか、など、色々な場面で乱数が必要とされ、その都度「乱数生成用サブルーチン」を実行している。</p>
+
+<p>というような形で「サブルーチン」という言葉をよく使って説明をするので、覚えておいていただきたい。</p>
+
+<h4>フレーム</h4>
+
+<p><a href="https://ja.wikipedia.org/wiki/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E3%83%AC%E3%83%BC%E3%83%88" target="_blank">フレームレート - Wikipedia</a></p>
+
+<p>「フレーム」（frame）という英単語自体には色々な意味があるが、当コンテンツにおいては「フレームレート」の意味で使っている。<br>
+ゲームや映像において、「フレームレート」とは、1秒あたり画面に何枚の絵を表示できるか、その枚数を示すと考えていただいて良い。<br>
+単位は「Frames Per Second」、頭文字を取って「FPS」である。<br>
+ゲーム好きなら、「ゲーム画面の滑らかさの単位」という意味で「FPS」を捉えている人が多いだろうが、概ね、それで正解である。<br>
+スーパーファミコンは、60FPSでプログラムを処理し、画面の表示ができる。<br>
+つまり、1秒あたり60枚の絵を表示可能である。<br>
+このため、1/60秒を単位として「1フレーム」という言い方をする。</p>
+
+<p>人間からすれば、1フレームというのはほんの一瞬である。<br>
+だが、本作においては（というか、他のスーパーファミコンのゲームでもできるが）、実はその1フレームの間に乱数を生成するサブルーチンを1周回して、1フレームに1個、乱数を作っている。<br>
+幕末編や西部編だったら、同時に「1分間隔で鐘を鳴らす」というタイマー処理もやっているし、背景やキャラクターといった画像の処理もして、BGMを流し、場面に合ったサウンドエフェクトも鳴らしている。中世編や最終編はランダムエンカウント関係の計算もしている。<br>
+それくらいの処理能力を持っているのがスーパーファミコンというゲームハードであり、当時のプログラマーが工夫した様々なプログラムが動いていたのである。</p>
+
+<p>※厳密にはスーパーファミコンのフレームレートは59.94FPSだそうだが、当コンテンツではとりあえず60FPSということでこの先も話を進める。<br>
+詳細は上のWikipediaの説明、及び専門書などでご確認いただきたい。</p>
+
+<p>この「フレーム」という単位も、本作のプログラムを説明する上で時折登場するので、用語として説明した次第である。<br>
+非常に大雑把に説明すると、本作では1フレームの間に、</p>
+
+<ol>
+	<li>その場面で必要な何らかの処理</li>
+	<li>コントローラーのボタンが押されているか判定処理</li>
+	<li>1.と2.の合計処理時間が1フレームになったら強制割り込みでボタン判定を終了して、1.に戻る</li>
+</ol>
+
+<p>という処理をひたすら繰り返している。</p>
+
+<p>1.はフィールドならキャラを移動させるなど、戦闘なら各種計算など。<br>
+西部編の罠仕掛けなどの時間制限イベントだったら、1.で「1フレームでカウントが1減るカウントダウンタイマー」用のプログラムを1回動かしているのである。<br>
+2.で、プレイヤーがコントローラーの何かのボタンを押したら、それに対応した処理が次から開始になる。</p>
+
+<p>余談だが、1/60秒、1フレームの間にスーパーファミコンはどれくらいの処理ができるのか。<br>
+上で、</p>
+
+<div class="code-container"><pre>
+<span style="color: #0000FF;">LDA</span> #$01
+</pre></div>
+
+<p>というプログラム（1回分のニーモニック）を紹介した。<br>
+実際には、</p>
+
+<div class="code-container"><pre>
+<span style="color: #0000FF;">LDA</span> #$01
+<span style="color: #0000FF;">STA</span> $22
+<span style="color: #0000FF;">STZ</span> $23
+<span style="color: #0000FF;">LDA</span> #$08
+<span style="color: #0000FF;">STA</span> $08
+<span style="color: #0000FF;">STZ</span> $20
+<span style="color: #0000FF;">LDA</span> $7ECE00,x
+<span style="color: #0000FF;">JSR</span> $20CD
+……
+</pre></div>
+
+<p>というように、ニーモニックがひたすら続いていく。<br>
+1回のニーモニックの処理時間は内容により少しずつ違うので厳密に何回できるのかは明言できないが、「ライブ・ア・ライブ」のプログラムでいえば、1フレームの間にニーモニックを<span style="font-weight:bold;">10,000回くらい</span>処理してしまう。<br>
+1秒だと60倍だから、<span style="font-weight:bold;">600,000回くらい</span>。<br>
+コンピュータに慣れ親しんでいないと、とんでもない回数の計算をこなしているように見える。<br>
+だがこれでも1980～90年代の技術であり、リメイク版が発売された2020年代のゲーム機は当然、計算回数が桁違いに増加している（らしい）。<br>
+扱える数値の幅も、スーパーファミコンでは最大16ビットだったが、Nintendo Switchでは64ビットである。<br>
+詳しいことを知りたいのなら「クロック周波数」などで調べてみると良い。</p>
+
+<script>//見出しリスト用
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll("h3, h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let d=document.createElement("li"),i=`li_${n}`;e.id=i;let h=document.createElement("a");h.href=`#${i}`,h.textContent=e.textContent,d.appendChild(h),l.appendChild(d),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let p=a.children.length,r=`li_${n}_${p}`;e.id=r;let c=document.createElement("li"),o=document.createElement("a");o.href=`#${r}`,o.textContent=e.textContent,c.appendChild(o),a.appendChild(c)}}),e.appendChild(l)});
+</script>
+
+<div class="pagelink">
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program2.html"><span class="button">&#9654;次　テレポートの仕様</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script><div style="display:none;"><script type="text/javascript" src="//x7.shinobi.jp/ufo/07424540p"></script></div>
+</body>
+</html>

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 状態異常</h1>
+<h2>状態異常</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>本作の状態異常は8種類存在している（石化・酔い・眠り・マヒ・毒・腕かため・足かため・首かため）。<br>
+首かためは隠し状態異常でゲーム画面には表示されないが、キャラの行動の制御に使われていることがほとんどである。<br>
+状態異常の発生方法は2種類ある。</p>
+
+<ol>
+	<li>技（アイテム使用時含む）の追加効果として状態異常が発生する。</li>
+	<li>武器の追加効果として状態異常が発生する。</li>
+</ol>
+
+<p>1.は味方が敵、または敵が味方を攻撃した時どちらでも発生するが、2.は味方キャラしか武器を装備できないため、味方が敵を攻撃した時のみ発生する。<br>
+また、キャラ自身の能力または味方の装備品で、特定の状態異常を完全無効化可能であり、その場合は該当の状態異常になることはない。</p>
+
+<p>状態異常発生時には、その状態異常の継続時間もセットされる。ここでは「状態異常継続時間」とする。<br>
+全ての敵味方キャラには、各状態異常の状態異常継続時間を記録するアドレスが存在している（自然回復しない石化にもある）。<br>
+状態異常継続時間の減少方法は、タメ時間ありの技のタメ時間などと同じで、1ターンで16、味方の移動・パス・Yボタン足踏みで4、向き変えで2減っていく仕組みである。</p>
+
+<p>状態異常が解除される条件は、状態異常によって多少変わるが以下のとおり。<br>
+敵側の石化を解除する方法はない（撃破と同じであるため）。</p>
+
+<ol>
+	<li>石化以外、状態異常継続時間が<span class="formula">0</span>になる。</li>
+	<li>状態異常を解除できる技（回復アイテム含む）で回復する。</li>
+	<li>眠り状態のみ、攻撃されると解除される。</li>
+</ol>
+
+<p>1.はいわゆる、時間経過での解除にあたる。<br>
+他の解除方法で解除された場合、状態異常継続時間に<span class="formula">0</span>が上書きされるようになっている。</p>
+
+<p>ここでは、状態異常の発生について具体的に説明していく。<br>
+状態異常が発生する条件は、既に<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様がとても詳しく調べていらっしゃるため、ここでは、実際にどういう処理がなされているのかを紹介する。</p>
+
+<p>世界の合言葉は森部様によれば、状態異常の発生条件は以下の通りである。</p>
+
+<blockquote><p>　・状態異常：<br>
+(自能力値+(0～(自能力値-1)))/2-敵能力値が正のとき状態異常発生（下の異常時間が17以上であることも条件）<br>
+　・状態異常時間：<br>
+上の引き算結果*異常時間係数/8+自能力値/敵LV</p>
+
+<p>　・武器固有状態異常発生条件：<br>
+技が武器影響ありで、技自体に状態異常がない時？<br>
+　・武器固有状態異常発生率：<br>
+((0～15)>敵LV)のとき状態異常（異常時間は自LV*8）</p></blockquote>
+
+<p>計算方法は少々ややこしい。<br>
+結論は既に上にある通りだが、筆者の調査の結果わかった、もう少し詳しい計算式は以下のようになる。<br>
+技による状態異常の発生条件は世界の合言葉は森部様と一致したのだが、武器で発生する状態異常については、世界の合言葉は森部様による説明とは少し異なる部分があり、どちらが正しいのかはわからない。<br>
+「自能力値」「敵能力値」「自LV」「敵LV」は技を使用した時点での値であり、ステータスアップ・ダウンの効果が反映される。</p>
+
+<div class="place"><h5>技による状態異常の発生条件：</h5>
+<p>敵が該当の状態異常を無効化せず、かつ、該当の状態異常に既にかかっていない時に、以下のように判定する。<br>
+多段ヒット技の場合でも、判定は各状態異常につき1回。<br>
+※計算途中の割り算はすべて小数点以下切り捨て。<span class="formula">trunc()</span>で表記すると見辛いので以下では記していない。</p>
+
+<p><span class="formula">状態異常の判定値 = (自能力値 + 乱数(0～255)*自能力値/256)/2 - 敵能力値</span><br>
+が正の値の時、続けて状態異常継続時間を計算する。</p>
+
+<p><span class="formula">状態異常継続時間 = min(状態異常の判定値*状態異常時間係数/8 + 自能力値/敵LV, 255)</span><br>
+状態異常継続時間が17以上の時、該当の状態異常が発生になる。</p>
+
+<p>※「<span class="formula">(自能力値 + 乱数(0～255)*自能力値/256)/2</span>」は、自能力値の<span class="formula">0.5</span>倍～<span class="formula">0.99</span>倍（厳密には<span class="formula">255/256</span>倍）のことになる。</p>
+
+<h5>武器による状態異常の発生条件：</h5>
+
+<p>該当する武器は「ムラサメ」（眠り）、「ヨシユキ」（マヒ）のみ。<br>
+敵が該当の状態異常を無効化せず、使用技に状態異常の効果がない、かつ、武器の攻撃力依存の時に、</p>
+
+<p><span class="formula">乱数(0～255) mod 256 - 敵LV(現在値)</span><br>
+<span class="formula"> = 乱数(0～15) - 敵LV(現在値)</span><br>
+が<span class="formula">0</span>以上なら、状態異常が発生する。<br>
+※「<span class="formula">mod</span>」は剰余（割り算の余り）</p>
+
+<p><span class="formula">状態異常継続時間 = 自LV(現在値)*8 mod 256</span><br>
+※<span class="formula">自LV(現在値)*8</span>の計算結果の繰り上がりを考慮していないため、レベル<span class="formula">32</span>以上で状態異常発生時間のオーバーフローが起きてしまうようである。仕様なのかミスなのかは不明。</p>
+
+<p>既に該当の状態異常が発生している場合でも、状態異常が起きるかどうか判定し、該当の状態異常発生時間を上書きする（加算はされない）。</p></div>
+
+<p>このページではまず、技による状態異常の発生処理を説明する。<br>
+実際におぼろ丸の「忍法夢幻蝶」（毒と眠りの追加効果あり）を、毒と眠りの耐性がない敵1体に当てた場合の処理方法を見ていくことにする。<br>
+ちなみに「忍法夢幻蝶」は8ヒットするが、だからといって状態異常判定を8回行うことはない。<br>
+範囲攻撃なので2体以上に当たれば各攻撃相手に状態異常判定を行うが、1体につき1回分の判定である。<br>
+この処理はどの状態異常つきの技でも同じ。</p>
+
+<h3>状態異常関連のデータ</h3>
+
+<p>実際のサブルーチンを見る前に、計算に必要なデータを紹介していく。<br>
+まず、使用技の状態異常関係のデータが必要である。</p>
+
+<h4>技データ08・発生させる状態異常</h4>
+
+<p>1バイトのデータの中に8種類の状態異常の値が収納されている。<br>
+該当の状態異常に<span class="formula">1</span>が立つ。</p>
+
+<table>
+<thead>
+	<tr><th>2進法の位</th><th>2<sup>7</sup></th><th>2<sup>6</sup></th><th>2<sup>5</sup></th><th>2<sup>4</sup></th><th>2<sup>3</sup></th><th>2<sup>2</sup></th><th>2<sup>1</sup></th><th>2<sup>0</sup></th></tr>
+</thead>
+<tbody>
+	<tr><th>状態異常</th><td>石化</td><td>酔い</td><td>眠り</td><td>マヒ</td><td>毒</td><td>腕かため</td><td>足かため</td><td>首かため</td></tr>
+</tbody>
+</table>
+
+<p>「忍法夢幻蝶」だと毒と眠りの状態異常があるので、2進数だと<span class="formula">%0010 1000</span>になる。16進数だと<span class="formula">$28</span>が入っている。</p>
+
+<p>なお、敵味方の現在の状態異常の記録方法も上の表記と同じで、1バイトに8種類の状態異常を格納している。</p>
+
+<h4>技データ18・状態異常関連値</h4>
+
+<p>1バイトの中に、以下のように3種類のデータが入っている。</p>
+
+<ul>
+	<li>上1～2ビット：状態異常自身依存ステータス</li>
+	<li>上3～4ビット：状態異常敵依存ステータス</li>
+	<li>下4ビット：状態異常時間係数</li>
+</ul>
+
+<p>技の状態異常は、使用者自身の依存ステータスと攻撃される側（以下、敵とする）自身の依存ステータスの値が必要になる。<br>
+ステータスは力・速・体・知のいずれか。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td>力</td></tr>
+	<tr><td><span class="formula">%01</span></td><td>速</td></tr>
+	<tr><td><span class="formula">%10</span></td><td>体</td></tr>
+	<tr><td><span class="formula">%11</span></td><td>知</td></tr>
+</tbody>
+</table>
+
+<p>以上のように、上1～2ビットに使用者自身の依存ステータス、上3～4ビットに敵自身の依存ステータスが入る。</p>
+
+<p>下4ビットは状態異常時間係数で、<span class="formula">$0</span>～<span class="formula">$F</span>が入る。</p>
+
+<p>「忍法夢幻蝶」だと、使用者自身の依存ステータスも敵自身の依存ステータスも「知」で、状態異常時間係数は<span class="formula">$A</span>（<span class="formula">%1010</span>）なので、技データ18の値は、<span class="formula">%1111 1010 = $FA</span>である。</p>
+
+<h4>戦闘中の味方キャラデータ</h4>
+
+<p>味方キャラのデータは、レベル（現在値）、使用者自身の依存ステータス（現在値）が必要になる。<br>
+戦闘中の味方キャラ4人分のデータは、順に<code>$00:1C00</code>～、<code>$00:1C40</code>～、<code>$00:1C80</code>～、<code>$00:1CC0</code>～に入るが、各アドレスに以下数値を加えると該当ステータスのアドレスになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス加算値</th><th>ステータス</th></tr>
+</thead>
+<tbody>
+	<tr><td>+<span class="formula">$34</span></td><td>力(現在値)</td></tr>
+	<tr><td>+<span class="formula">$35</span></td><td>速(現在値)</td></tr>
+	<tr><td>+<span class="formula">$36</span></td><td>体(現在値)</td></tr>
+	<tr><td>+<span class="formula">$37</span></td><td>知(現在値)</td></tr>
+	<tr><td>+<span class="formula">$38</span></td><td>レベル(現在値)</td></tr>
+</tbody>
+</table>
+
+<p>実際にはレベル（現在値）は必要ないが、次ページの武器による状態異常関係で必要になるので、ついでで載せておく。</p>
+
+<h4>戦闘中の敵キャラデータ</h4>
+
+<p>敵1体目（敵番号1）のステータス及び状態異常関係のアドレスは以下のように入る。<br>
+敵番号2以降はアドレスを<span class="formula">+10</span>していく。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:AA03</code></td><td>力(現在値)</td></tr>
+	<tr><td><code>$7E:AA04</code></td><td>速(現在値)</td></tr>
+	<tr><td><code>$7E:AA05</code></td><td>体(現在値)</td></tr>
+	<tr><td><code>$7E:AA06</code></td><td>知(現在値)</td></tr>
+	<tr><td><code>$7E:AA07</code></td><td>状態異常</td></tr>
+	<tr><td><code>$7E:AA08</code></td><td>首かため 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA09</code></td><td>足かため 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0A</code></td><td>腕かため 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0B</code></td><td>毒 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0C</code></td><td>マヒ 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0D</code></td><td>眠り 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0E</code></td><td>酔い 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AB00</code></td><td>レベル(現在値)</td></tr>
+</tbody>
+</table>
+
+<h3>サブルーチン</h3>
+
+<p>以上を踏まえた上で、サブルーチンを見ていく。</p>
+
+<div class="code-container"><pre>
+$C1/785C LDA $D50000,x[$D5:2CEF] ;Aに[$D5:2CEF]（技データ09）をロード
+$C1/7860 STA $0000,y[$7E:9019]   ;Aを[$7E:9019]に書き込み
+;（中略）
+$C1/785C LDA $D50000,x[$D5:2CF8] ;Aに[$D5:2CF8]（技データ18）をロード
+$C1/7860 STA $0000,y[$7E:9022]   ;Aを[$7E:9022]に書き込み
+;（中略）
+$C1/D754 STZ $13    [$00:0313]   ;[$00:0313]に$00を書き込み
+</pre></div>
+
+<p>状態異常発生処理前の諸々の処理が上の通り。<br>
+技データはループ処理で全ての値が呼び出されて<code>[$7E:9010]</code>～<code>[$7E:9028]</code>に読み込まれるのだが、技データ09と技データ18は、上のようにそれぞれ<code>[$7E:9019]</code>、<code>[$7E:9022]</code>に書き込まれる。<br>
+また、<code><span class="r">$C1/D754</span></code>で、<code>[$00:0313]</code>に<span class="formula">$00</span>が書き込まれているが、<code>[$00:0313]</code>には後々で発生した状態異常を書き込んでいくことになる。<br>
+なお、<code><span class="r">$C1/D754</span></code>の後あたりから、技で発生する行動異常の処理が入り、状態異常の処理はその後から開始になる。</p>
+
+<p>以降が状態異常発生処理になる。</p>
+
+<div class="code-container"><pre>
+$C1/DC66 LDA $7E9019[$7E:9019]   ;[$7E:9019]（技データ09）をロード
+$C1/DC6A STA $12    [$00:0312]   ;A（技データ09）を[$00:0312]に書き込み
+$C1/DC6C LDA $7E9022[$7E:9022]   ;[$7E:9022]（技データ18）をロード
+$C1/DC70 STA $14    [$00:0314]   ;A（技データ18）を[$00:0314]に書き込み
+$C1/DC72 LDX $78    [$00:0378]   ;Xに[$00:0378]をロード
+$C1/DC74 CPX #$1C00              ;Xと$1C00を減算比較（ステータスレジスタ変更のみ）
+$C1/DC77 BCC $21    [$DC9A]      ;キャリーフラグが立っていないとき[$DC9A]分岐
+$C1/DC79 AND #$C0                ;A（技データ18）と$C0で論理積
+$C1/DC7B BEQ $0D    [$DC8A]      ;ゼロフラグが立っているとき[$DC8A]分岐（使用者依存ステータスが力の時）
+$C1/DC7D CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/DC7F BEQ $0E    [$DC8F]      ;ゼロフラグが立っているとき[$DC8F]分岐（使用者依存ステータスが速の時）
+$C1/DC81 CMP #$80                ;Aと$80を減算比較（ステータスレジスタ変更のみ）
+$C1/DC83 BEQ $0F    [$DC94]      ;ゼロフラグが立っているとき[$DC94]分岐（使用者依存ステータスが体の時）
+$C1/DC85 LDA $0037,x             ;Aに[$0037,x]（味方キャラ・知(現在値)）をロード
+$C1/DC88 BRA $0D    [$DC97]      ;フラグにかかわりなく常に[$DC97]分岐
+;
+;依存ステータス分岐先
+$C1/DC8A LDA $0034,x             ;Aに[$0034,x]をロード（使用者依存ステータスが力の時）
+$C1/DC8D BRA $08    [$DC97]      ;フラグにかかわりなく常に[$DC97]分岐
+$C1/DC8F LDA $0035,x             ;Aに[$0035,x]をロード（使用者依存ステータスが速の時）
+$C1/DC92 BRA $03    [$DC97]      ;フラグにかかわりなく常に[$DC97]分岐
+$C1/DC94 LDA $0036,x             ;Aに[$0036,x]をロード（使用者依存ステータスが体の時）
+;
+$C1/DC97 STA $15    [$00:0315]   ;使用者依存ステータス（知(現在値)）を[$00:0315]に書き込み
+$C1/DC99 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/DC66</span></code>～<code><span class="r">$C1/DC70</span></code>で、先に<code>[$7E:9019]</code>と<code>[$7E:9022]</code>に読み込まれた技データ09と技データ18が、それぞれ<code>[$00:0312]</code>と<code>[$00:0314]</code>に書き込まれている。<br>
+<code><span class="r">$C1/DC79</span></code>は、技データ18と<span class="formula">$C0</span>で論理積を取っている。<br>
+<span class="formula">$C0 = %1100 0000</span>だから、技データ18の上2ビット分の値の取り出しである。<br>
+技データ18の上2ビット分は、状態異常の使用者自身依存ステータスなので、依存ステータスにより以下のような値になる。</p>
+
+<table>
+<thead>
+	<tr><th>技データ18と<span class="formula">$C0</span>の論理積</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%0000 0000</span></td><td>力</td></tr>
+	<tr><td><span class="formula">%0100 0000</span></td><td>速</td></tr>
+	<tr><td><span class="formula">%1000 0000</span></td><td>体</td></tr>
+	<tr><td><span class="formula">%1100 0000</span></td><td>知</td></tr>
+</tbody>
+</table>
+
+<p>よって、<code><span class="r">$C1/DC7B</span></code>でゼロフラグが立つのは、依存ステータスが「力」の時であり、<code>[$DC8A]</code>に分岐。<br>
+<code><span class="r">$C1/DC7D</span></code>では<span class="formula">$40 = %0100 0000</span>と減算比較しているので、ゼロフラグが立つのは依存ステータスが「速」の時であり、<code>[$DC8F]</code>に分岐。<br>
+<code><span class="r">$C1/DC81</span></code>では<span class="formula">$80 = %1000 0000</span>と減算比較しているので、ゼロフラグが立つのは依存ステータスが「体」の時であり、<code>[$DC94]</code>に分岐。<br>
+残るのは依存ステータスが「知」の時なので、<code><span class="r">$C1/DC85</span></code>で使用者の「知(現在値)」である<code>[$00:0037,x]</code>をロードしている。<br>
+今回は「忍法夢幻蝶」の処理を見ていくので、依存ステータスは「知」になり、サブルーチンは<code><span class="r">$C1/DC88</span></code>まで読み込むのだが、依存ステータスによる分岐<code>[$DC8A]</code><code>[$DC8F]</code><code>[$DC94]</code>も上に参考までに記しておいた。要するに、該当する依存ステータス値を<code>A</code>にロードする処理である。<br>
+そして、最終的に<code><span class="r">$C1/DC97</span></code>で、使用者の依存ステータスの現在値が<code>[$00:0315]</code>に書き込まれる。</p>
+
+<div class="code-container"><pre>
+$C1/DB38 LDA $12    [$00:0312]   ;Aに[$00:0312]（技データ09）をロード
+$C1/DB3A BEQ $F5    [$DB31]      ;ゼロフラグが立っているとき[$DB31]分岐
+$C1/DB3C LDA $14    [$00:0314]   ;Aに[$00:0314]（技データ18）をロード
+$C1/DB3E LDX $10    [$00:0310]   ;Xに[$00:0310]をロード
+$C1/DB40 AND #$30                ;A（技データ18）と$30で論理積
+$C1/DB42 BEQ $0E    [$DB52]      ;ゼロフラグが立っているとき[$DB52]分岐（敵依存ステータスが力の時）
+$C1/DB44 CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C1/DB46 BEQ $10    [$DB58]      ;ゼロフラグが立っているとき[$DC8F]分岐（敵依存ステータスが速の時）
+$C1/DB48 CMP #$20                ;Aと$20を減算比較（ステータスレジスタ変更のみ）
+$C1/DB4A BEQ $12    [$DB5E]      ;ゼロフラグが立っているとき[$DC8F]分岐（敵依存ステータスが体の時）
+$C1/DB4C LDA $7E8F06,x           ;Aに[$7E8F06,x]（敵番号x・知(現在値)）をロード
+$C1/DB50 BRA $12    [$DB64]      ;フラグにかかわりなく常に[$DB64]分岐
+$C1/DB64 STA $16    [$00:0316]   ;（敵番号x・知(現在値)）を[$00:0316]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/DB38</span></code>で技データ09をロードし、ゼロフラグ判定をしているが、技データ09には技で発生する状態異常の値が格納されている。<br>
+技データ09が<span class="formula">$00</span>ということは、該当技では状態異常は発生しないため、<code>[$DB31]</code>に飛ぶ。つまり状態異常の処理はしない。<br>
+使用者の依存ステータスを計算後に、状態異常が発生するかどうかを判定するという、妙な順序なのだが、とにかくここで状態異常発生処理を行うかどうかが判定されている。</p>
+
+<p><code><span class="r">$C1/DB3C</span></code>以降は、敵依存ステータスの判定と該当ステータスの現在値のロードを行っている。つまり先の味方側の処理を敵側でも行うことになる。<br>
+<code><span class="r">$C1/DB40</span></code>で、技データ18と<span class="formula">$30</span>で論理積を取っているが、<span class="formula">$30 = %0011 0000</span>なので、技データ18の上3～4ビットの取り出し、つまり状態異常敵依存ステータスを取り出している。<br>
+<code><span class="r">$C1/DB42</span></code>でゼロフラグが立つのは、依存ステータスが「力」の時であり、<code>[$DB52]</code>に分岐。<br>
+<code><span class="r">$C1/DC7D</span></code>では<span class="formula">$10 = %0001 0000</span>と減算比較しているので、ゼロフラグが立つのは依存ステータスが「速」の時であり、<code>[$DC8F]</code>に分岐。<br>
+<code><span class="r">$C1/DC81</span></code>では<span class="formula">$20 = %0010 0000</span>と減算比較しているので、ゼロフラグが立つのは依存ステータスが「体」の時であり、<code>[$DC8F]</code>に分岐。<br>
+残るのは依存ステータスが「知」の時なので、<code><span class="r">$C1/DC85</span></code>で敵番号xの「知(現在値)」である<code>[$7E8F06,x]</code>をロードしている。敵番号1なら<code>[$7E:AA06]</code>である。<br>
+この先は説明を簡単にするため、攻撃した敵は敵番号1としておく。<br>
+今回は「忍法夢幻蝶」の処理なので、敵依存ステータスは「知」になる。つまり敵番号1の「知(現在値)」がロードされた。<br>
+最終的に<code><span class="r">$C1/DC97</span></code>で、敵依存ステータスの現在値が<code>[$00:0316]</code>に書き込まれる。</p>
+
+<p>ここまでで、</p>
+
+<ul>
+	<li><code>[$00:0312]</code>：技データ09</li>
+	<li><code>[$00:0313]</code>：<span class="formula">$00</span>（初期値）</li>
+	<li><code>[$00:0314]</code>：技データ18</li>
+	<li><code>[$00:0315]</code>：使用者の依存ステータスの現在値（おぼろ丸の「知」現在値）</li>
+	<li><code>[$00:0316]</code>：敵の依存ステータスの現在値（敵番号1の「知」現在値）</li>
+</ul>
+
+<p>が入ったということになる。</p>
+
+<div class="code-container"><pre>
+$C1/DB66 LDA $15    [$00:0315]   ;Aに[$00:0315]をロード
+$C1/DB68 STA $4204  [$00:4204]   ;符号付16bit / 8bit　被除数（下1バイト）
+$C1/DB6B LDA #$00                ;Aに$00をロード
+$C1/DB6D STA $4205  [$00:4205]   ;符号付16bit / 8bit　被除数（上1バイト）
+$C1/DB70 LDA $7E9000,x[$7E:AB00] ;Aに[$7E:AB00]	をロード
+$C1/DB74 STA $4206  [$00:4206]   ;符号付16bit / 8bit　除数
+$C1/DB77 JSR $46C8  [$C1:46C8]   ;[$C1:46C8]へジャンプ
+;
+$C1/46C8 NOP                     ;計算待機
+$C1/46C9 RTS                     ;計算待機
+;
+$C1/DB7A LDA $4214  [$00:4214]   ;符号付16bit / 8bit　商（下1バイト）
+$C1/DB7D STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+</pre></div>
+
+<p>次に符号付16bit / 8bit（割り算）の計算を行っている。<br>
+<code>[$00:4204]</code><code>[$00:4205]</code>に被除数の下1バイト・上1バイト、<code>[$00:4206]</code>に除数を入れると、割り算の商（下1バイト）が<code>[$00:4214]</code>に入る。<br>
+被除数（下1バイト）に<code>[$00:0315]</code>（使用者の依存ステータスの現在値）、上1バイトに<span class="formula">$00</span>、除数に<code>[$7E:AB00]</code>をセットしているが、<code>[$7E:AB00]</code>は先の表で紹介した通りに、敵番号1のレベル(現在値)である。<br>
+つまり、この計算は、</p>
+
+<p><span class="formula">trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」)</span></p>
+
+<p>になる。<br>
+割り算の商なので余りを考慮しないため、<span class="formula">trunc</span>（小数点以下切り捨て）である。<br>
+デバフにより、レベル(現在値)が<span class="formula">0</span>になる可能性もあるため、いわゆるゼロ除算（<span class="formula">÷0</span>）になる可能性もあるのだが、この符号付16bit / 8bitの方法だと、ゼロ除算で商と余りに<span class="formula">$FFFF</span>を返す仕組みになっているので、妙なエラーが出る心配はない。<br>
+何にせよ、上の計算結果は<code>[$00:0320]</code>に書き込みされる。</p>
+
+<ul>
+	<li><code>[$00:0312]</code>：技データ09</li>
+	<li><code>[$00:0313]</code>：<span class="formula">$00</span>（初期値）</li>
+	<li><code>[$00:0314]</code>：技データ18</li>
+	<li><code>[$00:0315]</code>：使用者の依存ステータスの現在値（おぼろ丸の「知」現在値）</li>
+	<li><code>[$00:0316]</code>：敵の依存ステータスの現在値（敵番号1の「知」現在値）</li>
+	<li><code>[$00:0320]</code>：<span class="formula">trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」)</span></li>
+</ul>
+
+<div class="code-container"><pre>
+$C1/DB7F LDA #$08                ;Aに$08をロード
+$C1/DB81 STA $08    [$00:0308]   ;A（$08）を[$00:0308]に書き込み
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]（技データ09）を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBDC CLC                     ;キャリーフラグクリア
+$C1/DBDD ROR $13    [$00:0313]   ;[$00:0313]をキャリーフラグを含めた9bitで右ローテート
+$C1/DBDF INX                     ;X+1
+$C1/DBE0 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DBE2 BNE $9F    [$DB83]      ;ゼロフラグが立っていないとき[$DB83]分岐
+</pre></div>
+
+<p>ここから、状態異常8種類について、「技に該当の状態異常がセットされているか」をループ処理して判定していく。</p>
+
+<p>まず、<code>[$00:0308]</code>に<span class="formula">$08</span>を書き込みしているが、これは8種類ある状態異常判定のためのループ回数をセットしている。ループするたびに<code>[$00:0308]</code>の値を<span class="formula">-1</span>して、<span class="formula">0</span>になるまでループを繰り返す仕組みである。<br>
+続いて、<code>[$00:0312]</code>（技データ09）を論理右シフトしている。<br>
+技データ09に入っているのは、技で発生する状態異常の値であり、2進数の上の桁から順に、石化・酔い・眠り・マヒ・毒・腕かため・足かため・首かために対応している。<br>
+「忍法夢幻蝶」は<span class="formula">$28</span>、2進数だと<span class="formula">%0010 1000</span>である。<br>
+論理右シフトは<span class="formula">÷2</span>の計算であり、2進数においては8桁の値をすべて右へ1つずつズラすことでもあるが、一番右の数値はキャリー分の値となり、<span class="formula">1</span>だった時には論理右シフト時にキャリーフラグが立つ。<br>
+「忍法夢幻蝶」の<span class="formula">%0010 1000</span>を論理右シフトすると、<span class="formula">%0001 0100</span>となり、一番右の値、つまり「首かため」に対応した値は<span class="formula">0</span>だったため、キャリーフラグは立たない。</p>
+
+<p>次の<code><span class="r">$C1/DB85</span></code>が、キャリーフラグによる分岐になっており、キャリーフラグが立ったら該当の状態異常の発生処理を行うサブルーチンへ、キャリーフラグが立たない場合は状態異常の発生処理をスキップし<code>[$DBDC]</code>へ、となっている。<br>
+つまり、論理右シフトで状態異常の値（2進数8桁）を回しながら、該当の状態異常に<span class="formula">1</span>が立っているかどうかキャリーフラグで判断していくループ処理である。<br>
+「忍法夢幻蝶」では「首かため」が発生しないので、<code><span class="r">$C1/DBDC</span></code>にジャンプし、キャリーフラグをクリアしている。</p>
+
+<p>次の処理<code><span class="r">$C1/DBDD</span></code>がポイントで、<code>[$00:0313]</code>の値を、キャリーフラグを含めた9bitで右ローテートする。<br>
+<code>[$00:0313]</code>は、ここより前に、初期値として<span class="formula">$00</span>を入れた。つまり<span class="formula">%0000 0000</span>が入っている。<br>
+直前でキャリーフラグをクリアしたから、キャリーフラグを含めた9bitというのは、</p>
+
+<p><span class="formula">%0 0000 0000</span></p>
+
+<p>と、頭にキャリー分の<span class="formula">0</span>を加えた9桁である。<br>
+右ローテートは文字通りに、このまま右に1桁ずつ数値を移動させ、一番右の値はキャリー分として一番左に入る。つまり円のようにぐるぐる回す。<br>
+といっても現状ではすべて<span class="formula">0</span>が入っているから、回してもこのままである。</p>
+
+<p>このままでは何の意味もない処理のように見えるが、実は状態異常が発生すると、キャリーフラグがONのまま、同じ処理をすることになる。<br>
+その処理はおいおい説明する。</p>
+
+<div class="code-container"><pre>
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBDC CLC                     ;キャリーフラグクリア
+$C1/DBDD ROR $13    [$00:0313]   ;[$00:0313]をキャリーフラグを含めた9bitで右ローテート
+$C1/DBDF INX                     ;X+1
+$C1/DBE0 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DBE2 BNE $9F    [$DB83]      ;ゼロフラグが立っていないとき[$DB83]分岐
+;
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBDC CLC                     ;キャリーフラグクリア
+$C1/DBDD ROR $13    [$00:0313]   ;[$00:0313]をキャリーフラグを含めた9bitで右ローテート
+$C1/DBDF INX                     ;X+1
+$C1/DBE0 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DBE2 BNE $9F    [$DB83]      ;ゼロフラグが立っていないとき[$DB83]分岐
+</pre></div>
+
+<p>「忍法夢幻蝶」での処理を続けてみていく。<br>
+状態異常の値が入った<code>[$00:0312]</code>は1回論理右シフトしているから、最初の<code><span class="r">$C1/DB83</span></code>の論理右シフトでは、<span class="formula">%0001 0100</span>→<span class="formula">%0000 1010</span>で、一番下の位に「足かため」の状態異常の有無の値が来る。<br>
+「忍法夢幻蝶」は「足かため」の効果もないので、先程と同じ処理が続く。<br>
+<code><span class="r">$C1/DBDD</span></code>の<code>[$00:0313]</code>の右ローテートも、「<span class="formula">%0 0000 0000</span>」のままである。</p>
+
+<p>次のループの処理は、最初の<code><span class="r">$C1/DB83</span></code>の論理右シフトで、<code>[$00:0312]</code>は<span class="formula">%0000 1010</span>→<span class="formula">%0000 0101</span>、「腕かため」も効果なしなので、やはり処理は変わらない。</p>
+
+<div class="code-container"><pre>
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]（技データ09）を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DB87 LDA $7E8F08,x[$7E:AA0B] ;Aに[$7E:AA0B]（敵1 毒回復までの残り時間）をロード
+$C1/DB8B BNE $4F    [$DBDC]      ;ゼロフラグが立っていないとき[$DBDC]分岐
+$C1/DB8D JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+$C1/6150 PHX                     ;戦闘乱数計算
+$C1/6151 PHB                     ;↓
+;（省略）
+$C1/61A3 PLX                     ;↓
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+</pre></div>
+
+<p><code>[$00:0312]</code>が論理右シフトで<span class="formula">%0000 0101</span>→<span class="formula">%1000 0010</span>、「毒」状態の時はキャリーフラグが立つ。<br>
+ここで「忍法夢幻蝶」の「毒」状態についての計算が開始になる。<br>
+まず、<code>[$7E:AA0B]</code>（敵1 毒 状態異常継続時間）がロードされ、ゼロフラグが立っていないのならこの先の処理はスキップされる。<br>
+つまり、既に毒状態で、状態異常継続時間が<span class="formula">0</span>以上の時、新たに毒状態にする処理は行われない。<br>
+ここから、</p>
+
+<p style="font-weight:bold;">何かしらの状態異常にある敵をもう一度同じ状態異常にして、状態異常継続時間を伸ばし続けることはできない。</p>
+
+<p>ということがわかる。<br>
+例えば原始編のキングマンモー相手に完封したい場合、マヒ状態の時にマヒを続けて入れるだけでは状態異常継続時間が伸びないので、かならずどこかのタイミングでマヒが切れる。<br>
+眠り状態とマヒ状態を交互に入れることで、どちらかの状態異常の継続時間が切れたらどちらかの状態異常が働いている状態にし、キングマンモーを行動させないようにすることが可能になる。</p>
+
+<p>話が少し逸れたが、ここでは、敵は「忍法夢幻蝶」をくらった時点で何の状態異常にもなっていない前提として先を進める。<br>
+その場合は戦闘乱数の生成処理に進む。<br>
+戦闘乱数生成サブルーチンは既に紹介済みなので、該当部分の<code><span class="r">$C1/6150</span></code>～<code><span class="r">$C1/61A4</span></code>の説明は省略する。<br>
+この時点で<span class="formula">$00</span>～<span class="formula">$FF</span>の乱数が<code>A</code>と<code>[$00:033B]</code>に入る。</p>
+
+<div class="code-container"><pre>
+$C1/DB90 STA $4202  [$00:4202]   ;符号付8bit x 8bit　被乗数
+$C1/DB93 LDA $15    [$00:0315]   ;Aに[$00:0315]をロード
+$C1/DB95 STA $4203  [$00:4203]   ;符号付8bit x 8bit　乗数
+$C1/DB98 NOP                     ;乗算計算待機
+$C1/DB99 NOP                     ;乗算計算待機
+$C1/DB9A NOP                     ;乗算計算待機
+$C1/DB9B CLC                     ;キャリーフラグクリア
+$C1/DB9C ADC $4217  [$00:4217]   ;A + 符号付8bit x 8bit結果の上位1バイト
+$C1/DB9F ROR A                   ;Aにキャリーフラグを含めた9bitで右ローテート
+$C1/DBA0 SEC                     ;キャリーフラグON
+$C1/DBA1 SBC $16    [$00:0316]   ;A-[$00:0316]（敵1　知(現在値)）
+$C1/DBA3 BEQ $37    [$DBDC]      ;ゼロフラグが立っているとき[$DBDC]分岐
+$C1/DBA5 BCC $35    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBA7 STA $17    [$00:0317]   ;Aを[$00:0317]に書き込み
+</pre></div>
+
+<p>ここから符号付8bit x 8bitの計算を行う。<br>
+<code>[$00:4202]</code>に被乗数、<code>[$00:4203]</code>に乗数を入れると、計算結果の上1バイトが<code>[$00:4217]</code>、下1バイトが<code>[$00:4216]</code>に入る。<br>
+生成した乱数は、符号付8bit x 8bitの計算の被乗数としてセットされている。<br>
+更に、<code>[$00:0315]</code>が乗数としてセットされているので、この乗算は、</p>
+
+<p><span class="formula">乱数（$00～$FF）×使用者依存ステータス（現在値）</span></p>
+
+<p>である。<br>
+<code><span class="r">$C1/DB9C</span></code>で、Aに<code>[$00:4217]</code>を加算している。<br>
+<code>A</code>には<code>[$00:0315]</code>が入ったままであり、<code>[$00:4217]</code>には乗算結果の上1バイトが入っている。つまり乗算結果4桁の上2桁部分だから、乗算結果を<span class="formula">$100</span>で割った値である。<br>
+つまり、<code><span class="r">$C1/DB9C</span></code>の計算結果は、</p>
+
+<p><span class="formula">使用者依存ステータス（現在値） + 乱数×使用者依存ステータス（現在値）/$100</span><br>（<span class="formula">trunc</span>表記は見づらくなるので省く）</p>
+
+<p>「<span class="formula">乱数×使用者依存ステータス（現在値）/$100</span>」の部分だが、乱数は<span class="formula">$00</span>～<span class="formula">$FF</span>だから、使用者依存ステータス（現在値）に<span class="formula">$00</span>～<span class="formula">$FF</span>を掛けて<span class="formula">$100</span>で割る場合、使用者依存ステータス（現在値）の<span class="formula">0～255/256</span>倍の値である。<br>
+これに、更に「使用者依存ステータス（現在値）」を足しているので、結局、</p>
+
+<p><span class="formula">使用者依存ステータス（現在値） + 乱数×使用者依存ステータス（現在値）/$100</span></p>
+
+<p>というのは、「使用者依存ステータス（現在値）」の<span class="formula">1</span>倍～<span class="formula">511/256</span>倍の値の算出を意味する。</p>
+
+<div class="place"><p>例：<br>
+おぼろ丸の知が<span class="formula">99</span>の時だったら、16進数で<span class="formula">$63</span>だから、</p>
+
+<p><span class="formula">使用者依存ステータス（現在値） + 乱数×使用者依存ステータス（現在値）/$100</span><br>
+<span class="formula"> = $63 + ($00～$FFの乱数)*$63/$100</span><br>
+<span class="formula"> = $63 + 0 ～ $63 + $FF*$63/$100</span><br>
+<span class="formula"> = $63 ～ $C5</span></p>
+ 
+<p>10進数だと<span class="formula">99</span>～<span class="formula">197</span>で、元の知の値の1倍～約1.99倍が乱数で計算されたことになる。</p></div>
+
+<p>ステータスと乱数次第では、計算結果が<span class="formula">$100</span>を越える、つまりキャリーフラグが立つことになる。<br>
+次の<code><span class="r">$C1/DB9F</span></code>は、上の結果をキャリーフラグを含めた9bitで右ローテートする。つまり、キャリーフラグ含めて<span class="formula">÷2</span>するので、</p>
+
+<p><span class="formula">(使用者依存ステータス（現在値） + 乱数×使用者依存ステータス（現在値）/$100)/2</span></p>
+
+<p>次の<code><span class="r">$C1/DBA1</span></code>で、キャリーフラグを立ててから<code>[$00:0316]</code>（敵依存ステータス（現在値））を引いている。</p>
+
+<p><span class="formula">(使用者依存ステータス（現在値） + 乱数×使用者依存ステータス（現在値）/$100)/2 - 敵依存ステータス（現在値）</span></p>
+
+<p>ここでゼロフラグが立つか、キャリーフラグが立たない場合は、処理中止で<code>[$DBDC]</code>分岐になり、それ以外だと計算結果を<code>[$00:0317]</code>に書き込む。<br>
+つまり、上の計算結果が<span class="formula">0</span>か負になった場合は、状態異常が発生しないことになる。正の値だった時のみ、計算結果が<code>[$00:0317]</code>に入って、処理が続く。<br>
+大雑把に言えば、使用者依存ステータスの<span class="formula">0.5</span>倍～<span class="formula">0.99</span>倍（厳密には<span class="formula">255/256</span>倍）と敵依存ステータスを比較して、前者の方が大きいのなら状態異常発生、ということになる。</p>
+
+<div class="place">例：<br>
+おぼろ丸の知が99の時だったら、先程の計算の続きで、<span class="formula">$63</span> ～ <span class="formula">$C5</span>を2で割って、<br>
+<span class="formula">$31</span>～<span class="formula">$62</span><br>
+10進数だと<span class="formula">49</span>～<span class="formula">98</span>。<br>
+敵の知の値がこの値未満なら、状態異常発生条件を満たす。<br>
+また、敵の知の値が<span class="formula">49</span>未満なら、乱数が何であっても必ず状態異常発生条件を満たすことになり、敵の知の値が<span class="formula">98</span>以上だと、乱数が何であっても状態異常が発生しないことになる。</div>
+
+<p><code>[$00:0317]</code>の最大値は、使用者依存ステータスが<span class="formula">$FF</span>、敵依存ステータスが<span class="formula">$00</span>、乱数が<span class="formula">$FF</span>の時の「<span class="formula">$FE</span>」になる。</p>
+
+<ul>
+	<li><code>[$00:0312]</code>：技データ09</li>
+	<li><code>[$00:0313]</code>：<span class="formula">$00</span>（初期値）</li>
+	<li><code>[$00:0314]</code>：技データ18</li>
+	<li><code>[$00:0315]</code>：使用者の依存ステータスの現在値（おぼろ丸の「知」現在値）</li>
+	<li><code>[$00:0316]</code>：敵の依存ステータスの現在値（敵番号1の「知」現在値）</li>
+	<li><code>[$00:0317]</code>：<span class="formula">(使用者依存ステータス（現在値） + 乱数×使用者依存ステータス（現在値）/$100)/2 - 敵依存ステータス（現在値）</span></li>
+	<li><code>[$00:0320]</code>：<span class="formula">trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」)</span></li>
+</ul>
+
+<p>さて、以上で状態異常発生条件のひとつが満たされただけで、ここから先に更に状態異常時間に関する計算が続く。</p>
+
+<div class="code-container"><pre>
+$C1/DBA9 STA $4202  [$00:4202]   ;符号付8bit x 8bit　被乗数
+$C1/DBAC LDA $14    [$00:0314]   ;[$00:0314]（技データ18）をロード
+$C1/DBAE AND #$0F                ;Aと$0Fで論理積（下4ビット：状態異常時間係数）
+$C1/DBB0 STA $4203  [$00:4203]   ;符号付8bit x 8bit　乗数
+$C1/DBB3 NOP                     ;乗算計算待機
+$C1/DBB4 NOP                     ;乗算計算待機
+$C1/DBB5 NOP                     ;乗算計算待機
+$C1/DBB6 NOP                     ;乗算計算待機
+$C1/DBB7 LDA $4217  [$00:4217]   ;Aに符号付8bit x 8bit答えの上バイトをロード
+$C1/DBBA AND #$F8                ;Aと$F8（%1111 1000）で論理積
+$C1/DBBC BNE $0F    [$DBCD]      ;ゼロフラグが立っていないとき[$DBCD]分岐
+$C1/DBBE REP #$20                ;Mフラグをクリア　Aレジスタは16bit幅
+$C1/DBC0 LDA $4216  [$00:4216]   ;Aに符号付8bit x 8bit答えの下バイトをロード
+$C1/DBC3 LSR A                   ;論理右シフト /2
+$C1/DBC4 LSR A                   ;論理右シフト /2
+$C1/DBC5 LSR A                   ;論理右シフト /2
+$C1/DBC6 SEP #$20                ;MフラグON Aレジスタは8bit幅
+$C1/DBC8 CLC                     ;キャリーフラグクリア
+$C1/DBC9 ADC $20    [$00:0320]   ;A+[$00:0320]（trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」)）
+$C1/DBCB BCC $02    [$DBCF]      ;キャリーフラグが立っていないとき[$DBCF]分岐
+$C1/DBCD LDA #$FF                ;Aに$FFをロード
+$C1/DBCF CMP #$11                ;Aと$11（17）を減算比較
+$C1/DBD1 BCC $09    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBD3 STA $7E8F08,x[$7E:AA0B] ;Aを[$7E:AA0B]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/DBA9</span></code>は先程までの計算結果<code>[$00:0317]</code>を被乗数、<code><span class="r">$C1/DBB0</span></code>は技データ18と<span class="formula">$0F</span>の論理積で下4ビットの「状態異常時間係数」を取り出し乗数としてセットしている。<br>
+つまり<code>[$00:0317]</code>×状態異常時間係数を計算し、<code><span class="r">$C1/DBB7</span></code>でこの答えの上1バイトが入る<code>[$00:4217]</code>を<code>A</code>にロードしている。<br>
+<code><span class="r">$C1/DBB7</span></code>の時点での<code>A</code>は、</p>
+
+<p><span class="formula"><code>[$00:0317]</code>*状態異常時間係数/$100</span></p>
+
+<p>である。<br>
+<code><span class="r">$C1/DBBA</span></code>では<code>A</code>と<span class="formula">$F8</span>（<span class="formula">%1111 1000</span>）で論理積を取り、ゼロフラグが立つかどうかを判断している。<br>
+<span class="formula">$F8</span>と論理積を取ってゼロフラグが立つのは（<span class="formula">%0000 0???</span>）の時、つまり<code>A</code>が<span class="formula">$07</span>以下の時。<br>
+ゼロフラグが立たないのは<code>A</code>が<span class="formula">$08</span>以上になる。<br>
+<code>A</code>に入っているのは、<code>[$00:0317]</code>×状態異常時間係数の上1バイトだから、ゼロフラグが立たないのは「掛け算の答えが<span class="formula">$0800</span>以上」と言い換えることができる。<br>
+この後の<code><span class="r">$C1/DBC0</span></code>～の処理を見るとわかるが、この時点で状態異常時間の判定をするまでもなく大きな値になっているので、ゼロフラグが立たない時は<code><span class="r">$C1/DBCD</span></code>にジャンプして<code>A</code>に<span class="formula">$FF</span>をロードしている。</p>
+
+<p>では、ゼロフラグが立つ場合の<code><span class="r">$C1/DBC0</span></code>以降の処理を見ていく。<br>
+<code>A</code>を16bitモードに変更後、<code>A</code>に<code>[$00:4216]</code>をロードしている。つまり、先の掛け算の答えを16ビットで<code>A</code>にロードした。この時の答えは<span class="formula">$07FF</span>以下のはずである。<br>
+<code><span class="r">$C1/DBC3</span></code>～<code><span class="r">$C1/DBC5</span></code>で論理右シフトを3回繰り返しているので、<span class="formula">÷8</span>である。<br>
+ここで<code>A</code>を8bitモードに変更している。掛け算の答えが<span class="formula">$07FF</span>以下だったから、<span class="formula">÷8</span>の結果、Aは<span class="formula">$FF</span>以下になっているから、8bitモードに変更しても値は変わらない。<br>
+<code><span class="r">$C1/DBC9</span></code>で、<code>A</code>と<code>[$00:0320]</code>を加算している。<code>[$00:0320]</code>は<span class="formula">trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」)</span>が入っているから、</p>
+
+<p><span class="formula">trunc(<code>[$00:0317]</code>*状態異常時間係数/$8) + trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」)</span></p>
+
+<p>という計算になる。これが「<span style="font-weight:bold;">状態異常継続時間</span>」になる。<br>
+キャリーフラグが立つかどうかで分岐になるが、キャリーフラグが立つ場合は、加算で繰り上がりが起き、計算結果は<span class="formula">$100</span>以上だったことになる。<br>
+この時は<code><span class="r">$C1/DBCD</span></code>に進み<code>A</code>に<span class="formula">$FF</span>をロードしている。<br>
+計算結果が<span class="formula">$FF</span>以下の時は、<code><span class="r">$C1/DBCF</span></code>に進み、計算結果と<span class="formula">$11</span>（10進数17）と減算比較している。<br>
+この結果でキャリーフラグが立っていない、つまり減算の結果が負の数だったら、状態異常は発生せず<code>[$DBDC]</code>に飛ぶ。<br>
+減算の結果が<span class="formula">0</span>以上なら、キャリーフラグが立たず、状態異常が発生する。<br>
+つまり、</p>
+
+<p><span class="formula">状態異常継続時間 = <code>[$00:0317]</code>*状態異常時間係数/$8 + trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」</span></p>
+
+<p>が、<span class="formula">17</span>以上の時に状態異常が発生する。<br>
+ただし最大値は<span class="formula">$FF</span>だから、厳密には、</p>
+
+<p><span class="formula">状態異常継続時間 = min(trunc（<code>[$00:0317]</code>*状態異常時間係数/$8） + trunc(「使用者依存ステータス(現在値)」/「敵番号1レベル(現在値)」), <span class="formula">$FF</span>)</span></p>
+
+<p>である。<br>
+<code><span class="r">$C1/DBD3</span></code>で、状態異常継続時間が<code>[$7E:AA0B]</code>に格納される。</p>
+
+<p>ここまでをまとめると、</p>
+
+<div class="place"><p><span class="formula">状態異常の判定値<code>[$00:0317]</code> = (使用者依存ステータス（現在値） + 乱数(<span class="formula">$00</span>～<span class="formula">$FF</span>)×使用者依存ステータス（現在値）/$100)/2 - 敵依存ステータス（現在値）</span><br>
+が正の値の時、続けて状態異常継続時間を計算する。</p>
+
+<p><span class="formula">状態異常継続時間 = min(trunc（<code>[$00:0317]</code>*状態異常時間係数/$8） + trunc(使用者依存ステータス(現在値) / 敵番号1レベル(現在値)), <span class="formula">$FF</span>)</span><br>
+が<span class="formula">$11</span>（10進数17）以上の時、該当の状態異常が発生になる。</p></div>
+
+<p>ということがわかった。<br>
+これは世界の合言葉は森部様の以下の計算と同一になる。</p>
+
+<blockquote><p>　・状態異常：<br>
+(自能力値+(0～(自能力値-1)))/2-敵能力値が正のとき状態異常発生（下の異常時間が17以上であることも条件）<br>
+　・状態異常時間：<br>
+上の引き算結果*異常時間係数/8+自能力値/敵LV</p></blockquote>
+
+<div class="code-container"><pre>
+$C1/DBD7 SEC                     C;キャリーフラグON
+$C1/DBD8 ROR $13    [$00:0313]   C;[$00:0313]をキャリーフラグを含めた9bitで右ローテート
+$C1/DBDA BRA $03    [$DBDF]      c;フラグにかかわりなく常に分岐[$DBDF]
+$C1/DBDF INX                     c;X+1
+$C1/DBE0 DEC $08    [$00:0308]   c;[$00:0308]-1
+$C1/DBE2 BNE $9F    [$DB83]      c;ゼロフラグが立っていないとき[$DB83]分岐
+</pre></div>
+
+<p>状態異常が発生することが決定した後は、<code><span class="r">$C1/DBD7</span></code>でキャリーフラグをONにする。<br>
+<code><span class="r">$C1/DBD8</span></code>で、先程までは何の意味もなかった「<code>[$00:0313]</code>をキャリーフラグを含めた9bitで右ローテート」を行うのだが、今回はキャリーフラグが入っているから、</p>
+
+<p><span class="formula">%1 0000 0000</span>→<span class="formula">%0 1000 0000</span></p>
+
+<p>ここで初めて<code>[$00:0313]</code>に<span class="formula">%1000 0000</span>という値が入った。<br>
+これが「毒の状態異常が発生した」処理になる。<br>
+<code><span class="r">$C1/DBDF</span></code>でようやく、状態異常判定ループに戻ってきたことになり、<span class="formula">X+1</span>、<span class="formula"><code>[$00:0308]</code>-1</span>の処理をして、毒の次の状態異常であるマヒの判定に移る。</p>
+
+<div class="code-container"><pre>
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]（技データ09）を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBDC CLC                     ;キャリーフラグクリア
+$C1/DBDD ROR $13    [$00:0313]   ;[$00:0313]をキャリーフラグを含めた9bitで右ローテート
+$C1/DBDF INX                     ;X+1
+$C1/DBE0 DEC $08    [$00:0308]   ;[$00:0308]-1
+</pre></div>
+
+<p><code>[$00:0312]</code>の論理シフトは<span class="formula">%1000 0010</span>→<span class="formula">%0100 0001</span>なので、キャリーフラグは立たない。マヒの判定となる。<br>
+<code><span class="r">$C1/DBDD</span></code>の右ローテートは、さきほど毒の状態異常の処理が入ったから、<br>
+<span class="formula">%0 1000 0000</span>→<span class="formula">%0 0100 0000</span><br>
+である。<br>
+<code>[$00:0313]</code>に<span class="formula">%0100 0000</span>が入り、次の処理へ移る。</p>
+
+<div class="code-container"><pre>
+$C1/DBE2 BNE $9F    [$DB83]      ;ゼロフラグが立っていないとき[$DB83]分岐
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]（技データ09）を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DB87 LDA $7E8F08,x[$7E:AA0D] ;Aに[$7E:AA0D]（敵1 眠り 状態異常継続時間）をロード
+$C1/DB8B BNE $4F    [$DBDC]      ;ゼロフラグが立っていないとき[$DBDC]分岐
+$C1/DB8D JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+</pre></div>
+
+<p><code>[$00:0312]</code>の論理シフトは<span class="formula">%0100 0001</span>→<span class="formula">%1010 0000</span>でキャリーフラグが立つ。眠りの判定である。<br>
+よって眠り状態にできるかどうかの判定が行われる。<br>
+<code>A</code>に<code>[$7E:AA0D]</code>（敵1 眠り 状態異常継続時間）をロードし、<span class="formula">0</span>の時は戦闘乱数生成へ移る。<br>
+この後の処理は、毒状態の時と同じである。変わるのは乱数の値だけである。<br>
+乱数が変わるので、ステータス次第で「毒状態にはできたが眠り状態にはできない」や、その逆もあり得るし、もし毒状態にも眠り状態にもできたとしても、状態異常継続時間に異なる値が入ることもある。</p>
+
+<p>ここでは処理の紹介は省略し、眠り状態にできたものとする。</p>
+
+<div class="code-container"><pre>
+$C1/DBD7 SEC                     ;キャリーフラグON
+$C1/DBD8 ROR $13    [$00:0313]   ;[$00:0313]をキャリーフラグを含めた9bitで右ローテート
+$C1/DBDA BRA $03    [$DBDF]      ;フラグにかかわりなく常に分岐[$DBDF]
+$C1/DBDF INX                     ;X+1
+$C1/DBE0 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DBE2 BNE $9F    [$DB83]      ;ゼロフラグが立っていないとき[$DB83]分岐
+</pre></div>
+
+<p>眠り状態にできた場合は、毒状態と同じく、<code>[$00:0313]</code>に対してキャリーフラグ分の値を入れて右ローテートする。</p>
+
+<p><span class="formula">%1 0100 0000</span>→<span class="formula">%0 1010 0000</span></p>
+
+<p><span class="formula"><code>[$00:0313]</code> = %1010 0000</span>となる。</p>
+
+<div class="code-container"><pre>
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]（技データ09）を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBDC CLC                     ;キャリーフラグクリア
+$C1/DBDD ROR $13    [$00:0313]   ;[$00:0313]をキャリーフラグを含めた9bitで右ローテート 
+$C1/DBDF INX                     ;X+1
+$C1/DBE0 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DBE2 BNE $9F    [$DB83]      ;ゼロフラグが立っていないとき[$DB83]分岐
+
+$C1/DB83 LSR $12    [$00:0312]   ;[$00:0312]（技データ09）を論理右シフト（/2）
+$C1/DB85 BCC $55    [$DBDC]      ;キャリーフラグが立っていないとき[$DBDC]分岐
+$C1/DBDC CLC                     ;キャリーフラグクリア
+$C1/DBDD ROR $13    [$00:0313]   ;[$00:0313]をキャリーフラグを含めた9bitで右ローテート
+$C1/DBDF INX                     ;X+1
+$C1/DBE0 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DBE2 BNE $9F    [$DB83]      ;ゼロフラグが立っていないとき[$DB83]分岐
+</pre></div>
+
+<p>残るは酔い状態と石化状態の処理で、「忍法夢幻蝶」ではどちらの状態異常も入らないから、</p>
+
+<p>酔い状態の<code>[$00:0313]</code>：<br>
+<span class="formula">%0 1010 0000→%0 0101 0000</span></p>
+
+<p>石化状態の<code>[$00:0313]</code>：<br>
+<span class="formula">%0 0101 0000→%0 0010 1000</span></p>
+
+<p>となって、最終的に<code>[$00:0313]</code>には<span class="formula">%0010 1000</span>が入った。<br>
+つまり毒状態と眠り状態に対応した位に<span class="formula">1</span>が立って、他は<span class="formula">0</span>のままである。<br>
+石化処理を終えた時点で、ループ回数を入れてある<code>[$00:0308]</code>が<span class="formula">0</span>になるため、<code><span class="r">$C1/DBE2</span></code>でゼロフラグが立ち、状態異常処理ループを抜ける。</p>
+
+<div class="code-container"><pre>
+$C1/DBE4 LDX $10    [$00:0310]   ;Xに[$00:0310]をロード
+$C1/DBE6 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/DBE9 LDA $002A,y[$00:1A2A]   ;Aに[$00:1A2A]をロード
+$C1/DBEC EOR #$FF                ;Aと$FFで排他的論理和
+$C1/DBEE AND $13    [$00:0313]   ;Aと[$00:0313]で論理積
+$C1/DBF0 STA $7E900C,x[$7E:AB0C] ;Aを[$7E:AB0C]に書き込み
+$C1/DBF4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/DBE9</span></code>で、<code>[$00:1A2A]</code>（敵種類1の敵データ10）を<code>A</code>にロードしている。<br>
+敵データ10に入っているのは、無効状態異常の値であり、8ビット中、石化・酔い・眠り・マヒ・毒・腕かため・足かため・首かための順に、無効化できる状態異常に<span class="formula">1</span>、無効化できない状態異常に<span class="formula">0</span>が入っている。<br>
+ここでは敵がすべての状態異常を無効化できない、つまり敵データ10<span class="formula"> = $00</span>としておく。</p>
+
+<p><code><span class="r">$C1/DBEC</span></code>で<span class="formula">$FF</span>（<span class="formula">%1111 1111</span>）と排他的論理和を取っている。<br>
+排他的論理和は「どちらかが<span class="formula">1</span>なら<span class="formula">1</span>、それ以外は<span class="formula">0</span>」にする処理であるから、<span class="formula">$FF</span>との排他的論理和は実質、敵データ10の8ビットの値をすべて逆（<span class="formula">0</span>なら<span class="formula">1</span>、<span class="formula">1</span>なら<span class="formula">0</span>）にする処理と同じである。<br>
+このため、無効化できる状態異常に<span class="formula">0</span>、無効化できない状態異常に<span class="formula">1</span>が入る。<br>
+敵データ10<span class="formula"> = $00</span>だったら、<span class="formula">$FF</span>と排他的論理和をとると<span class="formula">$FF</span>になる。<br>
+この値と<code>[$00:0313]</code>、つまり状態異常処理ループにより、状態異常にできるビットに1が入っている数値と論理積を取る。<br>
+「状態異常にできる値に<span class="formula">1</span>が立っている8ビットの数値」と「状態異常にした値に<span class="formula">1</span>が立っている8ビットの数値」で論理積を取ったことで、最終的に状態異常にできる状態異常が決定となった。</p>
+
+<p>ということは、仮に「忍法夢幻蝶」を当てた敵が全状態異常を無効化できるとしても、まずは「状態異常にできるかどうか」をステータスから判定し、その後に敵の無効状態異常の値を見て、すべての状態異常にできなかった、という判定を行うことになる。<br>
+順序としては何か妙な気もするが、色々な事情があるのであろう。<br>
+とにかく、これで決まった状態異常の値は、<code>[$7E:AB0C]</code>に書き込まれる。<br>
+この段階ではまだ、敵番号1の状態異常のアドレスには書き込んでいない。処理がまだ続くことになる。</p>
+
+<div class="code-container"><pre>
+$C1/BD6C LDA $7E9003,x[$7E:AB03] ;Aに[$7E:AB03]をロード
+$C1/BD70 BEQ $10    [$BD82]      ;ゼロフラグが立っているとき[$BD82]分岐
+$C1/BD72 LDA $7E900C,x[$7E:AB0C] ;Aに[$7E:AB0C]をロード
+$C1/BD76 BEQ $0A    [$BD82]      ;ゼロフラグが立っているとき[$BD82]分岐
+$C1/BD78 ORA $7E8F07,x[$7E:AA07] ;Aと[$7E:AA07]（敵番号1の状態異常）で論理和
+$C1/BD7C STA $7E8F07,x[$7E:AA07] ;Aを[$7E:AA07]（敵番号1の状態異常）に書き込み
+$C1/BD80 INC $0F    [$00:030F]   ;[$00:030F]をインクリメント
+$C1/BD82 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/BD6C</span></code>で、<code>[$7E:AB03]</code>をロードしているが、これは「忍法夢幻蝶」の敵番号1へのヒット数である。<br>
+多段ヒット技の「忍法夢幻蝶」が敵番号1に1ヒット以上していなければそもそも状態異常にできないので、ここでゼロフラグが立っていないかどうかを判定している。<br>
+（多段ヒットする範囲攻撃に2体以上の敵を巻き込んだ場合、どの敵に命中するかは1ヒット毎に乱数で判定している）</p>
+
+<p>続いて状態異常の値<code>[$7E:AB0C]</code>がロードされ、ゼロフラグが立っていない場合は、敵番号1の状態異常<code>[$7E:AA07]</code>の値と論理和を取る。<br>
+つまり、既に発生している状態異常の値と、新たに発生した状態異常の値が加算される。<br>
+それを新たな状態異常の値として、<code>[$7E:AA07]</code>に書き込み、状態異常発生処理は終了である。</p>
+
+<p>まとめると以下のようになる。</p>
+
+<div class="place"><p>技による状態異常の発生条件：</p>
+
+<p>技に設定された状態異常を、当てる相手が無効化せず、かつ、既にその状態異常になっていない時に、状態異常を発生させるか以下のように判定する。</p>
+
+<ol>
+	<li><span class="formula">状態異常の判定値<code>[$00:0317]</code> = (使用者依存ステータス（現在値） + 乱数($00～$FF)×使用者依存ステータス（現在値）/$100)/2 - 敵依存ステータス（現在値）</li><br>が正の値の時、続けて状態異常継続時間を計算する。</li>
+	<li><span class="formula">状態異常継続時間 = min(trunc(<code>[$00:0317]</code>*状態異常時間係数/$8) + trunc(使用者依存ステータス(現在値) / 敵番号1レベル(現在値)), $FF)</span><br>が<span class="formula">$11</span>（10進数17）以上の時、該当の状態異常が発生になる。</li>
+</ol>
+</div>
+
+<p><a href="program18_2.html">次ページ</a>では、武器の追加効果として状態異常が発生する場合について説明する。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program17_4.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program18_2.html"><span class="button">&#9654;次　武器の状態異常</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

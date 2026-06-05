@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ボタン判定">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ボタン判定">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ボタン判定</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="here"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ボタン判定</h1>
+<h2>ボタン判定</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>コンピュータゲームでは、プレイヤーが何らかの操作をしなければゲームが進行しない。<br>
+スーパーファミコンのゲームでいえば、プレイヤーがコントローラのボタンを押さなければゲームは進行しない。<br>
+ここでは、ゲームにおける基本中の基本、コントローラのボタンを押したかどうか、ボタン判定について説明する。<br>
+本作におけるプログラムの紹介だが、おそらくスーパーファミコンのゲームならどれも似たような処理でボタン判定をしているはずである。<br>
+スーパーファミコンのコントローラ周りの説明は以下も参照にさせていただいた。</p>
+
+<ul>
+	<li><a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/keypad/joypad.md" target="_blank">snes-docs-ja/keypad/joypad.md akatsuki105/snes-docs-ja</a></li>
+	<li><a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/interrupt/ioreg.md" target="_blank">snes-docs-ja/interrupt/ioreg.md akatsuki105/snes-docs-ja</a></li>
+	<li><a href="https://wiki.superfamicom.org/controllers" target="_blank">Controllers | Super Famicom Development Wiki</a></li>
+</ul>
+
+<p>上サイトなどでも記述があるが、ゲームのコントローラをジョイパッド（Joypad）とも呼ぶ。意味は同じ。</p>
+
+<p>ライブ・ア・ライブにおいて、ゲーム操作に必要なのはコントローラ1個（1P用のコネクタに接続）のみである。<br>
+コントローラのボタンは12個。</p>
+
+<p>ボタン判定の仕組みだが、スーパーファミコン内部には、「Auto Joypad Read（自動ジョイパッド読み取り）」という機能があり、これを利用している。<br>
+<code>$00:4200</code>が、割り込み有効化レジスタというアドレスにあたり、8ビットの値の一番下のビットに1を入れると自動ジョイパッド読み取り機能をONにしてくれる。<br>
+アドレス<code>$00:4212</code>に入る値が、自動ジョイパッド読み取り機能のON・OFF状態を記録しており、8ビットの値の一番下に1の時、自動ジョイパッド読み取り機能がON、0ならOFFを表す。<br>
+自動ジョイパッド読み取り機能がONの間、<code>$00:4218</code>～<code>$00:4219</code>の2バイトの領域に、コントローラ1の何のボタンが押されているかを出力する仕組みである。<br>
+ちなみにコントローラ2の状態は<code>$00:421A</code>～<code>$00:421B</code>の2バイトに出力されるそうだが、本作においては特に関係ない。</p>
+
+<p>自動ジョイパッド読み取り機能はONにしてから一定時間有効で、その時間は4224マスターサイクルである。4224マスターサイクル経過後、自動的にOFFになる。<br>
+スーパーファミコンの中の水晶発振器という部品に電圧をかけると振動することを利用して電気信号を送信する仕組みがあるのだが、1秒間に2,100万回以上というとんでもない回数で振動している（21.4772700MHz）。この振動した回数4224回分の時間が4224マスターサイクルで、4224/21477270秒にあたる。<br>
+……数字だけ見てもよくわからないが、0.0002秒くらいであり、1/60秒を単位とするフレームで表すと0.01フレームくらいである。<br>
+とにかく、ほんの短時間しかボタンが押されているか判定しないことになるが、この判定を1フレーム毎に行えば、ボタンを押して1フレーム以内にボタンを押しているかどうか判断してくれることになる。<br>
+本作をプレイしていて、ボタンの反応が遅いと感じることはまずないだろう。</p>
+
+<p><code>$00:4218</code>～<code>$00:4219</code>の2バイトに出力される値は以下のようになっている。<br>
+<code>$00:4218</code>が下位バイト、<code>$00:4219</code>が上位バイト。<br>
+ボタンを同時押しした場合は合計値が出力される。</p>
+
+<table>
+<thead>
+	<tr><th>ボタン</th><th>16進数2バイト</th><th>2進数16ビット</th></tr>
+</thead>
+<tbody>
+	<tr><td>R</td><td><span class="formula">$0010</td><td><span class="formula">%0000 0000 0001 0000</span></td></tr>
+	<tr><td>L</td><td><span class="formula">$0020</td><td><span class="formula">%0000 0000 0010 0000</span></td></tr>
+	<tr><td>X</td><td><span class="formula">$0040</td><td><span class="formula">%0000 0000 0100 0000</span></td></tr>
+	<tr><td>A</td><td><span class="formula">$0080</td><td><span class="formula">%0000 0000 1000 0000</span></td></tr>
+	<tr><td>右</td><td><span class="formula">$0100</td><td><span class="formula">%0000 0001 0000 0000</span></td></tr>
+	<tr><td>左</td><td><span class="formula">$0200</td><td><span class="formula">%0000 0010 0000 0000</span></td></tr>
+	<tr><td>下</td><td><span class="formula">$0400</td><td><span class="formula">%0000 0100 0000 0000</span></td></tr>
+	<tr><td>上</td><td><span class="formula">$0800</td><td><span class="formula">%0000 1000 0000 0000</span></td></tr>
+	<tr><td>スタート</td><td><span class="formula">$1000</span></td><td><span class="formula">%0001 0000 0000 0000</span></td></tr>
+	<tr><td>セレクト</td><td><span class="formula">$2000</span></td><td><span class="formula">%0010 0000 0000 0000</span></td></tr>
+	<tr><td>Y</td><td><span class="formula">$4000</span></td><td><span class="formula">%0100 0000 0000 0000</span></td></tr>
+	<tr><td>B</td><td><span class="formula">$8000</span></td><td><span class="formula">%1000 0000 0000 0000</span></td></tr>
+</tbody>
+</table>
+
+<p>例えば右ボタンを押した場合、<code>$00:4218</code>に<span class="formula">$00</span>、<code>$00:4219</code>に<span class="formula">$01</span>が出力される。<br>
+右方向にダッシュをする時は、Bボタンと右ボタンを同時押しするから、<span class="formula">$0100</span>と<span class="formula">$8000</span>を加算し、<code>$00:4218</code>に<span class="formula">$00</span>、<code>$00:4219</code>に<span class="formula">$81</span>が出力される。<br>
+といった仕組みである。<br>
+上の通りに<code>$00:4218</code>の下1桁にはボタンに対応した数値がない。<br>
+よって、ボタンの状態は、<code>$00:4219</code>・<code>$00:4218</code>の2バイト（16進数4桁）の中で上3桁で表されるということがわかる。</p>
+
+<h3>アドレス</h3>
+
+<p>ボタンの出力先は上の通り<code>$00:4218</code>～<code>$00:4219</code>なのだが、この値は他アドレスにもコピーされて各種判定に使われる。</p>
+
+<table>
+<thead>
+	<tr><th>フィールド</th><th><code>$00:0000</code></th><th><code>$00:0001</code><br><code>$00:020A</code></th></tr>
+	<tr><th>戦闘</th><th><code>$00:0344</code><br><code>$00:0348</code></th><th><code>$00:0345</code><br><code>$00:0349</code></th></tr>
+	<tr><th>メニュー画面</th><th><code>$00:057D</code></th><th><code>$00:057E</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>R</td><td><span class="formula">$10</span></td><td>-</td></tr>
+	<tr><td>L</td><td><span class="formula">$20</span></td><td>-</td></tr>
+	<tr><td>X</td><td><span class="formula">$40</span></td><td>-</td></tr>
+	<tr><td>A</td><td><span class="formula">$80</span></td><td>-</td></tr>
+	<tr><td>右</td><td>-</td><td><span class="formula">$01</span></td></tr>
+	<tr><td>左</td><td>-</td><td><span class="formula">$02</span></td></tr>
+	<tr><td>下</td><td>-</td><td><span class="formula">$04</span></td></tr>
+	<tr><td>上</td><td>-</td><td><span class="formula">$08</span></td></tr>
+	<tr><td>スタート</td><td>-</td><td><span class="formula">$10</span></td></tr>
+	<tr><td>セレクト</td><td>-</td><td><span class="formula">$20</span></td></tr>
+	<tr><td>Y</td><td>-</td><td><span class="formula">$40</span></td></tr>
+	<tr><td>B</td><td>-</td><td><span class="formula">$80</span></td></tr>
+</tbody>
+</table>
+
+<p>つまり、<code>[$00:4219]</code><code>[$00:4218]</code>の2バイトは以下のようにコピーされる。</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th><code>[$00:4219]</code></th><th><code>[$00:4218]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>フィールド</td><td><code>[$00:0001]</code><br>-</td><td><code>[$00:0000]</code><br><code>[$00:020A]</code></td></tr>
+	<tr><td>戦闘</td><td><code>[$00:0345]</code><br><code>[$00:0349]</code></td><td><code>[$00:0344]</code><br><code>[$00:0348]</code></td></tr>
+	<tr><td>メニュー画面</td><td><code>[$00:057E]</code></td><td><code>[$00:057D]</code></td></tr>
+</tbody>
+</table>
+
+<h3>サブルーチン</h3>
+
+<p>実際の判定のサブルーチンだが、フィールド・戦闘・メニュー画面でアドレスが異なる。<br>
+「自動ジョイパッド読み取り機能がONの間、<code>$00:4218</code>～<code>$00:4219</code>の値を読み取る」という処理自体は変わらない。<br>
+本作では、フィールドでのサブルーチンはバンク<span class="formula">$C0</span>、戦闘中のサブルーチンはバンク<span class="formula">$C1</span>、メニュー画面のサブルーチンはバンク<span class="formula">$C2</span>に収納されている。<br>
+アドレスの値が近い方が呼び出しに時間がかからないので、フィールド・戦闘・メニュー画面でそれぞれボタン判定サブルーチンを用意しているようだ。</p>
+
+<p>基本の処理は以下の通り。</p>
+
+<div class="code-container"><pre>
+;ループ処理開始
+LDA $4212  [$00:4212]   ;Aに[$00:4212]をロード
+AND #$01                ;Aと$01で論理積
+BNE (ループ頭)          ;ゼロフラグが立っていないときループ頭に戻る
+;ループ処理ここまで
+;以降16bitモードのAレジスタか、
+LDA $4218  [$00:4218]   ;Aに[$00:4219][$00:4218]をロード
+;または16bitモードのXレジスタで処理
+LDX $4218  [$00:4218]   ;Xに[$00:4219][$00:4218]をロード
+</pre></div>
+
+<p><code>[$00:4212]</code>の一番下1ビットに1が入っている時は、<code>[$00:4219]</code><code>[$00:4218]</code>にボタンの押されている状態を出力し続けている。<br>
+上に記した通り、自動ジョイパッド読み取り機能は4224マスターサイクル経過すると自動終了だが、その時に<code>[$00:4212]</code>の一番下1ビットが<span class="formula">0</span>となって、自動ジョイパッド読み取り機能終了寸前のボタンの状態が<code>[$00:4219]</code><code>[$00:4218]</code>に残る。<br>
+自動ジョイパッド読み取り機能終了のタイミングのボタンの状況を読み出すのが上のサブルーチンになる。<br>
+ループ処理で、<code>[$00:4212]</code>と<span class="formula">$01</span>の論理積を取り、<code>[$00:4212]</code>の下1ビットが1ならゼロフラグが立たないのでループ頭に戻る。<br>
+このループは、<code>[$00:4212]</code>の下1ビットが<span class="formula">0</span>になるまで、つまり自動ジョイパッド読み取り機能がOFFになるまで続く。<br>
+自動ジョイパッド読み取り機能がOFFになると<code>[$00:4219]</code><code>[$00:4218]</code>をロードして、ボタン状況を読み出し、各種判定を行うことになる。</p>
+
+<p>判定中、何のボタンも押されていないのなら、<code>[$00:4219]</code><code>[$00:4218]</code>には<span class="formula">$0000</span>が入るが、何かのボタンが押されていたら<span class="formula">$0000</span>以外が入る。<br>
+右ボタンを押せば、<code>$00:4218</code>に<span class="formula">$00</span>、<code>$00:4219</code>に<span class="formula">$01</span>が出力され、状況により右ボタンに対応した処理を行うことになる。</p>
+
+<p>もし<code>[$00:4219]</code><code>[$00:4218]</code>が<span class="formula">$0000</span>、つまり何のボタンも押されなかったとしても、何もしないままということはない。<br>
+フィールドであったら何のボタンも押されていなくても、1フレームに1回、フィールド乱数を生成しているし、幕末編のフィールドなどだったらタイマーイベントがタイマー残り時間を-1して、鐘を鳴らしたりもする。ランダム移動する街の人の移動処理も行う。</p>
+
+<p>以下、フィールド・戦闘・メニュー画面それぞれのサブルーチンをざっと紹介しておく。</p>
+
+<h4>フィールド</h4>
+
+<p>フィールドにいる時のボタン判定用サブルーチンは以下の通り。<br>
+フィールド上でも、メニュー画面を開いている時とは別になる。</p>
+
+<div class="code-container"><pre>
+$C0/B83E LDA #$01                ;Aに$01をロード
+;ボタン判定ループ処理
+$C0/B840 BIT $4212  [$00:4212]   ;Aと[$00:4212]で論理積（ステータスフラグ変更のみ）
+$C0/B843 BNE $FB    [$B840]      ;ゼロフラグが立っていないとき[$B840]分岐
+;ボタン判定ループ処理ここまで
+$C0/B845 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/B847 LDA $4218  [$00:4218]   ;Aに[$00:4219][$00:4218]をロード
+$C0/B84A BIT #$000F              ;Aと$000Fで論理積（ステータスフラグ変更のみ）
+$C0/B84D BEQ $03    [$B852]      ;ゼロフラグが立っているとき[$B852]分岐
+;ゼロフラグOFF
+$C0/B84F LDA #$0000              ;Aに$0000をロード
+;ゼロフラグON
+$C0/B852 TAX                     ;Aの値をXレジスタに転送
+$C0/B853 EOR $00    [$00:0000]   ;Aと[$00:0001][$00:0000]で排他的論理和XOR
+$C0/B855 STX $00    [$00:0000]   ;Xを[$00:0001][$00:0000]に書き込み
+$C0/B857 AND $00    [$00:0000]   ;Aと[$00:0001][$00:0000]で論理積
+$C0/B859 STA $04    [$00:0004]   ;Aを[$00:0005][$00:0004]に書き込み
+$C0/B85B STA $08    [$00:0008]   ;Aを[$00:0009][$00:0008]に書き込み
+</pre></div>
+
+<p>まず<code><span class="r">$C0/B83E</span></code>で<span class="formula">$01</span>をロードし、<code>[$00:4212]</code>と論理積を取って、<code><span class="r">$C0/B843</span></code>でゼロフラグ判定をし、ゼロフラグが立っていないなら<code><span class="r">$C0/B840</span></code>にジャンプする。<br>
+つまり、ゼロフラグが立つまで、<code><span class="r">$C0/B840</span></code>と<code><span class="r">$C0/B843</span></code>をループすることになる。<br>
+<code><span class="r">$C0/B83E</span></code>で<span class="formula">$01= %0000 0001</span> をロードしたから、<span class="formula">$01</span>と<code>[$00:4212]</code>の論理積でゼロフラグが立つのは、<code>[$00:4212]</code>の下1ビットが0の時。<br>
+先に説明したとおり、<code>[$00:4212]</code>の下1ビットは、自動ジョイパッド読み取り機能がONかOFFかの状態を示す。下1ビットが<span class="formula">1</span>ならON、<span class="formula">0</span>ならOFF。<br>
+ボタン判定ループ処理を抜けるのは、自動ジョイパッド読み取り機能がOFFになったタイミングになる。<br>
+自動ジョイパッド読み取り機能がONの間は<code>[$00:4219]</code><code>[$00:4218]</code>にボタンの状態を出力し続けるので、ループを抜けた<code><span class="r">$C0/B847</span></code>でロードする<code>[$00:4219]</code><code>[$00:4218]</code>は、自動ジョイパッド読み取り機能がOFFになる直前のボタンの状態である。<br>
+<code><span class="r">$C0/B84A</span></code>～では、<code>[$00:4219]</code><code>[$00:4218]</code>と<span class="formula">$000F</span>で論理積を取ってゼロフラグ判定をしている。<br>
+ボタンの状況は、<code>[$00:4219]</code><code>[$00:4218]</code>の16進数4桁の値の中で、上3桁で表されるため、<code>[$00:4219]</code><code>[$00:4218]</code>と<span class="formula">$000F</span>で論理積を取ると上3桁の値がすべて<span class="formula">0</span>となり、通常は<span class="formula">$0000</span>となってゼロフラグが立つはずである（おそらく）。<br>
+よって<code><span class="r">$C0/B84D</span></code>のゼロフラグ判定が立たないことは多分ない。次の<code><span class="r">$C0/B852</span></code>へジャンプする。<br>
+ゼロフラグが立っている場合は<code>A</code>に<span class="formula">$0000</span>をロードして進む。</p>
+
+<p>フィールドでは、<code>[$00:4219]</code><code>[$00:4218]</code>の値が<code>[$00:0001]</code><code>[$00:0000]</code>と同一なのだが、ここから<code>[$00:0001]</code><code>[$00:0000]</code>へのコピーが開始になっている。<br>
+Aに入っている<code>[$00:4219]</code><code>[$00:4218]</code>を<code>X</code>レジスタにコピーする。<br>
+この<code>X</code>は<code><span class="r">$C0/B855</span></code>で<code>[$00:0001]</code><code>[$00:0000]</code>に書き込まれるので、<code>[$00:4219]</code><code>[$00:4218]</code>→<code>X</code>レジスタ→<code>[$00:0001]</code><code>[$00:0000]</code>である。<br>
+これで入力されたボタンがほぼリアルタイムに<code>[$00:0001]</code><code>[$00:0000]</code>に反映されることになる。</p>
+
+<p><code><span class="r">$C0/B853</span></code>～の処理は、ひとつ前のボタンの状況から、ボタンを押しっぱなしか、それとも新たに更新されたか、という判定用の計算である。<br>
+<code><span class="r">$C0/B853</span></code>は、<code>[$00:4219]</code><code>[$00:4218]</code>と<code>[$00:0001]</code><code>[$00:0000]</code>の排他的論理和の計算になる。<br>
+排他的論理和は、2進数で各桁を比較した時、どちらかが<span class="formula">1</span>なら<span class="formula">1</span>を、それ以外は<span class="formula">0</span>を返す論理演算である。<br>
+この時点の<code>[$00:0001]</code><code>[$00:0000]</code>は、ひとつ前のボタンの状況が入っている。<br>
+たとえば、直前まで右ボタンを押していたら<span class="formula"><code>[$00:0001]</code><code>[$00:0000]</code> = $0100 = %0000 0001 0000 0000</span>である。<br>
+今回の判定では右ボタンを押すのを止めていれば、<span class="formula"><code>[$00:4219]</code><code>[$00:4218]</code> = $0000 = %0000 0000 0000 0000</span>である。<br>
+排他的論理和を取ると右ボタンの<span class="formula">1</span>だけ残り、<span class="formula">%0000 0001 0000 0000 = $0100</span>である。<br>
+一方、右ボタンを押しっぱなしだったとしたら、右ボタンの<span class="formula">1</span>と<span class="formula">1</span>で排他的論理和は<span class="formula">0</span>となり、<span class="formula">%0000 0000 0000 0000 = $0000</span>である。<br>
+要するに、直前までのボタンの状況と変化がない場合は排他的論理和が<span class="formula">$0000</span>、変化がある場合はそれ以外の値になる。</p>
+
+<p><code><span class="r">$C0/B857</span></code>は、この排他的論理和の結果と、<code>[$00:0001]</code><code>[$00:0000]</code>（現在のボタンの状況）の論理積をとって、<code>[$00:0005]</code><code>[$00:0004]</code>及び、<code>[$00:0009]</code><code>[$00:0008]</code>に書き込む。<br>
+直前までのボタンの状況と変化がない場合、<span class="formula">$0000</span>と<code>[$00:0001]</code><code>[$00:0000]</code>（現在のボタンの状況）の論理積になるから、必ず<span class="formula">$0000</span>である。<br>
+それ以外なら新たに変化があったボタンの状態が<code>[$00:0005]</code><code>[$00:0004]</code>及び、<code>[$00:0009]</code><code>[$00:0008]</code>に入る。</p>
+
+<p>ここまででとりあえず押したボタンの値の読み取りと保存は完了となる。<br>
+以降はどのボタンを押したか、またはボタンを離したか、という判定になる……と思いきや、実は次に以下のような処理がある。</p>
+
+<div class="code-container"><pre>
+$C0/B85D LDA $421A  [$00:421A]   ;Aに[$00:421B][$00:421A]をロード
+$C0/B860 BIT #$000F              ;Aと$000Fで論理積（ステータスフラグ変更のみ）
+$C0/B863 BEQ $03    [$B868]      ;ゼロフラグが立っているとき[$B868]分岐
+;ゼロフラグOFF
+$C0/B865 LDA #$0000              ;Aに$0000をロード
+;ゼロフラグON
+$C0/B868 TAX                     ;Aの値をXレジスタに転送
+$C0/B869 EOR $02    [$00:0002]   ;Aと[$00:0003][$00:0002]で排他的論理和XOR
+$C0/B86B STX $02    [$00:0002]   ;Xを[$00:0003][$00:0002]に書き込み
+$C0/B86D AND $02    [$00:0002]   ;Aと[$00:0003][$00:0002]で論理積
+$C0/B86F STA $06    [$00:0006]   ;Aを[$00:0007][$00:0006]に書き込み
+$C0/B871 STA $0A    [$00:000A]   ;Aを[$00:000B][$00:000A]に書き込み
+</pre></div>
+
+<p>最初にも書いたが、コントローラ2の状態は<code>$00:421A</code>～<code>$00:421B</code>の2バイトに入る。<br>
+上の通り、実はコントローラ2のボタンの状態を、コントローラ1のボタンの状況とほぼ同じ判定で各アドレスに書き込んでいるのだ。<br>
+つまり、<code>[$00:0003]</code><code>[$00:0002]</code>はコントローラ2のボタンの状態が常に反映されている。<br>
+といっても、本作でコントローラ2を使う場面はない。<br>
+<code>[$00:0003]</code><code>[$00:0002]</code>を何かの処理に使うかどうかも筆者にはわからない。<br>
+開発中はコントローラ2を何かに使う予定があったのか、それともスーパーファミコンのゲームの共通処理という意味で形式的に入れておいたのか、そこまではわからない。<br>
+（基本的に1人用のRPGでコントローラ2を使う作品はさほどないが、「ライブ・ア・ライブ」と同時期のスクウェアのゲームだと、「聖剣伝説2」や「ファイナルファンタジー4」で、戦闘時仲間キャラをコントローラ2で操作できるという仕組みがあった）<br>
+なお、コントローラ2の判定は、戦闘やメニュー画面のボタン判定用サブルーチンにも残されている。</p>
+
+<p><code>[$00:0001]</code>→<code>[$00:020A]</code>のコピーは上処理の直後に行われている。</p>
+
+<div class="code-container"><pre>
+$C0/0926 LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/0928 STA $020A  [$00:020A]   ;Aを[$00:020A]に書き込み
+</pre></div>
+
+
+<h4>戦闘</h4>
+
+<p>戦闘中のボタン判定用サブルーチンは以下の通り。</p>
+
+<div class="code-container"><pre>
+;ボタン判定ループ処理
+$C1/8AD8 LDA $4212  [$00:4212]   ;Aに[$00:4212]をロード
+$C1/8ADB AND #$01                ;Aと$01で論理積
+$C1/8ADD BNE $F9    [$8AD8]      ;ゼロフラグが立っていないとき[$8AD8]分岐
+;ボタン判定ループ処理ここまで
+$C1/8ADF LDX #$0000              ;Xに$0000をロード
+$C1/8AE2 LDA $4218  [$00:4218]   ;Aに[$00:4218]をロード
+$C1/8AE5 BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/8AE7 BNE $03    [$8AEC]      ;ゼロフラグが立っていないとき[$8AEC]分岐
+$C1/8AE9 LDX $4218  [$00:4218]   ;Xに[$00:4219][$00:4218]をロード
+$C1/8AEC STX $44    [$00:0344]   ;Xを[$00:0345][$00:0344]に書き込み
+$C1/8AEE LDX #$0000              ;Xに$0000をロード
+$C1/8AF1 LDA $421A  [$00:421A]   ;Aに[$00:421B][$00:421A]をロード
+$C1/8AF4 BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/8AF6 BNE $03    [$8AFB]      ;ゼロフラグが立っていないとき[$8AFB]分岐
+$C1/8AF8 LDX $421A  [$00:421A]   ;Xに[$00:421B][$00:421A]をロード
+$C1/8AFB STX $46    [$00:0346]   ;Xを[$00:0347][$00:0346]に書き込み
+$C1/8AFD RTS                     ;サブルーチン戻り
+（中略）
+$C1/8B15 LDX $44    [$00:0344]   ;Xに[$00:0344]をロード
+$C1/8B17 STX $48    [$00:0348]   ;Xを[$00:0348]に書き込み
+$C1/8B19 LDX $46    [$00:0346]   ;Xに[$00:0346]をロード
+$C1/8B1B STX $4A    [$00:034A]   ;Xを[$00:034A]に書き込み
+$C1/8B1D RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/8AD8</span></code>～<code><span class="r">$C1/8ADD</span></code>のループで、<code>[$00:4212]</code>の下1ビットが<span class="formula">0</span>になるまで（自動ジョイパッド読み取り機能がOFFになるまで）ループを行う。<br>
+後の判定の方法はフィールドとだいたい同じで、<code>[$00:4218]</code>のみで<span class="formula">$0F</span>と論理積を取ってゼロフラグ判定してから、現在のボタンの状況<code>[$00:4219]</code><code>[$00:4218]</code>を<code>[$00:0345]</code><code>[$00:0344]</code>に書き込む。<br>
+<code>[$00:0345]</code><code>[$00:0344]</code>は更に、<code><span class="r">$C1/8B15</span></code>～で<code>[$00:0349]</code><code>[$00:0348]</code>にもコピーされる。</p>
+
+<p>なお<code><span class="r">$C1/8AF1</span></code>～<code><span class="r">$C1/8AFB</span></code>はコントローラ2の処理である。</p>
+
+<h4>メニュー画面</h4>
+
+<p>メニュー画面でのボタン判定用サブルーチンは以下の通り。</p>
+
+<div class="code-container"><pre>
+$C2/5178 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/5179 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+;ボタン判定ループ処理
+$C2/517B LDA #$01                ;Aに$01をロード
+$C2/517D AND $004212[$00:4212]   ;Aと[$00:4212]で論理積
+$C2/5181 BNE $F8    [$517B]      ;ゼロフラグが立っていないとき[$517B]分岐
+;ボタン判定ループ処理ここまで
+$C2/5183 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/5185 LDA $004218[$00:4218]   ;Aに[$00:4219][$00:4218]をロード
+$C2/5189 STA $7D    [$00:057D]   ;Aを[$00:057E][$00:057D]に書き込み
+</pre></div>
+
+<p>判定方法はフィールドや戦闘時と同様である。<br>
+<code>[$00:4219]</code><code>[$00:4218]</code>は<code>[$00:057E]</code><code>[$00:057D]</code>に書き込まれる。<br>
+ただし、メニュー画面の方ではコントローラ2判定はないようだ。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 位置変化・向き変え">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 位置変化・向き変え">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 位置変化・向き変え</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 位置変化・向き変え</h1>
+<h2>位置変化・向き変え</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>技の中には、攻撃を当てた相手を吹き飛ばしたり、向きを変える（回転）追加効果がついているものがある。<br>
+ただし、吹き飛ばしや向き変えは確実に成功するのではない。<br>
+また、最終編のオディオモールとピュアオディオのみ、吹き飛ばしと向き変えを無効化する。<br>
+確率計算はどのように行われているのか。</p>
+
+<p>結論だけ先に述べると、<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様に確率について記されている。</p>
+
+<blockquote><p>　・向き変え・吹き飛ばし発動確率：<br>
+それぞれ3/4</p>
+
+<p>オディオモール・ピュアオディオは戦えば分かることだけど、<br>
+吹き飛ばしや向き変え技は無効。</p></blockquote>
+
+<p>吹き飛ばしと向き変えだが、実際には以下のようにいくつかパターンがある。</p>
+
+<ol>
+	<li>後方吹き飛ばし</li>
+	<li>90度右回転</li>
+	<li>180度回転</li>
+	<li>使用者後退</li>
+	<li>使用者90度右回転</li>
+	<li>使用者180度回転</li>
+</ol>
+
+<p>1.～3.は攻撃を当てた相手に対しての効果だが、4.～6.は技使用者に対しての効果である。<br>
+1.～4.は味方技の追加効果にもあるが、5.と6.は敵の技のみ（「水神のヒゲむち」「ライブイレイザー」「エッシャー空間」など）。<br>
+使用者に対しての追加効果は確実に発動するが、1.～3.の成功率は3/4である。</p>
+
+<p>また、攻撃相手が技のタメ中だった場合、吹き飛ばしと向き変えをされたらタメが解除されるから、成功時はタメ時間に関する処理も行われているはずだ。</p>
+
+<p>では、実際の処理について説明する。<br>
+今回は、味方キャラが敵を攻撃して回転または吹き飛ばしをする場合の処理について紹介する。<br>
+吹き飛ばしは、座標に関する処理も行うので少々ややこしい。</p>
+
+<h3>メモリアドレス</h3>
+
+<p>向き変え・吹き飛ばし関連のアドレスは以下の通り。</p>
+
+<h4>技データ11</h4>
+
+<p>技データ11には命中タイプと向き変え・吹き飛ばしに関する値が入っている。<br>
+上2ビットは命中タイプ。</p>
+
+<table>
+<thead>
+	<tr><th>数値<br>2進数</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td>狙撃</td></tr>
+	<tr><td><span class="formula">%01</span></td><td>直進</td></tr>
+	<tr><td><span class="formula">%10</span></td><td>貫通（目標まで）</td></tr>
+	<tr><td><span class="formula">%11</span></td><td>貫通（目標より先まで）</td></tr>
+</tbody>
+</table>
+
+<p>下6ビットは位置変化の値、以下合計値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>数値<br>2進数</th><th>数値<br>16進数</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%000001</span></td><td><span class="formula">$01</span></td><td>後方吹き飛ばし</td></tr>
+	<tr><td><span class="formula">%000010</span></td><td><span class="formula">$02</span></td><td>90度右回転</td></tr>
+	<tr><td><span class="formula">%000100</span></td><td><span class="formula">$04</span></td><td>180度回転</td></tr>
+	<tr><td><span class="formula">%001000</span></td><td><span class="formula">$08</span></td><td>使用者後退</td></tr>
+	<tr><td><span class="formula">%010000</span></td><td><span class="formula">$10</span></td><td>使用者90度右回転</td></tr>
+	<tr><td><span class="formula">%100000</span></td><td><span class="formula">$20</span></td><td>使用者180度右回転</td></tr>
+</tbody>
+</table>
+
+<p>攻撃相手に対しての効果は下3ビットの値で判定できることがわかる。</p>
+
+<h4>向き・座標・タメ時間</h4>
+
+<p>吹き飛ばしや向き変えで変わることになる、座標や向きの値は、以下のアドレスに入っている。<br>
+また、敵の場合は敵のサイズが吹き飛ばしで重要なので合わせて記す。<br>
+タメ時間は実行中の技にタメ時間がある場合<span class="formula">$00</span>以上の値が入り、時間経過で減少、<span class="formula">$00</span>になると技が出るが、向き変えや吹き飛ばしに成功するとキャンセルされる。</p>
+
+<h5>味方キャラ</h5>
+
+<table>
+<thead>
+	<tr><th>味方</th><th>X座標</th><th>Y座標</th><th>向き</th><th>技関係状態</th><th>タメ時間</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td><code>$00:1C18</code></td><td><code>$00:1C19</code></td><td><code>$00:1C1D</code></td><td><code>$00:1C05</code></td><td><code>$00:1C06</code></td></tr>
+	<tr><td>2</td><td><code>$00:1C58</code></td><td><code>$00:1C59</code></td><td><code>$00:1C5D</code></td><td><code>$00:1C45</code></td><td><code>$00:1C46</code></td></tr>
+	<tr><td>3</td><td><code>$00:1C98</code></td><td><code>$00:1C99</code></td><td><code>$00:1C9D</code></td><td><code>$00:1C85</code></td><td><code>$00:1C86</code></td></tr>
+	<tr><td>4</td><td><code>$00:1CD8</code></td><td><code>$00:1CD9</code></td><td><code>$00:1CDD</code></td><td><code>$00:1CC5</code></td><td><code>$00:1CC6</code></td></tr>
+</tbody>
+</table>
+
+<p>X座標は左から<span class="formula">$00</span>～<span class="formula">$06</span>。計算値が<span class="formula"><code>$00:1CX0</code> + $1A</span>に入る。<br>
+Y座標は上から<span class="formula">$00</span>～<span class="formula">$06</span>。計算値が<span class="formula"><code>$00:1CX0</code> + $1B</span>に入る。<br>
+向きは、右下向き<span class="formula">$00</span>, 左下向き<span class="formula">$01</span>, 左上向き<span class="formula">$03</span>, 右上向き<span class="formula">$04</span><br>
+技関係状態は、<span class="formula">$00</span>:通常, <span class="formula">$40</span>:タメ時間中, <span class="formula">$F0</span>:技を出している最中。</p>
+
+<h5>敵キャラ</h5>
+
+<p>敵の横幅・縦幅は、敵種類のアドレスに入る。</p>
+
+<table>
+<thead>
+	<tr><th>敵種類</th><th>横幅</th><th>縦幅</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td><code>$7E:1A04</code></td><td><code>$7E:1A05</code></td></tr>
+	<tr><td>2</td><td><code>$7E:1A44</code></td><td><code>$7E:1A45</code></td></tr>
+	<tr><td>3</td><td><code>$7E:1A84</code></td><td><code>$7E:1A85</code></td></tr>
+	<tr><td>4</td><td><code>$7E:1AC4</code></td><td><code>$7E:1AC5</code></td></tr>
+</tbody>
+</table>
+
+<p>向きや座標など、敵個体ごとのデータは、<span class="formula">n=0～E</span>（敵番号）として以下のアドレスに入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1Bn4</code></td><td>向き（右下<span class="formula">$00</span>/左下<span class="formula">$40</span>/右上<span class="formula">$80</span>/左上<span class="formula">$C0</span>）</td></tr>
+	<tr><td><code>$00:1BnA</code></td><td>X座標（左から<span class="formula">$00</span>～<span class="formula">$06</span>）※敵の左上マス基準</td></tr>
+	<tr><td><code>$00:1BnB</code></td><td>Y座標（上から<span class="formula">$00</span>～<span class="formula">$06</span>）※敵の左上マス基準</td></tr>
+	<tr><td><code>$00:1Bn5</code></td><td>技関係状態（<span class="formula">$00</span>:通常 <span class="formula">$40</span>:タメ時間中 <span class="formula">$F0</span>:技を出している最中）</td></tr>
+	<tr><td><code>$00:1Bn6</code></td><td>タメ時間</td></tr>
+</tbody>
+</table>
+
+<p>向き表記が敵と味方では異なる。<br>
+敵の場合は味方の表記方法＋下4ビットを<span class="formula">0</span>で埋める形式。<br>
+座標は敵と味方で共通だが、敵はサイズが1×1ではない場合、敵の左上マス位置が座標にあたる。</p>
+
+<h3>サブルーチン</h3>
+
+<p>後方吹き飛ばし・90度右回転・180度回転が成功するかどうか、判定は分けて行われるのではなく一度に判定される。<br>
+攻撃相手がタメ時間のある技のタメ中の場合、吹き飛ばしや回転を成功させるとキャンセルできるが、これについては別途処理が入るので、分けて説明していく。</p>
+
+<p>今回は味方キャラが敵を攻撃して向き変え・吹き飛ばしさせる場合を紹介する。<br>
+<code>$7E:9010</code>～<code>$7E:9028</code>には、使用中の技データ00～34が入るので、技データ11は<code>$7E:901B</code>に入るが、「どう回し回転げり」の技データ11は<span class="formula">$02</span>、90度右回転の効果があることが記録されている。</p>
+
+<p>以下がサブルーチンで、ここまでで攻撃相手に技が当たることが判定された上で続く。</p>
+
+<div class="code-container"><pre>
+$C1/CBE3 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+$C1/6150 PHX                     ;戦闘乱数計算開始
+;（戦闘乱数計算処理省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/CBE6 STA $11    [$00:0311]   ;A（乱数1）を[$00:0311]に書き込み
+$C1/CBE8 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+$C1/6150 PHX                     ;戦闘乱数計算開始
+;（戦闘乱数計算処理省略）
+$C1/61A4 RTS                     ;サブルーチン戻り
+;
+$C1/CBEB ORA $11    [$00:0311]   ;A(乱数2)と[$00:0311](乱数1 $EA)で論理和
+$C1/CBED AND $7E901B[$7E:901B]   ;Aと[$7E:901B](技データ11)で論理積
+$C1/CBF1 AND #$07                ;Aと$07(%0000 0111)で論理積
+$C1/CBF3 STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/CBE3</span></code>～が判定処理である。<br>
+まず、戦闘乱数を2回生成する。<br>
+ここでは乱数1と乱数2としておく。<br>
+<code><span class="r">$C1/CBEB</span></code>～の処理を見ると、</p>
+
+<p><span class="formula">((乱数1 | 乱数2) &amp; 技データ11) &amp; $07</span><br>
+（※<span class="formula">A | B</span>は論理和、<span class="formula">A &amp; B</span>は論理積）</p>
+
+<p>を計算して、<code>[$00:0311]</code>に書き込んでいる。<br>
+この計算値が実質、吹き飛ばし、90度右回転、180度回転の成功判定値である。<br>
+どういうことか順に説明する。</p>
+
+<p>乱数1・乱数2は<span class="formula">$00</span>(<span class="formula">%0000 0000</span>)～<span class="formula">$FF</span>(<span class="formula">%1111 1111</span>)の8ビットの値である。<br>
+論理和は、2進数で見た時、それぞれの位のどちらかに<span class="formula">1</span>が立っていれば<span class="formula">1</span>、どちらも<span class="formula">0</span>なら<span class="formula">0</span>とする演算になる。<br>
+例えば乱数1が<span class="formula">$EA</span>(<span class="formula">%1110 1010</span>)、乱数2が<span class="formula">$A9</span>(<span class="formula">%1010 1001</span>)なら、</p>
+
+<p><span class="formula">%1110 1010</span><br>
+<span class="formula">%1010 1001</span></p>
+
+<p>上から4ビットと6ビットが<span class="formula">0</span>、他はどちらも<span class="formula">1</span>か、どちらかが<span class="formula">1で</span>あるから、<br>
+<span class="formula">$EA | $A9 = %1110 1110 = $EB(%1110 1011)</span><br>
+である。</p>
+
+<p>続いて、<code><span class="r">$C1/CBED</span></code>で、技データ11と論理積を取り、次の<code><span class="r">$C1/CBF1</span></code>で<span class="formula">$07(%0000 0111)</span>と論理積を取っている。<br>
+最後の<span class="formula">$07(%0000 0111)</span>との論理積を取っていることからして、技データ11の下3ビットの判定であることがわかる。</p>
+
+<p>技データ11の下3ビットは下のように、それぞれの位が後方吹き飛ばし・90度右回転・180度回転に対応している。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%0000 0001</span></td><td>後方吹き飛ばし</td></tr>
+	<tr><td><span class="formula">%0000 0010</span></td><td>90度右回転</td></tr>
+	<tr><td><span class="formula">%0000 0100</span></td><td>180度回転</td></tr>
+</tbody>
+</table>
+
+<p>例えば、高原の「どう回し回転げり」の技データ11は90度右回転の効果だけがあるから<span class="formula">$02(%0000 0010)</span>が入っている。<br>
+乱数1・乱数2の論理和の下から2ビット目に<span class="formula">1</span>が立っていれば、技データ11と論理積を取っても下から2ビット目に1が残る。<br>
+だが、乱数1・乱数2の論理和の下から2ビット目が<span class="formula">0</span>だと、技データ11と論理積を取ったら下から2ビット目が<span class="formula">0</span>になってしまう。<br>
+下から2ビット目に<span class="formula">1</span>が残れば、この後、「どう回し回転げり」の回転が成功と判定されることになる。</p>
+
+<p>例として、先程と同じく乱数1が<span class="formula">$EA</span>(<span class="formula">%1110 1010</span>)、乱数2が<span class="formula">$A9</span>(<span class="formula">%1010 1001</span>)だと、<span class="formula">乱数1 | 乱数2 = $EB</span>(<span class="formula">%1110 1011</span>)である。<br>
+「どう回し回転げり」の技データ11<span class="formula"> = $02</span>を入れて計算すると、</p>
+
+<p><span class="formula">((乱数1 | 乱数2) &amp; 技データ11) &amp; $07</span><br>
+<span class="formula">= ($EB &amp; $02) &amp; $07</span><br>
+<span class="formula">= $00</span></p>
+
+<p><span class="formula">$02</span>(<span class="formula">%0000 0010</span>)となって、「どう回し回転げり」の回転は成功である。<br>
+もしこれがとらわれの男の「いかく射撃」だったら、技データ11 = <span class="formula">$06</span>(<span class="formula">%0000 0110</span>)、90度回転と180度回転の効果がある。</p>
+
+<p><span class="formula">((乱数1 | 乱数2) &amp; 技データ11) &amp; $07</span><br>
+<span class="formula">= ($EB &amp; $06) &amp; $07</span><br>
+<span class="formula">= $02</span></p>
+
+<p><span class="formula">$02</span>(<span class="formula">%0000 0010</span>)が答えで、90度右回転に対応した桁・下2ビット目は<span class="formula">1</span>が立っているが、180度回転に対応した桁・下3ビット目は<span class="formula">0</span>であるから、「90度右回転は成功」し、「180度回転は失敗」となるのである。<br>
+後方吹き飛ばしの判定は一番下の1ビットの値で決まるので、もし「アロハリテ」「パンチャマキック」などの後方吹き飛ばしでの乱数判定で、上の計算結果だったとしたら、「<span class="formula">乱数1 | 乱数2</span>（=<span class="formula">$EB</span>）」の下3ビットが「<span class="formula">%011</span>」だから、吹き飛ばしは成功判定になる。</p>
+
+<p>整理してみると、後方吹き飛ばし・90度右回転・180度回転の判定は、1ビットの乱数（<span class="formula">0</span>か<span class="formula">1</span>か）を2回生成して論理和を取り、<span class="formula">1</span>なら成功、<span class="formula">0</span>なら失敗、と判定しているのと同じである。<br>
+成功は、「<span class="formula">1,1</span>」, 「<span class="formula">1,0</span>」, 「<span class="formula">0,1</span>」の3パターン、失敗は「<span class="formula">0,0</span>」の1パターンのみ。<br>
+ということは、成功確率は<span class="formula">3/4</span>、失敗確率は<span class="formula">1/4</span>ということになる。<br>
+実際には8ビットの乱数2種の下3桁（3ビット分）の領域で判定をしていることになる。</p>
+
+<div class="code-container"><pre>
+$C1/CBF5 LDX $60    [$00:0360]   ;Xに[$00:0360]をロード
+$C1/CBF7 LDA #$00                ;Aに$00をロード
+$C1/CBF9 STA $7E9202,x           ;Aを[$7E:ADx2]に書き込み
+$C1/CBFD STA $7E9203,x           ;Aを[$7E:ADx3]に書き込み
+$C1/CC01 LDA $7E9003,x           ;Aに[$7E:ABx3](ヒット数)をロード
+$C1/CC05 BNE $01    [$CC08]      ;ゼロフラグが立っていないとき[$CC08]分岐
+;ゼロフラグON
+$C1/CC07 RTS                     ;サブルーチン戻り
+;ゼロフラグOFF
+$C1/CC08 AND #$7F                ;Aと$7Fで論理積
+$C1/CC0A STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/CC0C JSR $03F1  [$C1:03F1]   ;[$C1:03F1]へジャンプ
+</pre></div>
+
+<p>実質成功・失敗判定の計算後、<code>[$7E:ABx3]</code>(敵番号xへのヒット数)が<span class="formula">0</span>ではないか、つまり命中しているかの判定を行っている。<br>
+ヒット数<span class="formula">0</span>の時は<code><span class="r">$C1/CC07</span></code>でサブルーチンが戻るから、ここまでの計算値が何であっても位置変化は起こらない。<br>
+そうでない場合は更に判定が続く。</p>
+
+<div class="code-container"><pre>
+$C1/03F1 LDY $0002,x             ;Yに[$00:1Bx2]をロード
+$C1/03F4 LDA $002F,y             ;Aに[$00:1AxF](敵データ15　タイプ)をロード
+$C1/03F7 BIT #$04                ;Aと$04(タイプ:OBJECT)で論理積（ステータスフラグ変更のみ）
+$C1/03F9 RTS                     ;サブルーチン戻り
+;
+$C1/CC0F BEQ $02    [$CC13]      ;ゼロフラグが立っているとき[$CC13]分岐
+;ゼロフラグOFF
+$C1/CC11 STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+;ゼロフラグON
+$C1/CC13 LDA $0000,x[$00:1B20]   ;Aに[$00:1Bx0](敵ID)をロード
+$C1/CC16 CMP #$D0                ;Aと$D0(敵IDオディオモール)を減算比較（ステータスレジスタ変更のみ）
+$C1/CC18 BEQ $04    [$CC1E]      ;ゼロフラグが立っているとき[$CC1E]分岐
+$C1/CC1A CMP #$D1                ;Aと$D1(敵IDピュアオディオ)を減算比較（ステータスレジスタ変更のみ）
+$C1/CC1C BNE $02    [$CC20]      ;ゼロフラグが立っていないとき[$CC20]分岐
+;$C1/CC18 ゼロフラグON
+$C1/CC1E STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+;ゼロフラグOFF
+$C1/CC20 LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/CC22 PHY                     ;Yをスタックへプッシュ
+$C1/CC23 STX $AC    [$00:03AC]   ;Xを[$00:03AC]に書き込み
+$C1/CC25 PHX                     ;Xをスタックにプッシュ
+$C1/CC26 JSR $1429  [$C1:1429]   ;[$C1:1429]へジャンプ
+</pre></div>
+
+<p>ここが、攻撃相手の判定にあたる。<br>
+<code><span class="r">$C1/03F1</span></code>～<code><span class="r">$C1/CC0F</span></code>では、敵データ15に入っている敵タイプがOBJECTだと、<code><span class="r">$C1/CC0F</span></code>でゼロフラグが立たず、他のタイプならゼロフラグが立つ。<br>
+敵タイプがOBJECTというのは岩やしょく台など、倒す必要がない障害物のこと。<br>
+敵タイプがOBJECTだと、<span class="formula">((乱数1 | 乱数2) &amp; 技データ11) &amp; $07</span>の計算値を入れた<code>[$00:0311]</code>に、<code><span class="r">$C1/CC1E</span></code>で<span class="formula">$00</span>を上書きしてしまう。<br>
+つまり、敵タイプがOBJECTだと、この処理で向き変えや吹き飛ばしを無効にしてしまう。</p>
+
+<p>敵タイプがOBJECTではない場合、<code><span class="r">$C1/CC13</span></code>～の処理に入る。<br>
+ここでは<code>[$00:1Bx0]</code>(敵ID)をロードして、<span class="formula">$D0</span>または<span class="formula">$D1</span>ではないかを判定していく。<br>
+減算比較してゼロフラグ判定なので、<span class="formula">$D0</span>または<span class="formula">$D1</span>に一致したら、<code><span class="r">$C1/CC1E</span></code>に進み、敵タイプがOBJECTと同様、<code>[$00:0311]</code>に<span class="formula">$00</span>を上書きしている。<br>
+では、敵IDが<span class="formula">$D0</span>または<span class="formula">$D1</span>は何かというと、<span class="formula">$D0</span>はオディオモール、<span class="formula">$D1</span>はピュアオディオである。<br>
+ここで、攻撃相手がオディオモールかピュアオディオなら、向き変えや吹き飛ばしは無効化、という処理が入っているのである。<br>
+敵IDを指定しているのはこの2体のみ。</p>
+
+<p>以上から、</p>
+
+<ul>
+	<li>敵タイプがOBJECT</li>
+	<li>オディオモール</li>
+	<li>ピュアオディオ</li>
+</ul>
+
+<p>の3パターンは、向き変えや吹き飛ばしが無効化されることがわかった。</p>
+
+<p>この先は実際に向き変えや吹き飛ばしを行い、敵の向きや位置を計算する処理である。<br>
+<code>[$00:0311]</code>に入っている<span class="formula">((乱数1 | 乱数2) &amp; 技データ11) &amp; $07</span>から判定・計算を行う。</p>
+
+<div class="code-container"><pre>
+$C1/1429 LDA $11    [$00:0311]   ;Aに[$00:0311]をロード
+$C1/142B BNE $01    [$142E]      ;ゼロフラグが立っていないとき[$142E]分岐
+;ゼロフラグON
+$C1/142D RTS                     ;サブルーチン戻り
+;ゼロフラグOFF
+$C1/142E LDA $0005,x[$00:1B25]   ;Aに[$00:1Bx5]（技関連状態）をロード
+$C1/1431 CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/1433 BNE $03    [$1438]      ;ゼロフラグが立っていないとき[$1438]分岐
+;ゼロフラグON（技関連状態が$40・タメ時間中）
+$C1/1435 STZ $0005,x[$00:1B25]   ;[$00:1Bx5]に$00を書き込み
+;ゼロフラグOFF（技関連状態が$40以外・タメ時間ではない）
+$C1/1438 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上は、攻撃相手がタメ時間のある技を使っているかどうかの判定である。<br>
+最初の<code><span class="r">$C1/142B</span></code>のゼロフラグ分岐は、<code>[$00:0311]</code>に入った計算値が0ならタメ時間判定自体をスキップする、という意味である。<br>
+<code>[$00:0311]</code>に何らかの値が入ってれば、<code><span class="r">$C1/142E</span></code>で<code>[$00:1Bx5]</code>（<code>x</code>は敵番号）をロードする。<br>
+このアドレスには、攻撃した敵の技関係状態が入っており、<span class="formula">$40</span>はタメ時間中を意味する。<br>
+タメ時間中なら<code><span class="r">$C1/1435</span></code>に進み、<code>[$00:1Bx5]</code>に<span class="formula">$00</span>を上書きするが、技関係状態が<span class="formula">$00</span>は通常状態、つまりタメ時間中ではなくなるので、この時点でタメていた技がキャンセルされることになる。</p>
+
+<p>ただしこの時点では、残りタメ時間が入る<code>[$00:1Bx6]</code>には値を入れない。<br>
+実際には、<code>[$00:1Bx6]</code>から、向き変え・吹き飛ばし技を当てたことによる時間経過<span class="formula">$10</span>を引いた後に、再びタメ時間（初期値）をセットし、敵味方が何か行動したタイミングで<code>[$00:1Bx6]</code>が<span class="formula">0</span>になる、という少々面倒な手順で、残りタメ時間を変えている。この処理の詳細な説明は、今回は省く。</p>
+
+<p>どのパターンでもサブルーチンを抜けて次の処理へ移るが、次は<span class="tri"><a href="program17.html">行動異常</a></span>関係の処理（<code><span class="r">$C1/CC29</span></code>～<code><span class="r">$C1/CC3F</span></code>）で、以前にも紹介したことがあるので、ここでは飛ばす。</p>
+
+<div class="code-container"><pre>
+$C1/CC42 LDA $11    [$00:0311]   ;Aに[$00:0311]をロード
+$C1/CC44 BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C1/CC46 BEQ $09    [$CC51]      ;ゼロフラグが立っているとき[$CC51]分岐
+;ゼロフラグOFF　90度回転処理へ
+$C1/CC48 JSR $CED4  [$C1:CED4]   ;[$C1:CED4]へジャンプ
+;ゼロフラグON
+$C1/CC51 LDA $11    [$00:0311]   ;Aに[$00:0311]をロード
+$C1/CC53 BIT #$04                ;Aと$04で論理積（ステータスフラグ変更のみ）
+$C1/CC55 BEQ $09    [$CC60]      ;ゼロフラグが立っているとき[$CC60]分岐
+;ゼロフラグOFF　180度回転処理へ
+$C1/CC57 JSR $CF0A  [$C1:CF0A]   ;[$C1:CF0A]へジャンプ
+;ゼロフラグON
+$C1/CC60 JSR $D025  [$C1:D025]   ;[$C1:D025]へジャンプ
+;
+$C1/D025 LDA $000A,x             ;Aに[$00:1BxA](現在のマス目のX座標)をロード
+$C1/D028 STA $0008,x             ;Aを[$00:1Bx8](敵のX座標・計算値)に書き込み
+$C1/D02B LDA $000B,x             ;Aに[$00:1BxB](現在のマス目のY座標)をロード
+$C1/D02E STA $0009,x             ;Aを[$00:1Bx9](敵のY座標・計算値)に書き込み
+$C1/D031 RTS                     ;サブルーチン戻り
+;
+$C1/CC63 LDA $11    [$00:0311]   ;Aに[$00:0311]をロード
+$C1/CC65 BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C1/CC67 BEQ $09    [$CC72]      ;ゼロフラグが立っているとき[$CC72]分岐（向き変え・吹き飛ばしなし）
+;ゼロフラグOFF　吹き飛ばし処理へ
+$C1/CC69 LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/CC6B PHY                     ;Yをスタックへプッシュ
+$C1/CC6C JSR $D052  [$C1:D052]   ;[$C1:D052]へジャンプ
+</pre></div>
+
+<p>ここで、<code>[$00:0311]</code>の下3ビットの値から処理を分岐させる。<br>
+<span class="formula">$02</span>と論理積をとってゼロフラグが立たない場合は下から2ビット目に1が立っているから、<code><span class="r">$C1/CC48</span></code>のジャンプ先<code>[$C1:CED4]</code>以降で90度回転の処理を行う。<br>
+<span class="formula">$04</span>と論理積をとってゼロフラグが立たない場合は下から3ビット目に1が立っているから、<code><span class="r">$C1/CC57</span></code>のジャンプ先<code>[$C1:CF0A]</code>以降で180度回転の処理を行う。</p>
+
+<p>それ以外は<code><span class="r">$C1/CC60</span></code>→<code><span class="r">$C1/D025</span></code>とジャンプし、攻撃した敵の座標<code>[$00:1BxA]</code><code>[$00:1BxB]</code>をそれぞれ<code>[$00:1Bx8]</code><code>[$00:1Bx9]</code>にコピーしてから、今度は<code>[$00:0311]</code>と<span class="formula">$01</span>で論理積をとり、ゼロフラグが立たない場合は下から1ビット目に1が立っているから、吹き飛ばし処理先の<code>[$C1:D052]</code>へ進むことになる。</p>
+
+<p>飛び先が分岐したので、それぞれの処理を分けて見ていこう。</p>
+
+<h4>90度回転</h4>
+
+<p>ジャンプ先<code>[$C1:CED4]</code>以降の処理は以下のとおり。</p>
+
+<div class="code-container"><pre>
+;90度回転処理
+$C1/CED4 LDA $0004,x[$00:1B24]   ;Aに[$00:1Bx4](敵の向き)をロード
+$C1/CED7 BIT #$C0                ;Aと$C0で論理積（ステータスフラグ変更のみ）
+$C1/CED9 BEQ $0C    [$CEE7]      ;ゼロフラグが立っているとき[$CEE7]分岐
+$C1/CEDB CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/CEDD BEQ $0C    [$CEEB]      ;ゼロフラグが立っているとき[$CEEB]分岐
+$C1/CEDF CMP #$80                ;Aと$80を減算比較（ステータスレジスタ変更のみ）
+$C1/CEE1 BEQ $0C    [$CEEF]      ;ゼロフラグが立っているとき[$CEEF]分岐
+;向きが$C0（右上）
+$C1/CEE3 LDA #$80                ;Aに$80をロード
+$C1/CEE5 BRA $0A    [$CEF1]      ;フラグにかかわりなく常に分岐[$CEF1]
+;向きが$00（右下）
+$C1/CEE7 LDA #$40                ;Aに$40をロード
+$C1/CEE9 BRA $06    [$CEF1]      ;フラグにかかわりなく常に分岐[$CEF1]
+;向きが$40（左下）
+$C1/CEEB LDA #$C0                ;Aに$C0をロード
+$C1/CEED BRA $02    [$CEF1]      ;フラグにかかわりなく常に分岐[$CEF1]
+;向きが$80（左上）
+$C1/CEEF LDA #$00                ;Aに$00をロード
+;分岐合流
+$C1/CEF1 STA $0004,x[$00:1B24]   ;Aを[$00:1Bx4](敵の向き)に書き込み
+$C1/CEF4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>まず、<code><span class="r">$C1/CED4</span></code>で敵の向きが記録されている<code>[$00:1Bx4]</code>をロードする。<br>
+向きに対応した値は以下の通り。90度回転後の値も追加してある。</p>
+
+<table>
+<thead>
+	<tr><th>向き</th><th>数値</th><th>90度回転後</th></tr>
+</thead>
+<tbody>
+	<tr><td>右下</td><td><span class="formula">$00</span></td><td><span class="formula">$40</span></td></tr>
+	<tr><td>左下</td><td><span class="formula">$40</span></td><td><span class="formula">$C0</span></td></tr>
+	<tr><td>右上</td><td><span class="formula">$80</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>左上</td><td><span class="formula">$C0</span></td><td><span class="formula">$80</span></td></tr>
+</tbody>
+</table>
+
+<p>上の処理を見ての通り、向き4パターンで分岐し、<code>A</code>に新たな向き（90度回転後）をロードして、<code><span class="r">$C1/CEF1</span></code>で<code>[$00:1Bx4]</code>に上書き、という方法で向き変えを行っている。</p>
+
+<h4>180度回転</h4>
+
+<p>ジャンプ先<code>[$C1:CF0A]</code>の処理は以下のとおり。</p>
+
+<div class="code-container"><pre>
+$C1/CF0A LDA $0004,x             ;Aに[$00:1Bx4](敵の向き)をロード
+$C1/CF0D EOR #$C0                ;Aと$C0で排他的論理和XOR
+$C1/CF0F STA $0004,x             ;Aを[$00:1Bx4](敵の向き)に書き込み
+$C1/CF12 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>90度回転と比べると非常にシンプルである。<br>
+排他的論理和は、2進数で各桁を見た時に、片方の桁だけ<span class="formula">1</span>なら<span class="formula">1</span>、それ以外は<span class="formula">0</span>とする論理演算にあたる。<br>
+<span class="formula">$C0(%1100 0000)</span>と排他的論理和を取るということは実質、上2ビットの値を逆にすることとと変わらない。<br>
+つまり、</p>
+
+<table>
+<thead>
+	<tr><th>向き</th><th>数値</th><th>2進数</th><th><span class="formula">$C0</span>と排他的論理和</th></tr>
+</thead>
+<tbody>
+	<tr><td>右下</td><td><span class="formula">$00</span></td><td><span class="formula">%0000 0000</span></td><td><span class="formula">%1100 0000 = $C0</span></td></tr>
+	<tr><td>左下</td><td><span class="formula">$40</span></td><td><span class="formula">%0100 0000</span></td><td><span class="formula">%1000 0000 = $80</span></td></tr>
+	<tr><td>右上</td><td><span class="formula">$80</span></td><td><span class="formula">%1000 0000</span></td><td><span class="formula">%0100 0000 = $40</span></td></tr>
+	<tr><td>左上</td><td><span class="formula">$C0</span></td><td><span class="formula">%1100 0000</span></td><td><span class="formula">%0000 0000 = $00</span></td></tr>
+</tbody>
+</table>
+
+<p>このようにちょうど、180度逆の方向が計算できることになる。<br>
+この値が新たな敵の向き<code>[$00:1Bx4]</code>としてセットされる。</p>
+
+<h4>吹き飛ばし</h4>
+
+<p>マス目の座標のコピー部分も含めて紹介していく。<br>
+吹き飛ばし後のマス位置のサブルーチンは、敵のサイズやフィールド隅の場合など、考慮しなければならない点が多く、少々複雑。</p>
+
+<div class="code-container"><pre>
+$C1/D025 LDA $000A,x             ;Aに[$00:1BxA](敵のX座標)をロード
+$C1/D028 STA $0008,x             ;Aを[$00:1Bx8](敵のX座標・計算値)に書き込み
+$C1/D02B LDA $000B,x             ;Aに[$00:1BxB](敵のY座標)をロード
+$C1/D02E STA $0009,x             ;Aを[$00:1Bx9](敵のY座標・計算値)に書き込み
+$C1/D031 RTS                     ;サブルーチン戻り
+;
+$C1/CC63 LDA $11    [$00:0311]   ;Aに[$00:0311]をロード
+$C1/CC65 BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C1/CC67 BEQ $09    [$CC72]      ;ゼロフラグが立っているとき[$CC72]分岐（吹き飛ばしなし）
+;ゼロフラグOFF　吹き飛ばし処理へ
+$C1/CC69 LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/CC6B PHY                     ;Yをスタックへプッシュ
+$C1/CC6C JSR $D052  [$C1:D052]   ;[$C1:D052]へジャンプ
+;
+$C1/D052 JSR $CF2F  [$C1:CF2F]   ;[$C1:CF2F]へジャンプ
+;
+$C1/CF2F LDY $78    [$00:0378]   ;Yに[$00:0378]をロード
+$C1/CF31 CPY #$1C00              ;Yと$1C00を減算比較（ステータスレジスタ変更のみ）
+$C1/CF34 BCS $1A    [$CF50]      ;キャリーフラグが立っているとき[$CF50]分岐
+$C1/CF50 LDA $0018,y             ;Aに[$00:1C18+40n](技使用者のX座標)をロード
+$C1/CF53 STA $14    [$00:0314]   ;Aを[$00:0314]に書き込み
+$C1/CF55 LDA $0019,y             ;Aに[$00:1C19+40n](技使用者のY座標)をロード
+$C1/CF58 STA $15    [$00:0315]   ;Aを[$00:0315]に書き込み
+$C1/CF5A RTS                     ;サブルーチン戻り
+;
+$C1/D055 LDY $0002,x[$00:1B22]   ;Yに[$00:1Bx2]をロード
+$C1/D058 LDA $14    [$00:0314]   ;Aに[$00:0314](技使用者のX座標)をロード
+$C1/D05A CMP $000A,x             ;Aと[$00:1BxA](敵のX座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/D05D BCC $10    [$D06F]      ;キャリーフラグが立っていないとき[$D06F]分岐
+</pre></div>
+
+<p><code><span class="r">$C1/CC65</span></code>の分岐で、<code>[$00:0311]</code>が0と判定される場合は吹き飛ばし処理なし。<code><span class="r">$C1/CC69</span></code>以降が吹き飛ばし用の専用処理になる。<br>
+<code><span class="r">$C1/D025</span></code>～<code><span class="r">$C1/D02E</span></code>では敵の座標を計算用アドレスにコピーしたが、<code><span class="r">$C1/CF50</span></code>からは吹き飛ばし技を使ったキャラのX座標を<code>[$00:0314]</code>、Y座標を<code>[$00:0315]</code>にコピーする。<br>
+<code><span class="r">$C1/D055</span></code>からが最初の分岐であり、『<span class="formula"><code>[$00:0314]</code>(技使用者のX座標) - <code>[$00:1BxA]</code>(敵のX座標)</span>』を計算してキャリーフラグ分岐を行う。<br>
+マス目と座標の対応は以下のようになっている。</p>
+
+<table>
+<tbody>
+	<tr><td>(0,0)</td><td>(1,0)</td><td>(2,0)</td><td>(3,0)</td><td>(4,0)</td><td>(5,0)</td><td>(6,0)</td></tr>
+	<tr><td>(0,1)</td><td>(1,1)</td><td>(2,1)</td><td>(3,1)</td><td>(4,1)</td><td>(5,1)</td><td>(6,1)</td></tr>
+	<tr><td>(0,2)</td><td>(1,2)</td><td>(2,2)</td><td>(3,2)</td><td>(4,2)</td><td>(5,2)</td><td>(6,2)</td></tr>
+	<tr><td>(0,3)</td><td>(1,3)</td><td>(2,3)</td><td>(3,3)</td><td>(4,3)</td><td>(5,3)</td><td>(6,3)</td></tr>
+	<tr><td>(0,4)</td><td>(1,4)</td><td>(2,4)</td><td>(3,4)</td><td>(4,4)</td><td>(5,4)</td><td>(6,4)</td></tr>
+	<tr><td>(0,5)</td><td>(1,5)</td><td>(2,5)</td><td>(3,5)</td><td>(4,5)</td><td>(5,5)</td><td>(6,5)</td></tr>
+	<tr><td>(0,6)</td><td>(1,6)</td><td>(2,6)</td><td>(3,6)</td><td>(4,6)</td><td>(5,6)</td><td>(6,6)</td></tr>
+</tbody>
+</table>
+
+<p>X座標は戦闘フィールドの横方向にあたる。<br>
+『<span class="formula">技使用者X座標-敵X座標</span>』が正か<span class="formula">0</span>（キャリーフラグON）は、技使用者X座標の方が大きいか同じ座標になる。<br>
+『<span class="formula">技使用者X座標-敵X座標</span>』が負（キャリーフラグOFF）は、技使用者X座標の方が小さい。</p>
+
+<div class="code-container"><pre>
+;キャリーフラグON（技使用者のX座標≧敵のX座標)
+$C1/D05F LDA $000A,x[$00:1B1A]   A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;Aに[$00:1BxA](敵のX座標)をロード
+$C1/D062 CLC                     A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;キャリーフラグクリア
+$C1/D063 ADC $0004,y[$00:1A04]   A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;A + [$00:1An4](敵種類nの横の幅)
+$C1/D066 DEC A                   A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;Aをデクリメント -1
+$C1/D067 CMP $14    [$00:0314]   A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;Aと[$00:0314](技使用者のX座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/D069 BCC $08    [$D073]      A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;キャリーフラグが立っていないとき[$D073]分岐
+$C1/D06B LDA #$00                A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;Aに$00をロード
+$C1/D06D BRA $06    [$D075]      A:0003 X:1B10 Y:1A00 P:eNvMxdIzc;フラグにかかわりなく常に分岐[$D075]★
+;
+;キャリーフラグOFF（技使用者のX座標＜敵のX座標)
+$C1/D06F LDA #$01                A:0003 X:1B20 Y:1A00 P:eNvMxdIzc;Aに$01をロード
+$C1/D071 BRA $02    [$D075]      A:0001 X:1B20 Y:1A00 P:envMxdIzc;フラグにかかわりなく常に分岐[$D075]★
+;
+;$C1/D069 キャリーフラグOFF（減算結果が負）
+$C1/D073 LDA #$FF                A:0002 X:1B10 Y:1C00 P:envMxdIzC;Aに$FFをロード
+</pre></div>
+
+<p>分岐した先の処理だが、まず<code><span class="r">$C1/D05F</span></code>～の使用者のX座標≧敵のX座標の場合を見てみる。<br>
+まず、敵のX座標にその敵の横幅を加算している。<br>
+例えば、下図において、敵■のX座標が3で、味方○のX座標が5、敵の横幅2の場合、敵味方が横位置列に並ぶと以下のようになっているはず。</p>
+
+<div class="mono">
+□□□■■○□
+</div>
+
+<p>横幅を足してから<code><span class="r">$C1/D066</span></code>で<span class="formula">-1</span>しているから（<span class="formula">3+2-1=4</span>)、敵の一番右側のマスのX座標を求めていることがわかる。<br>
+<code><span class="r">$C1/D067</span></code>では、<code>A</code>（敵の一番右側のマスのX座標）と、<code>[$00:0314]</code>(技使用者のX座標)を減算比較する。<br>
+上のような並びなら、<span class="formula">4-5</span>で減算結果が負だから、キャリーフラグが立たない。<br>
+その場合は<code><span class="r">$C1/D073</span></code>で<code>A</code>に<span class="formula">$FF</span>をロードしてから<code><span class="r">$C1/D075</span></code>にジャンプする。</p>
+
+<p>キャリーフラグが立つ場合は、敵の一番右側のマスのX座標≧技使用者のX座標という意味である。</p>
+
+<div class="mono">
+□□□■■□□<br>
+□□□□○□□<br>
+</div>
+
+<p>上のように敵の一番右側のマスのX座標と技使用者のX座標が同一か、</p>
+
+<div class="mono">
+□□□■■■□<br>
+□□□□○□□<br>
+</div>
+
+<p>または敵の一番右側のマスのX座標＞技使用者のX座標のどちらかになる。<br>
+つまり、敵の真上か真下に居る場合になり、この時は<code><span class="r">$C1/D06B</span></code>で<code>A</code>に<span class="formula">$00</span>をロードしてから<code><span class="r">$C1/D075</span></code>にジャンプする。</p>
+
+<p>これで使用者のX座標≧敵のX座標の場合の処理は終了。</p>
+
+<p>技使用者のX座標＜敵のX座標の飛び先、<code><span class="r">$C1/D06F</span></code>では、<code>A</code>に<span class="formula">$01</span>をロードしてから<code><span class="r">$C1/D075</span></code>に進む。<br>
+幅による分岐はない。<br>
+というのは、技使用者のX座標＜敵のX座標だと、敵幅を見るまでもなく、必ず味方キャラが敵の左のマスにいることになる。</p>
+
+<div class="mono">
+□○□■■□□
+</div>
+
+<p>以上から、</p>
+<ul>
+	<li>技使用者が敵の右側にいる時は<code>A</code>に<span class="formula">$FF</span>をロード</li>
+	<li>技使用者が敵の左側にいる時は<code>A</code>に<span class="formula">$01</span>をロード</li>
+	<li>技使用者が敵の真上か真下にいる時は<code>A</code>に<span class="formula">$00</span>をロード</li>
+</ul>
+<p>という処理をしてから、次の<code><span class="r">$C1/D075</span></code>に進むことがわかった。<br>
+なお、<code><span class="r">$C1/D075</span></code>では<code>A</code>の値を<code>[$00:0314]</code>に書き込んでいるから、これまで技使用者のX座標が入っていたアドレスが上書きされたことになる。</p>
+
+<div class="code-container"><pre>
+;処理合流（★飛び先）
+$C1/D075 STA $14    [$00:0314]   ;A($00/$FF/$01)を[$00:0314]に書き込み
+$C1/D077 LDA $15    [$00:0315]   ;Aに[$00:0315](技使用者のY座標)をロード
+$C1/D079 CMP $000B,x             ;Aと[$00:1BxB](敵のY座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/D07C BCC $10    [$D08E]      ;キャリーフラグが立っていないとき[$D08E]分岐
+;キャリーフラグON（技使用者のY座標≧敵のY座標)
+$C1/D07E LDA $000B,x             ;Aに[$00:1BxB](敵のY座標)をロード
+$C1/D081 CLC                     ;キャリーフラグクリア
+$C1/D082 ADC $0005,y[$00:1A05]   ;A + [$00:1An5](敵種類nの縦の幅)
+$C1/D085 DEC A                   ;Aをデクリメント -1
+$C1/D086 CMP $15    [$00:0315]   ;Aと[$00:0315](技使用者のY座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/D088 BCC $08    [$D092]      ;キャリーフラグが立っていないとき[$D092]分岐
+;$C1/D088でキャリーフラグON
+$C1/D08A LDA #$00                ;Aに$00をロード
+$C1/D08C BRA $06    [$D094]      ;フラグにかかわりなく常に分岐[$D094]★
+;$C1/D07CでキャリーフラグOFF（技使用者のY座標＜敵のY座標)
+$C1/D08E LDA #$01                ;Aに$01をロード
+$C1/D090 BRA $02    [$D094]      ;フラグにかかわりなく常に分岐[$D094]★
+;$C1/D088でキャリーフラグOFF
+$C1/D092 LDA #$FF                ;Aに$FFをロード
+;★合流
+$C1/D094 STA $15    [$00:0315]   ;Aを[$00:0315]に書き込み
+$C1/D096 ORA $14    [$00:0314]   ;Aと[$00:0314]で論理和
+$C1/D098 BEQ $5A    [$D0F4]      ;ゼロフラグが立っているとき[$D0F4]分岐
+</pre></div>
+
+<p>上処理はY座標に関しての分岐で、分岐の条件はX座標と似ている。<br>
+『<span class="formula">技使用者のY座標-敵のY座標</span>』による分岐と、敵の縦幅での分岐を行っている。</p>
+
+<ul>
+	<li>技使用者が敵の下側にいる時は<code>A</code>に<span class="formula">$FF</span>をロード</li>
+	<li>技使用者が敵の上側にいる時は<code>A</code>に<span class="formula">$01</span>をロード</li>
+	<li>技使用者が敵の真右か真左にいる時は<code>A</code>に<span class="formula">$00</span>をロード</li>
+</ul>
+
+<p>この<code>A</code>の値は<code><span class="r">$C1/D094</span></code>で<code>[$00:0315]</code>に書き込まれる。<br>
+これまで技使用者のY座標が入っていたアドレスが上書きされたことになる。</p>
+
+<p><code><span class="r">$C1/D096</span></code>では<code>[$00:0314]</code>と<code>[$00:0315]</code>の論理和を取り、ここでゼロフラグが立つと<code>[<span class="r">$C1/D0F4</span>]</code>にジャンプして、処理を抜ける。<br>
+ここでの論理和が<span class="formula">0</span>になることはありえない。攻撃相手の真上か真下かつ、真右か真左というマスはないからである。<br>
+少しわかりにくくなってきたので、下図を見ていただきたい。<br>
+<code>[$00:0314]</code>,<code>[$00:0315]</code>の順で値を記すと、敵位置に対し味方のいるマスで下のように値が入ることになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/blow.png" class="modal-link">
+		<img src="img/blow.png" alt="吹き飛ばし" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>この通り、<code>[$00:0314]</code>と<code>[$00:0315]</code>どちらも<span class="formula">$00</span>になるケースはないので、処理終了となり<code>[<span class="r">$C1/D0F4</span>]</code>にジャンプして、処理を抜けるのである。<br>
+また、これらの値から吹き飛ぶ方向が決まることもだいたい察しがつくだろう。<br>
+上の値を座標に加算すれば飛ぶマスの座標になるからである。<span class="formula">$FF</span>の加算は符号付き8ビット整数での加算になり（負の数の加算）、10進数なら<span class="formula">-1</span>を意味していると考えれば良い。<br>
+では、続きを見ていく。</p>
+
+<div class="code-container"><pre>
+$C1/D09A LDA $000A,x             ;Aに[$00:1BxA](敵のX座標)をロード
+$C1/D09D CLC                     ;キャリーフラグクリア
+$C1/D09E ADC $14    [$00:0314]   ;A + [$00:0314]($00/$FF/$01)
+$C1/D0A0 CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/D0A2 BCS $17    [$D0BB]      ;キャリーフラグが立っているとき[$D0BB]分岐
+$C1/D0A4 STA $0008,x             ;Aを[$00:1Bx8](敵のX座標・計算値)に書き込み
+;
+$C1/D0A7 LDA $000B,x             ;Aに[$00:1BxB](敵のY座標)をロード
+$C1/D0AA CLC                     ;キャリーフラグクリア
+$C1/D0AB ADC $15    [$00:0315]   ;A + [$00:0315]($00/$FF/$01)
+$C1/D0AD CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/D0AF BCS $26    [$D0D7]      ;キャリーフラグが立っているとき[$D0D7]分岐
+$C1/D0B1 STA $0009,x             ;Aを[$00:1Bx9](敵のY座標・計算値)に書き込み
+$C1/D0B4 JSR $41F2  [$C1:41F2]   ;[$C1:41F2]へジャンプ
+</pre></div>
+
+<p>途中に分岐があるが、まず分岐先には飛ばない上の処理を見てみよう。<br>
+<code><span class="r">$C1/D09A</span></code>～<code><span class="r">$C1/D0A4</span></code>は、<code>[$00:1BxA]</code>(敵のX座標)に、ここまでで計算した<code>[$00:0314]</code>(<span class="formula">$00/$FF/$01</span>)を加算する。つまり飛び先のX座標の値の計算である。<br>
+右に飛ぶのなら<span class="formula">$01</span>を加算、左に飛ぶのなら<span class="formula">$FF</span>を加算（<span class="formula">-1</span>の加算と同じ）、左右方向へは飛ばない場合は<span class="formula">$00</span>の加算である。<br>
+<code><span class="r">$C1/D0A0</span></code>で、計算結果から<span class="formula">$07</span>を減算比較し、キャリーフラグ判定をしている。<br>
+これは、計算したX座標が戦闘フィールドからはみ出していないかの判定である。<br>
+左フィールド隅（X座標0）で左に飛ばすと座標が<span class="formula">$FF</span>になるし、右フィールド隅（X座標6）で右に飛ばすと座標が<span class="formula">$07</span>となって戦闘フィールド外になってしまう。<br>
+この場合、<span class="formula">$07</span>と減算比較すると、戦闘フィールド内（<span class="formula">$00</span>～<span class="formula">$06</span>）なら減算結果が必ず負となりキャリーフラグは立たないが、戦闘フィールド外（<span class="formula">$FF</span>か<span class="formula">$07</span>）なら減算結果が正か0でキャリーフラグが立ち、<code><span class="r">$C1/D0BB</span></code>にジャンプすることになる。<br>
+キャリーフラグが立たない時はX座標計算結果を<code>[$00:1Bx8]</code>(敵のX座標・計算値)に書き込む。</p>
+
+<p><code><span class="r">$C1/D0A7</span></code>～<code><span class="r">$C1/D0B1</span></code>は同じ処理をY座標で行う。<br>
+<code>[$00:1BxB]</code>(敵のY座標)に<code>[$00:0315]</code>(<span class="formula">$00/$FF/$01</span>)を加算して吹き飛ばされたマスのY座標を計算し、フィールド外の場合は<code><span class="r">$C1/D0D7</span></code>にジャンプする。<br>
+フィールド内に収まっているなら、Y座標計算結果を<code>[$00:1Bx9]</code>(敵のY座標・計算値)に書き込む。<br>
+ここまで済むと<code>[$C1:41F2]</code>へジャンプする。<br>
+ただし、この時点で、<code>[$00:1Bx8]</code><code>[$00:1Bx9]</code>が飛び先の座標と決まったのではない。<br>
+ここまでの判定は、フィールド外にはみ出さないかどうかだけである。<br>
+敵を吹き飛ばす場合はサイズを考慮しなければならない。ここまでの座標計算は、大型の敵だと、敵の占めるマスの左上位置を基準とした座標であるから、左上マスが戦闘フィールド内に収まっていても、それ以外の部分が戦闘フィールド内かどうかは判定を行う必要がる。<br>
+他に、飛び先の座標に、既に他のキャラ（敵または味方）がいるかどうかの判定も行わなければならない。<br>
+その処理が<code>[$C1:41F2]</code>以降になる。</p>
+
+<p>その前に、フィールド外にはみ出した場合の処理、<code><span class="r">$C1/D0BB</span></code>～と<code><span class="r">$C1/D0D7</span></code>～の処理を見てみよう。</p>
+
+<div class="code-container"><pre>
+;X座標飛び先がフィールド外の場合
+$C1/D0BB LDA $000A,x             ;Aに[$00:1BxA](敵のX座標)をロード
+$C1/D0BE STA $0008,x             ;Aを[$00:1Bx8](敵のX座標・計算値)に書き込み
+$C1/D0C1 LDA $15    [$00:0315]   ;Aに[$00:0315]($00/$FF/$01)をロード
+$C1/D0C3 BEQ $12    [$D0D7]      ;ゼロフラグが立っているとき[$D0D7]分岐
+$C1/D0C5 CLC                     ;キャリーフラグクリア
+$C1/D0C6 ADC $000B,x             ;A + [$00:1BxB](敵のY座標)
+$C1/D0C9 CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/D0CB BCS $0A    [$D0D7]      ;キャリーフラグが立っているとき[$D0D7]分岐
+$C1/D0CD STA $0009,x             ;Aを[$00:1Bx9](敵のY座標・計算値)に書き込み
+$C1/D0D0 JSR $41F2  [$C1:41F2]   ;[$C1:41F2]へジャンプ
+;
+;Y座標飛び先がフィールド外の場合
+$C1/D0D7 LDA $000B,x             ;Aに[$00:1BxB](敵のY座標)をロード
+$C1/D0DA STA $0009,x             ;Aを[$00:1Bx9](敵のY座標・計算値)に書き込み
+$C1/D0DD LDA $14    [$00:0314]   ;Aに[$00:0314]($00/$FF/$01)をロード
+$C1/D0DF BEQ $13    [$D0F4]      ;ゼロフラグが立っているとき[$D0F4]分岐
+$C1/D0E1 CLC                     ;キャリーフラグクリア
+$C1/D0E2 ADC $000A,x             ;A + [$00:1BxA](敵のX座標)
+$C1/D0E5 CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/D0E7 BCS $0B    [$D0F4]      ;キャリーフラグが立っているとき[$D0F4]分岐
+$C1/D0E9 STA $0008,x             ;Aを[$00:1Bx8](敵のX座標・計算値)に書き込み
+$C1/D0EC JSR $41F2  [$C1:41F2]   ;[$C1:41F2]へジャンプ
+;
+$C1/D0F4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>X座標、Y座標ともに、フィールド外にはみ出すのなら加算せず、そのままの値を<code>[$00:1Bx8]</code>(敵のX座標・計算値)または<code>[$00:1Bx9]</code>(敵のY座標・計算値)に書き込む、という処理をしている。フィールド隅だからそれ以上移動できないという処理である。<br>
+この仕組みにより、たとえばフィールドの上端にいる敵キャラを右上方向へ飛ばした時、上方向へはフィールド外だから飛ばないが、右方向がフィールド外でない時、右方向にだけ1マス飛ぶ、というような現象が起こるのである。</p>
+
+<p>その後だが、X座標の判定後にY座標の処理（<code><span class="r">$C1/D0C1</span></code>～<code><span class="r">$C1/D0CD</span></code>）、Y座標の判定後にX座標の処理（<code><span class="r">$C1/D0DD</span></code>～<code><span class="r">$C1/D0E9</span></code>）をするが、<code><span class="r">$C1/D0DD</span></code>～<code><span class="r">$C1/D0E9</span></code>で<code>X</code>方向への移動がない場合（<code>[$00:0314]</code>が<span class="formula">$00</span>）、<code>Y</code>方向にも<code>X</code>方向にも飛ばないということになる。<br>
+つまり吹き飛ばしは成功だが吹き飛ばす先のマスがないので、結局誰も移動しないから、飛び先の座標に誰かが既にいるかどうかの判定も飛ばして構わないということになり、<code><span class="r">$C1/D0F4</span></code>でサブルーチンを抜けるのである。</p>
+
+<p>吹き飛ばし成功でも吹き飛ばせなかった場合を除き、<code>[$C1:41F2]</code>にジャンプして処理が続く。</p>
+
+<div class="code-container"><pre>
+$C1/41F2 LDA #$10                ;Aに$10をロード
+$C1/41F4 STA $13    [$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/41F6 LDA $0001,x[$00:1B21]   ;Aに[$00:1Bx1](敵番号x戦闘状態)をロード
+$C1/41F9 CMP #$20                ;Aと$20を減算比較（ステータスレジスタ変更のみ）
+;(戦闘状態$20:敵キャラをプレイヤーが操作)
+$C1/41FB BNE $02    [$41FF]      ;ゼロフラグが立っていないとき[$41FF]分岐
+$C1/41FF TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/4200 LSR A                   ;Aを論理右シフト　(/2)
+$C1/4201 LSR A                   ;Aを論理右シフト　(/2)
+$C1/4202 LSR A                   ;Aを論理右シフト　(/2)
+$C1/4203 LSR A                   ;Aを論理右シフト　(/2)
+$C1/4204 INC A                   ;Aをインクリメント +1
+$C1/4205 ORA $13    [$00:0313]   ;Aと[$00:0313]で論理和
+$C1/4207 STA $13    [$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/4209 JSR $4260  [$C1:4260]   ;[$C1:4260]へジャンプ
+;
+$C1/4260 LDY $0002,x             ;Yに[$00:1Bx2]をロード
+$C1/4263 LDA $0004,y             ;Aに[$00:1Ax4](敵種類xの横の幅)をロード
+$C1/4266 STA $0A    [$00:030A]   ;Aを[$00:030A]に書き込み
+$C1/4268 LDA $0005,y             ;Aに[$00:1A05](敵種類xの縦の幅)をロード
+$C1/426B STA $0B    [$00:030B]   ;Aを[$00:030B]に書き込み
+$C1/426D STA $09    [$00:0309]   ;Aを[$00:0309]に書き込み
+$C1/426F LDA #$08                ;Aに$08をロード
+$C1/4271 SEC                     ;キャリーフラグON
+$C1/4272 SBC $0A    [$00:030A]   ;A - [$00:030A](敵種類xの横の幅)
+$C1/4274 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/4276 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/41F2</span></code>～<code><span class="r">$C1/4276</span></code>は、吹き飛ぶ相手の吹き飛ばし先座標<code>$00:04C8</code>～<code>$00:04FE</code>を求めるための計算である。<br>
+敵味方の状態が入っている座標のアドレスは<code>$00:04C8</code>～<code>$00:04FE</code>で、下には<code>$00:04??</code>の<code>??</code>の値部分のみ記している。</p>
+
+<table>
+<tbody>
+	<tr><td>C8</td><td>C9</td><td>CA</td><td>CB</td><td>CC</td><td>CD</td><td>CE</td></tr>
+	<tr><td>D0</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td></tr>
+	<tr><td>D8</td><td>D9</td><td>DA</td><td>DB</td><td>DC</td><td>DD</td><td>DE</td></tr>
+	<tr><td>E0</td><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td></tr>
+	<tr><td>E8</td><td>E9</td><td>EA</td><td>EB</td><td>EC</td><td>ED</td><td>EE</td></tr>
+	<tr><td>F0</td><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td></tr>
+	<tr><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td></tr>
+</tbody>
+</table>
+
+<p>座標に入る値だが、敵の場合は上1桁が<span class="formula">1</span>、下1桁が敵番号<span class="formula">+1</span>である。<br>
+<code><span class="r">$C1/41F6</span></code>～<code><span class="r">$C1/4207</span></code>は、敵番号<code>[$00:1Bx1]</code>から、座標に入る値を算出して<code>[$00:0313]</code>に書き込む処理である。<br>
+敵の場合<span class="formula">$11</span>～<span class="formula">$1E</span>のいずれかの値が<code>[$00:0313]</code>に書き込まれる。</p>
+
+<p><code><span class="r">$C1/4260</span></code>からは、<code>[$00:030A]</code>に横幅、<code>[$00:030B]</code>と<code>[$00:0309]</code>に縦幅、<code>[$00:0312]</code>に「<span class="formula">$08-横幅</span>」が入る。<br>
+これらの値から、攻撃相手の吹き飛ぶ先の<code>$00:04C8</code>～<code>$00:04FE</code>のアドレスなどが計算される。</p>
+
+<div class="code-container"><pre>
+$C1/420C LDA $0008,x             ;Aに[$00:1Bx8](敵のX座標・計算値)をロード
+$C1/420F CLC                     ;キャリーフラグクリア
+$C1/4210 ADC $0A    [$00:030A]   ;A + [$00:030A](敵種類xの横の幅)
+$C1/4212 CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/4214 BCS $47    [$425D]      ;キャリーフラグが立っているとき[$425D]分岐
+;キャリーフラグOFF（横方向フィールド内）
+$C1/4216 LDA $0009,x             ;Aに[$00:1Bx9](敵のY座標・計算値)をロード
+$C1/4219 CLC                     ;キャリーフラグクリア
+$C1/421A ADC $0B    [$00:030B]   ;A + [$00:030B](敵種類xの縦の幅)
+$C1/421C CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/421E BCS $3D    [$425D]      ;キャリーフラグが立っているとき[$425D]分岐
+;キャリーフラグOFF（縦方向フィールド内）
+$C1/4220 LDA $0009,x             ;Aに[$00:1Bx9](敵のY座標・計算値)をロード
+$C1/4223 ASL A                   ;Aを算術左シフト *2
+$C1/4224 ASL A                   ;Aを算術左シフト *2
+$C1/4225 ASL A                   ;Aを算術左シフト *2
+$C1/4226 ADC $0008,x             ;A + [$00:1Bx8](敵のX座標・計算値)
+$C1/4229 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/422B STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/422D LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+</pre></div>
+
+<p>敵が飛ばされる先の仮のX座標・Y座標は<code>[$00:1Bx8]</code><code>[$00:1Bx9]</code>にコピーされているが、それぞれに横幅または縦幅を加算している。<br>
+例えばX座標5、Y座標2が飛ばされる位置とする。以下の★のマスである。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□★□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>この★の位置は、敵の左上マスである。<br>
+敵の横幅が<span class="formula">2</span>までなら、フィールドマスの範囲に収まる。<span class="formula">X座標5+横幅2=7</span>である。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□★■<br>
+□□□□□■■<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>だが、敵の横幅が<span class="formula">3</span>だったら、フィールド外に敵の一部がはみ出す。<span class="formula">X座標5+横幅3=8</span>である。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□★■■<br>
+□□□□□■■■<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>つまり<span class="formula">X座標+横幅</span>が<span class="formula">8</span>だったら横方向へは吹き飛ばしができない。<br>
+同じことはY座標でもいえる。<br>
+<code><span class="r">$C1/4212</span></code>で<span class="formula">X座標+横幅</span>の値を<span class="formula">$08</span>と減算比較していたり、<code><span class="r">$C1/421C</span></code>で<span class="formula">Y座標+縦幅</span>の値を<span class="formula">$08</span>と減算比較してキャリーフラグ判定を行うことで、敵のサイズから、各方向への吹き飛ばし後にフィールド内に収まるかどうかでの分岐になる。<br>
+どちらかもキャリーフラグが立たない場合は、縦方向・横方向ともに敵のサイズが戦闘フィールド内に収まっていることになるが、どちらかでキャリーフラグが立つ場合は飛ぶ先のマスがフィールド外なので、吹き飛ばし判定は成功だが吹き飛ぶことはない。<br>
+吹き飛ばない場合の飛び先<code><span class="r">$C1/425D</span></code>は、</p>
+
+<div class="code-container"><pre>
+$C1/425D ORA #$FF                ;Aと$FFで論理和
+$C1/425F RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><span class="formula">X座標+横幅</span>または<span class="formula">Y座標+縦幅</span>と<span class="formula">$FF</span>で論理和を取ってから、サブルーチンから抜ける。</p>
+
+<p>一方、吹き飛ばし先において敵のサイズがすべて戦闘フィールドに収まるのなら、<code><span class="r">$C1/4220</span></code>に処理が進み、</p>
+
+<span class="formula"><code>[$00:0310]</code> = 敵のY座標*8 + 敵のX座標</span>
+<span class="formula"><code>[$00:0311]</code> = $00</span>
+
+<p>を書き込んで次の処理へ進む。<br>
+<code>[$00:0310]</code>に入る値は、下3ビットが敵のX座標、その更に上3ビットが敵のY座標という値である。<br>
+座標の値は0～6なので、2進数では3桁（3ビット）に収まるから、</p>
+
+<table>
+<thead>
+	<tr><th>上2ビット</th><th>X座標</th><th>Y座標</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">00</span></td><td><span class="formula">000</span></td><td><span class="formula">000</span></td></tr>
+</tbody>
+</table>
+
+<p>の形式で8ビット（1バイト）に座標の値を収めている。<br>
+敵味方の状態が入っている座標のアドレスは<code>$00:04C8</code>～<code>$00:04FE</code>になるが、<span class="formula">$0004C8</span>に<code>[$00:0310]</code>の座標の値を加算すると、ちょうど該当のマスのアドレスが計算できるようになっている。</p>
+
+<p><code><span class="r">$C1/422D</span></code>で、<code>[$00:0310]</code>が<code>Y</code>に読み込まれ、<code><span class="r">$C1/422F</span></code>からループ処理が入る。<br>
+<span class="formula">$04C8 + Y</span>で敵の左上位置マスのアドレスが読み込め、<span class="formula">+1</span>していくと1マスずつ右方向のアドレスが読み出せることになる。</p>
+
+<div class="code-container"><pre>
+;敵の横幅確認ループ開始
+$C1/422F LDA $0A    [$00:030A]   ;Aに[$00:030A](敵種類xの横の幅)をロード
+$C1/4231 STA $08    [$00:0308]   ;A(敵種類xの横の幅)を[$00:0308]に書き込み
+;1マスずつ確認ループ開始
+$C1/4233 LDA $04C8,y[$00:04D5]   ;Aに[$04C8,y](戦闘フィールドマスの状態)をロード
+$C1/4236 INY                     ;Yをインクリメント +1
+$C1/4237 AND #$1F                ;Aと$1Fで論理積
+$C1/4239 CMP $13    [$00:0313]   ;Aと[$00:0313]を減算比較（ステータスレジスタ変更のみ）
+$C1/423B BEQ $04    [$4241]      ;ゼロフラグが立っているとき[$4241]分岐
+;ゼロフラグOFF
+$C1/423D BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/423F BNE $1C    [$425D]      ;ゼロフラグが立っていないとき[$425D]分岐
+;ゼロフラグON
+$C1/4241 DEC $08    [$00:0308]   ;[$00:0308](敵種類xの横の幅)をデクリメント -1
+$C1/4243 BNE $EE    [$4233]      ;ゼロフラグが立っていないとき[$4233]分岐
+;1マスずつ確認ループここまで
+$C1/4245 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/4247 TYA                     ;Yレジスタの値をAレジスタに転送
+$C1/4248 ADC $12    [$00:0312]   ;A + [$00:0312]($08-横幅)
+$C1/424A AND #$00FF              ;Aと$00FFで論理積
+$C1/424D TAY                     ;Aの値をYレジスタに転送
+$C1/424E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/4250 DEC $09    [$00:0309]   ;[$00:0309](敵の縦幅)をデクリメント -1
+$C1/4252 BNE $DB    [$422F]      ;ゼロフラグが立っていないとき[$422F]分岐
+;敵の横幅確認ループここまで
+$C1/4254 JSR $4277  [$C1:4277]   ;[$C1:4277]へジャンプ
+</pre></div>
+
+<p>例えば敵が横2マス・縦3マスの敵であったら、</p>
+
+<div class="mono">
+１２<br>
+３４<br>
+５６<br>
+</div>
+
+<p>上で１の位置が敵座標<code>[$00:1Bx8]</code><code>[$00:1Bx9]</code>にあたるが、上のループ処理では、まず１の位置に該当する座標のアドレス<code>$00:04C8</code>～<code>$00:04FE</code>を、<code><span class="r">$C1/4233</span></code>でロードする。<br>
+ここに自身以外の敵または味方キャラがいるかどうかの判定が、1マスずつ確認ループ<code><span class="r">$C1/4233</span></code>～<code><span class="r">$C1/4243</span></code>である。</p>
+
+<p><code>$00:04C8</code>～<code>$00:04FE</code>は、</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$01</span>～<span class="formula">$04</span></td><td>味方キャラ1～味方キャラ4</td></tr>
+	<tr><td><span class="formula">$11</span>～<span class="formula">$1F</span></td><td>敵番号0～E</td></tr>
+	<tr><td><span class="formula">$80/$A0/$C0/$E0</span></td><td>水/毒/火炎/電撃フィールド</td></tr>
+</tbody>
+</table>
+
+<p>このように値が入り、キャラとダメージフィールドの値は加算される。<br>
+<code><span class="r">$C1/4237</span></code>～で、<span class="formula">$1F</span>と論理積を取り（フィールドの値を削除する）、<code>[$00:0313]</code>（飛ばされた敵自身の値<span class="formula">$11</span>～<span class="formula">$1F</span>）と減算比較してゼロフラグ判定を行っている。<br>
+つまり、吹き飛んだ先に既に自身がいるかどうかを判定しているが、大型の敵の場合は1マス飛ばされたとしても、下のように、</p>
+
+<div class="mono">
+１２□<br>
+３４□<br>
+５６□<br>
+</div>
+
+<p>↓右1マス吹き飛ばし</p>
+
+<div class="mono">
+□１２<br>
+□３４<br>
+□５６<br>
+</div>
+
+<p>敵の右上マス「２」の位置に、敵の左上マス「１」が移動する、ということがあり得るので、<code><span class="r">$C1/423B</span></code>にてゼロフラグが立つ場合もある。その場合は<code><span class="r">$C1/423D</span></code>～<code><span class="r">$C1/423F</span></code>は飛ばされて<code><span class="r">$C1/4241</span></code>に進む。<br>
+一方、吹き飛んだ先が自身の一部がいるマスでない場合は<code><span class="r">$C1/423D</span></code>～<code><span class="r">$C1/423F</span></code>の処理が入るが、ここでは<span class="formula">$0F</span>との論理積を取ってゼロフラグ判定をしている。つまり、<code>$00:04C8</code>～<code>$00:04FE</code>の下1桁の値だけ取ってゼロフラグ判定をするが、下1桁は、敵味方いずれかがいれば<span class="formula">0</span>以外の値、誰もいないマスなら<span class="formula">0</span>が入るから、<code><span class="r">$C1/423F</span></code>でゼロフラグが立たないのは該当マスに他の敵か味方キャラがいる場合になり、<code><span class="r">$C1/425D</span></code>にジャンプしてサブルーチンを抜ける。<br>
+ゼロフラグが立つ場合は、吹き飛ばし先がカラのマス、またはダメージフィールドだけがあるマスのみである。</p>
+
+<p>以上の判定で「吹き飛ばし先のマスに吹き飛ばしが可能」となり、<code>[$00:0308]</code>をデクリメント(<span class="formula">-1</span>)してから、ループの最後の<code><span class="r">$C1/4243</span></code>に到達する。<br>
+これで1マス分の判定終了である。</p>
+
+<div class="mono">
+１２<br>
+３４<br>
+５６<br>
+</div>
+
+<p>の、１の位置の判定が終わったので、敵の幅<code>[$00:0308]</code>が<span class="formula">0</span>になるまで横方向にマス目の判定を続ける。<br>
+横1列分の判定が終わったら（上の２の位置）、<code><span class="r">$C1/4245</span></code>に抜けるが、ここで一段下の３のマスのアドレスを計算して<code>[$00:0309]</code>(敵の縦幅)をデクリメント(<span class="formula">-1</span>)し、<code>[$00:0309]</code>(敵の縦幅)が<span class="formula">0</span>になるまで<code><span class="r">$C1/422F</span></code>に戻るループを繰り返すことで、１から６までの6マスについて判定をしていく。<br>
+全てのマスの判定で「吹き飛ばし先のマスに自身の一部がいるか、誰もいないマス」であった場合はループを終了して、<code><span class="r">$C1/4254</span></code>に到達する。<br>
+一方、1マスでも「吹き飛ばし先のマスに自身の一部がいるか、誰もいないマス」ではなかったのなら、吹き飛ばし判定は成功だが吹き飛ばされないということになり、<code><span class="r">$C1/425D</span></code>にジャンプしてサブルーチンを抜ける。</p>
+
+<p>ここまでは「吹き飛ばし先のマスに自身の一部がいるか、誰もいないマス」ということが確定しただけなので、次に、座標の値の書き換えをしなければならない。<br>
+次のジャンプ先<code>$C1:4277</code>以降の処理は以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C1/4277 LDA $000B,x             ;Aに[$00:1BxB](敵のY座標)をロード
+$C1/427A ASL A                   ;Aを算術左シフト *2
+$C1/427B ASL A                   ;Aを算術左シフト *2
+$C1/427C ASL A                   ;Aを算術左シフト *2
+$C1/427D ADC $000A,x             ;A + [$00:1BxA](敵のX座標)
+$C1/4280 STA $14    [$00:0314]   ;A(敵のY座標・X座標)を[$00:0314]に書き込み
+$C1/4282 STZ $15    [$00:0315]   ;[$00:0315]に$00を書き込み
+$C1/4284 LDY $14    [$00:0314]   ;Yに[$00:0314]をロード
+$C1/4286 LDA $0B    [$00:030B]   ;Aに[$00:030B](敵種類xの縦の幅)をロード
+$C1/4288 STA $09    [$00:0309]   ;A(敵種類xの縦の幅)を[$00:0309]に書き込み
+;敵の横幅確認ループ開始
+$C1/428A LDA $0A    [$00:030A]   ;Aに[$00:030A](敵種類xの横の幅)をロード
+$C1/428C STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+;1マスずつ確認ループ
+$C1/428E LDA $04C8,y             ;Aに[$04C8,y](戦闘フィールドマスの状態)をロード
+$C1/4291 AND #$E0                ;Aと$E0で論理積
+$C1/4293 STA $04C8,y             ;Aを[$04C8,y](戦闘フィールドマスの状態)に書き込み
+$C1/4296 INY                     ;Yをインクリメント +1
+$C1/4297 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/4299 BNE $F3    [$428E]      ;ゼロフラグが立っていないとき[$428E]分岐
+;1マスずつ確認ループここまで
+$C1/429B REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/429D TYA                     ;Yレジスタの値をAレジスタに転送
+$C1/429E ADC $12    [$00:0312]   ;A + [$00:0312]
+$C1/42A0 AND #$00FF              ;Aと$00FFで論理積
+$C1/42A3 TAY                     ;Aの値をYレジスタに転送
+$C1/42A4 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/42A6 DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/42A8 BNE $E0    [$428A]      ;ゼロフラグが立っていないとき[$428A]分岐
+;敵の横幅確認ループ処理ここまで
+$C1/42AA RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここまでで、</p>
+
+<ul>
+	<li>敵が飛ばされる前の元の座標：<span class="formula">(X,Y) = <code>[$00:1BxA]</code><code>[$00:1BxB]</code></span></li>
+	<li>敵が飛ばされる先の仮の座標：<span class="formula">(X,Y) = <code>[$00:1Bx8]</code><code>[$00:1Bx9]</code></span></li>
+</ul>
+
+<p>と、値が入った。<br>
+上の処理は、敵が飛ばされる前の元の座標<code>[$00:1BxA]</code><code>[$00:1BxB]</code>から、<code>$00:04C8</code>～<code>$00:04FE</code>内の、敵が飛ぶ前の座標をすべて計算して、敵がいない状態に上書きするループ処理になる。<br>
+敵がいない状態といっても、<span class="formula">$00</span>で上書きするのではない。<code>$00:04C8</code>～<code>$00:04FE</code>にはダメージフィールドの状況も入っているため、敵の値だけ削除する必要がある。<br>
+<code>$00:04C8</code>～<code>$00:04FE</code>の座標計算自体は先の処理とほぼ同じなので、詳細は端折る。<br>
+重要なのは1マスずつの確認ループ処理<code><span class="r">$C1/428E</span></code>～<code><span class="r">$C1/4299</span></code>で、<code>[$04C8,y]</code>（該当の<code>$00:04C8</code>～<code>$00:04FE</code>）をロードし、<span class="formula">$E0</span>と論理積を取ってから、<code>[$04C8,y]</code>に上書きしている。<br>
+例えば敵番号0だったら、ダメージフィールド上に立っていなければ、<code>[$04C8,y]</code>に<span class="formula">$10</span>が入るし、水/毒/火炎/電撃フィールド上なら、<span class="formula">$10 + $80/$A0/$C0/$E0</span>が入っていることになるが、ダメージフィールド上ではないなら、</p>
+
+<p><span class="formula">$10 &amp; $E0 = $00</span></p>
+
+<p>で、<span class="formula">$00</span>を上書きし、敵番号0は該当マスからいなくなる。<br>
+火炎フィールド上なら<code>[$04C8,y]</code>に<span class="formula">$D0</span>が入っているが、</p>
+
+<span class="formula">$D0 &amp; $E0 = $C0</span>
+
+<p>と、火炎フィールドの値<span class="formula">$C0</span>だけ残る。<br>
+<span class="formula">$E0</span>と論理積を取る処理により、元からいた敵の値だけを削除できるのである。<br>
+敵が元からいたマスすべてに対しループ処理を終えると<code><span class="r">$C1/42AA</span></code>でサブルーチンを抜けて、次の処理に移る。</p>
+
+<div class="code-container"><pre>
+$C1/4257 JSR $42AB  [$C1:42AB]   ;[$C1:42AB]へジャンプ
+;
+$C1/42AB LDA $0B    [$00:030B]   ;Aに[$00:030B](敵種類xの縦の幅)をロード
+$C1/42AD STA $09    [$00:0309]   ;A(敵種類xの縦の幅)を[$00:0309]に書き込み
+$C1/42AF LDY $10    [$00:0310]   ;Yに[$00:0310](敵のY座標・X座標)をロード
+;敵の横幅確認ループ開始
+$C1/42B1 LDA $0A    [$00:030A]   ;Aに[$00:030A](敵種類xの横の幅)をロード
+$C1/42B3 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+;1マスずつ確認ループ
+$C1/42B5 LDA $04C8,y             ;Aに[$04C8,y](戦闘フィールドマスの状態)をロード
+$C1/42B8 AND #$E0                ;Aと$E0で論理積
+$C1/42BA ORA $13    [$00:0313]   ;Aと[$00:0313]（飛ばされた敵自身の値$11～$1F）で論理和
+$C1/42BC STA $04C8,y[$00:04D5]   ;Aを[$04C8,y](戦闘フィールドマスの状態)に書き込み
+$C1/42BF INY                     ;Yをインクリメント +1
+$C1/42C0 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/42C2 BNE $F1    [$42B5]      ;ゼロフラグが立っていないとき[$42B5]分岐
+;1マスずつ確認ループここまで
+$C1/42C4 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/42C6 TYA                     ;Yレジスタの値をAレジスタに転送
+$C1/42C7 ADC $12    [$00:0312]   ;A + [$00:0312]
+$C1/42C9 AND #$00FF              ;Aと$00FFで論理積
+$C1/42CC TAY                     ;Aの値をYレジスタに転送
+$C1/42CD SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/42CF DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/42D1 BNE $DE    [$42B1]      ;ゼロフラグが立っていないとき[$42B1]分岐
+;敵の横幅確認ループ処理ここまで
+$C1/42D3 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>そして最後に、敵が飛ばされる先の仮の座標：<span class="formula">(X,Y) = <code>[$00:1Bx8]</code><code>[$00:1Bx9]</code></span>から、<code>$00:04C8</code>～<code>$00:04FE</code>内の、敵が飛ばされる先の座標をすべて計算して、敵がいる状態に上書きする（<code>[$00:0313]</code>の値を加算する）ループ処理を行う。<br>
+1マスずつ確認ループ<code><span class="r">$C1/42B5</span></code>～<code><span class="r">$C1/42C2</span></code>の処理は、まず<code><span class="r">$C1/42B8</span></code>で戦闘フィールドマスの状態と<span class="formula">$E0</span>の論理積を取ることにより、一度ダメージフィールドの値だけ取り出す。<br>
+飛ばされる先なので、何もないマスか、ダメージフィールドだけがある状態か、既に飛ばされる敵の一部分があるマスかのいずれかになるのだが、<span class="formula">$E0</span>との論理積で、もし既に飛ばされる敵の一部分があるマスであっても一度削除している。<br>
+そこにあらためて、<code>[$00:0313]</code>（飛ばされた敵自身の値<span class="formula">$11</span>～<span class="formula">$1F</span>）と論理和を取った値を書き込み、1マス分の処理終了である。<br>
+全ての処理が終わり<code><span class="r">$C1/42D3</span></code>でサブルーチンが戻った段階で、<code>$00:04C8</code>～<code>$00:04FE</code>内は、敵が吹き飛ばしにあった後の座標の状態となった。</p>
+
+<p>なお、敵が飛ばされる先の仮の座標、つまり座標計算値が入っている<code>[$00:1Bx8]</code><code>[$00:1Bx9]</code>は、現在の座標<code>[$00:1BxA]</code><code>[$00:1BxB]</code>を下の処理で上書きする。<br>
+これで<code>$00:04C8</code>～<code>$00:04FE</code>内の値と、敵番号0～E用の座標アドレスのどちらも新たな値に更新されたことになる。</p>
+
+<div class="code-container"><pre>
+$C1/437F LDA $0008,x             ;Aに[$00:1Bx8](敵のX座標・計算値)をロード
+$C1/4382 STA $000A,x             ;Aを[$00:1BxA](敵のX座標)に書き込み
+$C1/4385 JSR $456B               ;[$C1:456B]へジャンプ
+（中略）
+$C1/438B LDA $0009,x             ;Aに[$00:1Bx9](敵のY座標・計算値)をロード
+$C1/438E STA $000B,x             ;Aを[$00:1BxB](敵のY座標)に書き込み
+$C1/4391 JSR $4577               ;[$C1:4577]へジャンプ
+</pre></div>
+
+<p>以上で、味方から敵に対する吹き飛ばし判定と、吹き飛ばし成功時の座標関連処理が終了となる。<br>
+敵から味方に対しても処理自体は似たようなものである。</p>
+
+<p>また、吹き飛ばしでは、吹き飛ばし判定に成功したとしても、飛ばす先の座標すべてが、フィールド外ではない、かつ、誰もいない、ダメージフィールドのみ、既に自身の一部がある（これは敵のみということになる）のいずれかを満たした時でないと吹き飛ばない、という処理を行っていることがわかった。<br>
+このため、斜めに設置された岩の間を1×1マスキャラがすり抜けて吹き飛ばされる現象などが起こる。</p>
+
+<div class="mono">
+□３□<br>
+□１２<br>
+敵□□<br>
+</div>
+
+<p>上のような配置で、２と３に味方キャラがいる状態で、敵が右上の１の味方キャラに吹き飛ばしを仕掛けて成功した時、吹き飛ばし先は１の右上、つまり一番右上のマスと判断される。<br>
+その位置は誰も居ないので、吹き飛ばしが成功すると下図のように飛ばされる。</p>
+
+<div class="mono">
+□３１<br>
+□&#x2197;２<br>
+敵□□<br>
+</div>
+
+<p>実際のゲームの画面上では２と３の間に隙間がないように見えるので、妙な現象のように見えてしまうが、吹き飛ばされる先のマスの状態しか判定しないから、一見すり抜けのように見える現象が起きてしまうのである。<br>
+おそらくこの仕様は、ある程度意図したものだろう。<br>
+味方キャラの場合、「山猿拳」や「天馬後すい脚」（自身後退）をうまく使って斜め移動をし、狭い場所から脱出する方法もある。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program31.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program33.html"><span class="button">&#9654;次 オディオ戦</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

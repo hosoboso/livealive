@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップタイマー（仕様）">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップタイマー（仕様）">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップタイマー（仕様）</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program9_1.html">マップタイマー</a> &gt; サブルーチン</h1>
+<h2>マップタイマーのサブルーチン</h2>
+
+<p>前ページ、<span class="tri"><a href="program9_1.html">マップタイマー概要</a></span>の続き。<br>
+ここではマップタイマーを計算するサブルーチンを紹介する。<br>
+前ページの説明を前提とするので、まずは上リンクから、前ページに一通り目を通していただきたい。</p>
+
+<p>マップタイマーが動く場合、まずはマップタイマー開始の処理が入る。<br>
+タイマーの残り時間が0になるまで、マップタイマーのカウントダウン用サブルーチンで1フレームにつき1回カウントダウンする。<br>
+残り時間が0になったら、マップタイマー終了の処理をする。<br>
+という手順になる。</p>
+
+<h3>マップタイマー開始</h3>
+
+<p>マップタイマー開始だが、何かしらのイベントによりマップタイマーがONになると、<code><span class="r">$C0/3284</span></code>～の処理が開始になる。<br>
+とりあえずは重要な部分だけ（というよりは筆者にもわかった部分を）紹介する。</p>
+
+<div class="code-container"><pre>
+$C0/328A REP #$20                ;Mフラグをクリア　Aレジスタは16bit幅
+$C0/328C LDA $000AC0[$00:0AC0]   ;Aに[$00:0AC0]をロード
+$C0/3290 ORA $30    [$00:0030]   ;Aと[$00:0030]で論理和
+$C0/3292 STA $000AC0[$00:0AC0]   ;Aを[$00:0AC0]に書き込み
+$C0/3296 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/3298 EOR #$FFFF              ;Aと$FFFFで排他的論理和
+$C0/329B AND $000AC2[$00:0AC2]   ;Aと[$00:0AC2]で論理積
+$C0/329F STA $000AC2[$00:0AC2]   ;Aを[$00:0AC2]に書き込み
+$C0/32A3 LDA $8E01,y             ;Aに[$7F:CB70]をロード
+$C0/32A6 STA $00,x               ;Aを[$00:0AE0]に書き込み
+$C0/32A8 SEP #$20                ;MフラグON　Aレジスタ8bitモード
+$C0/32AA LDX $32    [$00:0032]   ;Xに[$00:0032]をロード
+$C0/32AC LDA $8E03,y             ;Aに$8E03,yをロード
+$C0/32AF STA $000AD0,x           ;Aを$000AD0,xに書き込み
+</pre></div>
+
+<p>この部分では、マップタイマーの初期値を読み込んでいる。<br>
+2行目の<code><span class="r">$C0/328C</span></code>で<code>[$00:0AC0]</code>の値を<code>A</code>にロードしているが、これは前ページに記した通り、「マップタイマー判定値」である。<br>
+16bitモードのため、<code>[$00:0AC0][$00:0AC1]</code>両方とも読み込んでいる。<br>
+既に他のタイマーが動いていれば何らかの値が入っているし、他のタイマーが動いていないのなら<span class="formula">$0000</span>である。<br>
+<code><span class="r">$C0/3290</span></code>では<code>[$00:0030]</code>と論理和を取っている。<br>
+これより前に、<code>[$00:0030]</code>には「新たに開始するマップタイマーの番号」が入っている。<br>
+例えば幕末編の鐘だったら、マップタイマー00なので「<span class="formula">$0001</span>」である。<br>
+「マップタイマー判定値」と、「新たに開始するマップタイマーの番号」との論理和を取ることで、「マップタイマー判定値」の中の「新たに開始するマップタイマーの番号」部分に<span class="formula">1</span>が立つ仕組みである。<br>
+ここで「マップタイマー判定値」の更新が行われ、<code><span class="r">$C0/3292</span></code>で新たな「マップタイマー判定値」として<code>[$00:0AC0][$00:0AC1]</code>に書き込まれた、ということになる。</p>
+
+<p>続いてもう一度<code>[$00:0030]</code>、つまり「新たに開始するマップタイマーの番号」が<code>A</code>にロードされ、<code><span class="r">$C0/3298</span></code>では<span class="formula">$FFFF</span>と排他的論理和を取っている。<br>
+その後に<code>[$00:0AC2]</code>、前ページに記した「マップタイマー関連フラグ値」との論理積を取っている。<br>
+「マップタイマー関連フラグ値」は、<span class="formula">0</span>ならタイマーを動かし、<span class="formula">1</span>ならタイマーを動かさない、という「マップタイマー判定値」とは真逆の値の判定をする値である。<br>
+よって、「新たに開始するマップタイマーの番号」部分は「マップタイマー関連フラグ値」を<span class="formula">0</span>にしなければならない。<br>
+このためにまず、「新たに開始するマップタイマーの番号」と<span class="formula">$FFFF</span>で排他的論理和をとり、該当番号部分を0にする。<br>
+例えば幕末編の鐘だったら、排他的論理和を取ると<span class="formula">$FFFE</span>である。<br>
+この値と「マップタイマー関連フラグ値」との論理積を取って、「マップタイマー関連フラグ値」を更新し、<code><span class="r">$C0/329F</span></code>で新たな「マップタイマー関連フラグ値」として<code>[$00:0AC2][$00:0AC3]</code>に書き込まれた。</p>
+
+<p><code><span class="r">$C0/32A3</span></code>以降だが、</p>
+
+<div class="code-container"><pre>
+$C0/32A3 LDA $8E01,y             ;Aに[$7F:CB70]をロード
+$C0/32A6 STA $00,x               ;Aを[$00:0AE0]に書き込み
+</pre></div>
+
+<p>「<code>$8E01,y</code>」を<code>A</code>にロードして、「<code>$00,x</code>」に書き込んでいる。<br>
+これがマップタイマーの初期残り時間のセットに当たる。<br>
+この時点で<code>Y</code>に入っている値を<span class="formula">$8E01</span>と足したアドレスに、マップタイマーの初期残り時間が入っているのだが、<code>Y</code>に入る値はこれ以前に計算されており、詳細は省く。<br>
+例えば幕末編の鐘だと<code>Y:3D6F</code>で、<code>[$7F:CB70]</code>から初期残り時間を読み出す。<br>
+西部編の鐘だと<code>Y:52CE</code>で、<code>[$7F:E0CF]</code>から初期残り時間を読み出す。<br>
+鐘はどちらのシナリオでも1分のタイマーなのに、まったく別のアドレスから値を読み出していることがわかる。<br>
+何故なのかというと、マップタイマーの初期残り時間が入っているアドレスを<span class="formula">+2</span>したアドレスには、マップタイマー終了時の処理に使う値が入っているのである。<br>
+幕末編の鐘と西部編の鐘とでは、残り時間は同一であるが、鐘を鳴らした後の処理は全く異なるため、別のアドレスからの読み出しをしているようである。</p>
+
+<div class="code-container"><pre>
+$C0/32AA LDX $32    [$00:0032]   ;Xに[$00:0032]をロード
+$C0/32AC LDA $8E03,y             ;Aに$8E03,yをロード
+$C0/32AF STA $000AD0,x           ;Aを$000AD0,xに書き込み
+</pre></div>
+
+<p><code><span class="r">$C0/32AA</span></code>では、<code>X</code>に<code>[$00:0032]</code>をロードしているが、これは新たに開始するマップタイマーの番号である。<br>
+前ページでは便宜上、マップタイマーに00から15まで番号を振ったが、実はこの時点での<code>[$00:0032]</code>には、マップタイマー番号を16進数にした値が入っている。<br>
+つまり幕末編の鐘や西部編の鐘だったら、<code>[$00:0032]</code>には<span class="formula">$0000</span>が入っている。</p>
+
+<p><code><span class="r">$C0/32AC</span></code>で「<code>$8E03,y</code>」を<code>A</code>にロードして、「<code>$000AD0,x</code>」に書き込んでいる。<br>
+先に述べたが、「マップタイマーの初期残り時間」が入っているアドレスを<span class="formula">+2</span>したのが「<code>$8E03,y</code>」で、マップタイマー終了時の処理に使う値になる。<br>
+この値が「<code>$000AD0,x</code>」に入る。<br>
+直前に<code>X</code>にマップタイマー番号を入れたため、「<code>$000AD0,x</code>」は「<code>$00:0AD?</code>」（?はマップタイマー番号<span class="formula">0</span>～<span class="formula">F</span>）のことである。<br>
+つまり、<code>$00:0AD0</code>～<code>$00:0ADF</code>には、マップタイマー00～15終了時に関する値が入っている、ということである。</p>
+
+<p>以上で、マップタイマーを動かす上で必要な初期値がロードされた。<br>
+実際には他にも諸々の処理を挟むようだが、とりあえず筆者が説明できるのはこの程度である。</p>
+
+<h3>マップタイマーのカウントダウン</h3>
+
+<p>概要でも説明した通り、マップタイマーのカウントダウン用サブルーチンは以下のふたつの部分に分かれているので、順に説明していく。</p>
+
+<ul>
+	<li><span class="r"><code>$C0/1A69</code></span>～<span class="r"><code>$C0/1A97</code></span>：<br>
+	マップタイマー00～15までの動作状況を確認し、動作しているマップタイマーのタイマー残り時間を-1する。</li>
+	<li><span class="r"><code>$C0/1A98</code></span>～<span class="r"><code>$C0/1ADB</code></span>：<br>
+	マップタイマー00～15までのタイマー残り時間を調べ、残り時間が0になっているタイマーは「マップタイマー判定値」の動作状況を0にしてから、タイマー終了時の処理に飛ぶ。</li>
+</ul>
+
+<p>まず、<code><span class="r">$C0/1A69</span></code>～<code><span class="r">$C0/1A97</span></code>だが、以下のようになっている。</p>
+
+<div class="code-container"><pre>
+$C0/1A69 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/1A6C BNE $29    [$1A97]      ;ゼロフラグが立っていないとき[$1A97]分岐
+$C0/1A6E LDX $0AC0  [$00:0AC0]   ;Xに[$00:0AC0]をロード
+$C0/1A71 BEQ $24    [$1A97]      ;ゼロフラグが立っているとき[$1A97]分岐
+$C0/1A73 REP #$20                ;Mフラグをクリア、Aレジスタを16bit幅
+$C0/1A75 LDX #$0AE0              ;Xに$0AE0をロード
+$C0/1A78 LDA #$0001              ;Aに$0001をロード
+$C0/1A7B STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;
+$C0/1A7D LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1A7F BIT $0AC0  [$00:0AC0]   ;Aと[$00:0AC0]で論理積（ステータスフラグのみ変更）
+$C0/1A82 BEQ $0B    [$1A8F]      ;ゼロフラグが立っているとき[$1A8F]分岐
+$C0/1A84 BIT $0AC2  [$00:0AC2]   ;Aと[$00:0AC2]で論理積（ステータスフラグのみ変更）
+$C0/1A87 BNE $06    [$1A8F]      ;ゼロフラグが立っていないとき[$1A8F]分岐
+$C0/1A89 LDA $00,x               ;Aに[$00,x]（マップタイマーXX）をロード
+$C0/1A8B BEQ $02    [$1A8F]      ;ゼロフラグが立っているとき[$1A8F]分岐
+$C0/1A8D DEC $00,x               ;[$00,x]（マップタイマーXX）をデクリメント（-1）
+$C0/1A8F INX                     ;Xをインクリメント（+1）
+$C0/1A90 INX                     ;Xをインクリメント（+1）
+$C0/1A91 ASL $30    [$00:0030]   ;[$00:0030]を算術左シフト（×2）
+$C0/1A93 BCC $E8    [$1A7D]      ;キャリーフラグが立っていないとき[$1A7D]分岐
+;
+$C0/1A95 SEP #$20                ;MフラグON。Aは8bit幅
+$C0/1A97 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>順に見ていく。<br>
+最初に行うのは、「マップタイマー00～15までの動作状況を確認」である。</p>
+
+<div class="code-container"><pre>
+$C0/1A69 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/1A6C BNE $29    [$1A97]      ;ゼロフラグが立っていないとき[$1A97]分岐
+$C0/1A6E LDX $0AC0  [$00:0AC0]   ;Xに[$00:0AC0]をロード
+$C0/1A71 BEQ $24    [$1A97]      ;ゼロフラグが立っているとき[$1A97]分岐
+</pre></div>
+
+<p>最初に判定されるのは<code>[$00:0200]</code>に入っている値で、マップタイマーが一時停止しているかどうかの判定になる。<br>
+<code>[$00:0200]</code>の値はマップタイマーが止まる、セリフウィンドウ表示中や、プレイヤーが操作できないイベントの最中、戦闘中、マップ切り替えの暗転中などに<span class="formula">$01</span>や<span class="formula">$02</span>が入り、それ以外では<span class="formula">$00</span>が入る（数値の詳細は未確認だが、マップタイマーが一時停止している時は必ず<span class="formula">$00</span>なのは確定）。<br>
+次の<code>[$00:0AC0]</code>は「マップタイマー判定値」である。<br>
+<code>X</code>にロードしており、この時<code>X</code>は16bitモードのため、<code>[$00:0AC0]</code><code>[$00:0AC1]</code>両方とも読み込んでいる。<br>
+ひとつもマップタイマーが動作していない場合、<code>[$00:0AC0]</code><code>[$00:0AC1]</code>どちらも<span class="formula">$00</span>が入る。<br>
+この2つのメモリをチェックすることで、マップタイマーが現在動いているかどうかを判定し、動いていないと判定されたら、いずれも<code>[<span class="r">$C0/1A97</span>]</code>へジャンプする。<br>
+<code><span class="r">$C0/1A71</span></code>から<code><span class="r">$C0/1A97</span></code>までは、マップタイマーの処理（タイマーの値を<span class="formula">1</span>減らす）に当たるため、<code>[<span class="r">$C0/1A97</span>]</code>へジャンプするということは、マップタイマーイベントが発生していないため該当の処理を飛ばした、ということである。</p>
+
+<div class="code-container"><pre>
+$C0/1A73 REP #$20                ;Mフラグをクリア、Aレジスタを16bit幅
+$C0/1A75 LDX #$0AE0              ;Xに$0AE0をロード
+$C0/1A78 LDA #$0001              ;Aに$0001をロード
+$C0/1A7B STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+</pre></div>
+
+<p>ここからは、「動作しているマップタイマーのタイマー残り時間を<span class="formula">-1</span>する」部分に当たる。<br>
+まず<code>A</code>を16bitモードに変更し、<code>X</code>に<span class="formula">$0AE0</span>をロードしている。<br>
+「<span class="formula">0AE0</span>」は、タイマー残り時間を記録しておくメモリのアドレス<code>[$00:0AE0]</code>～<code>[$00:0AFF]</code>の最初の値である。<br>
+ここで、タイマー残り時間を呼び出すための準備として、<code>X</code>に<span class="formula">$0AE0</span>をロードしたのである。<br>
+また、<code><span class="r">$C0/1A78</span></code>～<code><span class="r">$C0/1A7B</span></code>では、<code>[$00:0030]</code>に<span class="formula">$0001</span>を書き込んでいる。<br>
+前ページにも記したが、「マップタイマー判定値」と、マップタイマーに対応した2進数の桁の値で論理積を取ることで、該当のマップタイマーが動作中なら0が、動作していないなら2進数の桁の値が返ってくるようになっている。<br>
+<code>[$00:0030]</code>に入るのはその「マップタイマーに対応した2進数の桁の値」の初期値である。<br>
+<code>[$00:0030]</code>の値はこの後のサブルーチンで次々変更されていくことになる。</p>
+
+<p>次から、マップタイマー00から15までのそれぞれの動作判定及び、動作していたらタイマー残り時間を-1する処理が入る。<br>
+プログラミングにおける、いわゆるループ処理（サブルーチンを一定条件を満たすまで繰り返し行う処理のこと）を使う。<br>
+ここではマップタイマー00から順に16回繰り返して、各タイマーをチェックする。</p>
+
+<div class="code-container"><pre>
+$C0/1A7D LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1A7F BIT $0AC0  [$00:0AC0]   ;Aと[$00:0AC0]で論理積（ステータスフラグのみ変更）
+$C0/1A82 BEQ $0B    [$1A8F]      ;ゼロフラグが立っているとき[$1A8F]分岐
+$C0/1A84 BIT $0AC2  [$00:0AC2]   ;Aと[$00:0AC2]で論理積（ステータスフラグのみ変更）
+$C0/1A87 BNE $06    [$1A8F]      ;ゼロフラグが立っていないとき[$1A8F]分岐
+$C0/1A89 LDA $00,x               ;Aに[$00,x]（マップタイマーXX）をロード
+$C0/1A8B BEQ $02    [$1A8F]      ;ゼロフラグが立っているとき[$1A8F]分岐
+$C0/1A8D DEC $00,x               ;[$00,x]（マップタイマーXX）をデクリメント（-1）
+$C0/1A8F INX                     ;Xをインクリメント（+1）
+$C0/1A90 INX                     ;Xをインクリメント（+1）
+$C0/1A91 ASL $30    [$00:0030]   ;[$00:0030]を算術左シフト（×2）
+$C0/1A93 BCC $E8    [$1A7D]      ;キャリーフラグが立っていないとき[$1A7D]分岐
+</pre></div>
+
+<p>以上がループ処理部分である。<br>
+最後の<code><span class="r">$C0/1A93</span></code>で、キャリーフラグが立っていないとき<code>[$1A7D]</code>分岐とあるから、条件を満たすまで一番上の<code><span class="r">$C0/1A7D</span></code>に戻ってループすることがわかる。</p>
+
+<p>具体的に各部を見てみよう。</p>
+
+<div class="code-container"><pre>
+$C0/1A7D LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1A7F BIT $0AC0  [$00:0AC0]   ;Aと[$00:0AC0]で論理積（ステータスフラグのみ変更）
+$C0/1A82 BEQ $0B    [$1A8F]      ;ゼロフラグが立っているとき[$1A8F]分岐
+$C0/1A84 BIT $0AC2  [$00:0AC2]   ;Aと[$00:0AC2]で論理積（ステータスフラグのみ変更）
+$C0/1A87 BNE $06    [$1A8F]      ;ゼロフラグが立っていないとき[$1A8F]分岐
+</pre></div>
+
+<p>ループ部分の最初の処理。<br>
+まず、先程初期値として<span class="formula">$0001</span>を入れた<code>[$00:0030]</code>が<code>A</code>に読み込まれている。16bitモードなので4桁である。<br>
+ループ1回目なら、必ず<code>A</code>に<span class="formula">$0001</span>が入るということである。<br>
+次は<code>[$00:0030]</code>（<span class="formula">$0001</span>）と<code>[$00:0AC0]</code>で論理積を取っているが、16bitモードなので実際には「マップタイマー判定値」の4桁が読み込まれている。<br>
+次の判定が「ゼロフラグが立っているとき<code>[$1A8F]</code>分岐」とあり、マップタイマーを<span class="formula">-1</span>する処理を飛ばしてしまうことから、ここでは、</p>
+
+<p style="text-decoration: underline;">「マップタイマー判定値」に格納されている、マップタイマー00に対応した桁の値が<span class="formula">%1</span>になっている時は次の判定に進む。</p>
+
+<p>ということである。<br>
+他に同時に動いているタイマーがあったとしても、論理積を取ったので、マップタイマー00の数値だけ一致しているかどうかが判定できる。</p>
+
+<p>続いて<code><span class="r">$C0/1A84</span></code>では、同じく、「マップタイマー判定値」と<code>[$00:0AC2]</code>との論理積を取っている。<br>
+<code>[$00:0AC2]</code>には「マップタイマー関連フラグ値」が入っている。<br>
+「マップタイマー関連フラグ値」は、「マップタイマー判定値」と同じくマップタイマー00～15に対応しているが、「マップタイマー判定値」とは逆に、「0」が入っているタイマーは動かし、「1」が入っているタイマーは動かさない、という仕様である。<br>
+たとえば幕末編において、本丸2階・天井裏の落とし穴の開閉はマップタイマーを使って制御しており、おぼろ丸が落とし穴前の特定のマスの上に乗ることがタイマー起動条件になるが、この落とし穴はカラクリ源内を倒すと動かなくなるため、「カラクリ源内撃破前か後か」という判定もしなければならない。<br>
+そういった、複数の起動条件が絡む時に必要となるのが「マップタイマー関連のフラグ」であり、特にストーリー進行がフラグによって複雑に分岐する幕末編で多用される値である。<br>
+<code><span class="r">$C0/1A87</span></code>では、ゼロフラグが立っていないとき<code>[$1A8F]</code>分岐となっているので、「マップタイマー関連フラグ値」が0なら分岐せず次の判定に進む。<br>
+ループ1回目なら、</p>
+
+<p style="text-decoration: underline;">「マップタイマー関連フラグ値」に格納されている、マップタイマー00に対応した桁の値が<span class="formula">%0</span>になっている時は次の判定に進む。</p>
+
+<p>ということである。<br>
+ここでも論理積を取っているため、マップタイマー00の数値だけ一致しているかどうかが判定できる。</p>
+
+<p>ここまでで、判定したいマップタイマーが動作中かどうかを確認できた。<br>
+以降は判定したいマップタイマーが動作中の場合の処理になる。</p>
+
+<div class="code-container"><pre>
+$C0/1A89 LDA $00,x               ;Aに[$00,x]（マップタイマーXX）をロード
+$C0/1A8B BEQ $02    [$1A8F]      ;ゼロフラグが立っているとき[$1A8F]分岐
+$C0/1A8D DEC $00,x               ;[$00,x]（マップタイマーXX）をデクリメント（-1）
+$C0/1A8F INX                     ;Xをインクリメント（+1）
+$C0/1A90 INX                     ;Xをインクリメント（+1）
+$C0/1A91 ASL $30    [$00:0030]   ;[$00:0030]を算術左シフト（×2）
+$C0/1A93 BCC $E8    [$1A7D]      ;キャリーフラグが立っていないとき[$1A7D]分岐
+</pre></div>
+
+<p><code><span class="r">$C0/1A75</span></code>で、<code>X</code>に<span class="formula">$0AE0</span>をロードしているため、ループ1回目だと「<code><span style="color: #0000FF;">LDA</span> $00,x</code>」は「<code><span style="color: #0000FF;">LDA</span> $00:0AE0</code>」である。<br>
+前ページで述べた通り、これはマップタイマー01の残り時間の入っているメモリである。<br>
+<code><span class="r">$C0/1A8B</span></code>は、タイマー残り時間が<span class="formula">0</span>だったら<code>[$1A8F]</code>に飛ぶ、という分岐。タイマーの残り時間が既に<span class="formula">0</span>であれば残り時間の処理をする必要がない。<br>
+<code><span class="r">$C0/1A8D</span></code>で、ようやくマップタイマーの残り時間を<span class="formula">-1</span>する処理を行う。</p>
+
+<p>続いて<code><span style="color: #0000FF;">INX</span></code>を2回繰り返して、<code>X</code>を<span class="formula">+2</span>する。<br>
+マップタイマー残り時間を呼び出すための値を<span class="formula">+2</span>したことで、ループ2回目では<code>$00:0AE2</code>から値を読み込むことになる。</p>
+
+<p>最後に、<code>[$00:0030]</code>の値を算術左シフトで2倍する。<br>
+<code>[$00:0030]</code>はマップタイマーに対応した2進数の桁の値になる、と述べた通りだが、左シフトすることで、2進数表記した時に全体を1桁左に移動させることになる。<br>
+最初に<code>[$00:0030]</code>に入れた値は<span class="formula">$0001</span>で、2進数なら<span class="formula">%0000 0000 0000 0001</span>。マップタイマー00に対応した位置に「<span class="formula">1</span>」が入っている。<br>
+これを左シフトすると、<span class="formula">%0000 0000 0000 0010</span>。これでマップタイマー01に対応した位置に「<span class="formula">1</span>」が移動した。<br>
+このように左シフトを繰り返していくと、最終的には15回目のループで<span class="formula">%1000 0000 0000 0000</span>まで<span class="formula">1</span>が移動し、16回目のループではこれ以上左にシフトできない。<br>
+できないのではなく実際には、<span class="formula">%1 0000 0000 0000 0000</span>と17桁目に<span class="formula">1</span>が移動することになるのだが、スーパーファミコンのプログラムでは、2進数で扱える数値は16桁までなので、桁溢れが生じる。英語で言えばキャリーオーバー、ここでキャリーフラグが立つということである。<br>
+<code><span class="r">$C0/1A93</span></code>の処理はキャリーフラグが立っていないとき<code>[$1A7D]</code>分岐であるから、キャリーフラグが立ったらループの最初に戻らず、ループ処理を抜ける。<br>
+ということで、上のループ処理では、16回ループするとループ処理を抜けることになる。</p>
+
+<p>以上、ループ中に、<br>
+「マップタイマーXXが動作中かを確認し、動作中なら処理を続ける」<br>
+「マップタイマーXXの残り時間を読み込む」<br>
+「残り時間が<span class="formula">0</span>でないのなら、残り時間を<span class="formula">-1</span>する」<br>
+「次のループ用に残り時間が入っているメモリのアドレスを<span class="formula">+2</span>する」<br>
+「<code>[$00:0030]</code>を算術左シフト」<br>
+を行うことで、マップタイマー00から順に01、02、03……と、マップタイマー15まで同じように処理してループを抜ける、ということがわかった。</p>
+
+<div class="code-container"><pre>
+$C0/1A95 SEP #$20                ;MフラグON。Aは8bit幅
+$C0/1A97 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ループが終わったら、<code>A</code>を8bitモードに戻してサブルーチン終了である。</p>
+
+<h3>マップタイマー終了</h3>
+
+<p>以上の処理はあくまでも、動作中の各マップタイマーの残り時間を減らす処理である。<br>
+減らした後、タイマーの残り時間が<span class="formula">0</span>だったら、タイマー終了時イベントへと移行するはずである。<br>
+西部編なら鐘が鳴ってマッドドッグのセリフが入るし（また、8つ目の鐘なら罠仕掛けイベント自体が終了である）、幕末編なら鐘が鳴っておぼろ丸が「かねの音‥‥」と呟くイベントが入る。<br>
+この次の<code><span class="r">$C0/1A98</span></code>～<code><span class="r">$C0/1ADB</span></code>こそが、「各マップタイマーが、タイマー終了時の処理に飛ぶかどうかの判断・処理」に当たる。<br>
+実際には、<code><span class="r">$C0/1A97</span></code>と<code><span class="r">$C0/1A98</span></code>の間に諸々の処理が挟まっているが、ここでは省略して<code><span class="r">$C0/1A98</span></code>以降を説明する。</p>
+
+<div class="code-container"><pre>
+$C0/1A98 LDX $0AC0  [$00:0AC0]   ;Xに[$00:0AC0]をロード
+$C0/1A9B BEQ $3E    [$1ADB]      ;ゼロフラグが立っているとき[$1ADB]分岐
+$C0/1A9D REP #$20                ;Mフラグをクリア、Aレジスタを16bit幅
+$C0/1A9F LDX #$0AE0              ;Xに$0AE0をロード
+$C0/1AA2 LDY #$0AD0              ;Yに$0AD0をロード
+$C0/1AA5 LDA #$0001              ;Aに$0001をロード
+$C0/1AA8 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;
+$C0/1AAA LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1AAC BIT $0AC0  [$00:0AC0]   ;Aと[$00:0AC0]で論理積（ステータスフラグのみ変更）
+$C0/1AAF BEQ $21    [$1AD2]      ;ゼロフラグが立っているとき[$1AD2]分岐
+$C0/1AB1 BIT $0AC2  [$00:0AC2]   ;Aと[$00:0AC2]で論理積（ステータスフラグのみ変更）
+$C0/1AB4 BNE $1C    [$1AD2]      ;ゼロフラグが立っていないとき[$1AD2]分岐
+$C0/1AB6 LDA $00,x  [$00:0AE0]   ;Aに[$00,x]（マップタイマーXX）をロード
+$C0/1AB8 BNE $18    [$1AD2]      ;ゼロフラグが立っていないとき[$1AD2]分岐
+;（カウントダウン終了時処理）
+$C0/1AD2 INX                     ;Xをインクリメント（+1）
+$C0/1AD3 INX                     ;Xをインクリメント（+1）
+$C0/1AD4 INY                     ;Yをインクリメント（+1）
+$C0/1AD5 ASL $30    [$00:0030]   ;[$00:0030]を算術左シフト（×2）
+$C0/1AD7 BCC $D1    [$1AAA]      ;キャリーフラグが立っていないとき[$1AAA]分岐
+;
+$C0/1AD9 SEP #$20                ;MフラグON。Aは8bit幅
+$C0/1ADB RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>前の、<code><span class="r">$C0/1A69</span></code>～<code><span class="r">$C0/1A97</span></code>の処理とよく似ている。<br>
+異なるのは、ループ前に「<code><span class="r">$C0/1AA2</span> <span style="color: #0000FF;">LDY</span> #$0AD0</code>」という処理が入っていて、ループ内にも<code><span class="r">$C0/1AD4</span> <span style="color: #0000FF;">INY</span></code>で<code>Y</code>を<span class="formula">+1</span>する処理が入っていること。<br>
+また、<code><span class="r">$C0/1AB6</span></code>から、「マップタイマーXXの残り時間の値が<span class="formula">0</span>だったら、<code><span class="r">$C0/1AB8</span></code>の後に続くカウントダウン終了時処理を実行」という分岐が起こる。<br>
+マップタイマー残り時間が<span class="formula">0</span>になっていたら、上で「（カウントダウン終了時処理）」と省略した処理をしてから、残りのマップタイマーの処理を続ける。<br>
+つまり、複数のマップタイマーが動いていた場合、同時にカウントダウンが終了した場合、カウントダウン終了時処理には優先順位がある、ということである。<br>
+といっても、1フレーム毎に上のサブルーチンは実行されているので、通常のプレイでフレーム単位までピッタリ一致してカウントダウンが終了することはまずない気もするが、もしも被った場合は優先順位がある、という話である。<br>
+カウントダウン終了時処理を行うか、マップタイマーの残り時間が0でない場合は、<code>X</code>を+2、<code>Y</code>を+1、<code>[$00:0030]</code>を2倍し、ループを繰り返すか抜けるかをキャリーフラグで判断、という手順になる。</p>
+
+<p><code><span class="r">$C0/1AB8</span></code>の後のカウントダウン終了時処理は以下の通りである。</p>
+
+<div class="code-container"><pre>
+$C0/1ABA LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1ABC EOR #$FFFF              ;Aと$FFFFで排他的論理和
+$C0/1ABF AND $0AC0  [$00:0AC0]   ;Aと[$00:0AC0]で論理積
+$C0/1AC2 STA $0AC0  [$00:0AC0]   ;Aを[$00:0AC0]に書き込み
+$C0/1AC5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1AC7 LDA #$01                ;Aに$01をロード
+$C0/1AC9 STA $01B8  [$00:01B8]   ;Aを[$00:01B8]に書き込み
+$C0/1ACC LDA $0000,y             ;Aに[$0000,y]をロード
+$C0/1ACF BRL $00A2  [$1B74]      ;フラグにかかわりなく常に[$1B74]分岐
+$C0/1B74 STZ $0201  [$00:0201]   ;[$00:0201]に0を書き込み
+$C0/1B77 PHA                     ;Aをスタックにプッシュ
+$C0/1B78 JSR $41EA  [$C0:41EA]   ;[$C0:41EA]にジャンプ
+</pre></div>
+
+<p>カウントダウンを終了するマップタイマーの番号が<code>[$00:0030]</code>に入っているが、<code><span class="r">$C0/1ABC</span></code>では、その値と<span class="formula">$FFFF</span>で排他的論理和を取っている。<br>
+更に、<code><span class="r">$C0/1ABF</span></code>で、「マップタイマー判定値」である<code>[$00:0AC0]</code>との論理積を取っている。<br>
+ここで何をしたのかというと、「マップタイマー判定値」の中でONになっていた（2進数で<span class="formula">1</span>が立っていた）カウントダウンを終了するマップタイマーの値を<span class="formula">0</span>に変更し、タイマーの動作状態をOFFに変えたのである。<br>
+新たな「マップタイマー判定値」の状態が<code><span class="r">$C0/1AC2</span></code>で<code>[$00:0AC0]</code>に書き込まれている。</p>
+
+<p><code><span class="r">$C0/1ACC</span></code>で、<code>A</code>に<code>[$0000,y]</code>をロードをしているが、これはカウントダウン開始時の、</p>
+
+<div class="code-container"><pre>
+$C0/32AA LDX $32    [$00:0032]   ;Xに[$00:0032]をロード
+$C0/32AC LDA $8E03,y             ;Aに$8E03,yをロード
+$C0/32AF STA $000AD0,x           ;Aを$000AD0,xに書き込み
+</pre></div>
+
+<p>この処理の<code><span class="r">$C0/32AF</span></code>で、各マップタイマーに対応した<code>$00:0AD0</code>～<code>$00:0ADF</code>に読み込まれた値である。<br>
+この値を<code><span class="r">$C0/1B77</span></code>でスタックにプッシュ（入れる）処理をしてから、<code>[$C0:41EA]</code>にジャンプしている。<br>
+後に、ジャンプ先<code>[$C0:41EA]</code>以降の処理で、飛び先（アドレス）を読み出すための計算に使われており、カウントダウン終了後のイベントを呼び出すための数値だったことがわかる。<br>
+マップタイマーそのものとは関係がないため、とりあえずここまででマップタイマー終了処理完了、ということにする。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program9_1.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program11.html"><span class="button">&#9654;次　セレクトバグ</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

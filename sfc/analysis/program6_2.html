@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 「ほいこーろー」の仕様">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 「ほいこーろー」の仕様">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 「ほいこーろー」の仕様</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+
+/* ネタバレ用ドロップダウン */
+.tog {
+	display: none;
+}
+.opt {
+	position: relative;
+	margin-bottom: 0.5rem;
+}
+.titl {
+	color: #FFF; 
+	background: #19447d;
+	margin:	0 0.5rem 0 0;
+	padding: 0.5rem;
+	display: block;
+	font-weight: bold;
+	cursor : pointer;
+}
+.con {
+	max-height: 0;
+	overflow: hidden;
+	margin:	0 0.5rem 0 0;
+	padding: 0.5rem;
+	border-color:#19447d;
+	border-width: 1px;
+	border-style: none;
+	transition: max-height .5s ease;
+	transition: border-style .5s ease;
+}
+.tog:checked + .titl + .con {
+	max-height: 9999px;
+	transition: max-height 2.2s ease;
+	border-style: solid;
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 「ほいこーろー」の仕様</h1>
+<h2>「ほいこーろー」の仕様</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>前ページの<a href="program6.html">オディオモールのダメージ量処理</a>の続き。</p>
+
+<p>オディオモールのダメージ量処理から、「ほいこーろー」の仕様はどうなっているのかが気になってくるところである。<br>
+「ほいこーろー」そのものの計算方法もさることながら、単発ダメージ量を強制的に1にするオディオモールに「ほいこーろー」を当てた時、オディオモールに対して、STEP数＋1のダメージを与えられる理由は何だろうか。</p>
+
+<!-- <p>なお、オディオモールだけではなく、ザコ敵のマスタードラゴンやピスタチオも、デバフでステータスを下げない限り同じ現象が起こることがある。</p> -->
+
+<p>筆者も以前から「ほいこーろー」の仕様については気になってはいたが、筆者のプログラミングに関する知識程度ではどうにもならない部分が多々ある。<br>
+とはいえ、多少はわかったこともあるので、以下で紹介しておく。</p>
+
+<p>筆者は以前、<a href="../battle04_hui.html"> 技 &gt; 「ほいこーろー」について</a>で、実際に1000回「ほいこーろー」を使い、STEP数をカウントしてみたことがあるので、そちらも参照していただきたい。<br>
+検証において、STEP数の平均値は<span class="formula">32.4</span>で、出現する値は<span class="formula">2～99</span>だった。<br>
+中央の値である50付近が平均ではない。</p>
+
+<p>また、上の「ほいこーろー」の検証内でも紹介しているが、<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様によれば、SFC版での「ほいこーろー」は、</p>
+
+<blockquote>ほいこーろーは、踊る前にSTEP数を設定するわけではなく、<br>
+踊りながらここで終わるか続けるかを決めている気がする。<br>
+具体的な確率はわからない。<br>
+STEP数は分布で言うと一様分布ではなく幾何分布になりそう。</blockquote>
+
+<p>とのことである。</p>
+
+<p>では、実際のプログラムではどうなっているのだろうか。<br>
+上にある通り、「ほいこーろー」のモーションの踊りが開始する前の乱数でSTEP数が決まっているのではなさそうで、</p>
+
+<p>乱数計算→特定のアドレスに値を追加→乱数計算→特定のアドレスに値を追加→……</p>
+
+<p>を繰り返し、メモリに蓄積された値がSTEP数となる、という仕様は間違いないようである。<br>
+これまでも述べた通り、戦闘中の乱数は、必要な時にだけ計算される。<br>
+マップ上での乱数のように常に計算され続けているのではない。<br>
+このため、「ほいこーろー」開始直前に、バーチャルコンソールの「まるごと保存」で保存してから「まるごと復元」した場合、その後に「ほいこーろー」を選択すると、すぐにAボタンで「ほいこーろー」を開始しようが、しばらく待ってからAボタンで「ほいこーろー」を開始しようが、「ほいこーろー」のSTEPSは変わらない。<br>
+戦闘中の乱数は、前4つの乱数が常に記録されている状態であるが、ただ待機するだけではそれら乱数が変化することはないからである。<br>
+逆に言えば、「ほいこーろー」のダメージ量を確認してから「まるごと復元」してわざと敵に行動させるなどして乱数を動かし、それから「ほいこーろー」を開始するとSTEP数が変わる可能性がある、ということでもある。バーチャルコンソール限定ではあるが、「ほいこーろー」で高ダメージ量だけを狙い続けたい場合に使えるテクニックである。</p>
+
+<p>ただ、具体的にどういう条件だと踊りを続けるのか、また止めるのかはよくわからない。<br>
+乱数計算は何度も繰り返されている上、間にサモのモーション関係のサブルーチンも動くようであり、筆者のような素人には非常に難解なプログラムになっている。<br>
+とりあえず最低限わかったことを、以下に記す。</p>
+
+<p>「ほいこーろー」が始まると、サモが踊るたびにアドレス<code>[$7E:A01A]</code>に値が蓄積されていく。<br>
+最初に初期値<span class="formula">$00</span>が以下のサブルーチンで入り、加算されていく。</p>
+
+<div class="code-container"><pre>
+$C1/A81F LDA #$0000              ;Aに$0000をロード
+$C1/A822 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A]に書き込み
+</pre></div>
+
+<p>また、<code>[$7E:A01A]</code>への数値の蓄積は、下のサブルーチンが関わっている。</p>
+
+<div class="code-container"><pre>
+$C1/A73F LDA $7E0000,x[$7E:A01A] ;[$7E:A01A]をロード
+$C1/A743 CLC                     ;キャリーフラグをクリア
+$C1/A744 ADC $11    [$00:0311]   ;[$7E:A01A]+[$00:0311]
+$C1/A746 STA $7E0000,x[$7E:A01A] ;[$7E:A01A]に書き込み
+</pre></div>
+
+<p>踊るたびに乱数計算をし、このサブルーチンに到達して、<code>[$7E:A01A]</code>が増加するのだが、<code><span class="r">$C1/A73F</span></code>は、<br>
+<code><span style="color: #0000FF;">LDA</span> $7E0000,x</code><br>
+と指定されており、この前までの計算で<span class="formula">X:A01A</span>となっていなければ<code>[$7E:A01A]</code>は増加しない。<br>
+乱数によって他のメモリが選ばれることがあり、それが分岐となって<code>[$7E:A01A]</code>が増えなくなり、実際のSTEP数が決まるはずだが、そのあたりもよくわからない。<br>
+このサブルーチンはサモが踊っている間に回るので、踊りつつ戦闘乱数を計算し踊り続けるかどうかを決めているのは間違いない。</p>
+
+<p><code><span class="r">$C1/A744</span></code>では<code>[$00:0311]</code>が足されているが、<code>[$00:0311]</code>の値は常に一定ではなく、踊った回数に従い<span class="formula">1</span>ずつ増加していくのではない。<br>
+16進数であるにも関わらず、</p>
+
+<p class="formula">00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 0A, 10, 11, 12, 13……, 18, 19, 1A, 20, 21……</p>
+
+<p>と、一番下の桁の<span class="formula">B～F</span>が飛ばされている。<br>
+どうやら<code>[$00:0311]</code>は、<code>[$7E:A01A]</code>に収納されている数値により変化し、通常は「<span class="formula">$01</span>」で、一番下の桁が<span class="formula">A</span>の時だけ「<span class="formula">$06</span>」になるようだ。<br>
+しかも一番下の桁が<span class="formula">A</span>だと、その直後にすぐ「<span class="formula">$01</span>」を加える処理が入るため、実質的には「<span class="formula">$09</span>」の後はすぐに「<span class="formula">$10</span>」に変わる。<br>
+何故このような処理にしているのかは、後でわかる。</p>
+
+<p>最終的に何かしらの条件で踊りが止まる。つまり、<code>[$7E:A01A]</code>の増加が止まる。<br>
+そうすると、諸々の計算を挟んだ後に、以下のアドレスに飛ぶ。</p>
+
+<div class="code-container"><pre>
+$C1/A4F7 LDA $7EA01A[$7E:A01A]
+$C1/A4FB STA $6E    [$00:036E]
+</pre></div>
+
+<p>ここで<code>[$7E:A01A]</code>の値は、<code>[$00:036E]</code>に収納され、STEP数として「●●STEPS」と画面上に表示される。<br>
+面白いことに、この時の数値は16進数2桁なのに、10進数に変換せず、そのままで表示される。<br>
+たとえば<code>[$00:036E]</code>に<span class="formula">$50</span>が入った場合、16進数の「<span class="formula">50</span>」は10進数に変換すると「<span class="formula">80</span>」なのに、<span class="formula">80</span>ではなく<span style="font-weight:bold;">「50 STEPS」</span>と表示されるのである。<br>
+このために、<code>[$7E:A01A]</code>の増加量は「<span class="formula">$01</span>」か「<span class="formula">$06</span>」のどちらかであったのだ。</p>
+
+<p>また、STEPS最大値が99である以上、何かしらの処理で最大値を「<span class="formula">$99</span>」までと制限しているはずである。</p>
+
+<p>更に、STEPSの表示の後に、実際のダメージ量計算が別に挟まっている。<br>
+このままでは、画面上では「50 STEPS」と表示されていても、10進数では「<span class="formula">80</span>」だから、例えば攻撃した敵の現在HPからダメージ量を引く場合などに矛盾が生じてしまう。<br>
+よって、STEPSから実際のダメージ量に変換する必要がある。<br>
+その変換は「ゲーム画面に実際のダメージ量を表示する前」に行われ、</p>
+
+<p>「計算した総ダメージ量から、実際に画面上に表示する数値を計算する」</p>
+
+<p>サブルーチンとなる。<br>
+そのサブルーチンは以下のようになっており、STEPS数が画面に表示されてから、実際のダメージ量（敵が回復技や吸収技を使った時は回復量）が敵の上に表示されるまでの間に処理される。<br>
+実は通常の攻撃技と共通のサブルーチンを使っているので、他の味方の技などでもこのサブルーチンは通過する。<br>
+ただ、「ほいこーろー」のダメージ量のみ<code>[$00:036E]</code>に格納され、それ以外の技だと<code>[$00:036E]</code>に「<span class="formula">00</span>」が収納されており、そこでのみ分岐が起きる仕組みである。<br>
+（このサブルーチンは、「ほいこーろー」とほぼ同じ仕組みである幕末編の商人などが使用してくる「わいろ」にも使用されているかもしれないが、未確認）</p>
+
+<p>なお以下は、オディオモールに「ほいこーろー」を当てた前提でメモリの位置を記している。</p>
+
+<div class="code-container"><pre>
+;通常技と共通処理
+$C1/CDE7 STZ $22    [$00:0322]   ;[$00:0322]に0を書き込み
+$C1/CDE9 STZ $23    [$00:0323]   ;[$00:0323]に0を書き込み
+$C1/CDEB LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
+$C1/CDED AND #$0F                ;Aと$0Fで論理積
+$C1/CDEF CMP #$08                ;Aと$08を減算比較
+$C1/CDF1 BNE $17    [$CE0A]      ;ゼロフラグが立っていないとき[$C1/CE0A]分岐
+$C1/CDF3 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード（= 「ほいこーろー」STEP数）
+$C1/CDF5 BEQ $13    [$CE0A]      ;ゼロフラグが立っているとき[$C1/CE0A]分岐（※おそらく「ほいこーろー」以外の技は00）
+;
+;ここから「ほいこーろー」用処理
+$C1/CDF7 AND #$F0                ;Aと$F0で論理積
+$C1/CDF9 LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+$C1/CDFC LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFD LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFE ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CE00 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+$C1/CE02 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード
+$C1/CE04 AND #$0F                ;Aと$0Fで論理積
+$C1/CE06 ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CE08 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+;ここまで「ほいこーろー」用処理
+;
+$C1/CE0A RTS                     ;サブルーチンここまで
+;
+;通常技と共通処理
+$C1/CD32 REP #$20                ;Mフラグをクリア　Aレジスタは16bit幅
+$C1/CD34 LDA $2134  [$00:2134]   ;Aに[$00:2134]をロード（= この時点での総ダメージ量）
+$C1/CD37 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/CD39 LDA $7E920A,x[$7E:AD2A] ;Aに[$7E:AD2A]をロード
+$C1/CD3D AND #$00FF              ;Aと$00FFで論理積
+$C1/CD40 BEQ $04    [$CD46]      ;ゼロフラグが立っているとき[$C1/CD46]分岐
+$C1/CD46 LDA $20    [$00:0320]   ;Aに[$00:0320]をロード
+$C1/CD48 CLC                     ;キャリーフラグをクリア
+$C1/CD49 ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CD4B CMP #$03E7              ;Aと$03E7（=10進数999）を減算比較
+$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$C1/CD53]分岐
+$C1/CD53 STA $7E9200,x[$7E:AD20] ;Aを[$7E:AD20]に書き込み
+</pre></div>
+
+<p>順に説明する。</p>
+
+<div class="code-container"><pre>
+;通常技と共通処理
+$C1/CDE7 STZ $22    [$00:0322]   ;[$00:0322]に0を書き込み
+$C1/CDE9 STZ $23    [$00:0323]   ;[$00:0323]に0を書き込み
+$C1/CDEB LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
+$C1/CDED AND #$0F                ;Aと$0Fで論理積
+$C1/CDEF CMP #$08                ;Aと$08を減算比較
+$C1/CDF1 BNE $17    [$CE0A]      ;ゼロフラグが立っていないとき[$C1/CE0A]分岐
+$C1/CDF3 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード（= 「ほいこーろー」STEP数）
+$C1/CDF5 BEQ $13    [$CE0A]      ;ゼロフラグが立っているとき[$C1/CE0A]分岐（※おそらく「ほいこーろー」以外の技は00）
+</pre></div>
+
+<p>「ほいこーろー」専用処理前の部分。<br>
+敵にダメージを与えたり、敵が回復するなど、敵側のHPの値に変動が起きる場合、敵のHPの増減分が画面に表示される直前に、必ずここの処理を通るようである。</p>
+
+<p>最初の2行、<code><span style="color: #0000FF;">STZ</span> $22</code>と<code><span style="color: #0000FF;">STZ</span> $23</code>は、該当アドレスに<span class="formula">0</span>を書き込むという命令なのだが、この後の計算の都合などで一度<span class="formula">0</span>を書き込んでいるのだと思われる。<br>
+その後に<code><span class="r">$C1/CDEB</span> <span style="color: #0000FF;">LDA</span> $77</code>で、アドレス<code>[$00:0377]</code>の値をロードし、次に<span class="formula">$0F</span>で論理積を取っていることから、必要なのは<code>[$00:0377]</code>の値の下1桁だけなのだろうという推測ができる。</p>
+
+<p>次の<br>
+<code><span class="r">$C1/CDEF</span> <span style="color: #0000FF;">CMP</span> #$08</code><br>
+は、「<code>[$00:0377]</code>の値の下1桁」と<span class="formula">$08</span>を引き算して比較しており、その次でゼロフラグが立っていないのなら<code>[<span class="r">$C1/CE0A</span>]</code>へジャンプする。<br>
+ここの「<code>[$00:0377]</code>の値の下1桁」は、敵のHPをマイナスするか（攻撃技か）、それともプラスするか（回復または吸収技か）、という判定のようである。<br>
+「ほいこーろー」はじめ、敵にダメージを与える場合は、ここで「<code>[$00:0377]</code>の値の下1桁」が<span class="formula">$08</span>となり、ゼロフラグが必ず立つようである。<br>
+（このあたりの詳しい処理は確認していない）<br>
+回復や吸収だと、戦闘画面に出る数値が緑色になることや、後の計算処理の関係から、ここで条件分岐して何かしら指定しているのだと思われる。</p>
+
+<p>問題は次の<br>
+<code><span class="r">$C1/CDF3</span> <span style="color: #0000FF;">LDA</span> $6E    [$00:036E]</code><br>
+である。<br>
+先に述べた通りに、<code>[$00:036E]</code>には「ほいこーろー」のSTEPS数が収納されており、「ほいこーろー」を使った時以外は<span class="formula">0</span>が入っているようである。<br>
+このため、「ほいこーろー」使用時だとここでゼロフラグが立たず、<code>[<span class="r">$C1/CE0A</span>]</code>へは飛ばないで、「ほいこーろー」用処理へ続く。</p>
+
+<div class="code-container"><pre>
+;ここから「ほいこーろー」用処理
+$C1/CDF7 AND #$F0                ;Aと$F0で論理積
+$C1/CDF9 LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+$C1/CDFC LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFD LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFE ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CE00 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+$C1/CE02 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード
+$C1/CE04 AND #$0F                ;Aと$0Fで論理積
+$C1/CE06 ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CE08 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+;ここまで「ほいこーろー」用処理
+</pre></div>
+
+<p>ここからが「ほいこーろー」用の処理になる。<br>
+<code>A</code>には、STEP数である<code>[$00:036E]</code>がロードされている状態である。<br>
+STEP数は16進数なのに、そのまま「10進数のSTEP数」という扱いで画面に表示されてしまったので、ここで<code>[$00:036E]</code>を10進数から16進数に変換する処理が行われているのだろう、ということは想像に難くない。<br>
+調べてみたところ、やはりその通りであったが、アセンブラ言語の教科書にも載っているような基本の「2桁の16進数の値を10進数に解釈し直すプログラム」であるらしいので、わかる方は以下の説明は飛ばしてしまっても構わない。<br>
+結論だけ述べると、最後の<br>
+<code><span class="r">$C1/CE08</span> <span style="color: #0000FF;">STA</span> $22    [$00:0322]</code><br>
+で、STEP数が16進数として<code>A</code>と<code>[$00:0322]</code>に書き込まれた状態になり、通常技と共通処理の<code><span class="r">$C1/CDF7</span></code>～に続く。</p>
+
+<div class="opt">
+<input type="checkbox" id="tog1" class="tog">
+<label class="titl" for="tog1">「2桁の16進数の値を10進数に解釈し直すプログラム」についての説明<br>ここをクリックまたはタップで表示&#x25bc;</label>
+<div class="con">
+<p>前提として、STEP数の最大値は<span class="formula">99</span>であるから、10進数1～2桁の数値を、16進数1～2桁に変換することになる。<br>
+また、これまでも何度か記しているが、2進数と16進数について理解しておく必要がある。<br>
+16進数2桁の数は、上1桁を2進数4桁＋下1桁を2進数4桁という形で表記できる。<br>
+たとえば、16進数<span class="formula">67</span>は、2進数だと「<span class="formula">01100111</span>」だが、2進数の上4桁「<span class="formula">0110</span>」は16進数だと「<span class="formula">6</span>」で、2進数の下4桁「<span class="formula">0111</span>」は16進数だと「<span class="formula">7</span>」である。</p>
+
+<p>では、「2桁の16進数の値を10進数に解釈し直す」には、どうしたら良いか。<br>
+10進数では、上1桁が10の位であるから、「<span class="formula">上1桁×10 + 下4桁</span>」で、10進数に見なした値に変換できる、という理屈である。<br>
+ここからの目的は「<span class="formula">上1桁×10 + 下4桁</span>」の実行である。</p>
+
+<p>例えばSTEP数が「<span class="formula">67</span>」の時、実際には16進数の<span class="formula">67</span>であるが、上1桁の「<span class="formula">6</span>」と下1桁の「<span class="formula">7</span>」に分離し、上1桁の「<span class="formula">6</span>」を10倍した後、下1桁の「<span class="formula">7</span>」を足せば、10進数の扱いにできる。<br>
+各桁を分離する方法だが、上の通りに16進数<span class="formula">67</span>は、2進数の上4桁「<span class="formula">0110</span>」が「<span class="formula">6</span>」にあたり、2進数の下4桁「<span class="formula">0111</span>」が「<span class="formula">7</span>」に当たる。<br>
+2進数に一度変換することで、上1桁と下1桁の分離が簡単にできる（……といっても、人間には2進数や16進数の時点で簡単には見えないが、2進数が基本のコンピュータにとっては都合が良い）。</p>
+
+<p>上1桁と下1桁の分離については、論理積を使えば良い。<br>
+ここまででも何度か紹介しているが、論理積は2つのものを見比べて、「AかつBなら真とする」「それ以外は偽」という演算のこと。<br>
+2進数での計算においては、2つの値を見比べて「どちらも1の桁は1とし、それ以外の桁は0とする」演算である。<br>
+16進数<span class="formula">67</span>は、2進数だと「<span class="formula">01100111</span>」であるが、上4桁だけ取り出したいのなら、上4桁が<span class="formula">1</span>で下4桁が<span class="formula">0</span>の値とで論理積を取る。<br>
+つまり「<span class="formula">01100111</span>」と「<span class="formula">11110000</span>」との論理積で、上4桁「<span class="formula">01100000</span>」になる。<br>
+これを16進数で書き直すと、「<span class="formula">$67</span>と<span class="formula">$F0</span>との論理積で、<span class="formula">$60</span>になる」ということになる。<br>
+「ほいこーろー」用処理の最初の行である、</p>
+
+<div class="code-container"><pre>
+$C1/CDF7 AND #$F0                ;Aと$F0で論理積
+</pre></div>
+
+<p>これはまさに「16進数の上1桁だけ取り出す」という計算である。<br>
+ただしこの時点では「<span class="formula">01100000</span>」と、下に<span class="formula">0</span>が4個ついた状態である（<span class="formula">$60</span>である）ということに注意。<br>
+「<span class="formula">$6</span>」だけだと、「<span class="formula">0110</span>」である。</p>
+
+<p>16進数の上1桁が取り出せたので、まずは「<span class="formula">上1桁×10 + 下4桁</span>」の最初の「<span class="formula">上1桁×10</span>」を行うのだが、上の処理を見ると、<code><span class="r">$C1/CDF7</span></code>以降に「<span class="formula">上1桁×10</span>」の計算はしておらず、なぜか割り算と足し算を繰り返している。<br>
+割り算と足し算でいったい何を計算しているのだろうか。</p>
+
+<p>ここまででも紹介してきた通り、スーパーファミコンのプログラム言語の65C816用アセンブリで乗算や除算をするのは処理に時間がかかるし、容量もかさむ。<br>
+ただし<span class="formula">×2</span>と<span class="formula">÷2</span>は、ビットシフトという方法で簡単にできるようになっている。<br>
+命令だと「<code><span style="color: #0000FF;">ASL</span></code>」が<span class="formula">×2</span>で（算術左シフト）、「<code><span style="color: #0000FF;">LSR</span></code>」が<span class="formula">÷2</span>である（論理右シフト）。</p>
+
+<p>2進数は<span class="formula">÷2</span>すると、数字列がそのまま右へ移動していく（ビットシフト。右に移動する場合、論理右シフト）。<br>
+16進数<span class="formula">67</span>を1回論理右シフトすると（<span class="formula">÷2</span>）、「<span class="formula">01100111</span>」→「<span class="formula">00110011</span>」である。</p>
+
+<p>では、「<code><span class="r">$C1/CDF7</span> <span style="color: #0000FF;">AND</span> #$F0</code>」で算出した、16進数の上4桁部分であり2進数の「<span class="formula">01100000</span>」に1回論理右シフトするとどうなるか。<br>
+右に1回移動するから、「<span class="formula">00110000</span>」である。<br>
+この値は、「<span class="formula">$6</span>」である「<span class="formula">0110</span>」を、左に3回移動（<span class="formula">×2</span>を3回）と同じである。<br>
+「<span class="formula">0110</span>」を左に3回移動することは、下に<span class="formula">0</span>を3個つけるのと同じことだから、「<span class="formula">0110000</span>」、8桁表示にすれば「<span class="formula">00110000</span>」である。</p>
+
+<p>つまり、「<span class="formula">$60</span>」を1回論理右シフト（<span class="formula">÷2</span>）と、「<span class="formula">$6</span>」を左に3回算術左シフト（<span class="formula">×2</span>を3回）は、同じ結果となる。</p>
+
+<p>現在の目的は、「<span class="formula">上1桁×10</span>」である。上1桁に<span class="formula">0</span>がひとつついている「<span class="formula">$60</span>」ではなく、「<span class="formula">$6</span>」を<span class="formula">×10</span>したい。<br>
+ここまでで、「<span class="formula">$6</span>」を左に3回算術左シフト（<span class="formula">×2</span>を3回）したことになる。つまり「<span class="formula">$6</span>」を<span class="formula">×8</span>することはできた。</p>
+
+<div class="code-container"><pre>
+$C1/CDF9 LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+</pre></div>
+
+<p>これは結局、「16進数の上1桁の数を<span class="formula">×8</span>」して、<code>[$00:0322]</code>に書き込んだ、という手順であった。<br>
+だが実際にやりたいのは「16進数の上1桁の数を<span class="formula">×10</span>」である。<br>
+この後の処理の続きを見てみよう。</p>
+
+<div class="code-container"><pre>
+$C1/CDFC LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFD LSR A                   ;Aを論理右シフト（A/2）
+$C1/CDFE ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CE00 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+</pre></div>
+
+<p>「<span class="formula">$60</span>」を1回論理右シフト（<span class="formula">÷2</span>）した後の数値を、更に2回続けて論理右シフト（<span class="formula">÷2</span>）している。<br>
+現在、「<span class="formula">01100000</span>」を1回右シフトして「<span class="formula">00110000</span>」になっており、ここから更に2回右シフトすると、「<span class="formula">00001100</span>」である。<br>
+この値は、「<span class="formula">$6</span>」である「<span class="formula">0110</span>」を、左に1回移動（<span class="formula">×2</span>を1回）と同じである。<br>
+よって、ここで行ったことは、<code><span class="r">$C1/CDFC</span></code>と<code><span class="r">$C1/CDFD</span></code>で「16進数の上1桁の数を<span class="formula">×2</span>」してから、<code><span class="r">$C1/CDFE</span></code>で、既に<code>[$00:0322]</code>に入っていた「16進数の上1桁の数を<span class="formula">×8</span>」と足し算をする、という計算である。<br>
+<code><span class="r">$C1/CE00</span></code>では足し算した結果を<code>[$00:0322]</code>に書き込んでいるので、<code>[$00:0322]</code>の中は、</p>
+
+<p class="formula">「16進数の上1桁の数を×8」+「16進数の上1桁の数を×2」</p>
+
+<p>に変化した。<br>
+これは、</p>
+
+<p class="formula">「16進数の上1桁の数」×(8 + 2)</p>
+
+<p>と、まとめることができ、結局、</p>
+
+<p class="formula">「16進数の上1桁の数」×10</p>
+
+<p>である。<br>
+論理右シフトという割り算と、足し算を組み合わせて、「16進数の上1桁の数」<span class="formula">×10</span>ができたのである。</p>
+
+<p>さて、ここまで計算したら、後は、<br>
+「<span class="formula">上1桁×10 + 下4桁</span>」<br>
+の、最後の「<span class="formula"> + 下4桁</span>」をするだけである。</p>
+
+<div class="code-container"><pre>
+$C1/CE02 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード
+$C1/CE04 AND #$0F                ;Aと$0Fで論理積
+$C1/CE06 ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CE08 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+;ここまで「ほいこーろー」用処理
+</pre></div>
+
+<p>上1桁と下1桁の分離の話で述べた通り、下1桁だけ取り出したいのなら、STEP数と<span class="formula">$0F</span>の論理積を取れば良い。<br>
+16進数<span class="formula">67</span>の下1桁だったら、<span class="formula">$67</span>と<span class="formula">$0F</span>の論理積を取って「<span class="formula">$07</span>」である。<br>
+<code><span class="r">$C1/CE02</span></code>でSTEP数を<code>A</code>にロードし、<code><span class="r">$C1/CE04</span></code>でSTEP数と<span class="formula">$0F</span>の論理積を取っている。<br>
+この値と、<code>[$00:0322]</code>に収納されている「<span class="formula">上1桁×10</span>」を足したのが<code><span class="r">$C1/CE06</span></code>である。<br>
+最後に、足した結果を<code>[$00:0322]</code>に書き込みして、「2桁の16進数の値を10進数に解釈し直す」作業が終了した。</p>
+
+<p>実際の計算だけ取り出すと以下の通り。<br>
+「<span class="formula">67</span>」を10進数と見なし、16進数に変換する場合、</p>
+
+<p class="formula">$60/2 + $60/8 + $7 = $43</p>
+
+<p>である。</p>
+</div></div>
+
+<div class="code-container"><pre>
+;通常技と共通処理
+$C1/CD32 REP #$20                ;Mフラグをクリア　Aレジスタは16bit幅
+$C1/CD34 LDA $2134  [$00:2134]   ;Aに[$00:2134]をロード（総ダメージ量）
+$C1/CD37 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/CD39 LDA $7E920A,x[$7E:AD2A] ;Aに[$7E:AD2A]をロード
+$C1/CD3D AND #$00FF              ;Aと$00FFで論理積
+$C1/CD40 BEQ $04    [$CD46]      ;ゼロフラグが立っているとき[$C1/CD46]分岐
+$C1/CD46 LDA $20    [$00:0320]   ;Aに[$00:0320]をロード
+$C1/CD48 CLC                     ;キャリーフラグをクリア
+$C1/CD49 ADC $22    [$00:0322]   ;A＋[$00:0322]
+$C1/CD4B CMP #$03E7              ;Aと$03E7（=999）を減算比較（0033-03E7）
+$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$C1/CD53]分岐
+$C1/CD53 STA $7E9200,x[$7E:AD20] ;Aを[$7E:AD20]に書き込み
+</pre></div>
+
+<p>STEP数が16進数として<code>A</code>と<code>[$00:0322]</code>に書き込まれた状態で、残りの処理が進む。<br>
+経緯は省略するが、この時点で<code>[$00:2134]</code>には総ダメージ量（= 単発ダメージ量×ヒット数）が入っている。<br>
+とはいえ、「ほいこーろー」の場合、この値は敵味方のステータスに関係なく<span class="formula">0</span>で、例外はオディオモールのみ。<br>
+単発ダメージ量が強制的に<span class="formula">1</span>に変更される都合で、オディオモールに対しての「ほいこーろー」の総ダメージ量は必ず「<span class="formula">1</span>」である。<br>
+総ダメージ量は一度、<code>[$00:0320]</code>に書き込まれる。</p>
+
+<p>次の<code><span class="r">$C1/CD39</span> <span style="color: #0000FF;">LDA</span> $7E920A,x</code>は、攻撃相手の回避属性関係・場の属性関係の値を取得しており、<code><span class="r">$C1/CD3D</span></code>で$00FFで論理積を取った結果、ゼロフラグが立つのであれば回避属性によるダメージ量半減計算が挟まる。<br>
+オディオモールには回避属性が設定されていないので、回避属性での半減は起こらないが、ここで回避属性のダメージ量半減が起こる場合は、</p>
+
+<div class="code-container"><pre>
+$C1/CD42 LSR $20    [$00:0320] ;論理右シフト(÷2)
+$C1/CD44 INC $20    [$00:0320] ;[$00:0320]の値をインクリメント(+1)
+</pre></div>
+
+<p>このような処理が挟まって、<span class="formula">[$00:0320]</span>に書き込まれた総ダメージ量は<span class="formula">÷2</span>された後<span class="formula">+1</span>される。<br>
+ＳＦ編キャプテンスクウェアで、ラ・ラに攻撃を当てた時、実際の総ダメージ量が<span class="formula">0</span>でも回避属性で「<span class="formula">0÷2+1</span>」と計算されてダメージ量が<span class="formula">1</span>になる、という有名なネタがあるが、その計算はここで生まれているのである。</p>
+
+<p>とはいえ、「ほいこーろー」では上の処理は入らないので、次の<code><span class="r">$C1/CD46</span></code>以降の話を続ける。</p>
+
+<p>この後は<code><span class="r">$C1/CD48</span></code>でキャリーフラグをクリアし（キャリーフラグが立っていると、この後の「<code><span style="color: #0000FF;">ADC</span> $22</code>」の計算で余計な繰り上がりが生じるので）、<code><span class="r">$C1/CD49</span> <span style="color: #0000FF;">ADC</span> $22</code>では、</p>
+
+<p><code>[$00:0320]</code>（＝総ダメージ量） + <code>[$00:0322]</code>（＝「ほいこーろー」でのダメージ量）</p>
+
+<p>を計算している。<br>
+「ほいこーろー」以外では、<code>[$00:0322]</code>の値は<span class="formula">0</span>であるから、<code>[$00:0320]</code>（＝総ダメージ量）に変化はない。<br>
+一方、「ほいこーろー」の場合、ここで「ほいこーろー」のSTEP数が足されることになる。<br>
+「ほいこーろー」の単発ダメージ量は、敵味方のステータスに関係なく、計算値は「<span class="formula">0</span>」にされる。<br>
+よって、通常、「ほいこーろー」のダメージ量は、</p>
+
+<p class="formula">0 + 「ほいこーろー」のSTEP数</p>
+
+<p>である。<br>
+しかし、<a href="program6.html">オディオモールのダメージ量処理</a>で記したとおり、オディオモールは自身への「単発ダメージ量を無条件で<span class="formula">1</span>に変更する」という仕様がある。<br>
+このため、オディオモールに対してだけは、「ほいこーろー」のダメージ量は、</p>
+
+<p class="formula">1 + 「ほいこーろー」のSTEP数</p>
+
+<p>になる。<br>
+これが、オディオモールに対して「ほいこーろー」を使った場合、画面に表示されるSTEPSの数と、実際にオディオモールへ与えるダメージ量が「<span class="formula">1</span>」だけ異なる理由である。</p>
+
+
+<p>最後に、以下の処理が入っている。</p>
+
+<div class="code-container"><pre>
+$C1/CD4B CMP #$03E7              ;Aと$03E7（=10進数999）を減算比較
+$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$C1/CD53]分岐
+$C1/CD53 STA $7E9200,x[$7E:AD20] ;Aを[$7E:AD20]に書き込み
+</pre></div>
+
+<p>総ダメージ量と、<span class="formula">$03E7（=10進数999）</span>を比較している。<br>
+この計算でキャリーフラグが立つのは、2進数で計算した時、引き算で繰り下がりが起きない時であり、つまりは引き算の結果が<span class="formula">0</span>以上の時である。<br>
+要するに、総ダメージ量が<span class="formula">999</span>以上の時は<code>[<span class="r">$C1/CD53</span>]</code>に飛ばずにそのまま計算が続くのだが、<code><span class="r">$C1/CD4E</span></code>と<code><span class="r">$C1/CD53</span></code>の間は、</p>
+
+<div class="code-container"><pre>
+$C1/CD50 LDA #$03E7 ;Aに$03E7（=10進数999）を書き込む
+</pre></div>
+
+<p>これが挟まっている。<br>
+つまり、総ダメージ量が<span class="formula">999</span>以上の時は、ダメージ量を<span class="formula">999</span>に変更する、という処理である。<br>
+ダメージ量（または回復量）のカウンターストップはここで処理されていた、ということがわかる。<br>
+ただし「ほいこーろー」のダメージ量は最大で<span class="formula">99</span>なので、この処理を通ることはない。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program6.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program6_3.html"><span class="button">&#9654;次　命中判定について</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script><div style="display:none;"><script type="text/javascript" src="//x7.shinobi.jp/ufo/07424540q"></script></div>
+</body>
+</html>

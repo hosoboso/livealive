@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ドロップアイテム判定">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ドロップアイテム判定">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ドロップアイテム判定</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ドロップアイテム判定</h1>
+<h2>ドロップアイテム判定</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様の敵データページには、敵を倒した時に落とすアイテム（ドロップアイテム）のデータも掲載されている。<br>
+アイテムの項目は、「アイテム(1/2)」「アイテム(1/4)」「アイテム(1/8)」の3種類あり、カッコ内の数値はドロップ率である。<br>
+更に、「アイテム入手確率には、この値に、敵ＰＴごとの係数がかかります。」とある通り、敵パーティページにある「アイテム入手率補正」という数値を掛け算して、アイテムドロップ率が計算される。</p>
+
+<p>以上の仕様さえ知っていれば、ゲームをプレイする上で充分であるが、せっかくなのでプログラムではどうなっているのかをざっと説明する。</p>
+
+<p>以下、「アイテム(1/2)」「アイテム(1/4)」「アイテム(1/8)」を便宜上「アイテム1」「アイテム2」「アイテム3」とする。<br>
+敵データを見てのとおり、敵によっては3つの枠の中でカラが存在していることもあるし、枠の中すべてが同一アイテムだったり、すべて異なる場合もある。</p>
+
+<p>実際のゲーム内ではどのように判定されているのか。<br>
+ドロップの判定は、戦闘終了時に行われる。<br>
+画面上の「勝利ッ！！」の文字が表示されたあたりで判定用サブルーチンが開始になり、味方がレベルアップするならレベルアップ表示→ドロップアイテム表示となるが、敵種類が複数の場合、敵種類ごとにドロップ判定がされる。<br>
+敵1ドロップ判定→（敵1がアイテムドロップしていたら画面に表示）→敵2ドロップ判定→（敵2がアイテムドロップしていたら画面に表示）→……<br>
+と、最大4種の敵のドロップを判定していくが、ここでは「敵種類1種に対してのドロップの判定開始から終わりまで」について説明をする。</p>
+
+<p>なお、判定用サブルーチンは、BREAK DOWNで敵を倒した時には読み込まれない設定になっている。つまりBREAK DOWNで倒すとドロップ判定そのものがされないため、ドロップアイテムが一切手に入らないのである。</p>
+
+<p>さて、ドロップの判定手順は以下の通りである。</p>
+
+<ol>
+	<li>戦闘終了時に新たに乱数生成後、敵パーティのドロップ率判定（各パーティ毎に設定された確率で2.へ、選ばれないのならドロップなし）</li>
+	<li>新たに乱数生成後、アイテム1の判定（確率1/2でアイテム1が選ばれ、選ばれないのなら3.へ）</li>
+	<li>新たに乱数生成後、アイテム2の判定（確率1/2でアイテム2が選ばれ、選ばれないのなら4.へ）</li>
+	<li>新たに乱数生成後、アイテム3の判定（確率1/2でアイテム3が選ばれ、選ばれないのならドロップなし）</li>
+</ol>
+
+<p>1. ～4. の実行前には必ず新たな乱数（<span class="formula">0～255</span>）が生成される。<br>
+この時に使われるサブルーチンは、<span class="tri"><a href="program5.html">戦闘乱数計算</a></span>ページで紹介した<code><span class="r">$C1/6150</span></code>～<code><span class="r">$C1/61A4</span></code>で、計算した乱数は<code>A</code>に書き込まれる。<br>
+乱数と<span class="formula">$80</span>（10進数<span class="formula">128</span>）で論理積を取り、ゼロフラグが立つ（乱数が<span class="formula">128</span>未満）か、ゼロフラグが立たない（乱数が<span class="formula">128</span>以上）で分岐させることで、確率<span class="formula">1/2</span>の判定を最大3回行い、どのアイテム枠が選ばれるか決まる、という手順である。<br>
+なお、アイテム1～3に空枠があり、その空枠が選ばれる場合も、ドロップなしの扱いである。</p>
+
+<p>たとえば原始編のキングマンモーなら、敵パーティとしてのドロップ率は<span class="formula">15/16</span>である。<br>
+上でいえば、1. で<span class="formula">15/16</span>の確率でドロップする判定になり、<span class="formula">1/16</span>でドロップなし判定になる。<br>
+そして、アイテムの枠は、</p>
+
+<ul>
+	<li>アイテム1：（空欄）</li>
+	<li>アイテム2：コーラのビン</li>
+	<li>アイテム3：コーラのビン</li>
+</ul>
+
+<p>と設定されている。<br>
+このため、上の2. で<span class="formula">1/2</span>の確率でアイテム1が選ばれると、アイテム1の欄は空欄なので結局「何もドロップしない」ことになる。<br>
+アイテム2が選ばれる場合は、</p>
+
+<ul>
+	<li>1. で<span class="formula">15/16</span>でドロップ成功判定が選ばれる</li>
+	<li>2. で<span class="formula">1/2</span>の確率でアイテム1が選ばれない</li>
+	<li>3. で<span class="formula">1/2</span>の確率でアイテム2が選ばれる</li>
+</ul>
+
+<p>という手順が必要なので、<span class="formula">15/16*1/2*1/2</span>が「アイテム2枠のコーラのビンが選ばれる確率」である。<br>
+更に、アイテム3枠のコーラのビンが選ばれる確率は<span class="formula">15/16*1/2*1/2*1/2</span>。<br>
+まとめると、キングマンモー戦で「コーラのビン」がドロップされる確率は、</p>
+
+<p class="formula">15/16*1/2*1/2 + 15/16*1/2*1/2*1/2<br>
+=15/16 * (1/4 + 1/8)</p>
+
+<p>である（約<span class="formula">35％</span>）。</p>
+
+<p>以下では判定に使われるプログラム（サブルーチン）を紹介する。<br>
+引き続き、キングマンモー戦を例として説明する。</p>
+
+<p>ドロップされるアイテムのデータ、アイテム1・アイテム2・アイテム3だが、戦闘中、メモリのアドレス</p>
+
+<ul>
+	<li><code>$00:1A38</code></li>
+	<li><code>$00:1A39</code></li>
+	<li><code>$00:1A40</code></li>
+</ul>
+
+<p>に読み込みされている。<br>
+（これが敵が1種類の時の読み込み先アドレスで、2種類以上いる場合、2種類目からは別の場所に読み込まれる）<br>
+本作のアイテムは、装備品も含め、アイテムデータに256種が登録されている（未使用アイテム含む）。<br>
+アイテムIDは16進数だと<span class="formula">$00～$FF</span>と番号が振ってあるが（以下便宜上アイテムIDとする）、アイテムIDの<span class="formula">$00</span>は空欄である。<br>
+アイテムIDの具体的な数値は、<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様のアイテムデータのID欄を参照のこと。</p>
+
+<p>戦闘開始時、味方に関する様々なデータが読み込まれる。<br>
+キングマンモー戦においては、「コーラのビン」のアイテムIDが「<span class="formula">$4A</span>」なので、</p>
+
+<ul>
+	<li><code>$00:1A38</code> : <span class="formula">$00</span></li>
+	<li><code>$00:1A39</code> : <span class="formula">$4A</span></li>
+	<li><code>$00:1A40</code> : <span class="formula">$4A</span></li>
+</ul>
+
+<p>というように数値が読み込みされる。<br>
+また、敵パーティとしてのキングマンモーのアイテムドロップ率は先に述べた通りに<span class="formula">15/16</span>であるが、実際には「<span class="formula">15</span>」の部分だけが読み込まれ、後々で<span class="formula">15/16</span>の判定に使われるようになっている。<br>
+ここではこの<span class="formula">15</span>のことを「ドロップ率計算用数値」と仮に名前をつけておく。<br>
+ドロップ率計算用数値は、戦闘開始直後、以下で読み込まれている。</p>
+
+<div class="code-container"><pre>
+$C1/F61A LDA $D60006,x[$D6:4F88] ;[$D6:4F88]の値$F1をAにロード
+$C1/F61E STA $58    [$00:0358]   ;A（$F1）を[$00:0358]に書き込み
+</pre></div>
+
+<p><code>[$D6:4F88]</code>に収納された「<span class="formula">$F1</span>」という値が読み込まれている。<br>
+この「<span class="formula">$F1</span>」の上位8ビット、つまり最初の16進数「<span class="formula">F</span>」（= 10進数<span class="formula">15</span>）が「ドロップ率計算用数値」である。<br>
+敵パーティデータでの「ドロップ率計算用数値」はすべて「<span class="formula">0～15</span>」に設定されているのだが、<span class="formula">0～15</span>は16進数だと<span class="formula">0～F</span>の1文字で表すことができるため、16進数1文字で全ての敵パーティの「ドロップ率計算用数値」が記録されている。<br>
+<code>[$00:0358]</code>に書き込まれた数値の上位8ビットのみが「ドロップ率計算用数値」であるという点に注意。</p>
+
+<p>戦闘開始の時点では、上のように各数値が読み込みされただけである。アイテムドロップの判定自体は、戦闘終了時に行われる。<br>
+アイテムドロップ判定は<code><span class="r">$C1/166E</span></code>以降のサブルーチンで行われている。<br>
+以下は、「キングマンモー撃破時、アイテム2が選ばれてコーラのビンをドロップする」という場合のサブルーチンの状態である。<br>
+<code>A</code>と<code>X</code>の数値も併記した。「??」はその時点での乱数である。</p>
+
+<div class="code-container"><pre>
+;■敵パーティのドロップ率判定開始
+$C1/166E LDA $58    [$00:0358]   ; A:1F?? X:1A00 Aに[$00:0358]を読み込み
+$C1/1670 AND #$F0                ; A:1FF1 X:1A00 Aと$F0で論理積（上位8bitそのまま、下位8bitを00にする）
+$C1/1672 STA $10    [$00:0310]   ; A:1FF0 X:1A00 A（上位8bitは「ドロップ率計算用数値」 = F）を[$00:0310]に書き込み
+$C1/1674 JSR $6150  [$C1:6150]   ; A:1FF0 X:1A00 乱数計算用サブルーチン[$C1:6150]にジャンプ
+;（※乱数計算処理省略。乱数生成し、Aに書き込まれる）
+$C1/1677 CMP $10    [$00:0310]   ; A:1F?? X:1A00 A（乱数）と[$00:0310]の値を減算比較(乱数 - $F0)
+$C1/1679 BCS $10    [$168B]      ; A:1F?? X:1A00 キャリーフラグが立っているなら[$C1/167B]へ
+
+;■アイテム1～3の判定準備
+$C1/167B LDA #$03                ; A:1F?? X:1A00 Aに$03をロード
+$C1/167D STA $08    [$00:0308]   ; A:1F03 X:1A00 Aの値を[$00:0308]に書き込み
+$C1/167F JSR $6150  [$C1:6150]   ; A:1F03 X:1A00 乱数計算用サブルーチン[$C1:6150]にジャンプ
+;（※乱数計算処理省略。乱数生成し、Aに書き込まれる）
+
+;■アイテム1の判定開始
+$C1/1682 BIT #$80                ; A:1F?? X:1A00 A（乱数）と$80（10進数128）で論理積
+$C1/1684 BEQ $06    [$168C]      ; A:1F?? X:1A00 ゼロフラグが立っているなら[$C1/168C]にジャンプ
+$C1/1686 INX                     ; A:1F?? X:1A00 Xをインクリメント
+$C1/1687 DEC $08    [$00:0308]   ; A:1F?? X:1A01 [$00:0308]をデクリメント（$03→$02）
+$C1/1689 BNE $F4    [$167F]      ; A:1F?? X:1A01 ゼロフラグが立っていないなら[$C1/167F]にジャンプ
+$C1/167F JSR $6150  [$C1:6150]   ; A:1F?? X:1A01 乱数計算用サブルーチン[$C1:6150]にジャンプ
+;（※乱数計算処理省略。乱数生成し、Aに書き込まれる）
+
+;■アイテム2の判定開始
+$C1/1682 BIT #$80                ; A:1F?? X:1A01 Aと$80（10進数128）で論理積
+$C1/1684 BEQ $06    [$168C]      ; A:1F?? X:1A01 ゼロフラグが立っているなら[$C1/168C]にジャンプ
+$C1/168C LDA $0038,x[$00:1A39]   ; A:1F?? X:1A01 Aに[$00:1A39]をロード
+$C1/168F BEQ $0C    [$169D]      ; A:1F4A X:1A01 ゼロフラグが立っているなら[$C1/169D]にジャンプ
+$C1/1691 STA $17    [$00:0317]   ; A:1F4A X:1A01 Aを[$00:0317]に書き込み
+</pre></div>
+
+<p>それぞれの部分を解説する。</p>
+
+<div class="code-container"><pre>
+;■敵パーティのドロップ率判定開始
+$C1/166E LDA $58    [$00:0358]   ; A:1F?? X:1A00 Aに[$00:0358]を読み込み
+$C1/1670 AND #$F0                ; A:1FF1 X:1A00 Aと$F0で論理積（上位8bitそのまま、下位8bitを00にする）
+$C1/1672 STA $10    [$00:0310]   ; A:1FF0 X:1A00 A（上位8bitは「ドロップ率計算用数値」 = F）を[$00:0310]に書き込み
+$C1/1674 JSR $6150  [$C1:6150]   ; A:1FF0 X:1A00 乱数計算用サブルーチン[$C1:6150]にジャンプ
+;（※乱数計算処理省略。乱数生成し、Aに書き込まれる）  
+$C1/1677 CMP $10    [$00:0310]   ; A:1F?? X:1A00 A（乱数）と[$00:0310]の値を減算比較(乱数 - $F0)
+$C1/1679 BCS $10    [$168B]      ; A:1F?? X:1A00 キャリーフラグが立っているなら[$C1/167B]へ
+</pre></div>
+
+<p>まず、敵パーティのドロップ率を判定している。<br>
+<code><span class="r">$C1/166E</span></code>で、<code>[$00:0358]</code>（<span class="formula">= $F1</span>）が<code>A</code>にロードされている。<br>
+先に述べたとおり、<code>[$00:0358]</code>に収納されているのは、上位8ビットに「ドロップ率計算用数値」が記されている値である。<br>
+次の<code><span class="r">$C1/1670</span></code>で、<code>A</code>と<span class="formula">$F0</span>（2進法<span class="formula">11110000</span>）で論理積を取っている。<br>
+この計算で、上位8ビットを残し下位8ビットを<span class="formula">0</span>とする処理が行われ、<code>A</code>はアイテムドロップ率だけ上位8ビットに残った「<span class="formula">$F0</span>」になる。<br>
+この値は、<code><span class="r">$C1/1672</span></code>で<code>[$00:0310]</code>に書き込まれている。<br>
+その後は乱数計算用サブルーチン<code>[$C1:6150]</code>に飛んだため、サブルーチンから戻ってきた時（<code><span class="r">$C1/1677</span></code>）には新たな乱数（<span class="formula">$00～$FF</span>）が<code>A</code>に収納されている。<br>
+<code><span class="r">$C1/1677</span></code>では、<code>A</code>に入っている新たな乱数と、<code>[$00:0310]</code>を減算比較している。<br>
+その後の<code><span class="r">$C1/1679</span></code>でキャリーフラグが立ったかどうかで分岐しているが、これまでにもあったとおり、</p>
+
+<ul>
+	<li>引き算で繰り下がりが起きなかった時、つまり乱数≧<code>[$00:0310]</code>（<span class="formula">= $F0</span>）なら、キャリーフラグが立つ</li>
+	<li>引き算で繰り下がりが起きた時、つまり乱数＜<code>[$00:0310]</code>（<span class="formula">= $F0</span>）なら、キャリーフラグが立たない</li>
+</ul>
+
+<p>という処理を行うことになる。</p>
+
+<p>ここでの引き算は、「<span class="formula">乱数 - $F0</span>」である。<br>
+だが、減数（ここでは<span class="formula">$F0</span>）の下1桁、16<sup>0</sup>の位は<span class="formula">0</span>だから、実際には2桁目、16<sup>1</sup>の位の引き算結果だけでキャリーフラグが立つかどうかが決まる。<br>
+乱数の16<sup>1</sup>の位は<span class="formula">$0～F</span>のいずれか（16通り）である。<br>
+「ドロップ率計算用数値」が<span class="formula">16</span>より大きいか小さいかで判定される、ということになるので、敵パーティのアイテムドロップ率は、<br>
+<span class="formula">「ドロップ率計算用数値」（$0～F）/16</span><br>
+となる。</p>
+
+<p>ややこしい説明になってしまったが、<code><span class="r">$C1/1677</span></code>で行われた「<span class="formula">乱数 - $F0</span>」は、</p>
+
+<ul>
+	<li>乱数が「<span class="formula">$00</span>（10進法<span class="formula">0</span>）～<span class="formula">$EF</span>（10進法<span class="formula">239</span>）」だと繰り下がりが起きてキャリーフラグが立つ → アイテムドロップ判定が続く</li>
+	<li>乱数が「<span class="formula">$F0</span>（10進法<span class="formula">240</span>）～<span class="formula">$FF</span>（10進法<span class="formula">255</span>）」だと繰り下がりが起きずキャリーフラグが立たない → アイテムドロップなし</li>
+</ul>
+
+<p>というように分岐する。<br>
+<span class="formula">240/256 = 15/16</span>の確率でアイテムドロップ判定が続くということである。<br>
+キングマンモーの場合、この「ドロップ率計算用数値」が大きいので、続いてのアイテム1～3の判定に辿り着く確率が高い。<br>
+一方で一部イベント戦闘やSF編・現代編・西部編の戦闘では<span class="formula">0/16</span>なので、一切アイテムをドロップしない。<br>
+それ以外だと、本作では確率が<span class="formula">3/16</span>に設定されている敵パーティが大半のため、敵ドロップが割と渋い。<br>
+ただし原始編の動物系の敵パーティではやや高めに設定されているのでアイテム合成用素材を集めやすくなっていたり、近未来編の全体マップの敵は<span class="formula">15/16</span>に設定されているためBREAK DOWNで倒さなければ高確率で敵がアイテムをドロップする。</p>
+
+<div class="code-container"><pre>
+;■アイテム1～3の判定準備
+$C1/167B LDA #$03                ; A:1F?? X:1A00 Aに$03をロード
+$C1/167D STA $08    [$00:0308]   ; A:1F03 X:1A00 Aの値を[$00:0308]に書き込み
+$C1/167F JSR $6150  [$C1:6150]   ; A:1F03 X:1A00 乱数計算用サブルーチン[$C1:6150]にジャンプ
+;（※乱数計算処理省略。乱数生成し、Aに書き込まれる） 
+</pre></div>
+
+<p>敵パーティでのアイテムドロップ率判定が終わった後はアイテム1～3の判定が始まるのだが、まずその下準備として、<code><span class="r">$C1/167B</span></code>～<code><span class="r">$C1/167D</span></code>で、メモリ<code>[$00:0308]</code>に<span class="formula">$03</span>を書き込んでいる。<span class="formula">$03</span>は10進数でも「<span class="formula">3</span>」である。<br>
+<code>[$00:0308]</code>は後でアイテム1・アイテム2・アイテム3を判定していくと<span class="formula">1</span>ずつ減っていく処理が行われることから、「何回判定したか（どこで判定を終わらせるか）」の判断を行うための数値だと思われる。<br>
+乱数計算用サブルーチン<code>[$C1:6150]</code>に飛び、新たな乱数を生成した後、アイテム1の判定になる。</p>
+
+<div class="code-container"><pre>
+;■アイテム1の判定開始 
+$C1/1682 BIT #$80                ; A:1F?? X:1A00 A（乱数）と$80（10進数128）で論理積
+$C1/1684 BEQ $06    [$168C]      ; A:1F?? X:1A00 ゼロフラグが立っているなら[$C1/168C]にジャンプ
+$C1/1686 INX                     ; A:1F?? X:1A00 Xをインクリメント
+$C1/1687 DEC $08    [$00:0308]   ; A:1F?? X:1A01 [$00:0308]をデクリメント（$03→$02）
+$C1/1689 BNE $F4    [$167F]      ; A:1F?? X:1A01 ゼロフラグが立っていないなら[$C1/167F]にジャンプ
+$C1/167F JSR $6150  [$C1:6150]   ; A:1F?? X:1A01 乱数計算用サブルーチン[$C1:6150]にジャンプ
+;（※乱数計算処理省略。乱数生成し、Aに書き込まれる） 
+</pre></div>
+
+<p>アイテム1～アイテム3の判定は、<code><span class="r">$C1/1682</span></code>から開始になる共通サブルーチンを使う。<br>
+まずはアイテム1の判定だが、上はアイテム1が選ばれなかったパターンになる。<br>
+最初に、<code><span class="r">$C1/1682</span></code>で、生成した乱数（<span class="formula">$00～$FF</span>）と<span class="formula">$80</span>とで論理積を取る。<br>
+<span class="formula">$80</span>は、10進数の「<span class="formula">128</span>」であり、2進数の「<span class="formula">10000000</span>」である。<br>
+<span class="formula">$80</span>未満だと2進数の8桁目が<span class="formula">0</span>、<span class="formula">$80</span>以上だと2進数の8桁目が<span class="formula">1</span>になるため、乱数「<span class="formula">$00～$FF</span>」の数値と<span class="formula">$80</span>で論理積をとると、</p>
+
+<ul>
+	<li>「乱数が<span class="formula">$80</span>未満だと論理積は<span class="formula">0</span>」</li>
+	<li>「乱数が<span class="formula">$80</span>以上だと論理積は<span class="formula">0</span>以外の数」</li>
+</ul>
+
+<p>と、各<span class="formula">1/2</span>に分岐する。<br>
+よって<code><span class="r">$C1/1684</span></code>の「ゼロフラグが立つ＝論理積の結果が<span class="formula">0</span>の時」では、確率<span class="formula">1/2</span>で分岐して<code>[<span class="r">$C1/168C</span>]</code>にジャンプし、アイテム1が選ばれて判定終了となる。<br>
+上は、乱数が<span class="formula">$80</span>以上のパターンで、<code>[<span class="r">$C1/168C</span>]</code>にジャンプせずそのまま計算が進む。<br>
+<code><span class="r">$C1/1686</span></code>では、<code>X</code>をインクリメント（<span class="formula">+1</span>）している。これは次のサブルーチン計算時に意味を持つ。<br>
+<code><span class="r">$C1/1687</span></code>では、<code>[$00:0308]</code>をデクリメント（<span class="formula">-1</span>）している。<br>
+先に、<code>[$00:0308]</code>に<span class="formula">$03</span>が書き込まれており、デクリメントの結果<code>[$00:0308]</code>は<span class="formula">$02</span>となった。<br>
+<code><span class="r">$C1/1689</span></code>では、<code><span class="r">$C1/1687</span></code>のデクリメント（<span class="formula">-1</span>）の結果、ゼロフラグが立っていない場合は<code>[<span class="r">$C1/167F</span>]</code>にジャンプする。<br>
+ゼロフラグが立つのは、<code>[$00:0308]</code>が<span class="formula">$00</span>まで減った時である。これは「アイテム3まで判定してもアイテム3が選ばれなかった時」に当たるので、ここでサブルーチンのループを抜けて判定終了となるはずである。<br>
+ここでは、<code><span class="r">$C1/167F</span></code>にジャンプしており、再び乱数計算用サブルーチン<code>[$C1:6150]</code>へ飛んで乱数計算、アイテム2判定へと進む。</p>
+
+<div class="code-container"><pre>
+;■アイテム2の判定開始 
+$C1/1682 BIT #$80                ; A:1F?? X:1A01 Aと$80（10進数128）で論理積
+$C1/1684 BEQ $06    [$168C]      ; A:1F?? X:1A01 ゼロフラグが立っているなら[$C1/168C]にジャンプ
+$C1/168C LDA $0038,x[$00:1A39]   ; A:1F?? X:1A01 Aに[$00:1A39]をロード
+$C1/168F BEQ $0C    [$169D]      ; A:1F4A X:1A01 ゼロフラグが立っているなら[$C1/169D]にジャンプ
+$C1/1691 STA $17    [$00:0317]   ; A:1F4A X:1A01 Aを[$00:0317]に書き込み
+</pre></div>
+
+<p>乱数生成し<code><span class="r">$C1/1682</span></code>へ戻ってきた。ここではアイテム2の判定が行われる。<br>
+上はアイテム2が選ばれた場合。<br>
+<code><span class="r">$C1/1684</span></code>で「ゼロフラグが立つ＝論理積の結果が0の時」に該当し、<code><span class="r">$C1/168C</span></code>へジャンプした。<br>
+<code><span class="r">$C1/168C</span></code>の命令は「<code><span style="color: #0000FF;">LDA</span> $0038,x</code>」である。<br>
+これは、「<code>$0038</code>」に<code>X</code>を足したアドレスのメモリの数値をロードしろ、という意味である。<br>
+最初に記したとおり、アイテム1・アイテム2・アイテム3は、以下のアドレスに読み込まれている。</p>
+
+<ul>
+	<li><code>$00:1A38</code> : アイテム1</li>
+	<li><code>$00:1A39</code> : アイテム2</li>
+	<li><code>$00:1A40</code> : アイテム3</li>
+</ul>
+
+<p>つまり、<code>X</code>が<span class="formula">0</span>なら<code>$00:1A38</code>（アイテム1）を読み込み、<code>X</code>が<span class="formula">1</span>なら<code>$00:1A39</code>（アイテム2）を読み込み、<code>X</code>が<span class="formula">2</span>なら<code>$00:1A40</code>（アイテム3）を読み込む、という仕組みである。<br>
+また、<code><span class="r">$C1/1686</span></code>でXをインクリメント（<span class="formula">+1</span>）しているから、</p>
+
+<p><code><span class="r">$C1/1682</span></code>→<code><span class="r">$C1/1684</span></code>でアイテムが選ばれない時、<code>X</code>を<span class="formula">+1</span>し、新たに乱数を生成してから、<code><span class="r">$C1/1682</span></code>へ戻る</p>
+
+<p>というループによって、アイテムが格納されているアドレスを<span class="formula">+1</span>しつつ、アイテム1→アイテム2→アイテム3と判定をしていることがわかる。<br>
+更に、<code><span class="r">$C1/168F</span></code>ではゼロフラグの判定をしていることから、読み込んだアイテムIDの数値が<span class="formula">$00</span>かどうか、つまりドロップアイテム欄が空欄かどうかを判定している。<br>
+空欄だった時はドロップアイテムなしということであり、<code>[<span class="r">$C1/169D</span>]</code>にジャンプして戦闘終了である。<br>
+一方、空欄ではなく何かのアイテムだった場合はメモリ<code>[$00:0317]</code>にドロップアイテムのIDを書き込んで、実際のゲーム画面に獲得アイテムを表示する。</p>
+
+<p>このようにしてドロップアイテムが入手できるかどうかが決まるのだが、判定は敵を倒した時点の乱数で決まるため、バーチャルコンソールでプレイしているのなら、最後の一撃の前に「まるごと保存」しておくと良い。<br>
+これまでも述べたとおり、戦闘中の乱数は、技を出したりアイテムを使ったり敵に行動させるなどしなければ新たに計算されない。<br>
+倒した時に欲しいアイテムがドロップされなかった時は、最後の一撃の前のデータを「まるごと復元」し、別の行動を挟んでから（この後にもう一度「まるごと保存」を忘れずに）撃破することで乱数を変えてみると良い。<br>
+技をあえてカラマスに出して空振りさせたり、回復技があるのなら使ってみたり、パスやYボタン足踏みなどで敵を行動させるなど（敵を移動させるだけでも乱数が動く）。<br>
+それから敵を撃破してみると乱数が変わったことにより、ドロップアイテム計算結果も変動するはずである。<br>
+一度しか戦えない強敵・キングマンモーから「コーラのビン」を狙う時はもちろん、最終編でザコ敵からしか入手できない「マンティスハンド」や「黒ねこのくつ」といったレアな装備品を狙ってみる時にも役立つ。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program7.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program10.html"><span class="button">&#9654;次　経験値計算</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

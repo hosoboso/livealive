@@ -11,7 +11,7 @@ const c = [
 
 GL = 
 	`${c[0]}${c[3]}475758542X${c[2]}${c[4]}/91-Muy2X2QL._SL160_.${c[5]}LIVE A LIVE ORIGINAL+HD-2D Illustrations${c[1]}${c[3]}475758542X${c[2]}LIVE A LIVE ORIGINAL+HD-2D Illustrations</a><br>価格：2,970${c[6]}
-	${c[0]}${c[3]}B0B1HZPT2M${c[2]}${c[4]}/71DI0mRABVL._SL160_.${c[5]}　LIVE A LIVE HD-2D Remake Original Soundtrack${c[1]}${c[3]}B0B1HZPT2M${c[2]}LIVE A LIVE HD-2D Remake Original Soundtrack</a><br>価格：2,616${c[6]}
+	${c[0]}${c[3]}B0B1HZPT2M${c[2]}${c[4]}/71DI0mRABVL._SL160_.${c[5]}　LIVE A LIVE HD-2D Remake Original Soundtrack${c[1]}${c[3]}B0B1HZPT2M${c[2]}LIVE A LIVE HD-2D Remake Original Soundtrack</a><br>価格：2,727${c[6]}
 	${c[0]}${c[3]}B0BZVFNJX9${c[2]}${c[4]}/818xnPhGhyL._SL160_.${c[5]}超級!! ライブアライブ近未来編${c[1]}${c[3]}B0BZVFNJX9${c[2]}超級!! ライブアライブ近未来編</a><br>価格：1,100${c[6]}`,
 
 kinmirai = 
@@ -25,7 +25,7 @@ if ( PT.match(/（リメイク版）/) ) {
 	resulttext += GL;
 } else if (PT.match(/（SFC版）/)) {
 	resulttext += `${c[0]}${c[3]}B007BRSNLS${c[2]}${c[4]}/41Rs6JSdnfL._SL160_.${c[5]}ライブ・ア・ライブ オリジナル・サウンドトラック${c[1]}${c[3]}B007BRSNLS${c[2]}ライブ・ア・ライブ オリジナル・サウンドトラック</a><br>価格：1,834${c[6]}
-	${c[0]}${c[3]}B09RX85NJW${c[2]}${c[4]}/81enFh3aroL._SL160_.${c[5]}LIVE A LIVE(ライブアライブ) -Switch${c[1]}${c[3]}B09RX85NJW${c[2]}LIVE A LIVE(ライブアライブ) -Switch</a><br>価格：3,800${c[6]}${GL}`;
+	${c[0]}${c[3]}B09RX85NJW${c[2]}${c[4]}/81enFh3aroL._SL160_.${c[5]}LIVE A LIVE(ライブアライブ) -Switch${c[1]}${c[3]}B09RX85NJW${c[2]}LIVE A LIVE(ライブアライブ) -Switch</a><br>価格：3,580${c[6]}${GL}`;
 }
 
 if (

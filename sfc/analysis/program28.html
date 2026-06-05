@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ざき3戦目の仕様">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ざき3戦目の仕様">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ざき3戦目の仕様</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+.num{
+font-family: 'STIXTwoMath', "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo UI", "Meiryo", "Helvetica Neue", arial, sans-serif;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ざき3戦目の仕様</h1>
+<h2>ざき3戦目の仕様</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>原始編におけるざきとの戦闘の3回目、つまりラストバトル前のポゴとの一騎打ちは、本作において特殊な仕様となっている。</p>
+
+<ul>
+	<li>ポゴの攻撃がざきに4回命中すると、「？？？？？？？？？？？？？？？」と画面上メッセージウィンドウに表示されて戦闘が強制終了する。</li>
+	<li>ざきの残りHPは関係なく、残りHPを0にしても戦闘は終了しない。</li>
+	<li>4回目の戦闘中、攻撃時にざきに「ばりぶる～ん」の反撃が出せる位置から攻撃すると、反撃で「ばりぶる～ん」を出すモーションだけ表示されてから戦闘が強制終了する。</li>
+</ul>
+
+<p>以上から、この戦闘のみ、ざきのHPの計算方法が特殊であること、ポゴの攻撃回数をカウントしていること、ざきのステータスやフラグが戦闘をまたいで一部引き継ぎになっているであろうことが推測できる。<br>
+実際の処理は以下のようになっているが、<span class="tri"><a href="program4.html" >ダメージ計算式の解説</a></span>、<span class="tri"><a href="program26_2.html">ダメージフィールド</a></span>の敵へのダメージ量から残りHPを算出する処理と、<span class="tri"><a href="program27.html">反撃</a></span>関係の処理も参照していただきたい。</p>
+
+<p>なお、反撃の「ばりぶる～ん」の件は<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様に以下のように書かれている。以下引用。</p>
+
+<blockquote>ざき３戦目で４発目を前方から攻撃すると、<br>
+反撃ばりぶる～んが出るタイミングで戦闘が終了し、<br>
+おーでぃーおー戦でざき参戦時に反撃ばりぶる～んをおーでぃーおーに当てる。</blockquote>
+
+<p>「ばりぶる～ん」の反撃属性は手/足/鋭/鈍/飛/火/水なので、ポゴがこれらの属性で4回目の攻撃を行うと、ざきは「ばりぶる～ん」のモーションだけ出して戦闘が終了するのだが、実はその後のおーでぃーおー戦冒頭でざきが反撃の「ばりぶる～ん」を出すのは、<br>
+『ゲーム開始時からざき3戦目までに戦闘を行っている場合、敵が何かの技を出し、かつその戦闘後にメニュー画面を開いていない』<br>
+『ざき3戦目でポゴがざきから攻撃を食らっていない』<br>
+『ざき3戦目の最後にポゴからの攻撃で反撃の「ばりぶる～ん」のモーションのみ出ている』<br>
+という状況下のみである。<br>
+なお、この戦闘において、ざきが出せる反撃技は「ばりぶる～ん」のみである。反撃モーションだけ見せて戦闘が終わる場合、該当技は「ばりぶる～ん」のみとなっている。</p>
+
+<p>これらの理由についても、この先説明していく。</p>
+
+<h3>ざき3戦目について</h3>
+
+<p>まず、ポゴが何らかの攻撃技で攻撃し命中した後の処理を見ていく。<br>
+ポゴが攻撃モーションを行った直後、命中時のモーション直前あたりの処理が以下のようになっている。<br>
+この戦闘は味方キャラ1人、敵1人だから、敵種類1、敵番号0でアドレスを見ていく。</p>
+
+<div class="code-container"><pre>
+$C1/CCA5 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CCA7 LDA $7E8F00,x[$7E:AA00] ;Aに[$7E:AA01][$7E:AA00](ざきの現在HP)をロード
+$C1/CCAB SEC                     ;キャリーフラグON
+$C1/CCAC SBC $7E9200,x[$7E:AD00] ;A - [$7E:AD01][$7E:AD00](ポゴが与えたダメージ量)
+$C1/CCB0 BCS $03    [$CCB5]      ;キャリーフラグが立っているとき[$CCB5]分岐
+$C1/CCB2 LDA #$0000              ;Aに$0000をロード
+$C1/CCB5 JSR $CE70  [$C1:CE70]   ;[$C1:CE70]へジャンプ
+
+$C1/CE70 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+;（中略）
+$C1/CE87 LDA $20    [$00:0320]   ;Aに[$00:0320](残りHP)をロード
+$C1/CE89 RTS                     ;サブルーチン戻り
+
+$C1/CCB8 STA $7E8F00,x[$7E:AA00] ;A(残りHP)を[$7E:AA01][$7E:AA00](現在HP)に書き込み
+$C1/CCBC TAY                     ;Aレジスタの値をYレジスタに転送
+$C1/CCBD SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CCBF JSR $0C14  [$C1:0C14]   ;[$C1:0C14]へジャンプ
+</pre></div>
+
+<p>直前までダメージ量や行動ポイントの計算をしているが、そのあたりの処理は省略。<br>
+ポゴがざきを攻撃した時の総ダメージ量は、2バイトの容量で<code>[$00:0321]</code><code>[$00:0320]</code>→<code>[$7E:AD01]</code><code>[$7E:AD00]</code>とコピーされている。<br>
+敵種類1、敵番号0にあたるざきの現在HPは<code>[$7E:AA01]</code><code>[$7E:AA00]</code>に入っており、<code><span class="r">$C1/CCAC</span></code>で、「現在HP - ダメージ量」を計算している。<br>
+つまりダメージをくらった後のざきの残りHPの計算であるが、ダメージ量が現在HP以上だと、計算結果が<span class="formula">0</span>以下になってしまうため、<code><span class="r">$C1/CCB0</span></code>でキャリーフラグで分岐し、減算結果が負の値なら<code>A</code>に<span class="formula">$0000</span>をロードする。<br>
+ダメージ量が現在HP以上なら、現在HPを<span class="formula">0</span>にする処理ということになる。<br>
+<code><span class="r">$C1/CE70</span></code>～<code><span class="r">$C1/CE89</span></code>はフィールドダメージ処理でも共通部分。<br>
+結局は計算したざきの残りHPが<code><span class="r">$C1/CCB8</span></code>で<code>[$7E:AA01]</code><code>[$7E:AA00]</code>(現在HP)に書き込まれることになる。</p>
+
+<p>つまり、ざき3戦目においても、通常通りにざきの残りHP計算を行っているし、ポゴの攻撃でざきのHPを<span class="formula">0</span>以下にした時、ざきのHPを<span class="formula">0</span>としている。<br>
+ただ、ここまではあくまでも計算の途中である。<br>
+続きの<code>$C1:0C14</code>以降の処理が肝になる。</p>
+
+<div class="code-container"><pre>
+$C1/0C14 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00](シナリオID)をロード
+$C1/0C17 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/0C19 BNE $0E    [$0C29]      ;ゼロフラグが立っていないとき[$0C29]分岐
+$C1/0C1B LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/0C1E CMP #$A8                ;Aと$A8を減算比較（ステータスレジスタ変更のみ）
+$C1/0C20 BNE $07    [$0C29]      ;ゼロフラグが立っていないとき[$0C29]分岐
+$C1/0C22 LDA $0041  [$00:0041]   ;Aに[$00:0041]をロード
+$C1/0C25 AND #$03                ;Aと$03で論理積
+$C1/0C27 CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/0C29 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここがざき3戦目用の処理である。<br>
+<code><span class="r">$C1/0C14</span></code>～<code><span class="r">$C1/0C19</span></code>で、シナリオIDが<span class="formula">$01</span>かどうかを判定しているが、シナリオIDが<span class="formula">$01</span>なのは原始編である。<br>
+その後は更に、<code>[$00:0040]</code><code>[$00:0041]</code>の値を判定しているが、このあたりはシナリオ進行と戦闘背景関係のメモリアドレスなので（詳細は未調査）、ざき3戦目かどうかの判定になる。<br>
+上の値から<code>[$00:0040]</code> = <span class="formula">$A8</span>、<code>[$00:0041]</code> = <span class="formula">$03</span>の時のみ<code><span class="r">$C1/0C29</span></code>まで進むことがわかる。<br>
+また、<code><span class="r">$C1/0C29</span></code>の時点でゼロフラグが立っている。</p>
+
+<div class="code-container"><pre>
+$C1/CCC2 BNE $12    [$CCD6]      ;ゼロフラグが立っていないとき[$CCD6]分岐
+$C1/CCC4 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CCC6 PHY                     ;Yをスタックへプッシュ
+$C1/CCC7 LDY $0002,x[$00:1B02]   ;Yに[$00:1B03][$00:1B02](敵番号0アドレス呼び出し)をロード
+$C1/CCCA LDA $0010,y[$00:1A10]   ;Aに[$00:1A11][$00:1A10](敵種類1のHP)をロード
+$C1/CCCD STA $7E8F00,x[$7E:AA00] ;Aを[$7E:AA01][$7E:AA00](現在HP)に書き込み
+$C1/CCD1 PLY                     ;Yレジスタにスタックからプル
+$C1/CCD2 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CCD4 BRA $2D    [$CD03]      ;フラグにかかわりなく常に分岐[$CD03]
+$C1/CD03 LDA #$FF                ;Aに$FFをロード
+$C1/CD05 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/0C29</span></code>のサブルーチンの戻り先<code><span class="r">$C1/CCC2</span></code>で、ゼロフラグ判定がある。<br>
+<code><span class="r">$C1/0C29</span></code>から戻った時点でゼロフラグが立っているのは、ざき3戦目のみになるから、ざき3戦目のみ<code><span class="r">$C1/CCC4</span></code>～の処理を行う。<br>
+処理自体はシンプルであり、<code><span class="r">$C1/CCCA</span></code>で敵種類1のHP、つまりざきの最大HP<code>[$00:1A11]</code><code>[$00:1A10]</code>を呼び出し、<code><span class="r">$C1/CCCD</span></code>でざきの現在HP<code>[$7E:AA01]</code><code>[$7E:AA00]</code>に書き込む、というだけである。<br>
+ここまでの処理でざきのHPが<span class="formula">0</span>になっていようが、問答無用でざきの最大HPをざきの現在HPに上書きするのである。<br>
+つまり、この戦闘において、ざきのHPは実質満タンのまままったく減らないことになる。<br>
+これが、ざき3戦目では、ざきの残りHP以上のダメージを与えても倒せない仕組みである。</p>
+
+<p>残りHP以外に回復するステータスなどはなく、通常通りの処理が行われるため、ざきを状態異常などにすることはできるし、ざきも通常通りに行動してくる。もちろん反撃してくる条件を満たせば反撃技も出してくる。</p>
+
+<p>更に、ポゴの攻撃が命中したモーションの後、もう一度判定がある。</p>
+
+<div class="code-container"><pre>
+$C1/0C14 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00](シナリオID)をロード
+$C1/0C17 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/0C19 BNE $0E    [$0C29]      ;ゼロフラグが立っていないとき[$0C29]分岐
+$C1/0C1B LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/0C1E CMP #$A8                ;Aと$A8を減算比較（ステータスレジスタ変更のみ）
+$C1/0C20 BNE $07    [$0C29]      ;ゼロフラグが立っていないとき[$0C29]分岐
+$C1/0C22 LDA $0041  [$00:0041]   ;Aに[$00:0041]をロード
+$C1/0C25 AND #$03                ;Aと$03で論理積
+$C1/0C27 CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/0C14 RTS                     ;サブルーチン戻り
+;
+$C1/0C2D BNE $1B    [$0C4A]      ;ゼロフラグが立っていないとき[$0C4A]分岐
+$C1/0C2F LDX #$1B00              ;Xに$1B00をロード
+$C1/0C32 LDA $7E9003,x[$7E:AB03] ;Aに[$7E:AB03](ざきへのヒット数)をロード
+$C1/0C36 BEQ $12    [$0C4A]      ;ゼロフラグが立っているとき[$0C4A]分岐
+$C1/0C38 LDA $7E9100[$7E:9100]   ;Aに[$7E:9100]（ざきへの攻撃回数）をロード
+$C1/0C3C INC A                   ;Aをインクリメント +1
+$C1/0C3D STA $7E9100[$7E:9100]   ;Aを[$7E:9100]（ざきへの攻撃回数）に書き込み
+$C1/0C41 CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/0C43 BNE $05    [$0C4A]      ;ゼロフラグが立っていないとき[$0C4A]分岐
+;ゼロフラグON（攻撃4回目）
+$C1/0C45 LDA #$55                ;Aに$55をロード
+$C1/0C47 STA $047E  [$00:047E]   ;Aを[$00:047E]に書き込み
+;処理合流
+$C1/0C4A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/0C14</span></code>～<code><span class="r">$C1/0C14</span></code>は先に紹介したのとまったく同じ処理で、ざき3戦目のみゼロフラグがONになる。<br>
+その後の<code><span class="r">$C1/0C2D</span></code>からだが、ゼロフラグが立つざき3戦目のみ<code><span class="r">$C1/0C2F</span></code>に進む。<br>
+更に、<code>[$7E:AB03]</code>をロードしているが、これは敵番号0に攻撃した時の被ヒット数である。<br>
+ざきへの攻撃が命中していれば1ヒット以上なので、<code><span class="r">$C1/0C36</span></code>でゼロフラグは立たず次の処理に進む。<br>
+そこでは<code>[$7E:9100]</code>をインクリメント(<span class="formula">+1</span>)する処理が入るが、この戦闘において<code>[$7E:9100]</code>にはざきへの攻撃回数が入っている（戦闘開始時は<span class="formula">$00</span>を入れる処理が入っている）。<br>
+つまり、ざきを攻撃し命中したらカウントアップするアドレスで、これでざきへの攻撃回数を判定できる。<br>
+<code><span class="r">$C1/0C41</span></code>は<span class="formula">$04</span>との減算比較でゼロフラグ判定であるから、4回攻撃したかどうかで分岐になる。<br>
+4回目の攻撃直後であれば<code><span class="r">$C1/0C45</span></code>～<code><span class="r">$C1/0C47</span></code>で<code>[$00:047E]</code>に<span class="formula">$55</span>を書き込み、それ以外は何もせずサブルーチンが終わる。</p>
+
+<p>ここから、<code>[$00:047E]</code>の値でざき3戦目を強制終了させるかどうかが決まることがわかる。<br>
+<code>[$00:047E]</code>は戦闘開始時に<span class="formula">$00</span>が書き込まれており、ざき3戦目では上のタイミングで<span class="formula">$55</span>が書き込まれるようになっている。</p>
+
+<p>この後、<code>[$00:047E]</code>の値で分岐が起こるのは以下のサブルーチンである。</p>
+
+<div class="code-container"><pre>
+$C1/014C LDA $047E  [$00:047E]   ;Aに[$00:047E]をロード
+$C1/014F BMI $66    [$01B7]      ;ネガティブフラグが立っているとき[$01B7]分岐
+;ネガティブフラグOFF
+$C1/0151 BEQ $0C    [$015F]      ;ゼロフラグが立っているとき[$015F]分岐
+;ゼロフラグOFF
+$C1/0153 CMP #$55                ;Aと$55を減算比較（ステータスレジスタ変更のみ）
+$C1/0155 BNE $14    [$016B]      ;ゼロフラグが立っていないとき[$016B]分岐
+;ゼロフラグON
+$C1/0157 JSR $256E  [$C1:256E]   ;[$C1:256E]へジャンプ
+</pre></div>
+
+<p><code>[$00:047E]</code>の値の判定になる。<br>
+<code><span class="r">$C1/014F</span></code>でネガティブフラグ判定、つまり<span class="formula">$80</span>以上かどうかの判定があるため、他の戦闘で<code>[$00:047E]</code>に<span class="formula">$80</span>以上の値を入れる何かしらの処理があると思われるが、未確認。<br>
+<span class="formula">$55</span>が入っている場合はネガティブフラグは立たないので次に進む。<br>
+<code><span class="r">$C1/0151</span></code>はゼロフラグ判定で、通常の戦闘では最初に<code>[$00:047E]</code>に<span class="formula">$00</span>が書き込まれてから特に何かの値が入ることはないので、ここでゼロフラグ分岐となり<code>[$015F]</code>へジャンプ、<code><span class="r">$C1/0153</span></code>以降の処理を抜ける。<br>
+次で<span class="formula">$55</span>かどうか判定を行っているから、ここがざき3戦目で4回ざきに攻撃を当てた場合の分岐であり、該当すれば<code><span class="r">$C1/0157</span></code>→<code>$C1:256E</code>にジャンプする。</p>
+
+<p>ちなみに<span class="formula">$55</span>ではない時の分岐先<code><span class="r">$C1/016B</span></code>では<span class="formula">$11</span>かどうかの判定があるため、<code>[$00:047E]</code>に<span class="formula">$11</span>が入る分岐もあるようだが詳細は未確認。</p>
+
+<p>以上の処理のタイミングが、ざきがポゴから攻撃をくらい、反撃判定を行って、「ばりぶる～ん」が出せる場合はメッセージウィンドウに「反撃：ばりぶる～ん」の文字列表示と「ばりぶる～ん」のモーション（範囲表示）だけ行われた直後になる。<br>
+つまり、そのタイミングまでは、<code>[$00:047E]</code>への数値書き込み以外、通常の戦闘と同じ処理が進められていた、ということになる。<br>
+画面上でも、技の出す位置まで表示されることからわかるが、反撃を出すマスの位置（ポゴの位置）まできちんと計算をしている。<br>
+だがこの後に、地面が揺れる（画面が上下に揺れる）処理が入り、メッセージウィンドウに「？？？？？？？？？？？？？？？」と表示されて、戦闘が強制終了する。<br>
+戦闘終了後からはイベントが始まり、ラストバトルまで続くので、プレイヤーが間に何らかの操作を行うことはできない。</p>
+
+<h3>ラストバトル開始時処理</h3>
+
+<p><span class="tri"><a href="program24.html">味方との戦闘</a></span>では、味方キャラが敵として登場する場合の戦闘開始時のステータス処理について紹介した。<br>
+ざき3戦目は、ざきは本来味方キャラとして登録されているため、味方キャラが敵として登場する場合の戦闘にあたる。<br>
+ラストバトル開始時、画面上のメッセージウィンドウにおーでぃーおーの名前が表示されてからざきが戦闘フィールドに登場するが、ざきのステータス自体は戦闘開始時に味方キャラ4人目としてセットされている。</p>
+
+<p>ではなぜ、条件によってはざきが反撃の「ばりぶる～ん」をおーでぃーおーに出すことがあるのだろうか？<br>
+通常、戦闘開始時に反撃に関する処理が入ることはない。<br>
+だが、原始編ラストバトル冒頭では、直前のざき3戦目ラストでざきが反撃「ばりぶる～ん」のモーションを出した時だけ、<span class="tri"><a href="program27.html">反撃</a></span>の仕様で紹介した、習得技で反撃可能かチェックするサブルーチンが、ループ処理されるようになっている。<br>
+反撃関係の処理が最初から行われるのではなく、途中の処理から開始になるという妙な手順であることと、直前の戦闘でざきが反撃「ばりぶる～ん」のモーションを出した時だけ処理が入ることから、ざき3戦目の戦闘終了処理において、反撃関係の何かしらの不具合があり、次の戦闘で反撃処理の続きが行われてしまうのだろう、ということが推測されるが、詳しい処理は筆者にはよくわからない。</p>
+
+<p>本来、反撃するかどうかの判定は、</p>
+
+<ol>
+	<li>敵から攻撃を食らった時、味方キャラ番号に対応したアドレス<code>[$7E:EA20]</code><code>[$7E:EA60]</code><code>[$7E:EAA0]</code><code>[$7E:EAE0]</code>に、敵からの攻撃のヒット数を書き込む（攻撃を食らっていないキャラは<span class="formula">$00</span>が入る）</li>
+	<li>敵からの攻撃のヒット数が1以上の味方キャラのみ、敵からの攻撃の属性と、味方キャラが覚えている技の反撃属性が一致するか、すべての習得技を判定</li>
+	<li>味方キャラの状態異常が、反撃で出す技を出せない状態にないか判定</li>
+	<li>反撃で出せる技の範囲を1マスずつチェックし、技の範囲内に、攻撃してきた敵がいるマスがあるなら反撃を出す</li>
+</ol>
+
+<p>という手順で進む。<br>
+ところが、原始編ラストバトル開始のタイミング（ざきが登場した直後あたり）で、上の2.の処理から反撃の判定が開始になってしまう。</p>
+
+<p>ポイントは<code>[$7E:EA20]</code><code>[$7E:EA60]</code><code>[$7E:EAA0]</code><code>[$7E:EAE0]</code>の値である。<br>
+本来ならば、これらのアドレスには上の1.の処理で書き込まれた、直前の敵の攻撃のヒット数が入っているはずである。<br>
+だが、これらアドレスは、ゲームを開始した時点ではヒット数とはまったく関係のない以下の値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>初期値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$7E:EA20]</code></td><td><span class="formula">$F8</span></td></tr>
+	<tr><td><code>[$7E:EA60]</code></td><td><span class="formula">$46</span></td></tr>
+	<tr><td><code>[$7E:EAA0]</code></td><td><span class="formula">$B4</span></td></tr>
+	<tr><td><code>[$7E:EAE0]</code></td><td><span class="formula">$30</span></td></tr>
+</tbody>
+</table>
+
+<p>（<code>$7E:EA20</code>～には、ゲーム開始時に<code>$4F:0100</code>あたりの値がコピーされるようである。内容は未確認）</p>
+
+<p>上の値は先に説明した通り、戦闘で敵が何かの攻撃（回復技含む）を行うことにより、敵が攻撃技なら食らった時のヒット数が入り、次に何か攻撃を食らうまで変わらない。<br>
+戦闘終了しても戦闘中の値は残るが、メニュー画面を開くと上の初期値に戻る。</p>
+
+<p>反撃判定時は上のアドレスの数値から、敵から攻撃をくらったかどうかを判定する。<br>
+サブルーチンでは、ゼロフラグが立つかどうかの判定である。<br>
+1以上の値が入っていれば、敵から攻撃されたと判断し、反撃判定に進む。<br>
+通常、反撃判定時には、上のアドレスに初期値の<span class="formula">$F8</span>, <span class="formula">$46</span>, <span class="formula">$B4</span>, <span class="formula">$30</span>は入っておらず、敵からの攻撃のヒット数で上書きされているので、問題なく処理されるのだが、原始編ラストバトルだけはおかしなことになる。<br>
+ざき3戦目の開始直前でゲームを開始したり、メニュー画面を開くと、<code>[$7E:EA20]</code>～に上の初期値が入った状態で戦闘が開始される。<br>
+更に、ざき3戦目でポゴがざきから一切攻撃をくらわずに4回攻撃を当てると、そのままラストバトルに突入する。<br>
+そして、なぜか原始編ラストバトル開始時、<code>[$7E:EA20]</code>～の値を参照しながら習得技で反撃可能かチェックするサブルーチンが開始になるのである（ただし味方2キャラ目から開始）。<br>
+この時、味方2キャラ目以降は、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>初期値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$7E:EA60]</code></td><td><span class="formula">$46</span></td></tr>
+	<tr><td><code>[$7E:EAA0]</code></td><td><span class="formula">$B4</span></td></tr>
+	<tr><td><code>[$7E:EAE0]</code></td><td><span class="formula">$30</span></td></tr>
+</tbody>
+</table>
+
+<p>と、値が入っているから、ゴリ・べる・ざき3キャラとも「敵から1ヒット以上の攻撃をくらった状態」と判定され、3キャラとも習得技で反撃可能かチェックすることになる。<br>
+しかし、原始編の味方キャラで、反撃技を習得できる（している）キャラはざきのみである。<br>
+このため、原始編ラストバトル開始時、反撃技を出せる可能性があるのはざきのみであり、しかもおーでぃーおーとの方向・距離から、「ばりぶる～ん」しか出せない（もうひとつの反撃技「ばりききゅーん」は後方3方向にしか出せない）。</p>
+
+<p>以上から、原始編ラストバトル開始時にざきが反撃の「ばりぶる～ん」を出す条件は、</p>
+
+<p style="font-weight:bold;"><code>[$7E:EA20]</code><code>[$7E:EA60]</code><code>[$7E:EAA0]</code><code>[$7E:EAE0]</code>に、初期値の<span class="formula">$F8</span>, <span class="formula">$46</span>, <span class="formula">$B4</span>, <span class="formula">$30</span>が入っている状態で、ざき3戦目の4回目の攻撃時、「ばりぶる～ん」の反撃属性に当たる技を当てる。</p>
+
+<p>ということになる。</p>
+
+<p>ゲーム開始時からざき3戦目開始までに戦闘を行い、敵が何かの技を出した場合、<code>[$7E:EA20]</code><code>[$7E:EA60]</code><code>[$7E:EAA0]</code><code>[$7E:EAE0]</code>には味方側の被ヒット数が書き込まれる。<br>
+原始編終盤の戦闘だから、通常はポゴとゴリの2人パーティであり、味方3人目・4人目はいないため、<code>[$7E:EAA0]</code><code>[$7E:EAE0]</code>には必ず<span class="formula">$00</span>が入る。<br>
+その状態のまま、ざき3戦目に突入した場合は、<code>[$7E:EAA0]</code><code>[$7E:EAE0]</code>は<span class="formula">$00</span>のままラストバトルなので、ざき3戦目の最後に反撃「ばりぶる～ん」が出るよう技の属性を調整しても、原始編ラストバトル開始時にざきが反撃の「ばりぶる～ん」を出さないことになる。</p>
+
+<p>とはいえ、通常プレイであれば、ラストバトル前にはメニュー画面を開いて装備を確認したりセーブをするだろう。<br>
+だいたいの場合、ざき3戦目開始では<code>[$7E:EA20]</code><code>[$7E:EA60]</code><code>[$7E:EAA0]</code><code>[$7E:EAE0]</code>に初期値が入った状態ではないだろうか。<br>
+ざき3戦目は「ブンブン」の吹き飛ばしや範囲攻撃を使えばざきに一切攻撃させずに4回攻撃することもでき、4回目のみ「ばりぶる～ん」の反撃を誘うことはさほど難しくはない。<br>
+このため、原始編ラストバトル開始時、ざきが「ばりぶる～ん」を出すのを見たプレイヤーは、皆無というほどではないが少なくないと思われる。</p>
+
+<p>もし、ゴリかべるが反撃技を使用可能で、ラストバトル開始時にざきのように反撃技を出してくるようなら、デバッグ時に発見されて修正されていたかもしれないが、そうではなかったのでそのまま放置されたのか、開発陣が気づかなかったのかはわからない。</p>
+
+<p>なお、反撃するかどうかの判定に必要な、被攻撃技属性は、ポゴが最後にざきを攻撃した時の属性の計算値が<code>[$00:0387]</code><code>[$00:0386]</code>に入ったままである。<br>
+「ばりぶる～ん」の反撃属性は手/足/鋭/鈍/飛/火/水なので、これらの中のどれかが<code>[$00:0387]</code><code>[$00:0386]</code>に入った状態で判定を行っている。<br>
+（ポゴは水属性の技を所持しておらず、原始編の攻撃アイテムにも水属性の技がないので、実質手/足/鋭/鈍/飛/火の6種のどれかになる）<br>
+確実に「ばりぶる～ん」を発生させたいのなら真正面1マスにざきを誘導して「ボコボコ」（鈍属性）「ドカドカ」（足属性）か、正面2マスで「ブンブン」（飛属性）が無難。</p>
+
+<h4>サブルーチン</h4>
+
+<p>具体的な処理は以下の通りだが、サブルーチンについては既に<span class="tri"><a href="program27.html">反撃</a></span>の仕様で説明済みなので、重要な箇所の解説を行う。<br>
+本来ならば、反撃属性チェック～習得技で反撃可能かチェック～習得技で反撃できるか確認するループ処理は、<code><span class="r">$C1/A12C</span></code>～<code><span class="r">$C1/A179</span></code>、<code><span class="r">$C1/A1BD</span></code>～<code><span class="r">$C1/A21B</span></code>と一連のサブルーチン内での処理である。<br>
+習得技で反撃できるか確認するループ処理は、キャラ1人目から順に判定であり、<code><span class="r">$C1/A1C4</span></code>～<code><span class="r">$C1/A1FF</span></code>で1人分の処理なのだが、以降は<code><span class="r">$C1/A1BD</span></code>～<code><span class="r">$C1/A1C2</span></code>の処理を入れてから<code><span class="r">$C1/A1C4</span></code>～<code><span class="r">$C1/A1FF</span></code>、と進んでいく。<br>
+原始編ラストバトル開始時なのだが、この2人目以降の処理開始位置の<code><span class="r">$C1/A1BD</span></code>の判定から判定が始まっており、味方1人目の処理が飛ばされている。<br>
+（もし味方1人目のポゴの処理が入ったとしても、ポゴも反撃技を所持していないため、反撃を行うことはないが）</p>
+
+<div class="code-container"><pre>
+;反撃処理 味方2人目 ゴリ
+$C1/A1BD LDA $8D    [$00:038D]   ;Aに[$00:038D]をロード
+$C1/A1BF CLC                     ;キャリーフラグクリア
+$C1/A1C0 ADC #$40                ;A + $40
+$C1/A1C2 BEQ $B7    [$A17B]      ;ゼロフラグが立っているとき[$A17B]分岐
+$C1/A1C4 STA $8D    [$00:038D]   ;Aを[$00:038D]に書き込み
+$C1/A1C6 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A1C8 LDA #$1C                ;Aに$1Cをロード
+$C1/A1CA STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A1CC LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/A1CE PHX                     ;Xをスタックにプッシュ
+$C1/A1CF LDX $10    [$00:0310]   ;Xに[$00:0310]をロード
+$C1/A1D1 STX $5A    [$00:035A]   ;Xを[$00:035A]に書き込み
+$C1/A1D3 LDA $0001,x[$00:1C41]   ;Aに[$00:1C41]をロード
+$C1/A1D6 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/A1D8 BEQ $22    [$A1FC]      ;ゼロフラグが立っているとき[$A1FC]分岐
+$C1/A1DA LDA $7ECE20,x[$7E:EA60] ;Aに[$7E:EA60](=$46)（被ダメージのヒット数）をロード
+$C1/A1DE BEQ $1C    [$A1FC]      ;ゼロフラグが立っているとき[$A1FC]分岐
+;
+;習得技で反撃できるか確認ループ処理（味方2人目）
+$C1/A1E0 LDA $7ECD00,x[$7E:E940] ;Aに[$7E:E940+n](技ID)をロード
+$C1/A1E4 BEQ $10    [$A1F6]      ;ゼロフラグが立っているとき[$A1F6]分岐
+$C1/A1E6 LDA $7ECD20,x[$7E:E960] ;Aに[$7E:E960+n](技データ14 反撃属性1)をロード
+$C1/A1EA AND $86    [$00:0386]   ;Aと[$00:0386]で論理積
+$C1/A1EC BNE $14    [$A202]      ;ゼロフラグが立っていないとき[$A202]分岐→反撃技確定
+$C1/A1EE LDA $7ECD30,x[$7E:E970] ;Aに[$7E:E970+n](技データ15 反撃属性2)をロード
+$C1/A1F2 AND $87    [$00:0387]   ;Aと[$00:0387]で論理積
+$C1/A1F4 BNE $0C    [$A202]      ;ゼロフラグが立っていないとき[$A202]分岐→反撃技確定
+$C1/A1F6 INX                     ;Xをインクリメント +1
+$C1/A1F7 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/A1F8 AND #$0F                ;Aと$0Fで論理積
+$C1/A1FA BNE $E4    [$A1E0]      ;ゼロフラグが立っていないとき[$A1E0]分岐
+;ループここまで
+;
+$C1/A1FC PLX                     ;Xレジスタにスタックからプル
+$C1/A1FD STX $5A    [$00:035A]   ;Xを[$00:035A]に書き込み
+$C1/A1FF BRL $FFBB  [$A1BD]      ;フラグにかかわりなく常に分岐[$A1BD]
+</pre></div>
+
+<p>これが最初の処理、味方キャラ2人目のゴリの反撃判定にあたる。<br>
+戦闘開始直後であるから、ゴリ含め誰も攻撃を受けていないのに、<code><span class="r">$C1/A1DA</span></code>でロードされる<code>[$7E:EA60]</code>（被ダメージのヒット数）に<span class="formula">$46</span>が入っているため、<code><span class="r">$C1/A1DE</span></code>のゼロフラグ判定が立たず、ゴリの習得技に反撃可能な技があるかを判定する処理に入ってしまう。<br>
+ヒット数が<span class="formula">$46</span>（10進数<span class="formula">70</span>）はさすがにおかしいので、<span class="formula">$10</span>（10進数<span class="formula">16</span>）以上なら分岐、のような処理も入っていれば、ここの妙な反撃判定も避けられたのだろうが。<br>
+そもそも戦闘開始時に反撃判定のサブルーチンに入ること自体が妙なので、ざきが加わる時点でサブルーチンの読み込み順に何らかの支障があったのだろう（そこまでは未確認）。</p>
+
+<p>とにかく、ゴリもべるも反撃技を所持していないので反撃は行わない処理となる。べるの処理については省略する。<br>
+問題は仲間キャラ4人目のざきである。<br>
+ここではざき3戦目ラストで、ポゴが鈍属性の「ボコボコ」をざきに当て、属性判定の入るアドレス<code>[$00:0386]</code><code>[$00:0387]</code> = <span class="formula">$0800</span>と値が入っているものとする。<br>
+ちなみに「ばりききゅーん」も反撃属性に鈍属性が含まれるので、判定はするが、後方3方向1マス距離にしか出せないので、ざきの初期配置の都合上、ざきのすぐ右のマスにしか出せないことになり、おーでぃーおーがいないため、「ばりききゅーん」は出ない。</p>
+
+<div class="code-container"><pre>
+;反撃処理 味方4人目 ざき
+$C1/A1BD LDA $8D    [$00:038D]   ;Aに[$00:038D]をロード
+$C1/A1BF CLC                     ;キャリーフラグクリア
+$C1/A1C0 ADC #$40                ;A + $40
+$C1/A1C2 BEQ $B7    [$A17B]      ;ゼロフラグが立っているとき[$A17B]分岐
+$C1/A1C4 STA $8D    [$00:038D]   ;Aを[$00:038D]に書き込み
+$C1/A1C6 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A1C8 LDA #$1C                ;Aに$1Cをロード
+$C1/A1CA STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A1CC LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/A1CE PHX                     ;Xをスタックにプッシュ
+$C1/A1CF LDX $10    [$00:0310]   ;Xに[$00:0310]をロード
+$C1/A1D1 STX $5A    [$00:035A]   ;Xを[$00:035A]に書き込み
+$C1/A1D3 LDA $0001,x[$00:1CC1]   ;Aに[$00:1CC1]をロード
+$C1/A1D6 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/A1D8 BEQ $22    [$A1FC]      ;ゼロフラグが立っているとき[$A1FC]分岐
+$C1/A1DA LDA $7ECE20,x[$7E:EAE0] ;Aに[$7E:EAE0](=$30)（被ダメージのヒット数）をロード
+$C1/A1DE BEQ $1C    [$A1FC]      ;ゼロフラグが立っているとき[$A1FC]分岐
+;
+;習得技で反撃できるか確認ループ処理（味方3人目）
+;ループ1回目～5回目省略、6回目処理
+$C1/A1E0 LDA $7ECD00,x[$7E:E9C5] ;Aに[$7E:E9C5](ばりぶる～ん技ID$3A)をロード
+$C1/A1E4 BEQ $10    [$A1F6]      ;ゼロフラグが立っているとき[$A1F6]分岐
+$C1/A1E6 LDA $7ECD20,x[$7E:E9E5] ;Aに[$7E:E9E5](技データ14)をロード
+$C1/A1EA AND $86    [$00:0386]   ;Aと[$00:0386]($08)で論理積
+$C1/A1EC BNE $14    [$A202]      ;ゼロフラグが立っていないとき[$A202]分岐
+;「ばりぶる～ん」と反撃属性一致
+$C1/A202 STX $0B    [$00:030B]   ;Xを[$00:030B]に書き込み
+$C1/A204 LDA $7ECD00,x[$7E:E9C5] ;Aに[$7E:E9C5](ばりぶる～ん技ID$3A)をロード
+$C1/A208 STA $6A    [$00:036A]   ;Aを[$00:036A]に書き込み
+$C1/A20A LDA $7ECD10,x[$7E:E9D5] ;Aに[$7E:E9D5](技データ08)をロード
+$C1/A20E LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/A210 AND $0039,x[$00:1CF9]   ;Aと[$00:1CF9](味方キャラ4・状態異常)で論理積
+$C1/A213 BEQ $04    [$A219]      ;ゼロフラグが立っているとき[$A219]分岐
+$C1/A219 LDA $6A    [$00:036A]   ;Aに[$00:036A]をロード
+$C1/A21B JSR $3D7A  [$C1:3D7A]   ;[$C1:3D7A]へジャンプ
+</pre></div>
+
+<p>本来なら被ダメージのヒット数が入る<code>[$7E:EAE0]</code>に初期値の<span class="formula">$30</span>が入っているため、習得技で反撃できるかの確認が開始になり、「ばりききゅーん」の判定時に技範囲の処理まで行うが、技範囲内におーでぃーおーがいないので反撃は出ない。<br>
+6個目の技「ばりぶる～ん」で反撃属性が一致するので、技の範囲判定に進む。<br>
+マス目計算値が入る<code>$00:0488</code>～<code>$00:04BE</code>を1マスずつ判定し、射程範囲のマスにだけ<span class="formula">$F0</span>を書き込むが、左上位置を<code>$00:0488</code>として7マス区切りで数値だけ表示すると以下のようになる。<br>
+<span style="background-color:#f29d9d">赤背景マス</span>がざきの初期位置（左上向き）、<span style="background-color:#f5f098">黄色背景マス</span>が射程、<span style="font-weight:bold;">太字</span>はおーでぃーおーがいるマス（横3マス×縦4マス）である。</p>
+
+<table>
+<tbody>
+	<tr><td><span class="num">$00</span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td></tr>
+	<tr><td><span class="num">$00</span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td></tr>
+	<tr><td><span class="num">$00</span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td></tr>
+	<tr><td><span class="num">$00</span></td><td style="background-color:#f5f098;font-weight:bold;"><span class="num">$F0</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="font-weight:bold;"><span class="num">$00</span></span></td><td style="background-color:#f5f098"><span class="num">$F0</span></span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td></tr>
+	<tr><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td style="background-color:#f5f098;"><span class="num">$F0</span></span></td><td><span class="num">$00</span></td><td style="background-color:#f5f098"><span class="num">$F0</span></span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td></tr>
+	<tr><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td style="background-color:#f5f098;"><span class="num">$F0</span></span></td><td style="background-color:#f5f098"><span class="num">$F0</span></span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td></tr>
+	<tr><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td><td style="background-color:#f29d9d"><span class="num">$00</span></span></td><td><span class="num">$00</span></td><td><span class="num">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>以上の状態を、戦闘フィールドの状態<code>$00:04C8</code>～<code>$00:04FE</code>と比較して、敵がいるマスと射程マスが一致したら反撃を行う。<br>
+上の図の通り、1マスだけ（<code>$00:04C8</code>～<code>$00:04FE</code>に対応したアドレスでいえば<code>$00:04E1</code>にあたる）、おーでぃーおーのいるマスと「ばりぶる～ん」の射程が被っているので、反撃が出ることになる。</p>
+
+<p>以上が、ざき3戦目～ラストバトルにおける特殊仕様の解説である。<br>
+プログラム的に見ると、ラストバトル開始時に「ばりぶる～ん」が出るのはバグの類のように思えるが、進行不能になるような致命的な問題ではない。</p>
+
+<p>リメイク版では、ざき3戦目において、ざきのHPを一定値まで減らさないと強制終了しないように変更されている。<br>
+反撃における妙な挙動も起こさなくなった。<br>
+3戦目の最後に、ざきが反撃を出す属性の技で攻撃しても、反撃が出ずに戦闘が終了するようになっている。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program27.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program29.html"><span class="button">&#9654;次　功夫編終盤</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

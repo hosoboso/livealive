@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 味方との戦闘 &gt; サブルーチン">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 味方との戦闘&gt; サブルーチン">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 味方との戦闘&gt; サブルーチン</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program24.html">味方との戦闘</a> &gt; サブルーチン</h1>
+<h2>味方との戦闘（サブルーチン）</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="program24.html">前ページ</a>からの続き。<br>
+前ページでは、</p>
+
+<ul>
+	<li>中世編ラストバトルにおける、ストレイボウのステータスをレベル16に上げる処理</li>
+	<li>主人公のキャラIDの呼び出し</li>
+	<li>仲間キャラのIDの呼び出し</li>
+</ul>
+
+<p>まで、サブルーチンでの処理を説明した。<br>
+その続きを以下で紹介する。</p>
+
+<p>ここまでは仲間キャラのデータの呼び出しが続いたが、以降は敵対する味方キャラ（修行だと仲間2人目）が敵種類1かつ敵番号1という処理が入っていく。<br>
+<code>[$00:1C40]</code>に、敵として戦うサモの値が入る前提で話を進めていくが、他シナリオでも処理自体は同じ。</p>
+
+<div class="code-container"><pre>
+$C1/F9B0 LDY #$1A00              ;Yに$1A00をロード
+$C1/F9B3 LDA $0018,x[$00:1C58]   ;Aに[$00:1C58](キャラ位置のマス目のX座標)をロード
+$C1/F9B6 STA $23    [$00:0323]   ;Aを[$00:0323]に書き込み
+$C1/F9B8 LDA $0019,x[$00:1C59]   ;Aに[$00:1C59](キャラ位置のマス目のY座標)をロード
+$C1/F9BB STA $24    [$00:0324]   ;Aを[$00:0324]に書き込み
+$C1/F9BD LDA $0010,x[$00:1C50]   ;Aに[$00:1C50](キャラの位置のX軸（ピクセル単位))をロード
+$C1/F9C0 STA $25    [$00:0325]   ;Aを[$00:0325]に書き込み
+$C1/F9C2 LDA $0012,x[$00:1C52]   ;Aに[$00:1C52](キャラの位置のY軸（ピクセル単位))をロード
+$C1/F9C5 CLC                     ;キャリーフラグクリア
+$C1/F9C6 ADC #$08                ;A + $08
+$C1/F9C8 STA $26    [$00:0326]   ;Aを[$00:0326]に書き込み
+</pre></div>
+
+<p>上はアドレスからして、戦闘におけるキャラの初期位置に関するデータの読み書きになるが、今回は詳細を省く。<br>
+問題はこの後の処理である。</p>
+
+<div class="code-container"><pre>
+$C1/F9CA LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]（シナリオID）をロード
+$C1/F9CD CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/F9CF BNE $04    [$F9D5]      ;ゼロフラグが立っていないとき[$F9D5]分岐
+;最終編用処理
+$C1/F9D1 LDA #$FF                ;Aに$FFをロード
+$C1/F9D3 BRA $06    [$F9DB]      ;フラグにかかわりなく常に分岐[$F9DB]
+;最終編以外の処理
+$C1/F9D5 LDA $0000,x[$00:1C40]   ;Aに[$00:1C40]をロード
+$C1/F9D8 CLC                     ;キャリーフラグクリア
+$C1/F9D9 ADC #$EB                ;A + $EB
+$C1/F9DB STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/F9DD PHX                     ;Xをスタックにプッシュ
+$C1/F9DE JSR $FB81  [$C1:FB81]   ;[$C1:FB81]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/F9CA</span></code>で<code>[$00:0A00]</code>、つまりシナリオIDを呼び出し、最終編のみの分岐がある。<br>
+最終編の場合は、<code>A</code>に<span class="formula">$FF</span>をロードしてから、<code><span class="r">$C1/F9DB</span></code>へ飛ぶ。<br>
+最終編以外だと、<code>[$00:1C40]</code>をロードし、<span class="formula">$EB</span>を加算して、<code><span class="r">$C1/F9DB</span></code>に進む。<br>
+どのシナリオでも<code><span class="r">$C1/F9DB</span></code>で合流するが、その前の処理は、</p>
+
+<ul>
+	<li>最終編：<span class="formula"><code>A</code> = $FF</span></li>
+	<li>最終編以外：<span class="formula"><code>A</code> = <code>[$00:1C40]</code>(味方キャラID) + $EB</span></li>
+</ul>
+
+<p>となっていて、この値を<code>[$00:0310]</code>に書き込み、<code>[$C1:FB81]</code>へジャンプ、となる。</p>
+
+<p>この計算は何にあたるのか。<br>
+功夫編のサモ相手の修行だったら、<code>[$00:1C40]</code>にサモのキャラIDの<span class="formula">$0B</span>が入っているから、</p>
+
+<p><span class="formula">$0B + $EB = $F6</span></p>
+
+<p>という計算をして、<code>A</code>に<span class="formula">$F6</span>が入る。<br>
+この<span class="formula">$F6</span>という値は、敵キャラデータに入っているサモのIDにあたる。<br>
+敵キャラデータIDの<span class="formula">$EB～$FF</span>に登録されている21キャラ分は、<span class="formula">$EB</span>を加算することで、敵キャラデータのIDを呼び出せるのである。</p>
+
+<p>だが、先に記した通りに、カラクリ丸についてはここで妙なことが起こる。<br>
+カラクリ丸の味方キャラIDは<span class="formula">$16</span>だから、</p>
+
+<p><span class="formula">$16 + $EB = $101</span></p>
+
+<p>となり、キャリーフラグがONになって、<code>A</code>には<span class="formula">$01</span>が入る（この時点では8bitモードである）。<br>
+上の処理を見る限りキャリーフラグでの分岐処理などはなく、<code><span class="r">$C1/F9DB</span></code>で加算の答えが<code>[$00:0310]</code>に書き込まれる。<br>
+サモなら<code>[$00:0310]</code>に<span class="formula">$F6</span>が入るが、カラクリ丸だと<span class="formula">$01</span>が入ってしまう。<br>
+敵キャラデータIDの<span class="formula">$01</span>は、最終編のころころムシにあたる。<br>
+このことが、最終的には、<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様の説明にある、</p>
+
+<blockquote>カラクリ丸はころころムシの側面背面補正と回避となっているようだ。</blockquote>
+
+<p>に繋がるのであるが、その説明は後ほど。<br>
+とにかく、敵キャラデータIDにデータがないカラクリ丸については、上の計算で一度、敵キャラデータID・<span class="formula">$01</span>のころころムシが呼び出されてしまうことになる。</p>
+
+<p>そしてもうひとつ、最終編の処理に注目していただきたい。<br>
+最終編でも、<br>
+<span class="formula"><code>[$00:1C40]</code>(味方キャラID) + $EB</span><br>
+で、敵キャラデータのIDが呼び出せるはずなのに、それを行わずに<span class="formula">$FF</span>と固定値を指定してしまっている。<br>
+敵キャラデータID・<span class="formula">$FF</span>は、一覧の一番下、キューブの敵キャラデータにあたる。<br>
+最終編だと、戦う相手がどの仲間キャラであろうが、敵キャラデータID・<span class="formula">$FF</span>を指定することになる。<br>
+これが後々で、「最終編で仲間キャラと戦う時、無効状態異常に眠り状態だけ指定されている」ことに繋がる。</p>
+
+<p>では、<code><span class="r">$C1/FB81</span></code>に飛んだ後の処理を見てみる。<br>
+上で計算した値は、<code>A</code>と<code>[$00:0310]</code>に入っている。</p>
+
+<div class="code-container"><pre>
+$C1/FB81 LDA $0001,y[$00:1A01]   ;Aに[$00:1A01]をロード
+$C1/FB84 BEQ $23    [$FBA9]      ;ゼロフラグが立っているとき[$FBA9]分岐
+$C1/FBA9 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/FBAB STA $0000,y[$00:1A00]   ;Aを[$00:1A00]に書き込み
+$C1/FBAE LDA #$FF                ;Aに$FFをロード
+$C1/FBB0 STA $0001,y[$00:1A01]   ;A($FF)を[$00:1A01]に書き込み
+$C1/FBB3 LDA #$00                ;Aに$00をロード
+$C1/FBB5 STA $000A,y[$00:1A0A]   ;A($00)を[$00:1A0A]に書き込み
+$C1/FBB8 JSR $FC0A  [$C1:FC0A]   ;[$C1:FC0A]へジャンプ
+</pre></div>
+
+<p><code>$00:1A00</code>～には、戦闘における敵種類1のデータが入る。<br>
+仲間との戦闘では、敵の種類は1種類（対戦相手）だけなので、<code>$00:1A00</code>～に敵になる仲間キャラのステータスが入っていく。<br>
+<code>$00:1A00</code>に入るのは、敵種類1の敵IDである。<br>
+<code><span class="r">$C1/FBA9</span></code>～<code><span class="r">$C1/FBAB</span></code>で、<code>[$00:0310]</code>の値が<code>[$00:1A00]</code>に書き込まれる。<br>
+つまり、先に計算した値が敵種類1の敵IDで決定である。</p>
+
+<p>整理してみると、敵種類1の敵IDの値は、以下のようになる。</p>
+
+<ul>
+	<li>最終編以外かつカラクリ丸以外との戦闘：<br>敵キャラデータIDの<span class="formula">$EB～$FF</span>の該当キャラの値</li>
+	<li>カラクリ丸：<br>敵キャラデータID<span class="formula">$01</span>（ころころムシ）</li>
+	<li>最終編の仲間キャラとの戦闘（NEVER END時のオルステッドも含む）：<br>敵キャラデータID<span class="formula">$FF</span>（キューブ）</li>
+</ul>
+
+<p>カラクリ丸と最終編の仲間キャラとの戦闘については、全く異なるキャラのIDが指定されたことになる。<br>
+今回は別調査とするが、最終編オルステッドルートで戦う仲間キャラも、一番下のID<span class="formula">$FF</span>が書き込まれる。</p>
+
+<p>この後に元の味方キャラのデータで上書きしていくため、ほとんどの場合で問題にはならない。<br>
+無効状態異常など一部データが上書きされないので、元の味方キャラのデータが完全に再現されることはない、ということになるが、それにより大幅に戦闘バランスがおかしくなるといったことは起こらない。<br>
+こういった処理がどこまで意図したものなのかは、今となってはわからないままである。<br>
+一方で、ストレイボウのように、味方キャラ時とは異なる敵データを用意したことで、戦闘においてきちんと意味が出ている場合もある（敵対時のみ電撃フィールド吸収能力を付けたことで、中世編ラストバトルで「アンバーストーム」による電撃フィールド吸収が反映される）。</p>
+
+<p>話が横に逸れたが、続きである<code>$C1:FC0A</code>～を見てみる。<br>
+以下はサモの場合の処理として値に注意書きをつけてある。</p>
+
+<div class="code-container"><pre>
+$C1/FC0A PHX                     ;Xをスタックにプッシュ
+$C1/FC0B PHY                     ;Yをスタックへプッシュ
+$C1/FC0C LDA $0000,y[$00:1A00]   ;Aに[$00:1A00]($F6)をロード
+$C1/FC0F STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/FC12 LDA #$00                ;Aに$00をロード
+$C1/FC14 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/FC17 LDA #$20                ;Aに$20をロード
+$C1/FC19 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/FC1C STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/FC1F REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/FC21 LDA $2134  [$00:2134]   ;Aに[$00:2134]($1EC0)をロード
+$C1/FC24 ADC $D50010[$D5:0010]   ;A + [$D5:0011][$D5:0010](=$04CB) = $238B
+$C1/FC28 TAX                     ;Aレジスタの値をXレジスタに転送
+$C1/FC29 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/FC2B LDA #$20                ;Aに$20をロード
+$C1/FC2D STA $09    [$00:0309]   ;A($20)を[$00:0309]に書き込み
+;
+;ループ処理
+;$D5:238B～$D5:23AAを、$00:1A20～$00:1A3Fに書き込み（$20＝32回分）
+$C1/FC2F LDA $D50000,x[$D5:238B] ;Aに[$D5:238B+n]をロード(敵データID $F6　サモ)
+$C1/FC33 INX                     ;Xをインクリメント +1
+$C1/FC34 STA $0020,y[$00:1A20]   ;Aを[$00:1A20+n]に書き込み
+$C1/FC37 INY                     ;Yをインクリメント +1
+$C1/FC38 DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/FC3A BNE $F3    [$FC2F]      ;ゼロフラグが立っていないとき[$FC2F]分岐
+;ループここまで
+;
+$C1/FC3C PLY                     ;Yレジスタにスタックからプル
+$C1/FC3D PLX                     ;Xレジスタにスタックからプル
+$C1/FC3E RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/FC0C</span></code>で<code>[$00:1A00]</code>をロードしているが、ここには前に計算した、「敵キャラデータに入っているサモのID」である<span class="formula">$F6</span>が入っている。<br>
+カラクリ丸なら敵ID<span class="formula">$01</span>（ころころムシ）、最終編だとID<span class="formula">$FF</span>（キューブ）が入っているが、他の味方キャラは「敵キャラデータに入っている味方キャラのID」である<span class="formula">$EB</span>～<span class="formula">$FF</span>のいずれかが入っている。<br>
+<code><span class="r">$C1/FC0F</span></code>～<code><span class="r">$C1/FC24</span></code>は、敵IDから、敵データが入っているアドレスを計算する処理なので詳細を省くが、「敵キャラデータに入っているサモのID」の開始位置は<code>$D5:238B</code>である。<br>
+<code><span class="r">$C1/FC2F</span></code>～<code><span class="r">$C1/FC3A</span></code>のループ処理で、「サモの敵キャラデータ」32バイト分を、<code>$00:1A20</code>～<code>$00:1A3F</code>へコピーしている。<br>
+敵種類1のデータは、<span class="formula">$20</span>以降に敵キャラデータ32バイトがそのまま入るため、その作業を上で行ったことになる。<br>
+味方キャラとの戦闘時、戦う相手は必ず1体で、敵種類1に登録されるため、この処理は共通である。</p>
+
+<p>カラクリ丸の場合、ころころムシの敵データが丸ごとコピーされてしまったため、力・速・体・知がオール200（<span class="formula">$C8</span>）など、とんでもない数値が入ってしまったことになるが、この後の処理で上書きされていく。<br>
+最終編だとキューブの敵データが入ることになり、ほとんどの値が00で埋まっているものの、先に紹介した通り、敵キャラデータ10だけ<span class="formula">$20</span>が入っている。<br>
+敵キャラデータ10は無効状態異常の値であり、8ビットの各ビットで状態異常8種が無効かどうかを表しているが、<span class="formula">$20</span>は眠り状態のみ無効を意味する。<br>
+この値は上書きされずに残ってしまうために、最終編での仲間との戦闘では、眠り状態のみ無効が付くことになる。</p>
+
+<p>では、実際に、どのようにして味方キャラのデータで上書きしていくか、続きを見ていく。</p>
+
+<div class="code-container"><pre>
+$C1/FD76 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]（プレイ中のシナリオID）をロード
+$C1/FD79 CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/FD7B BNE $03    [$FD80]      ;ゼロフラグが立っていないとき[$FD80]分岐
+;[$00:0A00] = $08,最終編のみの処理
+$C1/FD7D LDA $0A10  [$00:0A10]   ;Aに[$00:0A10]（最終編主人公の値）をロード
+$C1/FD80 RTS                     ;サブルーチン戻り
+;
+$C1/FD13 BEQ $01    [$FD16]      ;ゼロフラグが立っているとき[$FD16]分岐（最終編主人公 = $00はオルステッド）
+$C1/FD15 RTS                     ;サブルーチン戻り
+;
+$C1/F6FC JSR $F959  [$C1:F959]   ;[$C1:F959]へジャンプ
+;
+$C1/F959 JSR $FD76  [$C1:FD76]   ;[$C1:FD76]へジャンプ
+;
+$C1/FD76 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]（プレイ中のシナリオID）をロード
+$C1/FD79 CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/FD7B BNE $03    [$FD80]      ;ゼロフラグが立っていないとき[$FD80]分岐
+;[$00:0A00] = $08,最終編のみの処理
+$C1/FD7D LDA $0A10  [$00:0A10]   ;Aに[$00:0A10]をロード
+$C1/FD80 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>[$00:0A00]</code>に格納されているのはプレイ中のシナリオIDである。<br>
+<code><span class="r">$C1/FD76</span></code>～<code><span class="r">$C1/FD79</span></code>で、プレイ中のシナリオIDが<span class="formula">$08</span>かどうかを判定しているが、シナリオID<span class="formula">$08</span>は最終編である。<br>
+<code><span class="r">$C1/FD7B</span></code>でゼロフラグが立つのは最終編のみで、その場合は<code><span class="r">$C1/FD7D</span></code>で<code>[$00:0A10]</code>を<code>A</code>にロードする。他シナリオだと<code><span class="r">$C1/FD7D</span></code>はスキップされ、<code><span class="r">$C1/FD80</span></code>に進むのみである。<br>
+最終編における<code>[$00:0A10]</code>には、最終編の主人公の値が入っている。<br>
+<code><span class="r">$C1/FD13</span></code>でゼロフラグの判定をしているが、最終編以外だと<code><span class="r">$C1/FD79</span></code>で「シナリオID - <span class="formula">$08</span>」の計算をした直後で、<code><span class="r">$C1/FD13</span></code>は立っていない。<br>
+最終編の場合、<code>[$00:0A10]</code>をロードした直後になり、<code>[$00:0A10]</code>に<span class="formula">$00</span>が入っていた時のみゼロフラグが立つ。<br>
+最終編で<code>[$00:0A10]</code>に<span class="formula">$00</span>が入るのは、主人公がオルステッドの時のみである。<br>
+よって、<code><span class="r">$C1/FD13</span></code>のゼロフラグ分岐は「最終編かつオルステッドが主人公」の判定で、その場合は<code>[<span class="r">$C1/FD16</span>]</code>にジャンプする。<br>
+ここでは最終編オルステッドルートについては説明を省く。</p>
+
+<p>「最終編かつオルステッドが主人公」の分岐後に、もう一度<code><span class="r">$C1/FD76</span></code>～の処理を行い、最終編かどうかを判定している。<br>
+ここでゼロフラグが立つ、つまり最終編である場合は、「最終編かつオルステッド以外が主人公」であることを意味する。<br>
+その時は、<code><span class="r">$C1/FD7D</span></code>で<code>A</code>に<code>[$00:0A10]</code>（最終編主人公の値）をロードして続きの処理を行う。<br>
+最終編以外のシナリオだと、実質この処理では何も変化はなく、AにシナリオIDを呼び出しただけである。</p>
+
+<div class="code-container"><pre>
+$C1/F95C BEQ $2B    [$F989]      ;ゼロフラグが立っているとき[$F989]分岐
+$C1/F95E LDX $52    [$00:0352]   ;Xに[$00:0352]をロード
+$C1/F960 LDA $D60001,x[$D6:4D3F] ;Aに[$D6:4D3F]をロード
+$C1/F964 AND #$F0                ;Aと$F0で論理積
+$C1/F966 BNE $01    [$F969]      ;ゼロフラグが立っていないとき[$F969]分岐
+$C1/F969 STA $27    [$00:0327]   ;A($40)を[$00:0327]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/FD80</span></code>の続きだが、ここが重要な分岐である。<br>
+<code><span class="r">$C1/F95C</span></code>でゼロフラグが立っているかどうか判定しているが、（おそらく）ここでゼロフラグが立っていることはない。<br>
+<code><span class="r">$C1/F95E</span></code>～<code><span class="r">$C1/F960</span></code>は<code>X</code>の値により<code><span class="r">$C1/F960</span></code>で呼び出されるアドレスが変わるが、<code><span class="r">$C1/F960</span></code>でロードされる<code>$D60001,x</code>は、この戦闘の敵パーティデータ01にあたる。<br>
+上では功夫編修行の敵パーティデータID<span class="formula">$AC</span>の、敵パーティデータ01<code>[$D6:4D3F]</code>の値がロードされている。<br>
+先に説明したが、敵パーティデータ01は、操作キャラと敵対キャラが味方側か敵側かの数値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>味方キャラ 対 敵キャラ（通常）</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>敵キャラ 対 敵キャラ（ブリキ大王戦など）</td></tr>
+	<tr><td><span class="formula">$10</span></td><td>原始編　ざき1戦目</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>カラクリ丸戦（とらわれの男がいる時）</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>味方1キャラ 対 味方1キャラ（功夫編修行など）</td></tr>
+</tbody>
+</table>
+
+<p>つまり、対戦相手が味方キャラだと、上1桁に<span class="formula">0</span>以外の数が入る。<br>
+<code><span class="r">$C1/F964</span></code>で、敵パーティデータ01と<span class="formula">$F0</span>で論理積を取っているが、上1桁に0以外の値が入っている、敵対相手が味方キャラの戦闘だと、ここでゼロフラグが立たない。<br>
+ここで、「この戦闘で戦う相手は味方キャラ」という判定が入った。<br>
+功夫編修行の場合は論理積を取った結果、<span class="formula">$40</span>となり、<code>[$00:0327]</code>に書き込まれる。<br>
+仲間キャラとの戦闘だと、敵パーティデータ01の下1桁は必ず0なので、論理積を取っても取らなくても、<code>[$00:0327]</code>に入るのは敵パーティデータ01と同値である。</p>
+
+<div class="code-container"><pre>
+$C1/F96B LDX #$1C00              ;Xに$1C00をロード
+$C1/F96E STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/F970 LDA #$04                ;Aに$04をロード
+$C1/F972 STA $08    [$00:0308]   ;A($04)を[$00:0308]に書き込み
+$C1/F974 ASL $27    [$00:0327]   ;[$00:0327]($40)を算術左シフト *2 (=$40*2)
+$C1/F976 BCC $03    [$F97B]      ;キャリーフラグが立っていないとき[$F97B]分岐
+$C1/F97B LDA $1C    [$00:031C]   ;Aに[$00:031C]($00)をロード
+$C1/F97D CLC                     ;キャリーフラグクリア
+$C1/F97E ADC #$40                ;A + $40
+$C1/F980 STA $1C    [$00:031C]   ;Aを[$00:031C]($40)に書き込み
+$C1/F982 LDX $1C    [$00:031C]   ;Xに[$00:031C]($1C40)をロード
+$C1/F984 DEC $08    [$00:0308]   ;[$00:0308]($04)をデクリメント -1
+$C1/F986 BNE $EC    [$F974]      ;ゼロフラグが立っていないとき[$F974]分岐
+$C1/F974 ASL $27    [$00:0327]   ;[$00:0327]($80)を算術左シフト *2
+$C1/F976 BCC $03    [$F97B]      ;キャリーフラグが立っていないとき[$F97B]分岐
+$C1/F978 JSR $F9A7  [$C1:F9A7]   ;[$C1:F9A7]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/F96B</span></code>～<code><span class="r">$C1/F978</span></code>は次のジャンプ先のアドレスの計算や分岐になる。<br>
+詳細は省略するが、先程の敵パーティデータ01が書きこまれた<code>[$00:0327]</code>は、<code><span class="r">$C1/F974</span></code>と<code><span class="r">$C1/F974</span></code>でそれぞれ算術左シフトされ2倍になっている。<br>
+その後にキャリーフラグが立つかどうか判定をして分岐になるが、1回目の算術左シフトでは2倍で<span class="formula">$80</span>になるのでキャリーフラグが立たない。<br>
+敵パーティデータ01が<span class="formula">$10</span>や<span class="formula">$20</span>の時も同様である。<br>
+だが、2回目の算術左シフトだと、最初の値が4倍されることになるから、<span class="formula">$80*2 = $100</span>でキャリーフラグが立つ。<br>
+だが、敵パーティデータ01が<span class="formula">$10</span>や<span class="formula">$20</span>だと、4倍してもキャリーフラグは立たない。<br>
+<code><span class="r">$C1/F976</span></code>で、敵パーティデータ01が<span class="formula">$40</span>の場合と、<span class="formula">$10</span>または<span class="formula">$20</span>の場合とで、分岐になったということがわかる。<br>
+敵パーティデータ01が<span class="formula">$40</span>の場合は、<span class="formula"><code>X</code> = $1C40</span>で<code>[$C1:F9A7]</code>へジャンプする、ということも覚えておいていただきたい。</p>
+
+<p><span class="formula">$10</span>または<span class="formula">$20</span>の場合の分岐先、<code><span class="r">$C1/F97B</span></code>～は、最終的に上処理と合流するが、それまでの処理を紹介しておく。<br>
+敵パーティデータ01が<span class="formula">$10</span>は原始編のざき1戦目、<span class="formula">$20</span>は幕末編でとらわれの男がいる場合のカラクリ丸戦だが、これらはプレイヤー操作キャラが2キャラ以上いるので処理が別になっている。<br>
+実は<code><span class="r">$C1/F974</span></code>～<code><span class="r">$C1/F986</span></code>のループ処理になっていて、<code><span class="r">$C1/F976</span></code>でキャリーフラグが立つとループを抜けて、<code><span class="r">$C1/F978</span></code>に合流、という手順である。<br>
+<code>[$00:0327]</code>は、ループに入った時点で<span class="formula">$20</span>または<span class="formula">$40</span>になっているはずである。</p>
+
+<div class="code-container"><pre>
+;ループここから
+$C1/F974 ASL $27    [$00:0327]   ;[$00:0327]($20または$40)を算術左シフト *2
+$C1/F976 BCC $03    [$F97B]      ;キャリーフラグが立っていないとき[$F97B]分岐（ループを抜ける）
+$C1/F97B LDA $1C    [$00:031C]   ;Aに[$00:031C]($40～)をロード
+$C1/F97D CLC                     ;キャリーフラグクリア
+$C1/F97E ADC #$40                ;A + $40
+$C1/F980 STA $1C    [$00:031C]   ;Aを[$00:031C]に書き込み
+$C1/F982 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/F984 DEC $08    [$00:0308]   ;[$00:0308]($03～)をデクリメント -1
+$C1/F986 BNE $EC    [$F974]      ;ゼロフラグが立っていないとき[$F974]分岐
+;ループここまで
+</pre></div>
+
+<p>ざき1戦目は、ループ1周目で<code>[$00:0327]</code>が<span class="formula">$20</span>の状態で、ループ頭で毎回<span class="formula">*2</span>するから、<span class="formula">$40</span>, <span class="formula">$80</span>, <span class="formula">$100</span>と、3回目の頭で<code><span class="r">$C1/F97B</span></code>でキャリーフラグが立ってループを抜ける。<br>
+ループ中に毎回、<code>X</code>を<span class="formula">+$40</span>しているから、ループを抜けた時に<span class="formula"><code>X</code> = $1CC0</span>である。<br>
+カラクリ丸戦は、ループ1周目で<code>[$00:0327]</code>が<span class="formula">$40</span>の状態なので、2回目の頭でループを抜ける。<br>
+ループを抜けた時に<span class="formula"><code>X</code> = $1C80</span>である。</p>
+
+<p>どの場合でも、<code><span class="r">$C1/F978</span></code>で<code>[$C1:F9A7]</code>へジャンプする。<br>
+<code><span class="r">$C1/F9A7</span></code>からの処理は以下のようになっている。</p>
+
+<div class="code-container"><pre>
+$C1/F9A7 LDA #$20                ;Aに$20をロード
+$C1/F9A9 STA $0001,x[$00:1C?1]   ;A($20)を[$00:1C?1]に書き込み
+$C1/F9AC JSR $F9B0  [$C1:F9B0]   ;[$C1:F9B0]へジャンプ
+</pre></div>
+
+<p>敵パーティデータ01が<span class="formula">$40</span>の場合は、<span class="formula"><code>X</code> = $1C40</span>だった。<br>
+<span class="formula">$10</span>（ざき1戦目）だと<span class="formula"><code>X</code> = $1CC0</span>、<span class="formula">$20</span>（カラクリ丸戦）だと<span class="formula"><code>X</code> = $1C80</span>である。<br>
+<code><span class="r">$C1/F9A9</span></code>で、<code>A</code>(<span class="formula">$20</span>)を<code>[$0001,x]</code>に書き込むが、これは特定の味方キャラの戦闘状態を<span class="formula">$20</span>（味方キャラ敵対時の値）にセットするという意味である。</p>
+
+<table>
+<thead>
+	<tr><th>敵パーティ<br>データ01</th><th><span class="formula">$20</span>を書き込む<br>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$40</span></td><td><code>[$00:1C41]</code></td><td>味方キャラ番号2の戦闘状態</td></tr>
+	<tr><td><span class="formula">$10</span></td><td><code>[$00:1CC1]</code></td><td>味方キャラ番号4の戦闘状態</td></tr>
+	<tr><td><span class="formula">$20</span></td><td><code>[$00:1C81]</code></td><td>味方キャラ番号3の戦闘状態</td></tr>
+</tbody>
+</table>
+
+<p>つまり、主人公対味方キャラ1人の時は、味方2人目を「味方キャラ敵対」状態にセットする。<br>
+ざき1戦目は、味方キャラ番号4、ざきを「味方キャラ敵対」状態にセットする。<br>
+カラクリ丸戦（とらわれの男がいる時）は、味方キャラ番号3、カラクリ丸を「味方キャラ敵対」状態にセットする。<br>
+敵パーティデータ01の上1桁の違いは、「どの味方キャラ番号のキャラが敵扱いになるか」だったのだ。</p>
+
+<p>なお、幕末編については、とらわれの男・カラクリ丸どちらもパーティにいる場合、パーティに加入する順序は必ずとらわれの男→カラクリ丸の順なので、味方キャラ番号3がカラクリ丸になる。<br>
+カラクリ丸を先に仲間にするということは、その時点でからくり源内を撃破しており、とらわれの男は地下牢からいなくなっている。よって、カラクリ丸が虚無僧戦前に自爆した後でなければ、とらわれの男が加入しない。</p>
+
+<p>では、以降の処理を見ていく。<br>
+ひとまずは、功夫編のサモの修行での処理を追っていく。<br>
+ステータスとともに、使用する技も書き込んでいく必要があるが、ここから先で、敵として戦う味方キャラの技関係の値を呼び出していく。<br>
+（実際には、主人公の技の呼び出しなどの処理も並行して行っているが、ここでは割愛して、対戦相手についてのみ掲載する）<br>
+ここではサモの技を呼び出す。<br>
+手順としては、</p>
+
+<ol>
+	<li>サモの味方キャラデータ05～20に入っている、技レベル00～技レベル16の16種類の技のIDをロードする</li>
+	<li>各技のIDをサモが習得しているかチェック、覚えていたら技データの中の一部の値をコピー</li>
+</ol>
+
+<p>となるが、下にはサモの技レベル00「クマの手」（技ID<span class="formula">$A5</span>）の処理を載せておく。<br>
+サモの味方キャラデータ05～20は<code>$D5:02B4</code>～<code>$D5:02C3</code>で、「クマの手」の技データは、<code>$D5:34E8</code>～に入っている。</p>
+
+<div class="code-container"><pre>
+$C1/E94B PHX                     ;Xをスタックにプッシュ
+$C1/E94C STX $14    [$00:0314]   ;Xを[$00:0314]に書き込み
+$C1/E94E LDY $0002,x[$00:1C42]   ;Yに[$00:1C42]をロード
+$C1/E951 LDX $0004,y[$00:0F84]   ;Xに[$00:0F84]をロード
+$C1/E954 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/E956 LDA $000D,y[$00:0F8D]   ;Aに[$00:0F8E][$00:0F8D](覚えた技2バイト)をロード
+$C1/E959 STA $10    [$00:0310]   ;Aを[$00:0311][$00:0310]に書き込み
+$C1/E95B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/E95D LDY $14    [$00:0314]   ;Yに[$00:0314]をロード
+$C1/E95F LDA #$10                ;Aに$10をロード
+$C1/E961 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+$C1/E963 STA $09    [$00:0309]   ;Aを[$00:0309]に書き込み
+$C1/E965 LDA $D50005,x[$D5:02B4] ;Aに[$D5:02B4](レベル00の技ID)をロード
+$C1/E969 STA $12    [$00:0312]   ;A(技ID)を[$00:0312]に書き込み
+$C1/E96B BNE $06    [$E973]      ;ゼロフラグが立っていないとき[$E973]分岐
+$C1/E973 STX $14    [$00:0314]   ;Xを[$00:0314]に書き込み
+$C1/E975 JSR $3D93  [$C1:3D93]   ;[$C1:3D93]へジャンプ
+;
+;ここから習得技のステータス移動ループ処理
+$C1/3D93 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/3D96 LDA #$00                ;Aに$00をロード
+$C1/3D98 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/3D9B LDA #$19                ;Aに$19をロード
+$C1/3D9D STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/3DA0 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/3DA3 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/3DA5 LDA $2134  [$00:2134]   ;Aに[$00:2134]をロード
+$C1/3DA8 ADC $D50018[$D5:0018]   ;A + [$D5:0018]
+$C1/3DAC TAX                     ;Aレジスタの値をXレジスタに転送
+$C1/3DAD SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/3DAF RTS                     ;サブルーチン戻り
+;
+$C1/E978 LDA $D50008,x[$D5:34F0] ;Aに[$D5:34F0]をロード
+$C1/E97C STA $13    [$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/E97E LDA $D5000D,x[$D5:34F5] ;Aに[$D5:34F5]をロード
+$C1/E982 STA $18    [$00:0318]   ;Aを[$00:0318]に書き込み
+$C1/E984 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/E985 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/E986 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/E987 AND #$01                ;Aと#$01で論理積
+$C1/E989 STA $17    [$00:0317]   ;Aを[$00:0317]に書き込み
+$C1/E98B LDA $D5000F,x[$D5:34F7] ;Aに[$D5:34F7]をロード
+$C1/E98F AND #$FE                ;Aと$FEで論理積
+$C1/E991 ORA $17    [$00:0317]   ;Aと[$00:0317]で論理和
+$C1/E993 STA $17    [$00:0317]   ;Aを[$00:0317]に書き込み
+$C1/E995 LDA $D5000E,x[$D5:34F6] ;Aに[$D5:34F6]をロード
+$C1/E999 STA $16    [$00:0316]   ;Aを[$00:0316]に書き込み
+$C1/E99B TYX                     ;Yレジスタの値をXレジスタに転送
+;
+$C1/E99C LSR $11    [$00:0311]   ;[$00:0311]を論理右シフト　(/2) [$00:0311][$00:0310]覚えた技2バイト
+$C1/E99E ROR $10    [$00:0310]   ;[$00:0310]をキャリーフラグを含めた9bitで右ローテート
+$C1/E9A0 BCS $04    [$E9A6]      ;キャリーフラグが立っているとき[$E9A6]分岐
+$C1/E9A6 LDA $12    [$00:0312]   ;Aに[$00:0312](技ID)をロード
+$C1/E9A8 STA $7ECD00,x[$7E:E940] ;Aを[$7E:E940]に書き込み
+$C1/E9AC LDA $13    [$00:0313]   ;Aに[$00:0313]をロード
+$C1/E9AE STA $7ECD10,x[$7E:E950] ;Aを[$7E:E950]に書き込み
+$C1/E9B2 LDA $16    [$00:0316]   ;Aに[$00:0316]をロード
+$C1/E9B4 STA $7ECD20,x[$7E:E960] ;Aを[$7E:E960]に書き込み
+$C1/E9B8 LDA $17    [$00:0317]   ;Aに[$00:0317]をロード
+$C1/E9BA STA $7ECD30,x[$7E:E970] ;Aを[$7E:E970]に書き込み
+$C1/E9BE LDA $18    [$00:0318]   ;Aに[$00:0318]をロード
+$C1/E9C0 STA $7ECE10,x[$7E:EA50] ;Aを[$7E:EA50]に書き込み
+$C1/E9C4 LDX $14    [$00:0314]   ;Xに[$00:0314]をロード
+$C1/E9C6 INY                     ;Yをインクリメント +1
+$C1/E9C7 DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/E9C9 INX                     ;Xをインクリメント +1
+$C1/E9CA DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/E9CC BNE $97    [$E965]      ;ゼロフラグが立っていないとき[$E965]分岐
+$C1/E965 LDA $D50005,x[$D5:02B5] ;Aに[$D5:02B5](レベル01の技ID)をロード
+$C1/E969 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/E96B BNE $06    [$E973]      ;ゼロフラグが立っていないとき[$E973]分岐
+$C1/E973 STX $14    [$00:0314]   ;Xを[$00:0314]に書き込み
+$C1/E975 JSR $3D93  [$C1:3D93]   ;[$C1:3D93]へジャンプ
+;ループ処理ここまで
+</pre></div>
+
+<p>ややこしいので、どういう処理なのかをざっとまとめる。<br>
+<code><span class="r">$C1/E965</span></code>で「クマの手」の技ID<span class="formula">$A5</span>を呼び出している。<br>
+<code><span class="r">$C1/E956</span></code>～でサモのシナリオ別キャラデータ<code>[$00:0F8E]</code><code>[$00:0F8D]</code>(習得済みの技2バイト)を<code>[$00:0311]</code><code>[$00:0310]</code>にコピーし、<code><span class="r">$C1/E99C</span></code>～で一番下の1ビットに値が入っているかどうかで、現在呼び出している技IDの技を習得しているかどうかを判定する。<br>
+習得済みなら<span class="formula">1</span>が立っているため、右ローテート時にキャリーフラグが立ち（<span class="formula">2</span>で割り切れないため）、技習得と判断され、<code><span class="r">$C1/E9A6</span></code>～以降で以下のように値がコピー先アドレスにコピーされる。</p>
+
+<table>
+<thead>
+	<tr><th>内容</th><th>値</th><th>コピー先</th></tr>
+</thead>
+<tbody>
+	<tr><td>技ID</td><td><span class="formula">$A5</span></td><td><code>$7E:E940</code></td></tr>
+	<tr><td>技データ08（使用不能状態異常）</td><td><span class="formula">$F4</span></td><td><code>$7E:E950</code></td></tr>
+	<tr><td>技データ13</td><td><span class="formula">$00</span></td><td><code>$7E:EA50</code></td></tr>
+	<tr><td>技データ14（反撃属性1）</td><td><span class="formula">$00</span></td><td><code>$7E:E960</code></td></tr>
+	<tr><td>技データ15などから計算した反撃属性2の値</td><td><span class="formula">$00</span></td><td><code>$7E:E970</code></td></tr>
+</tbody>
+</table>
+
+<p>反撃属性1・反撃属性2は、2バイトで各属性への反撃属性（15種）が記録されている。<br>
+<code>$7E:E970</code>に入る反撃属性2の値は、<code><span class="r">$C1/E97E</span></code>～あたりで計算されているが、詳細は省く。</p>
+
+<p>ループの最後のあたり、<code><span class="r">$C1/E965</span></code>で、次の技(レベル01の技ID)をロードしている。<br>
+<code><span class="r">$C1/E96B</span></code>でゼロフラグ判定をしているので、そのレベルでの習得技がない、つまり00が入っているのなら処理はスキップで、次のレベルの技をループしつつ判定していく。<br>
+次のレベルの技のコピー先は、上のアドレスを<span class="formula">+1</span>した場所になる。<br>
+つまり、技データ08のコピー先は、<code>$7E:E950</code>, <code>$7E:E951</code>, <code>$7E:E952</code>, ……となる。<br>
+もしサモがすべての技を覚えていたら<code>$7E:E95F</code>まで値が入るが、今回は「サモがレベル5で功夫編の修行を行った場合」なので、サモは技レベル05までの6種類の技のデータしかコピーしない。</p>
+
+<p>上コピー先は、あくまでも「習得済みの技」だけである、という点に注意。<br>
+つまり、この先は、<code>$7E:E940</code>～<code>$7E:E94F</code>をチェックすることで、サモがどの技を習得済みか、かつ、習得済みの技IDが何なのかもわかるのである。</p>
+
+<p>上の値は後で、敵種類1のデータと、敵番号0のデータにコピーされることになる。</p>
+
+<p>なお、ざきとの戦闘では、前ページでの処理が入り、2戦目以降の使用技が変更されているので、上処理などで決まる使用技が1戦目とは変わることになる。</p>
+
+<div class="code-container"><pre>
+$C1/E894 STZ $0005,x[$00:1C45]   ;[$00:1C45](味方キャラ番号2 経験値)に$00を書き込み
+$C1/E897 STZ $001E,x[$00:1C5E]   ;[$00:1C5E]に$00を書き込み
+$C1/E89A LDA #$04                ;Aに$04をロード
+$C1/E89C STA $001F,x[$00:1C5F]   ;A($04)を[$00:1C5F]に書き込み
+$C1/E89F STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/E8A1 STX $14    [$00:0314]   ;Xを[$00:0314]に書き込み
+$C1/E8A3 LDY $0002,x[$00:1C42]   ;Yに[$00:1C42]をロード
+$C1/E8A6 LDA $0006,y[$00:0F86]   ;Aに[$00:0F86]（シナリオ別キャラデータ　サモ　レベル）をロード
+$C1/E8A9 STA $0038,x[$00:1C78]   ;Aを[$00:1C78]（味方キャラデータ2人目　LV(現在値)）に書き込み
+$C1/E8AC LDA #$00                ;Aに$00をロード
+$C1/E8AE STA $0039,x[$00:1C79]   ;Aを[$00:1C79]（味方キャラデータ2人目　状態異常）に書き込み
+$C1/E8B1 LDA #$04                ;Aに$04をロード
+$C1/E8B3 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+</pre></div>
+
+<p>ここから、「サモの敵キャラデータ」を、実際のサモのステータスに上書きしていく処理が開始になる。<br>
+カラクリ丸やざき1戦目の場合は、味方キャラ番号が異なる、つまり<code>X</code>の値が変わり<code>[$0005,x]</code>などのアドレスが変わっていくが、とりあえずサモの場合で追っていく。<br>
+<code>$00:1C40</code>～以降が味方キャラ番号2の数値で、ここまでで、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1C40</code></td><td><span class="formula">$0B</span></td><td>サモのキャラID</td></tr>
+	<tr><td><code>$00:1C41</code></td><td><span class="formula">$20</span></td><td>戦闘状況</td></tr>
+</tbody>
+</table>
+
+<p>この2つの値が入ったが、上の処理で更に値が入っている。<br>
+<code>$00:0F80</code>～がサモのシナリオ別キャラデータであり、LV(現在値)はそこからコピーしている。一方で経験値に<span class="formula">$00</span>がセットされている。<br>
+<code>$00:1C79</code>の状態異常は戦闘開始時なので<span class="formula">$00</span>にセットされている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1C40</code></td><td><span class="formula">$0B</span></td><td>サモのキャラID</td></tr>
+	<tr><td><code>$00:1C41</code></td><td><span class="formula">$20</span></td><td>戦闘状況</td></tr>
+	<tr><td><code>$00:1C45</code></td><td><span class="formula">$00</span></td><td>経験値</td></tr>
+	<tr><td><code>$00:1C5F</code></td><td><span class="formula">$04</span></td><td>？</td></tr>
+	<tr><td><code>$00:1C78</code></td><td><span class="formula">$05</span></td><td>シナリオ別キャラデータのLV(現在値)</td></tr>
+	<tr><td><code>$00:1C79</code></td><td><span class="formula">$00</span></td><td>状態異常</td></tr>
+</tbody>
+</table>
+
+<p>この後は、力・速・体・知を、シナリオ別キャラデータから<code>$00:1C??</code>へコピーするループ処理である。</p>
+
+<div class="code-container"><pre>
+;ループ処理（1回目）
+$C1/E8B5 LDA $0010,y[$00:0F90]   ;Aに[$00:0F90]（サモ　力（力＋装備上昇分））をロード
+$C1/E8B8 STA $0030,x[$00:1C70]   ;Aを[$00:1C70]（味方キャラデータ2人目　力(通常値)）に書き込み
+$C1/E8BB STA $0034,x[$00:1C74]   ;Aを[$00:1C74]（味方キャラデータ2人目　力(現在値)）に書き込み
+$C1/E8BE INX                     ;Xをインクリメント +1
+$C1/E8BF INY                     ;Yをインクリメント +1
+$C1/E8C0 INY                     ;Yをインクリメント +1
+$C1/E8C1 INY                     ;Yをインクリメント +1
+$C1/E8C2 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/E8C4 BNE $EF    [$E8B5]      ;ゼロフラグが立っていないとき[$E8B5]分岐
+;ループ処理（1回目）ここまで
+;
+;ループ処理（2回目～4回目）省略
+;
+$C1/E8C6 LDX $14    [$00:0314]   ;Xに[$00:0314]をロード
+$C1/E8C8 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>シナリオ別キャラデータには、素のステータスと、装備補正分を加算したステータスが記録されているのだが、装備補正分を考慮したステータスが味方キャラデータの通常値及び現在値（現在値は戦闘中にバフやデバフで変動した値が入る）にコピーされる。<br>
+後にこの値がそのまま敵データにもコピーされるため、味方キャラとの戦闘時、力・速・体・知は、装備による増減が考慮された値になっていることがわかる。<br>
+功夫編の修行時、弟子の装備を外しておく方が戦闘の難易度が下がるということである。<br>
+中世編ラストバトルのストレイボウも、離脱前に装備を外しておけば少しは楽になるということである（ストレイボウ戦の場合は完封する方法もあるので、大差ないかもしれないが）。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1C40</code></td><td><span class="formula">$0B</span></td><td>サモのキャラID</td></tr>
+	<tr><td><code>$00:1C41</code></td><td><span class="formula">$20</span></td><td>戦闘状況</td></tr>
+	<tr><td><code>$00:1C45</code></td><td><span class="formula">$00</span></td><td>経験値</td></tr>
+	<tr><td><code>$00:1C5F</code></td><td><span class="formula">$04</span></td><td>？</td></tr>
+	<tr><td><code>$00:1C70</code></td><td><span class="formula">$1C</span></td><td>シナリオ別キャラデータ　力(通常値)</td></tr>
+	<tr><td><code>$00:1C71</code></td><td><span class="formula">$05</span></td><td>シナリオ別キャラデータ　速(通常値)</td></tr>
+	<tr><td><code>$00:1C72</code></td><td><span class="formula">$2B</span></td><td>シナリオ別キャラデータ　体(通常値)</td></tr>
+	<tr><td><code>$00:1C73</code></td><td><span class="formula">$07</span></td><td>シナリオ別キャラデータ　知(通常値)</td></tr>
+	<tr><td><code>$00:1C74</code></td><td><span class="formula">$1C</span></td><td>シナリオ別キャラデータ　力(現在値)</td></tr>
+	<tr><td><code>$00:1C75</code></td><td><span class="formula">$05</span></td><td>シナリオ別キャラデータ　速(現在値)</td></tr>
+	<tr><td><code>$00:1C76</code></td><td><span class="formula">$2B</span></td><td>シナリオ別キャラデータ　体(現在値)</td></tr>
+	<tr><td><code>$00:1C77</code></td><td><span class="formula">$07</span></td><td>シナリオ別キャラデータ　知(現在値)</td></tr>
+	<tr><td><code>$00:1C78</code></td><td><span class="formula">$05</span></td><td>シナリオ別キャラデータ　LV(現在値)</td></tr>
+	<tr><td><code>$00:1C79</code></td><td><span class="formula">$00</span></td><td>状態異常</td></tr>
+</tbody>
+</table>
+
+<div class="code-container"><pre>
+$C1/FA31 PHX                     ;Xをスタックにプッシュ
+$C1/FA32 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/FA34 LDA $7E900E,x[$7E:AB0E] ;Aに[$7E:AB0F][$7E:AB0E]をロード
+$C1/FA38 TAY                     ;Aレジスタの値をYレジスタに転送
+$C1/FA39 PHX                     ;Xをスタックにプッシュ
+$C1/FA3A LDX $0002,y[$00:1C42]   ;Xに[$00:1C42]をロード
+$C1/FA3D LDA $0031,x[$00:0FB1]   ;Aに[$00:0FB2][$00:0FB1]（シナリオ別キャラデータ$31～32）をロード
+;シナリオ別キャラデータ$32の下4ビットはフィールド吸収
+$C1/FA40 STA $10    [$00:0310]   ;Aを[$00:0311][$00:0310]に書き込み
+;($00:0310:フィールド吸収)
+$C1/FA42 LDA $000A,x[$00:0F8A]   ;Aに[$00:0F8B][$00:0F8A]（シナリオ別キャラデータ　最大HP（2バイト））をロード
+$C1/FA45 PLX                     ;Xレジスタにスタックからプル
+$C1/FA46 STA $7E8F00,x[$7E:AA00] ;Aを[$7E:AA01][$7E:AA00]（敵番号0のHP2バイト）に書き込み
+$C1/FA4A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/FA4C LDA $001D,y[$00:1C5D]   ;Aに[$00:1C5D]をロード
+$C1/FA4F ROR A                   ;Aをキャリーフラグを含めた9bitで右ローテート
+$C1/FA50 ROR A                   ;Aをキャリーフラグを含めた9bitで右ローテート
+$C1/FA51 ROR A                   ;Aをキャリーフラグを含めた9bitで右ローテート
+$C1/FA52 AND #$C0                ;Aと$C0で論理積
+$C1/FA54 STA $0004,x[$00:1B04]   ;Aを[$00:1B04]に書き込み
+</pre></div>
+
+<p>ここから敵データへステータスを書き込んでいく。<br>
+サモの場合、シナリオ別キャラデータの<code>[$00:0F8B]</code><code>[$00:0F8A]</code>の2バイトがHPの値だが、<code><span class="r">$C1/FA46</span></code>で、<code>[$7E:AA01]</code><code>[$7E:AA00]</code>（敵番号0のHP・2バイト分）に書き込まれている。</p>
+
+<div class="code-container"><pre>
+$C1/FA57 LDA $0030,y[$00:1C70]   ;Aに[$00:1C70]（味方キャラデータ2人目　力(通常値)）をロード
+$C1/FA5A STA $7E8F03,x[$7E:AA03] ;Aを[$7E:AA03]（敵番号0　力(現在値)）に書き込み
+$C1/FA5E LDA $0031,y[$00:1C71]   ;Aに[$00:1C71]（味方キャラデータ2人目　速(通常値)）をロード
+$C1/FA61 STA $7E8F04,x[$7E:AA04] ;Aを[$7E:AA04]（敵番号0　速(現在値)）に書き込み
+$C1/FA65 LDA $0032,y[$00:1C72]   ;Aに[$00:1C72]（味方キャラデータ2人目　体(通常値)）をロード
+$C1/FA68 STA $7E8F05,x[$7E:AA05] ;Aを[$7E:AA05]（敵番号0　体(現在値)）に書き込み
+$C1/FA6C LDA $0033,y[$00:1C73]   ;Aに[$00:1C73]（味方キャラデータ2人目　知(通常値)）をロード
+$C1/FA6F STA $7E8F06,x[$7E:AA06] ;Aを[$7E:AA06]（敵番号0　知(現在値)）に書き込み
+$C1/FA73 LDA $0038,y[$00:1C78]   ;Aに[$00:1C78]（味方キャラデータ2人目　LV(現在値)）をロード
+$C1/FA76 STA $7E9000,x[$7E:AB00] ;Aを[$7E:AB00]（敵番号0　LV(現在値)）に書き込み
+$C1/FA7A LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/FA7D LDA $7E8F03,x[$7E:AA03] ;Aに[$7E:AA03]（味方キャラデータ2人目　力(通常値)）をロード
+$C1/FA81 STA $0025,y[$00:1A25]   ;Aを[$00:1A25]（敵種類1　敵データ05　力）に書き込み
+$C1/FA84 LDA $7E8F04,x[$7E:AA04] ;Aに[$7E:AA04]（味方キャラデータ2人目　速(通常値)）をロード
+$C1/FA88 STA $0026,y[$00:1A26]   ;Aを[$00:1A26]（敵種類1　敵データ06　速）に書き込み
+$C1/FA8B LDA $7E8F05,x[$7E:AA05] ;Aに[$7E:AA05]（味方キャラデータ2人目　体(通常値)）をロード
+$C1/FA8F STA $0027,y[$00:1A27]   ;Aを[$00:1A27]（敵種類1　敵データ07　体）に書き込み
+$C1/FA92 LDA $7E8F06,x[$7E:AA06] ;Aに[$7E:AA06]（味方キャラデータ2人目　知(通常値)）をロード
+$C1/FA96 STA $0028,y[$00:1A28]   ;Aを[$00:1A28]（敵種類1　敵データ08　知）に書き込み
+$C1/FA99 LDA $7E9000,x[$7E:AB00] ;Aに[$7E:AB00]（味方キャラデータ2人目　LV(現在値)）をロード
+$C1/FA9D STA $000B,y[$00:1A0B]   ;Aを[$00:1A0B]（敵種類1　レベル）に書き込み
+</pre></div>
+
+<p>ここで、味方キャラデータの力・速・体・知・レベルが、敵番号0のステータス関係のアドレス及び、敵種類1のステータス関係のアドレスに一斉にコピーされている。ループ処理ではない。<br>
+この処理で、カラクリ丸と戦う場合、ころころムシのステータスが入っていた箇所の大半はカラクリ丸のステータスで上書きされることにもなる。<br>
+最終編の味方キャラとの戦闘時も、敵データのキューブのステータスに上書きされていく。<br>
+まだ全てが上書きされてはいない点に注意。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:AA00</code></td><td><span class="formula">$F0</span></td><td>敵番号0　現在HP（下1バイト）</td></tr>
+	<tr><td><code>$7E:AA01</code></td><td><span class="formula">$00</span></td><td>敵番号0　現在HP（上1バイト）</td></tr>
+	<tr><td><code>$7E:AA03</code></td><td><span class="formula">$1C</span></td><td>敵番号0　力(現在値)</td></tr>
+	<tr><td><code>$7E:AA04</code></td><td><span class="formula">$05</span></td><td>敵番号0　速(現在値)</td></tr>
+	<tr><td><code>$7E:AA05</code></td><td><span class="formula">$2B</span></td><td>敵番号0　体(現在値)</td></tr>
+	<tr><td><code>$7E:AA06</code></td><td><span class="formula">$07</span></td><td>敵番号0　知(現在値)</td></tr>
+	<tr><td><code>$7E:AB00</code></td><td><span class="formula">$05</span></td><td>敵番号0　LV(現在値)</td></tr>
+	<tr><td><code>$00:1A0B</code></td><td><span class="formula">$05</span></td><td>敵種類1　レベル</td></tr>
+	<tr><td><code>$00:1A25</code></td><td><span class="formula">$1C</span></td><td>敵種類1　敵データ05　力</td></tr>
+	<tr><td><code>$00:1A26</code></td><td><span class="formula">$05</span></td><td>敵種類1　敵データ06　速</td></tr>
+	<tr><td><code>$00:1A27</code></td><td><span class="formula">$2B</span></td><td>敵種類1　敵データ07　体</td></tr>
+	<tr><td><code>$00:1A28</code></td><td><span class="formula">$07</span></td><td>敵種類1　敵データ08　知</td></tr>
+</tbody>
+</table>
+
+<div class="code-container"><pre>
+$C1/FAA0 LDA $10    [$00:0310]   ;Aに[$00:0310]（下4ビット：フィールド吸収）をロード
+$C1/FAA2 ASL A                   ;Aを算術左シフト *2
+$C1/FAA3 ASL A                   ;Aを算術左シフト *2
+$C1/FAA4 ASL A                   ;Aを算術左シフト *2
+$C1/FAA5 ASL A                   ;Aを算術左シフト *2
+$C1/FAA6 ORA $0021,y[$00:1A21]   ;Aと[$00:1A21]（敵データ01）で論理和
+$C1/FAA9 STA $0021,y[$00:1A21]   ;Aを[$00:1A21]（上4ビット：フィールド吸収）に書き込み
+$C1/FAAC REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/FAAE LDA $7E8F00,x[$7E:AA00] ;Aに[$7E:AA01][$7E:AA00]（敵番号0のHP2バイト）をロード
+$C1/FAB2 STA $0010,y[$00:1A10]   ;Aを[$00:1A11][$00:1A10]（敵種類1のHP2バイト）に書き込み
+</pre></div>
+
+<p><code>[$00:0310]</code>には先に<code>[$00:0FB1]</code>（シナリオ別キャラデータ<span class="formula">$32</span>）が入ったが、これは下1桁がフィールド吸収の値になる。<br>
+敵種類データ<span class="formula">$21</span>にあたる<code>[$00:1A21]</code>には敵データ01が入っており、上4ビット：フィールド吸収/下4ビット：移動頻度である。<br>
+シナリオ別キャラデータ<span class="formula">$32</span>の下1桁は、算術左シフト <span class="formula">*2</span>を4回繰り返すと上1桁に移動する。<br>
+元々の敵データに入っている<code>[$00:1A21]</code>上4ビットのフィールド吸収の値と、シナリオ別キャラデータ<span class="formula">$32</span>にあるフィールド吸収の値を加算して、新たに<code>[$00:1A21]</code>に設置、というのが<code>$C1/FAA9</code>の処理ということである。<br>
+ここでは「上書き処理」ではなく、「論理和」で処理しているのがポイントである。<br>
+つまり、元のシナリオ別キャラデータ<span class="formula">$32</span>の値も反映される。<br>
+シナリオ別キャラデータ<span class="formula">$32</span>のフィールド吸収の値は装備品の値を反映しているため、幕末編でカラクリ丸と戦う場合や、最終編でおぼろ丸を仲間にするための戦闘で、カラクリ丸やおぼろ丸が「水神のたび」「げんじのタビ」「コイツぁタマゲタ」のいずれかを装備していると、フィールド吸収能力がきちんと発動することになる。<br>
+他には、最終編でアキラを仲間にする時、アキラが「サンゴのゆびわ」を装備した状態で近未来編をクリアしていれば、水フィールド吸収能力が発動する。<br>
+装備品のフィールド吸収能力が反映されるのは、以上3キャラのみのはずである。<br>
+他にフィールド吸収能力がある装備は「マーメイドボトム」だが、「マーメイドボトム」は最終編でしか入手できないので、仲間との戦闘で装備しているキャラは存在しない。<br>
+なお、「論理和」で処理している理由は、敵データ01の下4ビットが移動頻度だからという理由もあると思われる。直前に算術左シフト4回行っているため、<code>$C1/FAA6</code>で論理和を取る時、<code>A</code>に入っているのは下1桁が0の値なので、移動頻度に影響はない。<br>
+よって、敵データ01の下4ビットは上の計算で変動せず、元の値のまま維持される。</p>
+
+<p>いずれにしても、功夫編の修行においては、弟子がフィールド吸収能力を持つことはないし、功夫編でダメージフィールドを発生させる手段もない。</p>
+
+<p><code><span class="r">$C1/FAAE</span></code>～<code><span class="r">$C1/FAB2</span></code>は、敵番号0のHPの値を敵種類1のHPの値にコピーしている。各2バイト。<br>
+これで、以下のように敵関係の値が決まった。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:AA00</code></td><td><span class="formula">$F0</span></td><td>敵番号0　現在HP（下1バイト）</td></tr>
+	<tr><td><code>$7E:AA01</code></td><td><span class="formula">$00</span></td><td>敵番号0　現在HP（上1バイト）</td></tr>
+	<tr><td><code>$7E:AA03</code></td><td><span class="formula">$1C</span></td><td>敵番号0　力(現在値)</td></tr>
+	<tr><td><code>$7E:AA04</code></td><td><span class="formula">$05</span></td><td>敵番号0　速(現在値)</td></tr>
+	<tr><td><code>$7E:AA05</code></td><td><span class="formula">$2B</span></td><td>敵番号0　体(現在値)</td></tr>
+	<tr><td><code>$7E:AA06</code></td><td><span class="formula">$07</span></td><td>敵番号0　知(現在値)</td></tr>
+	<tr><td><code>$7E:AB00</code></td><td><span class="formula">$05</span></td><td>敵番号0　LV(現在値)</td></tr>
+	<tr><td><code>$00:1A0B</code></td><td><span class="formula">$05</span></td><td>敵種類1　レベル</td></tr>
+	<tr><td><code>$00:1A10</code></td><td><span class="formula">$F0</span></td><td>敵種類1　現在HP（下1バイト）</td></tr>
+	<tr><td><code>$00:1A11</code></td><td><span class="formula">$00</span></td><td>敵種類1　現在HP（上1バイト）</td></tr>
+	<tr><td><code>$00:1A21</code></td><td><span class="formula">$00</span></td><td>敵種類1　敵データ01（上4ビット：フィールド吸収/下4ビット：移動頻度）</td></tr>
+	<tr><td><code>$00:1A25</code></td><td><span class="formula">$1C</span></td><td>敵種類1　敵データ05　力</td></tr>
+	<tr><td><code>$00:1A26</code></td><td><span class="formula">$05</span></td><td>敵種類1　敵データ06　速</td></tr>
+	<tr><td><code>$00:1A27</code></td><td><span class="formula">$2B</span></td><td>敵種類1　敵データ07　体</td></tr>
+	<tr><td><code>$00:1A28</code></td><td><span class="formula">$07</span></td><td>敵種類1　敵データ08　知</td></tr>
+</tbody>
+</table>
+
+<div class="code-container"><pre>
+$C1/FAB5 LDA $7E900E,x[$7E:AB0E] ;Aに[$7E:AB0E]をロード
+$C1/FAB9 ADC #$000F              ;A + $000F
+$C1/FABC TAX                     ;Aレジスタの値をXレジスタに転送
+$C1/FABD SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/FABF PHY                     ;Yをスタックへプッシュ
+$C1/FAC0 LDY #$0310              ;Yに$0310をロード
+$C1/FAC3 LDA #$04                ;Aに$04をロード
+$C1/FAC5 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+;
+;サモの習得技及び技IDチェックループ処理（1回目）
+$C1/FAC7 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/FAC8 AND #$0F                ;Aと$0Fで論理積
+$C1/FACA BNE $06    [$FAD2]      ;ゼロフラグが立っていないとき[$FAD2]分岐
+$C1/FAD2 LDA $7ECD00,x[$7E:E94F] ;Aに[$7E:E94F]をロード
+$C1/FAD6 BEQ $20    [$FAF8]      ;ゼロフラグが立っているとき[$FAF8]分岐
+$C1/FAF8 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/FAF9 AND #$0F                ;Aと$0Fで論理積
+$C1/FAFB BEQ $CA    [$FAC7]      ;ゼロフラグが立っているとき[$FAC7]分岐
+$C1/FAFD DEX                     ;Xをデクリメント -1
+$C1/FAFE BRA $C7    [$FAC7]      ;フラグにかかわりなく常に分岐[$FAC7]
+;ループ処理ここまで
+</pre></div>
+
+<p>ここから、敵データとして、サモの使用技関係の処理を行っていく。<br>
+既にだいぶ前の処理になってしまうが、サモが習得済みの技のみ、以下のように値をコピー済みである。<br>
+16種類の技IDが入るアドレス<code>$7E:E940</code>～<code>$7E:E94F</code>は、習得済みでない場合（または該当レベルで覚えられる技がない場合）は<span class="formula">$00</span>が入っている。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>コピー先</th></tr>
+</thead>
+<tbody>
+	<tr><td>技ID</td><td><code>$7E:E940</code>～<code>$7E:E94F</code></td></tr>
+	<tr><td>技データ08（使用不能状態異常）</td><td><code>$7E:E950</code>～<code>$7E:E95F</code></td></tr>
+	<tr><td>技データ13</td><td><code>$7E:EA50</code>～<code>$7E:EA5F</code></td></tr>
+	<tr><td>技データ14（反撃属性1）</td><td><code>$7E:E960</code>～<code>$7E:E96F</code></td></tr>
+	<tr><td>技データ15（反撃属性2）</td><td><code>$7E:E970</code>～<code>$7E:E97F</code></td></tr>
+</tbody>
+</table>
+
+<p><code><span class="r">$C1/FAC7</span></code>～<code><span class="r">$C1/FAFE</span></code>は、サモの技を一番高レベルから順に、習得済みかどうか調べるためのループ処理である。<br>
+<code><span class="r">$C1/FAD2</span></code>で、技IDが入るアドレスの中で、一番高レベルのアドレス<code>$7E:E94F</code>から順に、低レベルへ向けてチェックしている。<br>
+上の1回目のループは、技レベル16の技を習得しているかどうかであり、レベル5のサモは未習得なので、<code><span class="r">$C1/FAD6</span></code>でゼロフラグが立っている。<br>
+技レベル05（サモの場合は「ちんじゃおろーす」、技ID<span class="formula">$AA</span>）のループまでたどり着かないと、<code><span class="r">$C1/FAD6</span></code>でゼロフラグが立たない。</p>
+
+<div class="code-container"><pre>
+;サモの習得技及び技IDチェックループ処理（11回目）
+$C1/FAC7 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/FAC8 AND #$0F                ;Aと$0Fで論理積
+$C1/FACA BNE $06    [$FAD2]      ;ゼロフラグが立っていないとき[$FAD2]分岐
+$C1/FAD2 LDA $7ECD00,x[$7E:E945] ;Aに[$7E:E945]をロード
+$C1/FAD6 BEQ $20    [$FAF8]      ;ゼロフラグが立っているとき[$FAF8]分岐
+;習得技IDが入っている（ゼロフラグOFF）
+$C1/FAD8 STA $0000,y[$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/FADB INY                     ;Yをインクリメント +1
+$C1/FADC LDA $7ECD10,x[$7E:E955] ;Aに[$7E:E955]をロード
+$C1/FAE0 STA $0000,y[$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/FAE3 INY                     ;Yをインクリメント +1
+$C1/FAE4 LDA $7ECD20,x[$7E:E965] ;Aに[$7E:E965]をロード
+$C1/FAE8 STA $0000,y[$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/FAEB INY                     ;Yをインクリメント +1
+$C1/FAEC LDA $7ECD30,x[$7E:E975] ;Aに[$7E:E975]をロード
+$C1/FAF0 STA $0000,y[$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/FAF3 INY                     ;Yをインクリメント +1
+$C1/FAF4 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/FAF6 BEQ $08    [$FB00]      ;ゼロフラグが立っているとき[$FB00]分岐
+;習得技IDなし（ゼロフラグON）
+$C1/FAF8 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/FAF9 AND #$0F                ;Aと$0Fで論理積
+$C1/FAFB BEQ $CA    [$FAC7]      ;ゼロフラグが立っているとき[$FAC7]分岐
+$C1/FAFD DEX                     ;Xをデクリメント -1
+$C1/FAFE BRA $C7    [$FAC7]      ;フラグにかかわりなく常に分岐[$FAC7]
+;ループ処理ここまで
+</pre></div>
+
+<p>ループ11回目が、技レベル05のループにあたり、これ以下のレベルの技は習得済みであるから、<code><span class="r">$C1/FAD6</span></code>でゼロフラグが立たない処理<code><span class="r">$C1/FAD8</span></code>へ進む。<br>
+<code><span class="r">$C1/FAD8</span></code>～の処理は、先に以下のように書き込まれた技ID、使用不能状態異常、反撃属性1、反撃属性2を、<code>[$00:0310]</code>、<code>[$00:0311]</code>、<code>[$00:0312]</code>、<code>[$00:0313]</code>に書き込む処理である。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>コピー先</th></tr>
+</thead>
+<tbody>
+	<tr><td>技ID</td><td><code>$7E:E940</code>～<code>$7E:E94F</code></td></tr>
+	<tr><td>技データ08（使用不能状態異常）</td><td><code>$7E:E950</code>～<code>$7E:E95F</code></td></tr>
+	<tr><td>技データ13</td><td><code>$7E:EA50</code>～<code>$7E:EA5F</code></td></tr>
+	<tr><td>技データ14（反撃属性1）</td><td><code>$7E:E960</code>～<code>$7E:E96F</code></td></tr>
+	<tr><td>技データ15（反撃属性2）</td><td><code>$7E:E970</code>～<code>$7E:E97F</code></td></tr>
+</tbody>
+</table>
+
+<p>書き込むたびに<code>Y</code>をインクリメント(<span class="formula">+1</span>)しているから、書き込み先のアドレスは<code>[$00:0310]</code>から順に1ずつ増えていくことになる。<br>
+要するにこのループでは、「習得済みの技の中で、高レベルの技から順に、技ID、使用不能状態異常、反撃属性1、反撃属性2を、<code>[$00:0310]</code>～に順にコピーしていく」という処理を行っている。<br>
+レベル5のサモの場合、</p>
+
+<table>
+<thead>
+	<tr><th>技レベル</th><th>技名</th><th>技ID</th><th>使用不能状態異常</th><th>反撃属性1</th><th>反撃属性2</th></tr>
+</thead>
+<tbody>
+	<tr><td>技レベル05</td><td>ちんじゃおろーす</td><td><code>$00:0310</code></td><td><code>$00:0311</code></td><td><code>$00:0312</code></td><td><code>$00:0313</code></td></tr>
+	<tr><td>技レベル04</td><td>トン足</td><td><code>$00:0314</code></td><td><code>$00:0315</code></td><td><code>$00:0316</code></td><td><code>$00:0317</code></td></tr>
+	<tr><td>技レベル03</td><td>ばんばんじー</td><td><code>$00:0318</code></td><td><code>$00:0319</code></td><td><code>$00:031A</code></td><td><code>$00:031B</code></td></tr>
+	<tr><td>技レベル02</td><td>とうばんじゃん</td><td><code>$00:031C</code></td><td><code>$00:031D</code></td><td><code>$00:031E</code></td><td><code>$00:031F</code></td></tr>
+</tbody>
+</table>
+
+<p>ここまで書き込まれるとループを抜ける。<br>
+というのは、ループ前に<code>[$00:0308]</code>に<span class="formula">$04</span>が入り、ループで<code>[$00:0310]</code>～に値が入った時は、<code><span class="r">$C1/FAF4</span></code>で<code>[$00:0308]</code>をデクリメント(<span class="formula">-1</span>)している。<br>
+つまり、技のデータを4種類分、<code>[$00:0310]</code>～に入れた後（<code>[$00:031F]</code>まで埋まる）、<code>[$00:0308]</code>の値は<span class="formula">$00</span>になり、<code><span class="r">$C1/FAF6</span></code>でゼロフラグが立って<code>[$FB00]</code>にジャンプし、ループを抜けるのである。</p>
+
+<p>技を4種類以上覚えていない場合はループ終わり近くの<code><span class="r">$C1/FAFB</span></code>でループの戻りになる。初期レベル（レベル1）のユンの修行などが該当。<br>
+というのは、ループの最後で<code>X</code>はデクリメント(<span class="formula">-1</span>)されており、ループ前処理で<code>X</code>の下1桁が必ず<span class="formula">F</span>なので、<span class="formula">-1</span>されていくと技レベル00に到達した時に、<code>X</code>の下1桁が必ず<span class="formula">0</span>になる。<br>
+<code><span class="r">$C1/FAF8</span></code>で、<code>X</code>レジスタの値を<code>A</code>レジスタに転送してから、<code>A</code>と<span class="formula">$0F</span>で論理積をとり、<code><span class="r">$C1/FAFB</span></code>でゼロフラグ判定をしている。<br>
+下1桁が<span class="formula">0</span>の値と<span class="formula">$0F</span>で論理積をとると、必ず<span class="formula">$00</span>になるため、ゼロフラグが立つが、ジャンプ先はループ頭である。<br>
+つまり<code>X</code>をデクリメントせずにまたループ処理をするのである。<br>
+すると、初期レベルのユンだったら、習得技が技レベル01と技レベル00しかないから、技レベル01→技レベル00→技レベル00→技レベル00とループすることになり、<code>$00:031F</code>まで値が埋まる。</p>
+
+<p>結局のところ、<br>
+「習得している技の中で高レベルから順に4種類の技のデータを<code>$00:0310</code>～<code>$00:031F</code>に書き込む」<br>
+というループにより、味方キャラが敵対時の使用技4種が決まったことになる。<br>
+習得技が4種類未満ならデータにダブりが起きるが、結局のところ習得技すべてが選ばれることになる。<br>
+敵対時の使用技は以上のようにして決まっている。<br>
+最終編で高原やおぼろ丸を仲間にする時の戦闘で、現代編または幕末編のラーニング状況が反映され、高レベルで覚える技をラーニングで覚えていたら使ってくる仕組みは、以上のサブルーチンで生まれていることがわかった。</p>
+
+<p><code><span class="r">$C1/FAF6</span></code>でゼロフラグが立って<code>[$FB00]</code>にジャンプし、ループを抜けた後の処理は以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C1/FAF6 BEQ $08    [$FB00]      ;ゼロフラグが立っているとき[$FB00]分岐
+;
+$C1/FB00 PLX                     ;Xレジスタにスタックからプル
+$C1/FB01 LDY #$0310              ;Yに$0310をロード
+$C1/FB04 LDA #$04                ;Aに$04をロード
+$C1/FB06 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+;
+;$00:0310～を敵データに書き込むループ処理（1回目）
+$C1/FB08 LDA $0000,y[$00:0310]   ;Aに[$00:0310]をロード
+$C1/FB0B INY                     ;Yをインクリメント +1
+$C1/FB0C STA $002B,x[$00:1A2B]   ;Aを[$00:1A2B]（敵データ11　使用技1　技ID）に書き込み
+$C1/FB0F LDA $0000,y[$00:0311]   ;Aに[$00:0311]をロード
+$C1/FB12 INY                     ;Yをインクリメント +1
+$C1/FB13 STA $001A,x[$00:1A1A]   ;Aを[$00:1A1A]（技1が使用不可になるステータス異常）に書き込み
+$C1/FB16 LDA $0000,y[$00:0312]   ;Aに[$00:0312]をロード
+$C1/FB19 INY                     ;Yをインクリメント +1
+$C1/FB1A STA $0012,x[$00:1A12]   ;Aを[$00:1A12]（技1の反撃属性1）に書き込み
+$C1/FB1D LDA $0000,y[$00:0313]   ;Aに[$00:0313]をロード
+$C1/FB20 INY                     ;Yをインクリメント +1
+$C1/FB21 STA $0016,x[$00:1A16]   ;Aを[$00:1A16]（技1の反撃属性2）に書き込み
+$C1/FB24 INX                     ;Xをインクリメント +1
+$C1/FB25 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/FB27 BNE $DF    [$FB08]      ;ゼロフラグが立っていないとき[$FB08]分岐
+;ループ処理ここまで
+;
+$C1/FB29 PLX                     ;Xレジスタにスタックからプル
+$C1/FB2A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>$00:0310</code>～<code>$00:031F</code>に書き込まれた値を、1種類の技毎に、敵種類1のデータに書き込んでいくループ処理になる。<br>
+サモは以下のように値が入っていたが、</p>
+
+<table>
+<thead>
+	<tr><th>技レベル</th><th>技名</th><th>技ID</th><th>使用不能状態異常</th><th>反撃属性1</th><th>反撃属性2</th></tr>
+</thead>
+<tbody>
+	<tr><td>技レベル05</td><td>ちんじゃおろーす</td><td><code>$00:0310</code></td><td><code>$00:0311</code></td><td><code>$00:0312</code></td><td><code>$00:0313</code></td></tr>
+	<tr><td>技レベル04</td><td>トン足</td><td><code>$00:0314</code></td><td><code>$00:0315</code></td><td><code>$00:0316</code></td><td><code>$00:0317</code></td></tr>
+	<tr><td>技レベル03</td><td>ばんばんじー</td><td><code>$00:0318</code></td><td><code>$00:0319</code></td><td><code>$00:031A</code></td><td><code>$00:031B</code></td></tr>
+	<tr><td>技レベル02</td><td>とうばんじゃん</td><td><code>$00:031C</code></td><td><code>$00:031D</code></td><td><code>$00:031E</code></td><td><code>$00:031F</code></td></tr>
+</tbody>
+</table>
+
+<p>以下に書き込まれていくことになる。<br>
+つまり高レベルの技から順に使用技として登録されていくことがわかる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1A12</code></td><td>技1の反撃属性1</td></tr>
+	<tr><td><code>$00:1A13</code></td><td>技2の反撃属性1</td></tr>
+	<tr><td><code>$00:1A14</code></td><td>技3の反撃属性1</td></tr>
+	<tr><td><code>$00:1A15</code></td><td>技4の反撃属性1</td></tr>
+	<tr><td><code>$00:1A16</code></td><td>技1の反撃属性2</td></tr>
+	<tr><td><code>$00:1A17</code></td><td>技2の反撃属性2</td></tr>
+	<tr><td><code>$00:1A18</code></td><td>技3の反撃属性2</td></tr>
+	<tr><td><code>$00:1A19</code></td><td>技4の反撃属性2</td></tr>
+	<tr><td><code>$00:1A1A</code></td><td>技1が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A1B</code></td><td>技2が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A1C</code></td><td>技3が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A1D</code></td><td>技4が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A2B</code></td><td>敵データ11　使用技1　技ID</td></tr>
+	<tr><td><code>$00:1A2C</code></td><td>敵データ12　使用技2　技ID</td></tr>
+	<tr><td><code>$00:1A2D</code></td><td>敵データ13　使用技3　技ID</td></tr>
+	<tr><td><code>$00:1A2E</code></td><td>敵データ14　使用技4　技ID</td></tr>
+</tbody>
+</table>
+
+<p>ユンの場合だと、技1に「技レベル01」のデータが入り、技2～技4に「技レベル00」のデータが入ることで、結果的に使用技が2種類になる。</p>
+
+<p>以上で、HP・力・速・体・知・レベル・使用技4種のデータが敵データとして登録された。<br>
+ここまでで戦闘前のデータが決まったことになる。</p>
+
+<p>では、ここまでに決まった値を整理してみよう。<br>
+ほとんどの値が元の味方キャラのデータからコピーされたようではあるが、幾つか例外もある。<br>
+まず、敵に攻撃や防御の値を設定するメモリ（アドレス）がないため、反映されないことがわかる。<br>
+敵にも設定できる値はどうなっているかを見てみよう。<br>
+<code>$00:1A20</code>～<code>$00:1A3F</code>には、「サモの敵キャラデータ」32バイト分をまずコピーしてから、以下の値で上書きされた、ということになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:AA00</code></td><td>敵番号0　現在HP（下1バイト）</td></tr>
+	<tr><td><code>$7E:AA01</code></td><td>敵番号0　現在HP（上1バイト）</td></tr>
+	<tr><td><code>$7E:AA03</code></td><td>敵番号0　力(現在値)</td></tr>
+	<tr><td><code>$7E:AA04</code></td><td>敵番号0　速(現在値)</td></tr>
+	<tr><td><code>$7E:AA05</code></td><td>敵番号0　体(現在値)</td></tr>
+	<tr><td><code>$7E:AA06</code></td><td>敵番号0　知(現在値)</td></tr>
+	<tr><td><code>$7E:AB00</code></td><td>敵番号0　LV(現在値)</td></tr>
+	<tr><td><code>$00:1A0B</code></td><td>敵種類1　レベル</td></tr>
+	<tr><td><code>$00:1A04</code></td><td>敵種類1　横の幅（必ず<span class="formula">$01</span>）</td></tr>
+	<tr><td><code>$00:1A05</code></td><td>敵種類1　縦の幅（必ず<span class="formula">$01</span>）</td></tr>
+	<tr><td><code>$00:1A10</code></td><td>敵種類1　現在HP（下1バイト）</td></tr>
+	<tr><td><code>$00:1A11</code></td><td>敵種類1　現在HP（上1バイト）</td></tr>
+	<tr><td><code>$00:1A12</code></td><td>敵種類1　技1の反撃属性1</td></tr>
+	<tr><td><code>$00:1A13</code></td><td>敵種類1　技2の反撃属性1</td></tr>
+	<tr><td><code>$00:1A14</code></td><td>敵種類1　技3の反撃属性1</td></tr>
+	<tr><td><code>$00:1A15</code></td><td>敵種類1　技4の反撃属性1</td></tr>
+	<tr><td><code>$00:1A16</code></td><td>敵種類1　技1の反撃属性2</td></tr>
+	<tr><td><code>$00:1A17</code></td><td>敵種類1　技2の反撃属性2</td></tr>
+	<tr><td><code>$00:1A18</code></td><td>敵種類1　技3の反撃属性2</td></tr>
+	<tr><td><code>$00:1A19</code></td><td>敵種類1　技4の反撃属性2</td></tr>
+	<tr><td><code>$00:1A1A</code></td><td>敵種類1　技1が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A1B</code></td><td>敵種類1　技2が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A1C</code></td><td>敵種類1　技3が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A1D</code></td><td>敵種類1　技4が使用不可になるステータス異常</td></tr>
+	<tr><td><code>$00:1A20</code></td><td>敵種類1　敵データ00　<br>（移動パターン味方キャラの敵キャラデータがそのまま入る）</td></tr>
+	<tr><td><code>$00:1A21</code></td><td>敵種類1　敵データ01　<br>（上4ビット：フィールド吸収/下4ビット：移動頻度。味方キャラの敵キャラデータがそのまま入る）</td></tr>
+	<tr><td><code>$00:1A25</code></td><td>敵種類1　敵データ05　力</td></tr>
+	<tr><td><code>$00:1A26</code></td><td>敵種類1　敵データ06　速</td></tr>
+	<tr><td><code>$00:1A27</code></td><td>敵種類1　敵データ07　体</td></tr>
+	<tr><td><code>$00:1A28</code></td><td>敵種類1　敵データ08　知</td></tr>
+	<tr><td><code>$00:1A2B</code></td><td>敵種類1　敵データ11　使用技1　技ID</td></tr>
+	<tr><td><code>$00:1A2C</code></td><td>敵種類1　敵データ12　使用技2　技ID</td></tr>
+	<tr><td><code>$00:1A2D</code></td><td>敵種類1　敵データ13　使用技3　技ID</td></tr>
+	<tr><td><code>$00:1A2E</code></td><td>敵種類1　敵データ14　使用技4　技ID</td></tr>
+</tbody>
+</table>
+
+
+<p>味方キャラの元の値が反映されないのは、以下のステータスになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1A2A</code></td><td>敵データ10　無効状態異常</td></tr>
+	<tr><td><code>$00:1A3D</code></td><td>敵データ29　背後補正/側面補正</td></tr>
+	<tr><td><code>$00:1A3E</code></td><td>敵データ30　回避属性　8ビットが手足突鋭鈍締飛背に対応</td></tr>
+	<tr><td><code>$00:1A3F</code></td><td>敵データ31　回避属性　8ビットが火水風土精善悪無に対応</td></tr>
+</tbody>
+</table>
+
+<p>上の値はシナリオ別キャラデータにも存在するが、その値が敵種類1の敵データに読み込まれない。<br>
+このため、サモなら「サモの敵キャラデータ」に入っていた値がそのまま適用されることになる。<br>
+敵キャラデータ（味方データが入っているID<span class="formula">$EB</span>以降）を見ると、キューブ（ID<span class="formula">$FF</span>）の敵データ10に<span class="formula">$20</span>が入っている以外、味方キャラのデータには<span class="formula">$00</span>が入っている。<br>
+よって、サモの場合、無効状態異常なし、背後補正も側面補正も<span class="formula">0</span>、回避属性もなし、となる。<br>
+サモは味方キャラデータだと、背後補正<span class="formula">6</span>、側面補正<span class="formula">4</span>、回避属性は突であり、装備によって無効状態異常や回避属性が変動するが、敵として登場する時にはそれらはすべて無視されることになる。<br>
+背後補正や側面補正が<span class="formula">0</span>になるということは、ほとんどのキャラで強化されることになる（側面や背面から攻撃しても、補正分のレベルが引かれないことになるため）。<br>
+ただし無効状態異常や回避属性がなくなるので、弱体化する部分もある。</p>
+
+<p>そしてカラクリ丸だが、前述の通り、ころころムシのデータにカラクリ丸のデータを上書きしたため、上書きされない上の4種のステータスはころころムシと同一になってしまう。<br>
+ころころムシは、無効状態異常なし、回避属性は無属性以外すべて（15種）、側面補正<span class="formula">4</span>、背後補正<span class="formula">6</span>である。<br>
+味方キャラデータのカラクリ丸は、無効状態異常が毒・麻・眠・酔・石、回避属性は精、側面補正<span class="formula">1</span>、背後補正<span class="formula">1</span>である。<br>
+まったく別のデータに変わってしまっていることがわかる。<br>
+これが想定内なのかバグなのかはわからないが、プレイする上で重大な不具合が生じることはないし、HPやステータス、レベル、使用技などはカラクリ丸のデータなので、実際のプレイではさほど問題にはならないだろう。通常プレイなら、カラクリ丸と戦う機会はパーティに加わる時くらいだろうし、本作は無効状態異常や回避属性などが戦闘画面にはっきりと表示されることもないので気づかれにくいということもある。</p>
+
+<p>更に、最終編での仲間との戦闘時も、敵データのキューブの値を上書きしたため、敵データ10の無効状態異常が<span class="formula">$20</span>、つまり眠り無効耐性がどのキャラにも付くことになる。<br>
+背後補正・側面補正はどちらも<span class="formula">0</span>で、回避属性もいっさいない。<br>
+元の味方キャラのデータは反映されないことになる。<br>
+これまた、これが想定内なのかバグなのかはわからないし、何かしらのバグが起こることもない。<br>
+そもそもキューブのデータにあたる敵データID<span class="formula">$FF</span>に、無効状態異常として<span class="formula">$20</span>が設定されているのが何故なのかもわからない。最初にも記したが、キューブ本人には眠り耐性はない。<br>
+何を意図した設定なのか、どうにもわからない。</p>
+
+<p>元々味方キャラにはなかったステータスとして移動パターンがあるが、敵キャラデータで<span class="formula">$00</span>以外の移動パターンが設定されているのはストレイボウ、サンダウン、マッドドッグだけで、他は<span class="formula">$00</span>が入っている。<br>
+<span class="formula">$00</span>だとだいたい接近してきて技を出せるなら技を出すというパターンである。<br>
+ストレイボウと戦う時は妙な方向を向いたり移動することがあるが、移動パターン<span class="formula">$06</span>が設定されているためであり、おかげで3×2対角線を維持しつつ嵌めて倒すことが可能である。</p>
+
+<p>以上が、最終編オルステッド主人公時以外の、味方キャラとの戦闘におけるステータス設定である。<br>
+最終編オルステッド主人公時は別途説明するが、実はこちらでも、敵対する味方キャラのデータとして敵データID<span class="formula">$FF</span>が全キャラで読み込まれてから上書きしていく。<br>
+このため、同じ仕組みで全キャラに眠り耐性がつくことになる。<br>
+高原　日勝の敵キャラデータ08（知）にだけ<span class="formula">$08</span>が入っていたが、結局このデータは使われないことになり、なぜここだけ<span class="formula">$08</span>が入っていたのかは謎のままである。</p>
+
+<p><a href="program24_3.html">次ページ</a>からは、最終編オルステッド主人公時のサブルーチンや処理方法を解説していく。</p>
+
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program24.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program24_3.html"><span class="button">&#9654;次　最終編オルステッド主人公時</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

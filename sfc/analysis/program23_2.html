@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 功夫編・修行(その2)">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 功夫編・修行(その2)">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 功夫編・修行(その2)</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 功夫編・修行(その2)</h1>
+<h2>功夫編・修行(その2)</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="program23.html">前ページ</a>の続き。<br>
+ここでは、修行におけるレベルアップ時の処理と、修行場所によるステータスアップについて説明する。</p>
+
+<p>修行では、ステータスアップ関連の処理が特殊である。<br>
+功夫編用サブルーチンとなっている。</p>
+
+<p>レベルアップ時は、HPのみ特定値分アップする。</p>
+
+<table>
+<thead>
+	<tr><th>キャラ</th><th>HP増加量</th></tr>
+</thead>
+<tbody>
+	<tr><td>ユン</td><td><span class="formula">12</span></td></tr>
+	<tr><td>レイ</td><td><span class="formula">18</span></td></tr>
+	<tr><td>サモ</td><td><span class="formula">60</span></td></tr>
+</tbody>
+</table>
+
+<p>また、レベルアップとは関係なく、修行場所により、戦闘終了時に特定のステータスがアップする。<br>
+修行場所だが、戦闘に入ると、<code>$00:0041</code>の上6ビットに戦闘時の背景の番号が入り（詳しく調べていないので未確定。他シナリオでも戦闘に入った時に値が入るので共通処理と思われる）、その値で区別している。</p>
+
+<table>
+<thead>
+	<tr><th>場所</th><th><code>$00:0041</code></th><th>ステータス</th><th>上昇値</th></tr>
+</thead>
+<tbody>
+	<tr><td>山頂</td><td><span class="formula">$6C</span></td><td>体</td><td>5</td></tr>
+	<tr><td>竹林</td><td><span class="formula">$14</span></td><td>速</td><td>5</td></tr>
+	<tr><td>道場</td><td><span class="formula">$18</span></td><td>力</td><td>5</td></tr>
+</tbody>
+</table>
+
+<p>シナリオ別キャラデータのステータス関係のアドレスは以下の通り。<br>
+今回は知の値は関係ないが（修行では上がらない）、一応一緒に載せておく。</p>
+
+<table>
+<thead>
+	<tr><th>ユン</th><th>レイ</th><th>サモ</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:0F08</code></td><td><code>$00:0F48</code></td><td><code>$00:0F88</code></td><td>現在HP（下位バイト）</td></tr>
+	<tr><td><code>$00:0F09</code></td><td><code>$00:0F49</code></td><td><code>$00:0F89</code></td><td>現在HP（上位バイト）</td></tr>
+	<tr><td><code>$00:0F0A</code></td><td><code>$00:0F4A</code></td><td><code>$00:0F8A</code></td><td>最大HP（下位バイト）</td></tr>
+	<tr><td><code>$00:0F0B</code></td><td><code>$00:0F4B</code></td><td><code>$00:0F8B</code></td><td>最大HP（上位バイト）</td></tr>
+	<tr><td><code>$00:0F10</code></td><td><code>$00:0F50</code></td><td><code>$00:0F90</code></td><td>力（力＋装備上昇分）</td></tr>
+	<tr><td><code>$00:0F11</code></td><td><code>$00:0F51</code></td><td><code>$00:0F91</code></td><td>力</td></tr>
+	<tr><td><code>$00:0F12</code></td><td><code>$00:0F52</code></td><td><code>$00:0F92</code></td><td>力（装備上昇分）</td></tr>
+	<tr><td><code>$00:0F13</code></td><td><code>$00:0F53</code></td><td><code>$00:0F93</code></td><td>速（速＋装備上昇分）</td></tr>
+	<tr><td><code>$00:0F14</code></td><td><code>$00:0F54</code></td><td><code>$00:0F94</code></td><td>速</td></tr>
+	<tr><td><code>$00:0F15</code></td><td><code>$00:0F55</code></td><td><code>$00:0F95</code></td><td>速（装備上昇分）</td></tr>
+	<tr><td><code>$00:0F16</code></td><td><code>$00:0F56</code></td><td><code>$00:0F96</code></td><td>体（体＋装備上昇分）</td></tr>
+	<tr><td><code>$00:0F17</code></td><td><code>$00:0F57</code></td><td><code>$00:0F97</code></td><td>体</td></tr>
+	<tr><td><code>$00:0F18</code></td><td><code>$00:0F58</code></td><td><code>$00:0F98</code></td><td>体（装備上昇分）</td></tr>
+	<tr><td><code>$00:0F19</code></td><td><code>$00:0F59</code></td><td><code>$00:0F99</code></td><td>知（知＋装備上昇分）</td></tr>
+	<tr><td><code>$00:0F1A</code></td><td><code>$00:0F5A</code></td><td><code>$00:0F9A</code></td><td>知</td></tr>
+	<tr><td><code>$00:0F1B</code></td><td><code>$00:0F5B</code></td><td><code>$00:0F9B</code></td><td>知（装備上昇分）</td></tr>
+</tbody>
+</table>
+
+<h3>レベルアップ時のHP処理</h3>
+
+<p>戦闘終了時の処理の順番は、レベルアップした場合はレベルアップ処理（HP処理→技習得）→修行場所によるステータスアップ処理である。<br>
+まず、レベルアップした場合におけるステータス関係の処理から説明するが、修行時はHPしか上昇しない。<br>
+上昇量は、味方キャラデータ27の値から計算される。</p>
+
+<p><span class="tri"><a href="program10_2.html">レベルアップ処理 &gt; ステータス上昇値</a></span>で、レベルアップ時のHP上昇量は味方キャラデータ27の値から計算されることを紹介した。<br>
+HP上昇量計算は少しややこしいが（詳細は上リンク先参照）、ほとんどのキャラで乱数計算による上昇値のブレが生じるようになっている。<br>
+だが、修行時のみ、乱数計算は行わない。<br>
+味方キャラデータ27の下6ビットの値が固定値として加算される。</p>
+
+<p>味方キャラデータ27の値は以下の通り。</p>
+
+<table>
+<thead>
+	<tr><th>キャラ</th><th>アドレス</th><th>値</th><th>下6ビット</th></tr>
+</thead>
+<tbody>
+	<tr><td>ユン</td><td><code>$D5:0270</code></td><td><span class="formula">$8C</span></td><td><span class="formula">$0C</span></td></tr>
+	<tr><td>レイ</td><td><code>$D5:029D</code></td><td><span class="formula">$92</span></td><td><span class="formula">$12</span></td></tr>
+	<tr><td>サモ</td><td><code>$D5:02CA</code></td><td><span class="formula">$FC</span></td><td><span class="formula">$3C</span></td></tr>
+</tbody>
+</table>
+
+<p>以下が、修行におけるレベルアップ時のHP処理になる。</p>
+
+<div class="code-container"><pre>
+$C1/2451 LDA $D5001B,x           ;Aに[$D5001B,x]（味方キャラデータ27）をロード
+$C1/2455 AND #$3F                ;Aと$3Fで論理積
+$C1/2457 BRA $07    [$2460]      ;フラグにかかわりなく常に分岐[$2460]
+$C1/2460 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/2462 STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/2464 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/2466 LDA $000A,y[$00:0F4A]   ;Aに[$000A,y+1][$000A,y](シナリオ別キャラデータ 最大HP)をロード
+$C1/2469 ADC $10    [$00:0310]   ;A + [$00:0311][$00:0310]
+$C1/246B CMP #$03E7              ;Aと$03E7(10進数999)を減算比較（ステータスレジスタ変更のみ）
+$C1/246E BCC $03    [$2473]      ;キャリーフラグが立っていないとき[$2473]分岐
+;キャリーフラグON
+$C1/2470 LDA #$03E7              ;Aに$03E7をロード
+;キャリーフラグOFF
+$C1/2473 STA $000A,y[$00:0F4A]   ;Aを[$000A,y+1][$000A,y](シナリオ別キャラデータ 最大HP)に書き込み
+$C1/2476 STA $0008,y[$00:0F48]   ;Aを[$0008,y+1][$0008,y](シナリオ別キャラデータ 現在HP)に書き込み
+</pre></div>
+
+<p>処理は通常のレベルアップ時に比べるとシンプルである。<br>
+味方キャラデータ27の下6ビットの値の値を取り出すために、<code><span class="r">$C1/2455</span></code>で<span class="formula">$3F</span>(<span class="formula">%0011 1111</span>)と論理積を取る。<br>
+その計算値を<code>[$00:0310]</code>に、<code>[$00:0311]</code>に<span class="formula">$00</span>を書き込んでから、<code><span class="r">$C1/2464</span></code>で16bitモードに切り替える。<br>
+<code><span class="r">$C1/2466</span></code>で、弟子のシナリオ別キャラデータの最大HPの値を2バイトで読み込み、<code><span class="r">$C1/2469</span></code>で<code>[$00:0311]</code><code>[$00:0310]</code>を加算する。<br>
+<code>[$00:0311]</code><code>[$00:0310]</code>はさきほど、上1ビットに<span class="formula">$00</span>を入れ、<code>[$00:0310]</code>に味方キャラデータ27の下6ビットが入った。<br>
+つまり、味方キャラデータ27のHP上昇量の基礎値部分を、シナリオ別キャラデータの最大HPに足したことになる。</p>
+
+<p><code><span class="r">$C1/246B</span></code>で、加算の結果を<span class="formula">$03E7</span>(10進数<span class="formula">999</span>)と比較している。<br>
+つまり、加算したことで最大HPが<span class="formula">999</span>を越えていないか、<code><span class="r">$C1/246E</span></code>でキャリーフラグにて判定をする。<br>
+キャリーフラグが立つ場合は<span class="formula">999</span>以上であり、<code><span class="r">$C1/2470</span></code>で<code>A</code>に<span class="formula">$03E7</span>を読み込むことで、最大HPを<span class="formula">999</span>に変更する。<br>
+キャリーフラグが立たない場合は<span class="formula">999</span>未満であり、加算後の値がそのまま、新たなシナリオ別キャラデータの最大HPにセットされる。<br>
+同時に、シナリオ別キャラデータの現在HP（2バイト）のデータにもセットされて、処理終了である。<br>
+他ステータスには一切処理が入らない。</p>
+
+<p>ここから、修行では、HPのみ「味方キャラデータ27の下6ビット」分上昇し、他ステータスは上がらないことがわかる。<br>
+HPの上昇値も、通常の戦闘におけるレベルアップ時とは異なり、乱数に左右されず固定値となる。</p>
+
+<h3>場所によるステータス処理</h3>
+
+<p>修行中は、戦闘が終了する度に、修行を行った弟子のステータスがアップする。</p>
+
+<table>
+<thead>
+	<tr><th>場所</th><th><code>$00:0041</code></th><th>ステータス</th><th>上昇値</th></tr>
+</thead>
+<tbody>
+	<tr><td>山頂</td><td><span class="formula">$6C</span></td><td>体</td><td>5</td></tr>
+	<tr><td>竹林</td><td><span class="formula">$14</span></td><td>速</td><td>5</td></tr>
+	<tr><td>道場</td><td><span class="formula">$18</span></td><td>力</td><td>5</td></tr>
+</tbody>
+</table>
+
+<p>修行場所は、<code>$00:0041</code>の上6ビットの値（おそらく戦闘背景の番号にあたる）で区別している。<br>
+修行以外でも戦闘開始時、<code>$00:0041</code>に戦闘背景の番号が入る。<br>
+竹林の虎や、レイが弟子になる時の戦闘などの戦闘では<code>$00:0041</code><span class="formula"> = $14</span>だし、道場の修行前の弟子三連戦も<span class="formula"><code>$00:0041</code> = $18</span>である。<br>
+なお、今回、上表に乗せている<code>$00:0041</code>の値は、下2ビットがすべて<span class="formula">%00</span>なので、<code>$00:0041</code>の値はそのまま上6ビットの値と同値である。</p>
+
+<p>もうひとつ、修行中は、戦闘中の味方キャラデータの2人目に弟子のデータの一部が入る。<br>
+本来、修行での味方キャラは老師だけで、<code>$00:1C00</code>～<code>$00:1C3F</code>に入るのだが、弟子のデータの一部は<code>$00:1C40</code>～にも入る。<br>
+<code>$00:1C40</code>に入るキャラID以外は、おそらく修行用の専用値である。<br>
+<code>$00:1C41</code>には戦闘状態が入るが、<span class="formula">$20</span>は修行における対戦相手の値であろう。<br>
+<code>$00:1C42</code>～<code>$00:1C43</code>の値で、弟子毎に呼び出すアドレスを計算しているようである。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>ユン</th><th>レイ</th><th>サモ</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1C40</code></td><td><span class="formula">$09</span></td><td><span class="formula">$0A</span></td><td><span class="formula">$0B</span></td></tr>
+	<tr><td><code>$00:1C41</code></td><td><span class="formula">$20</span></td><td><span class="formula">$20</span></td><td><span class="formula">$20</span></td></tr>
+	<tr><td><code>$00:1C42</code></td><td><span class="formula">$00</span></td><td><span class="formula">$40</span></td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>$00:1C43</code></td><td><span class="formula">$0F</span></td><td><span class="formula">$0F</span></td><td><span class="formula">$0F</span></td></tr>
+	<tr><td><code>$00:1C44</code></td><td><span class="formula">$08</span></td><td><span class="formula">$09</span></td><td><span class="formula">$0A</span></td></tr>
+</tbody>
+</table>
+
+<p>以下が、修行時のステータス処理のサブルーチンである。</p>
+
+<div class="code-container"><pre>
+$C1/230E LDX #$1C40              ;Xに$1C40をロード
+$C1/2311 LDY $0002,x[$00:1C42]   ;Yに[$00:1C43][$00:1C42]をロード
+$C1/2314 LDA $0041  [$00:0041]   ;Aに[$00:0041]をロード
+$C1/2317 AND #$FC                ;Aと$FCで論理積
+$C1/2319 LDX #$FEDC              ;Xに$FEDCをロード
+$C1/231C CMP #$18                ;Aと$18を減算比較（ステータスレジスタ変更のみ）
+$C1/231E BEQ $19    [$2339]      ;ゼロフラグが立っているとき[$2339]分岐
+$C1/2320 LDX #$FECB              ;Xに$FECBをロード
+$C1/2323 INY                     ;Yをインクリメント +1
+$C1/2324 INY                     ;Yをインクリメント +1
+$C1/2325 INY                     ;Yをインクリメント +1
+$C1/2326 CMP #$14                ;Aと$14を減算比較（ステータスレジスタ変更のみ）
+$C1/2328 BEQ $0F    [$2339]      ;ゼロフラグが立っているとき[$2339]分岐
+$C1/232A LDX #$FEEA              ;Xに$FEEAをロード
+$C1/232D INY                     ;Yをインクリメント +1
+$C1/232E INY                     ;Yをインクリメント +1
+$C1/232F INY                     ;Yをインクリメント +1
+$C1/2330 CMP #$6C                ;Aと$6Cを減算比較（ステータスレジスタ変更のみ）
+$C1/2332 BEQ $05    [$2339]      ;ゼロフラグが立っているとき[$2339]分岐
+</pre></div>
+
+<p>弟子により変わるのは、<code><span class="r">$C1/2311</span></code>における<code>[$00:1C43]</code><code>[$00:1C42]</code>のロードで、</p>
+
+<table>
+<thead>
+	<tr><th>キャラ</th><th><code>[$00:1C43]</code><code>[$00:1C42]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>ユン</td><td><span class="formula">$0F00</span></td></tr>
+	<tr><td>レイ</td><td><span class="formula">$0F40</span></td></tr>
+	<tr><td>サモ</td><td><span class="formula">$0F80</span></td></tr>
+</tbody>
+</table>
+
+<p>以上が<code>Y</code>にロードされる。<br>
+<span class="formula">40</span>ずつズレることで、後々のキャラデータの呼び出し位置もアドレスが<span class="formula">40</span>ずつずれ、各弟子のデータを呼び出せることになる。</p>
+
+<p>続いて、<code><span class="r">$C1/2314</span></code>で<code>[$00:0041]</code>をロードしている。この値は先に書いた通りに戦闘背景の番号で、修行場所の判別に使っている。<br>
+<code><span class="r">$C1/2317</span></code>で、<code>[$00:0041]</code>と<span class="formula">$FC</span>で論理積を取ってから、この値を、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>処理</th><th><code>X</code></th><th><code>Y</code></th></tr>
+</thead>
+<tbody>
+	<tr><td><code><span class="r">$C1/231C</span></code></td><td><span class="formula">$18</span>と減算比較（道場）</td><td><code>X</code>:<span class="formula">FEDC</span></td><td><code>Y</code>:<span class="formula">0F?0+0</span></td></tr>
+	<tr><td><code><span class="r">$C1/2326</span></code></td><td><span class="formula">$14</span>と減算比較（竹林）</td><td><code>X</code>:<span class="formula">FECB</span></td><td><code>Y</code>:<span class="formula">0F?0+3</span></td></tr>
+	<tr><td><code><span class="r">$C1/2330</span></code></td><td><span class="formula">$6C</span>と減算比較（山頂）</td><td><code>X</code>:<span class="formula">FEEA</span></td><td><code>Y</code>:<span class="formula">0F?0+6</span></td></tr>
+</tbody>
+</table>
+
+<p>の順に判定し、ゼロフラグが立つ、つまり同値なら<code><span class="r">$C1/2339</span></code>にジャンプしている。<br>
+つまり、修行場所による分岐が入る。<br>
+分岐で飛ぶ前の<code>X</code>と<code>Y</code>の値が変更されていくという点がポイント。</p>
+
+<p>いずれかの値と一致した場合の<code><span class="r">$C1/2339</span></code>～の処理は以下の通り。</p>
+
+<div class="code-container"><pre>
+$C1/2339 LDA $0011,y             ;Aに[$0011,y](力/速/体)をロード
+$C1/233C CLC                     ;キャリーフラグクリア
+$C1/233D ADC #$05                ;A + $05
+$C1/233F CMP #$63                ;Aと$63(10進数99)を減算比較（ステータスレジスタ変更のみ）
+$C1/2341 BCC $02    [$2345]      ;キャリーフラグが立っていないとき[$2345]分岐
+;キャリーフラグON
+$C1/2343 LDA #$63                ;Aに$63(10進数99)をロード
+;キャリーフラグOFF
+$C1/2345 STA $0011,y             ;Aを[$0011,y](力/速/体)に書き込み
+$C1/2348 CLC                     ;キャリーフラグクリア
+$C1/2349 ADC $0012,y             ;A + [$0012,y](力/速/体（装備上昇分）)
+$C1/234C STA $0010,y             ;Aを[$0010,y](力/速/体（力/速/体＋装備上昇分）)に書き込み
+$C1/234F JSR $476E  [$C1:476E]   ;[$C1:476E]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/2339</span></code>で呼び出す<code>[$0011,y]</code>だが、<span class="formula">$0011</span>に<code>Y</code>の値を加えると、ちょうど修行場所にあったステータスのアドレスが呼び出せる。<br>
+たとえば、「レイが山頂で修行」の場合、<span class="formula"><code>Y</code> = $0F40 + 6</span>なので、<span class="formula"><code>[$0011,y]</code> = $0011 + $0F46 = $0F57</span>である。<br>
+<code>$00:0F57</code>は、下表の通り、レイの「体」にあたる。</p>
+
+<table>
+<thead>
+	<tr><th>ユン</th><th>レイ</th><th>サモ</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:0F10</code></td><td><code>$00:0F50</code></td><td><code>$00:0F90</code></td><td>力（力＋装備上昇分）</td></tr>
+	<tr><td><code>$00:0F11</code></td><td><code>$00:0F51</code></td><td><code>$00:0F91</code></td><td>力</td></tr>
+	<tr><td><code>$00:0F12</code></td><td><code>$00:0F52</code></td><td><code>$00:0F92</code></td><td>力（装備上昇分）</td></tr>
+	<tr><td><code>$00:0F13</code></td><td><code>$00:0F53</code></td><td><code>$00:0F93</code></td><td>速（速＋装備上昇分）</td></tr>
+	<tr><td><code>$00:0F14</code></td><td><code>$00:0F54</code></td><td><code>$00:0F94</code></td><td>速</td></tr>
+	<tr><td><code>$00:0F15</code></td><td><code>$00:0F55</code></td><td><code>$00:0F95</code></td><td>速（装備上昇分）</td></tr>
+	<tr><td><code>$00:0F16</code></td><td><code>$00:0F56</code></td><td><code>$00:0F96</code></td><td>体（体＋装備上昇分）</td></tr>
+	<tr><td><code>$00:0F17</code></td><td><code>$00:0F57</code></td><td><code>$00:0F97</code></td><td>体</td></tr>
+	<tr><td><code>$00:0F18</code></td><td><code>$00:0F58</code></td><td><code>$00:0F98</code></td><td>体（装備上昇分）</td></tr>
+</tbody>
+</table>
+
+<p>弟子のステータスに<code><span class="r">$C1/233D</span></code>で<span class="formula">$05</span>を加算し、<code><span class="r">$C1/233F</span></code>で加算後に<span class="formula">$63</span>(10進数<span class="formula">99</span>)を越えていないか判定。<br>
+<span class="formula">$63</span>以上はキャリーフラグが立って、<code>A</code>に<span class="formula">$63</span>(10進数<span class="formula">99</span>)を上書きすることで、加算後の値を<span class="formula">$63</span>に変更する。<br>
+キャリーフラグが立っていない、つまり<span class="formula">$63</span>未満なら、その値がそのまま新たな<code>[$0011,y]</code>(力/速/体)として書き込まれる。</p>
+
+<p><code>[$0012,y]</code>、つまりステータスの+1のアドレスには、現在の装備による該当ステータスのステータス補正分の値が入っている。<br>
+よって、素のステータス<code>[$0011,y]</code>に<code>[$0012,y]</code>を加算すると、ステータス+装備分のステータスとなり、これを<code>[$0010,y]</code>に書き込んで、処理終了となる。</p>
+
+<p>上の処理を見る限り、素のステータス+装備による補正値で<span class="formula">0</span>未満になったり、<span class="formula">256</span>以上になる場合の分岐処理がない。<br>
+功夫編の修行前までに入手できる装備品は限られており、力・速・体にマイナス補正が入る装備はないので、<span class="formula">0</span>未満になる場合を考慮する必要はないし、「ドンブリ」の体<span class="formula">+4</span>、「ちゅうかなべ」の体<span class="formula">+2</span>、「キリンのくつ」の速<span class="formula">+20</span>では、素のステータス＋装備補正で<span class="formula">256</span>を越えることもありえない。<br>
+ということで、通常のレベルアップであれば考慮されていたオーバーフロー関係の分岐処理は、功夫編の修行では行われないようである。</p>
+
+<hr>
+
+<p>おまけとして、修行関係の<span class="tri"><a href="flag.html">進行フラグ</a></span>の値も載せておく。<br>
+各シナリオでは、<code>$00:11F?</code>がカウンター、<code>$00:12??</code>に各種フラグの値（<span class="formula">$00</span>か<span class="formula">$01</span>のいずれかが立つ）が入るが、修行では以下のようにフラグが記録され、最終的に弟子の誰が伝承者になるかも以下の値から決定される。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:11F0</code></td><td>各地の修行回数累計。山頂・竹林・道場それぞれで<span class="formula">$00</span>～<span class="formula">$04</span>、竹林・道場は開始になる度にリセット。</td></tr>
+	<tr><td><code>$00:11F1</code></td><td>ユンの修行回数</td></tr>
+	<tr><td><code>$00:11F2</code></td><td>レイの修行回数</td></tr>
+	<tr><td><code>$00:11F3</code></td><td>サモの修行回数</td></tr>
+	<tr><td><code>$00:123A</code></td><td>修行（山頂）開始</td></tr>
+	<tr><td><code>$00:123B</code></td><td>修行（山頂）終了</td></tr>
+	<tr><td><code>$00:123C</code></td><td>修行（竹林）開始</td></tr>
+	<tr><td><code>$00:123D</code></td><td>修行（竹林）終了</td></tr>
+	<tr><td><code>$00:123E</code></td><td>修行（道場）開始</td></tr>
+	<tr><td><code>$00:123F</code></td><td>修行（道場）終了</td></tr>
+</tbody>
+</table>
+
+<p>ちなみに、山頂で一度でもレイに修行をすると、山頂の修行後に専用の会話になるが、判定は以下の通り。</p>
+
+<div class="code-container"><pre>
+$C0/2704 LDA $00,x  [$00:11F2]   ;Aに[$00:11F2]（レイの修行回数）をロード
+$C0/2706 CMP $8E01,y[$7F:A1CE]   ;Aと[$7F:A1CE]を減算比較（ステータスレジスタ変更のみ）
+$C0/2709 BNE $07    [$2712]      ;ゼロフラグが立っていないとき[$2712]分岐
+</pre></div>
+
+<p><code>[$7F:A1CE]</code> = <span class="formula">$00</span>なので、<code><span class="r">$C0/2706</span></code>の減算比較でゼロフラグが立つのは、レイの修行回数が0回の時のみ。<br>
+よって、レイに修行を1回以上行っておくと、専用会話が見られることになる。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program23.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="program23_2.html"><span class="button">&#9654;次　</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

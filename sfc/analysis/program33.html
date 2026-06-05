@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; オディオ戦">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; オディオ戦">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; オディオ戦</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; オディオ戦</h1>
+<h2>オディオ戦</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>最終編ラストバトルの、オディオアイ×2・オディオモール・オディオマウス～ピュアオディオ戦は、本作においてかなり特殊な戦闘である。<br>
+これまでも、</p>
+
+<ul>
+	<li>ダメージフィールドが発生する技を使用しても、ダメージフィールドは発生しない（<span class="tri"><a href="program26.html">ダメージフィールド</a></span>）</li>
+	<li>オディオモールは被ダメージ量を1ヒットあたり1に強制的に変更する（<span class="tri"><a href="program6.html">オディオモールのダメージ量処理</a></span>）</li>
+	<li>オディオモールとピュアオディオは向き変え・吹き飛ばしが無効（<span class="tri"><a href="program32.html">位置変化・向き変え</a></span>）</li>
+</ul>
+
+<p>ということは紹介したが、他にも、</p>
+
+<ul>
+	<li>オディオモールのみ残るとピュアオディオ戦に移行する</li>
+	<li>オディオアイ×2・オディオモール・オディオマウスすべて撃破するとピュアオディオ戦に移行しない</li>
+	<li>ピュアオディオ戦に移行する時、ピュアオディオ初期位置にいる味方キャラはフィールド隅に強制的に移動させられる</li>
+</ul>
+
+<p>といった、この戦闘専用の処理が行われている。<br>
+これらの仕様・処理がどうなっているのかを解説する。</p>
+
+<p>まず、敵パーティデータについて見てみよう。</p>
+
+<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様の敵パーティデータ一覧を見ると、敵パーティデータの一番下、敵パーティデータID<span class="formula">$FF</span>がオディオアイ×2・オディオモール・オディオマウス戦に該当する。<br>
+だが、敵パーティデータID<span class="formula">$FF</span>に、ピュアオディオのデータは含まれていない。<br>
+敵は戦闘の最初に出現する4体のみが登録されており、5体目にピュアオディオ（敵ID<span class="formula">$D1</span>）がセットされている、ということはない。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>No.</th><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$D6:512F</code></td><td>00</td><td><span class="formula">$00</span></td><td>敵パーティレベル</td></tr>
+	<tr><td><code>$D6:5130</code></td><td>01</td><td><span class="formula">$00</span></td><td>味方・敵の状態</td></tr>
+	<tr><td><code>$D6:5131</code></td><td>02</td><td><span class="formula">$85</span></td><td>味方1 向き/初期座標</td></tr>
+	<tr><td><code>$D6:5132</code></td><td>03</td><td><span class="formula">$8E</span></td><td>味方2 向き/初期座標</td></tr>
+	<tr><td><code>$D6:5133</code></td><td>04</td><td><span class="formula">$EE</span></td><td>味方3 向き/初期座標</td></tr>
+	<tr><td><code>$D6:5134</code></td><td>05</td><td><span class="formula">$F5</span></td><td>味方4 向き/初期座標</td></tr>
+	<tr><td><code>$D6:5135</code></td><td>06</td><td><span class="formula">$04</span></td><td>上位8ビット：アイテム入手率補正<br>下位8ビット：敵の総数</td></tr>
+	<tr><td><code>$D6:5136</code></td><td>07</td><td><span class="formula">$CD</span></td><td>敵ID(0)　オディオアイ</td></tr>
+	<tr><td><code>$D6:5137</code></td><td>08</td><td><span class="formula">$4A</span></td><td>向き/初期座標(0)</td></tr>
+	<tr><td><code>$D6:5138</code></td><td>09</td><td><span class="formula">$CD</span></td><td>敵ID(1)　オディオアイ</td></tr>
+	<tr><td><code>$D6:5139</code></td><td>10</td><td><span class="formula">$22</span></td><td>向き/初期座標(1)</td></tr>
+	<tr><td><code>$D6:513A</code></td><td>11</td><td><span class="formula">$D0</span></td><td>敵ID(2)　オディオモール</td></tr>
+	<tr><td><code>$D6:513B</code></td><td>12</td><td><span class="formula">$18</span></td><td>向き/初期座標(2)</td></tr>
+	<tr><td><code>$D6:513C</code></td><td>13</td><td><span class="formula">$CE</span></td><td>敵ID(3)　オディオマウス</td></tr>
+	<tr><td><code>$D6:513D</code></td><td>14</td><td><span class="formula">$15</span></td><td>向き/初期座標(3)</td></tr>
+	<tr><td><code>$D6:513E</code></td><td>15</td><td><span class="formula">$00</span></td><td>ラストバトル判定用数値</td></tr>
+</tbody>
+</table>
+
+<h3>メモリアドレス</h3>
+
+<p>仕様について大雑把に種明かしをすると、本作では一度の戦闘に敵の種類は4種まで、敵総数は15体まで登録できるが、戦闘開始時に、</p>
+
+<table>
+<thead>
+	<tr><th>敵種類</th><th>敵</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>オディオアイ</td></tr>
+	<tr><td>2</td><td>オディオモール</td></tr>
+	<tr><td>3</td><td>オディオマウス</td></tr>
+	<tr><td>4</td><td>（なし）</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>敵番号</th><th>敵</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td>オディオアイ（左）</td></tr>
+	<tr><td>1</td><td>オディオアイ（右）</td></tr>
+	<tr><td>2</td><td>オディオモール</td></tr>
+	<tr><td>3</td><td>オディオマウス</td></tr>
+	<tr><td>4</td><td>（なし）</td></tr>
+</tbody>
+</table>
+
+<p>と登録され、ピュアオディオは出現時に、</p>
+
+<table>
+<thead>
+	<tr><th>敵種類</th><th>敵</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>オディオアイ</td></tr>
+	<tr><td>2</td><td>オディオモール</td></tr>
+	<tr><td>3</td><td>オディオマウス</td></tr>
+	<tr><td>4</td><td>ピュアオディオ</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>敵番号</th><th>敵</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td>オディオアイ（左）</td></tr>
+	<tr><td>1</td><td>オディオアイ（右）</td></tr>
+	<tr><td>2</td><td>オディオモール</td></tr>
+	<tr><td>3</td><td>オディオマウス</td></tr>
+	<tr><td>4</td><td>ピュアオディオ</td></tr>
+</tbody>
+</table>
+
+<p>このようにピュアオディオが追加される（同時にオディオモールは倒された扱いとなり、ピュアオディオだけ残る）。</p>
+
+<p>まず、オディオアイ×2・オディオマウスを倒し、オディオモールのみ残った時にピュアオディオ戦に移行する時のサブルーチンについて紹介する。<br>
+敵のステータスなどが登録されるアドレスは以下の通り。<br>
+ピュアオディオ出現前まで、敵種類4の<code>$00:1AC0</code>～<code>$00:1AFF</code>、敵番号4の<code>$00:1B40</code>～, <code>$7E:AA40</code>～は敵が存在していない扱いである（ほとんどが<span class="formula">$00</span>で埋まっているが、全てではない）。</p>
+
+<table>
+<thead>
+	<tr><th>敵種類</th><th>アドレス</th><th>名前</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td><code>$00:1A00</code>～<code>$00:1A3F</code></td><td>オディオアイ</td></tr>
+	<tr><td>2</td><td><code>$00:1A40</code>～<code>$00:1A7F</code></td><td>オディオモール</td></tr>
+	<tr><td>3</td><td><code>$00:1A80</code>～<code>$00:1ABF</code></td><td>オディオマウス</td></tr>
+	<tr><td>4</td><td><code>$00:1AC0</code>～<code>$00:1AFF</code></td><td>ピュアオディオ</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>敵番号</th><th>アドレス</th><th>名前</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td><code>$00:1B00</code>～<code>$00:1B0F</code>, <code>$7E:AA00</code>～</td><td>オディオアイ（左）</td></tr>
+	<tr><td>1</td><td><code>$00:1B10</code>～<code>$00:1B1F</code>, <code>$7E:AA10</code>～</td><td>オディオアイ（右）</td></tr>
+	<tr><td>2</td><td><code>$00:1B20</code>～<code>$00:1B2F</code>, <code>$7E:AA20</code>～</td><td>オディオモール</td></tr>
+	<tr><td>3</td><td><code>$00:1B30</code>～<code>$00:1B3F</code>, <code>$7E:AA30</code>～</td><td>オディオマウス</td></tr>
+	<tr><td>4</td><td><code>$00:1B40</code>～<code>$00:1B4F</code>, <code>$7E:AA40</code>～</td><td>ピュアオディオ</td></tr>
+</tbody>
+</table>
+
+<p>重要となるのが、それぞれの敵が生存しているか倒されたかの判定である。<br>
+敵番号<code>$00:1Bx1</code>に、敵の戦闘状態が記録される。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>状態</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>戦闘離脱</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>敵キャラをプレイヤーが操作</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>味方キャラが敵状態</td></tr>
+	<tr><td><span class="formula">$80</span></td><td>敵総数+1の敵番号</td></tr>
+	<tr><td><span class="formula">$FF</span></td><td>通常</td></tr>
+</tbody>
+</table>
+
+<p>戦闘開始時、オディオアイ、オディオモール、オディオマウスは戦闘状態が通常で、存在しない5体目の敵であるアドレス<code>$00:1B41</code>には<span class="formula">$80</span>が入る。</p>
+
+<table>
+<thead>
+	<tr><th>敵番号</th><th>アドレス</th><th>名前</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td><code>$00:1B01</code></td><td>オディオアイ（左）</td><td><span class="formula">$FF</span></td></tr>
+	<tr><td>1</td><td><code>$00:1B11</code></td><td>オディオアイ（右）</td><td><span class="formula">$FF</span></td></tr>
+	<tr><td>2</td><td><code>$00:1B21</code></td><td>オディオモール</td><td><span class="formula">$FF</span></td></tr>
+	<tr><td>3</td><td><code>$00:1B31</code></td><td>オディオマウス</td><td><span class="formula">$FF</span></td></tr>
+	<tr><td>4</td><td><code>$00:1B41</code></td><td>（なし）</td><td><span class="formula">$80</span></td></tr>
+</tbody>
+</table>
+
+<p>オディオモール以外の敵を倒すと、オディオアイとオディオマウスの戦闘状態には、戦闘離脱を意味する<span class="formula">$00</span>が入る。</p>
+
+<table>
+<thead>
+	<tr><th>敵番号</th><th>アドレス</th><th>名前</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td><code>$00:1B01</code></td><td>オディオアイ（左）</td><td><span class="formula">$00</span></td></tr>
+	<tr><td>1</td><td><code>$00:1B11</code></td><td>オディオアイ（右）</td><td><span class="formula">$00</span></td></tr>
+	<tr><td>2</td><td><code>$00:1B21</code></td><td>オディオモール</td><td><span class="formula">$FF</span></td></tr>
+	<tr><td>3</td><td><code>$00:1B31</code></td><td>オディオマウス</td><td><span class="formula">$00</span></td></tr>
+	<tr><td>4</td><td><code>$00:1B41</code></td><td>（なし）</td><td><span class="formula">$80</span></td></tr>
+</tbody>
+</table>
+
+<p>この状況だと、何らかの判定の後にピュアオディオ戦へ移行する処理が入るはずだ。</p>
+
+<h3>サブルーチン</h3>
+
+<p>ピュアオディオ出現処理に移行するかどうか、また移行後の処理は<code><span class="r">$C1/7BCE</span></code>～<code><span class="r">$C1/7F92</span></code>で判定されている。<br>
+<code><span class="r">$C1/7BCE</span></code>自体はどの戦闘でも判定のために通過するのだが、後述の処理で、ピュアオディオ出現時以外は<code><span class="r">$C1/7BD3</span></code>でサブルーチンを抜ける。</p>
+
+<p>ここでは、敵を撃破して<code>$00:1B?1</code>に<span class="formula">$00</span>（戦闘離脱）が入るまでの処理の説明は端折る。<br>
+処理自体は以下。</p>
+
+<div class="code-container"><pre>
+$C1/0552 STZ $0001,x             ;[$00:1Bx1]に$00を書き込み
+$C1/0555 LDA #$FF                ;Aに$FFをロード
+$C1/0557 STA $FF    [$00:03FF]   ;Aを[$00:03FF]に書き込み
+$C1/0559 JSR $6121  [$C1:6121]   ;[$C1:6121]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/7BCE</span></code>～の処理は以下のようになっている。</p>
+
+<div class="code-container"><pre>
+$C1/7BCE JSR $03FA  [$C1:03FA]   ;[$C1:03FA]へジャンプ
+;
+$C1/03FA LDX #$1B00              ;Xに$1B00をロード
+;敵番号nが通常状態の時、敵IDが$D0=オディオモールかループ判定
+$C1/03FD LDA $0001,x             ;Aに[$00:1Bn1](敵番号nの戦闘状態　$FF=通常)をロード
+$C1/0400 BEQ $11    [$0413]      ;ゼロフラグが立っているとき[$0413]分岐
+$C1/0402 CMP #$80                ;Aと$80を減算比較（ステータスレジスタ変更のみ）
+$C1/0404 BEQ $1B    [$0421]      ;ゼロフラグが立っているとき[$0421]分岐
+$C1/0406 LDA $0000,x             ;Aに[$00:1Bn0](敵番号nの敵ID)をロード
+$C1/0409 CMP #$D0                ;Aと$D0を減算比較（ステータスレジスタ変更のみ）
+$C1/040B BNE $17    [$0424]      ;ゼロフラグが立っていないとき[$0424]分岐
+$C1/040D LDA #$00                ;Aに$00をロード
+$C1/040F STA $7E8F02,x           ;A($00)を[$7E8F02,x]に書き込み
+$C1/0413 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/0415 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/0416 ADC #$0010              ;A + $0010
+$C1/0419 TAX                     ;Aの値をXレジスタに転送
+$C1/041A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/041C CPX #$1C00              ;Xと$1C00を減算比較（ステータスレジスタ変更のみ）
+$C1/041F BNE $DC    [$03FD]      ;ゼロフラグが立っていないとき[$03FD]分岐
+;ループここまで
+;$C1/0404でゼロフラグON
+$C1/0421 LDA #$00                ;Aに$00をロード
+$C1/0423 RTS                     ;サブルーチン戻り
+;$C1/040BでゼロフラグOFF
+$C1/0424 LDA #$FF                ;Aに$FFをロード
+$C1/0426 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/03FA</span></code>～<code><span class="r">$C1/0426</span></code>が、敵番号0から順に、敵がオディオモールかどうかループ判定していくサブルーチンである。<br>
+まず、<code><span class="r">$C1/03FD</span></code>で、<code>[$00:1Bn1]</code>(敵番号nの戦闘状態)が<span class="formula">$00</span>、つまり既に撃破しており戦闘離脱かを判定している。<br>
+戦闘離脱だとゼロフラグが立って<code><span class="r">$C1/0413</span></code>にジャンプするから、<code><span class="r">$C1/0402</span></code>～<code><span class="r">$C1/040F</span></code>がスキップされる。</p>
+
+<p><code><span class="r">$C1/0402</span></code>～<code><span class="r">$C1/0404</span></code>は、戦闘状態が<span class="formula">$80</span>かの判定。<br>
+戦闘状態が<span class="formula">$80</span>は、敵番号の末尾がどこかを判定するために入る値であり、たとえばこの戦闘のように敵が4体なら、5体目に戦闘状態<span class="formula">$80</span>が入る。</p>
+
+<p><code><span class="r">$C1/0406</span></code>に入った時点で戦闘状態は<span class="formula">$00</span>でも<span class="formula">$80</span>でもないことになる。つまり、この判定の時点で生存している敵である。<br>
+ここで、<code>[$00:1Bn0]</code>（敵ID）と<span class="formula">$D0</span>を減算比較し、ゼロフラグ判定をしている。<br>
+敵IDが<span class="formula">$D0</span>はオディオモールなので、ここでゼロフラグが立つのはオディオモールのみである。<br>
+オディオモール以外なら、<code><span class="r">$C1/0424</span></code>に飛ぶので、<code>A</code>に<span class="formula">$FF</span>をロードして<code><span class="r">$C1/0426</span></code>でサブルーチンを抜けて終了となる。<br>
+オディオモールだと<code>[$7E8F02,x]</code>に<span class="formula">$00</span>を読み込んでループ末尾まで飛び、ループ頭へ戻る。</p>
+
+<p>さて、この処理で何が起こるのか。<br>
+敵が生存している場合は、<code><span class="r">$C1/040B</span></code>でオディオモールでない限り<code><span class="r">$C1/0424</span></code>にジャンプしてループから抜ける。<br>
+つまり、オディオモールがいない戦闘だと、必ず<code><span class="r">$C1/0424</span></code>にジャンプしてループから抜ける。<br>
+また、オディオモールがいる場合でも、オディオモール以外が生存していたら、結局<code><span class="r">$C1/0424</span></code>にジャンプしてループから抜ける。<br>
+判定順はオディオアイ（左）→オディオアイ（右）→オディオモール→オディオマウスであるから、オディオアイを両方倒していないとオディオモール自身のオディオモール判定までたどり着かないし、オディオモールの処理までたどり着いてもオディオマウスが生存していたらオディオモール判定で弾かれて<code><span class="r">$C1/0424</span></code>にジャンプしてしまう。</p>
+
+<p>つまり上のループは、最終編ラストバトルかつ、オディオアイ・マウスが倒されている状態で、オディオモールだけが生存している、という状態の時だけ、ループ5周目にたどりつくことになる。<br>
+ループ5周目で、<code><span class="r">$C1/0404</span></code>のゼロフラグがONになり、<code><span class="r">$C1/0421</span></code>にジャンプする。<br>
+この場合は<code>A</code>に<span class="formula">$00</span>をロードしてサブルーチンが戻る。</p>
+
+<p>整理すると、</p>
+
+<ol>
+	<li>最終編ラストバトルかつ、オディオアイ・マウスが倒されている状態で、オディオモールだけが生存しているなら、<code>A</code>に<span class="formula">$00</span>をロードしてサブルーチン戻り</li>
+	<li>それ以外は、<code>A</code>に<span class="formula">$FF</span>をロードしてサブルーチン戻り</li>
+</ol>
+
+<p>ということになり、1.がピュアオディオ戦発生分岐だったということがわかる。<br>
+オディオモールを先に倒してしまった場合、1.の条件は絶対に満たせなくなるため、ピュアオディオは出現しないのである。</p>
+
+<div class="code-container"><pre>
+$C1/7BD1 BEQ $01    [$7BD4]      ;ゼロフラグが立っているとき[$7BD4]分岐
+;ゼロフラグOFF
+$C1/7BD3 RTS                     ;サブルーチン戻り
+;ゼロフラグON
+$C1/7BD4 LDA #$10                ;Aに$10をロード
+$C1/7BD6 JSR $121C  [$C1:121C]   ;[$C1:121C]へジャンプ
+</pre></div>
+
+<p>サブルーチンが戻った先が上で、ゼロフラグ判定になる。<br>
+ゼロフラグが立つのは「最終編ラストバトルかつ、オディオアイ・マウスが倒されている状態で、オディオモールだけが生存」の時だけで、この時のみ<code><span class="r">$C1/7BD4</span></code>に処理が進み、そうでなければ<code><span class="r">$C1/7BD3</span></code>でサブルーチンを抜けてピュアオディオ戦へ移行しない。<br>
+<code><span class="r">$C1/7BD4</span></code>以降は、ピュアオディオ戦発生処理へと進むことになる。</p>
+
+<p>この後はしばらくモーションなどの処理があるので紹介は端折る。<br>
+<code><span class="r">$C1/7BD6</span></code>の戻り先が<code><span class="r">$C1/7BDE</span></code>なのだが、ここでサウンド関係の処理が入る。<br>
+筆者はサウンド関連のサブルーチンについては詳しくないため、とりあえずわかる箇所のみ解説する。</p>
+
+<div class="code-container"><pre>
+$C1/7BDE LDA #$1C                ;Aに$1Cをロード
+$C1/7BE0 JSR $12FE  [$C1:12FE]   ;[$C1:12FE]へジャンプ
+</pre></div>
+
+<p>まず、<code><span class="r">$C1/7BDE</span></code>で<code>A</code>に読み込まれる<span class="formula">$1C</span>という値なのだが、これはBGMのID<span class="formula">$1C</span>、サウンドトラックの曲名の「PURE ODIO」である。<br>
+つまり、ラストバトル後半、ピュアオディオ出現後のBGMのIDがここで<code>A</code>に読み込まれたことになる。</p>
+
+<div class="code-container"><pre>
+$C1/12FE STA $10    [$00:0310]   ;A($1C)を[$00:0310]に書き込み
+$C1/1300 LDA $AA    [$00:03AA]   ;Aに[$00:03AA]をロード
+$C1/1302 BEQ $04    [$1308]      ;ゼロフラグが立っているとき[$1308]分岐
+$C1/1304 LDA #$10                ;Aに$10をロード
+$C1/1306 BRA $3C    [$1344]      ;フラグにかかわりなく常に分岐[$1344]
+$C1/1344 STA $1D00  [$00:1D00]   ;A($10)を[$00:1D00]に書き込み
+$C1/1347 LDA $10    [$00:0310]   ;Aに[$00:0310]($1C)をロード
+$C1/1349 AND #$7F                ;Aと$7Fで論理積
+$C1/134B STA $1D01  [$00:1D01]   ;A($1C)を[$00:1D01]に書き込み
+$C1/134E LDA #$FF                ;Aに$FFをロード
+$C1/1350 STA $1D02  [$00:1D02]   ;A($FF)を[$00:1D02]に書き込み
+$C1/1353 JSR $11D8  [$C1:11D8]   ;[$C1:11D8]へジャンプ
+;
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+;
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/0160 JMP ($0734,x)[$C3:0180] ;[$C3:0180]へジャンプ(レジスタをスタックに積まない)
+$C3/0180 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0182 LDA $01    [$00:1D01]   ;Aに[$00:1D01]($1C)をロード
+$C3/0184 CMP $05    [$00:1D05]   ;Aと[$00:1D05](現在のBGM)を減算比較（ステータスレジスタ変更のみ）
+$C3/0186 BEQ $E9    [$0171]      ;ゼロフラグが立っているとき[$0171]分岐
+$C3/0188 CMP $C33FC8[$C3:3FC8]   ;Aと[$C3:3FC8]を減算比較（ステータスレジスタ変更のみ）
+$C3/018C BCS $E3    [$0171]      ;キャリーフラグが立っているとき[$0171]分岐
+$C3/018E JSR $062F  [$C3:062F]   ;[$C3:062F]へジャンプ
+</pre></div>
+
+<p>細かい説明は省くが（というか筆者の知識が足らないが）、<code>A</code>から<code>[$00:1D01]</code>に<span class="formula">$1C</span>の値がコピーされ、おそらく各種のフラグ判定後、最後の<code><span class="r">$C3/0182</span></code>で、現在のBGMのIDが書き込まれている<code>[$00:1D05]</code>と、<code>[$00:1D01]</code>(<span class="formula">$1C</span>)を減算比較しゼロフラグ判定をしている。<br>
+つまり、現在のBGMが「PURE ODIO」かどうかの判定である。<br>
+この時点では、ピュアオディオ戦への移行が決まっただけで、BGMには変化がない。前半戦のBGM「ILLUSION…」（BGMのID<span class="formula">$4B</span>）が入っている。<br>
+よって、この時点ではゼロフラグが立たず、BGMの切り替え処理に続くことになる。</p>
+
+<p><code>[$00:1D05]</code>(現在のBGM)にピュアオディオ戦のBGMである<span class="formula">$1C</span>が書き込まれるのは以下の処理。</p>
+
+<div class="code-container"><pre>
+$C3/04F1 STA $1E    [$00:1D1E]   ;Aを[$00:1D1E]に書き込み
+$C3/04F3 INY                     ;Yをインクリメント +1
+$C3/04F4 INY                     ;Yをインクリメント +1
+$C3/04F5 CPY #$0020              ;Yと$0020を減算比較（ステータスレジスタ変更のみ）
+$C3/04F8 BNE $E1    [$04DB]      ;ゼロフラグが立っていないとき[$04DB]分岐
+$C3/04FA LDA #$F0                ;Aに$F0をロード
+$C3/04FC STA $1E    [$00:1D1E]   ;Aを[$00:1D1E]に書き込み
+$C3/04FE SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0500 LDA $05    [$00:1D05]   ;Aに[$00:1D05]をロード
+$C3/0502 BMI $08    [$050C]      ;ネガティブフラグが立っているとき[$050C]分岐
+$C3/0504 LDX $04    [$00:1D04]   ;Xに[$00:1D03][$00:1D04]をロード
+$C3/0506 STX $08    [$00:1D08]   ;Xを[$00:1D07][$00:1D08]に書き込み
+$C3/0508 LDX $06    [$00:1D06]   ;Xに[$00:1D05][$00:1D06]をロード
+$C3/050A STX $0A    [$00:1D0A]   ;Xを[$00:1D0B][$00:1D0A]に書き込み
+$C3/050C LDX $00    [$00:1D00]   ;Xに[$00:1D01][$00:1D00]($1C10)をロード
+$C3/050E STX $04    [$00:1D04]   ;Xを[$00:1D05][$00:1D04]に書き込み
+$C3/0510 LDX $02    [$00:1D02]   ;Xに[$00:1D03][$00:1D02]をロード
+$C3/0512 STX $06    [$00:1D06]   ;Xを[$00:1D07][$00:1D06]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C3/050C</span></code>で<code>X</code>に<code>[$00:1D01]</code><code>[$00:1D00]</code>をロードしている（2バイト）。<br>
+<code><span class="r">$C1/1344</span></code>で<code>[$00:1D00]</code>に<span class="formula">$10</span>が、<code>[$00:1D01]</code>に<span class="formula">$1C</span>（「PURE ODIO」のBGMID）が書き込まれたから、ここで<code>X</code>にロードされた値は<span class="formula">$1C10</span>である。<br>
+それを<code><span class="r">$C3/050E</span></code>で<code>[$00:1D05]</code><code>[$00:1D04]</code>に書き込んでいるから、<code>[$00:1D05]</code>に<span class="formula">$1C</span>、<code>[$00:1D04]</code>に<span class="formula">$10</span>がコピーされたことになる。<br>
+ここで、<code>[$00:1D05]</code>(現在のBGM)に<span class="formula">$1C</span>が入り、ピュアオディオ戦のBGMのIDがセットされた。</p>
+
+<p>この後のBGMデータの呼び出しや転送については端折る。<br>
+一通りBGM関係の処理が終わるのが<code><span class="r">$C3/017F</span></code>で、そこから<code><span class="r">$C1/11E3</span></code>→<code><span class="r">$C1/1241</span></code>→<code><span class="r">$C1/1359</span></code>～<code><span class="r">$C1/1363</span></code>とサブルーチンが戻ると、<code><span class="r">$C1/7BE0</span></code>からの戻り位置、<code><span class="r">$C1/7BE3</span></code>に処理が続く。</p>
+
+<div class="code-container"><pre>
+$C1/7BE3 LDA #$FE                ;Aに$FEをロード
+$C1/7BE5 STA $77    [$00:0377]   ;Aを[$00:0377]に書き込み
+$C1/7BE7 LDA #$FF                ;Aに$FFをロード
+$C1/7BE9 STA $85    [$00:0385]   ;Aを[$00:0385]に書き込み
+$C1/7BEB JSR $6145  [$C1:6145]   ;[$C1:6145]へジャンプ
+;（戦闘タイマー処理など省略）
+$C1/7BEE JSR $8702  [$C1:8702]   ;[$C1:8702]へジャンプ
+;
+;（$C1/8702～$C1/8713　省略）
+;
+$C1/7BF1 LDY #$1B40              ;Yに$1B40をロード
+$C1/7BF4 STY $1E    [$00:031E]   ;Yを[$00:031E]に書き込み
+$C1/7BF6 LDA #$D1                ;Aに$D1をロード(敵ID$D1はピュアオディオ)
+$C1/7BF8 JSR $FB7C  [$C1:FB7C]   ;[$C1:FB7C]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/7BE3</span></code>～<code><span class="r">$C1/7BF4</span></code>までは説明を省く。<br>
+重要なのは<code><span class="r">$C1/7BF6</span></code>で<code>A</code>にロードした<span class="formula">$D1</span>で、敵ID<span class="formula">$D1</span>はピュアオディオである。<br>
+この状態で<code><span class="r">$C1/FB7C</span></code>にジャンプする。</p>
+
+<div class="code-container"><pre>
+$C1/FB7C STA $10    [$00:0310]   ;A($D1)を[$00:0310]に書き込み
+$C1/FB7E LDY #$1A00              ;Yに$1A00をロード
+;敵種類nの判定ループ
+$C1/FB81 LDA $0001,y             ;Aに[$00:1An1]をロード
+$C1/FB84 BEQ $23    [$FBA9]      ;ゼロフラグが立っているとき[$FBA9]分岐
+$C1/FB86 LDA $10    [$00:0310]   ;Aに[$00:0310]($D1)をロード
+$C1/FB88 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/FB8A BEQ $07    [$FB93]      ;ゼロフラグが立っているとき[$FB93]分岐
+$C1/FB8C LDA $0000,y             ;Aに[$00:1An0](敵種類nの敵ID$CD)をロード
+$C1/FB8F CMP $10    [$00:0310]   ;Aと[$00:0310]($D1)を減算比較（ステータスレジスタ変更のみ）
+$C1/FB91 BEQ $2B    [$FBBE]      ;ゼロフラグが立っているとき[$FBBE]分岐
+$C1/FB93 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/FB95 TYA                     ;Yレジスタの値をAレジスタに転送
+$C1/FB96 ADC #$0040              ;A + $0040
+$C1/FB99 TAY                     ;Aの値をYレジスタに転送
+$C1/FB9A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/FB9C CPY #$1B00              ;Yと$1B00を減算比較（ステータスレジスタ変更のみ）
+$C1/FB9F BNE $E0    [$FB81]      ;ゼロフラグが立っていないとき[$FB81]分岐
+;ループここまで
+$C1/FBA9 LDA $10    [$00:0310]   ;Aに[$00:0310]($D1)をロード
+$C1/FBAB STA $0000,y[$00:1AC0]   ;A($D1)を[$00:1AC0]に書き込み
+$C1/FBAE LDA #$FF                ;Aに$FFをロード
+$C1/FBB0 STA $0001,y[$00:1AC1]   ;A($FF)を[$00:1AC1]に書き込み
+$C1/FBB3 LDA #$00                ;Aに$00をロード
+$C1/FBB5 STA $000A,y[$00:1ACA]   ;Aを[$00:1ACA]に書き込み
+$C1/FBB8 JSR $FC0A  [$C1:FC0A]   ;[$C1:FC0A]へジャンプ
+</pre></div>
+
+<p>まず、<code>[$00:0310]</code>に<span class="formula">$D1</span>（ピュアオディオの敵ID）を書き込んでから、ループ処理に入る。<br>
+ループ頭<code><span class="r">$C1/FB81</span></code>で、<code>[$00:1A01]</code>, <code>[$00:1A41]</code>, <code>[$00:1A81]</code>, <code>[$00:1AC1]</code>……をロードするが、これは該当の敵種類が敵パーティ内に存在しているなら<span class="formula">$FF</span>、存在していないなら<span class="formula">$00</span>が入るアドレスのため、3種類の敵が出現したこの戦闘では、<code>[$00:1A01]</code>, <code>[$00:1A41]</code>, <code>[$00:1A81]</code>に<span class="formula">$FF</span>、<code>[$00:1AC1]</code>に<span class="formula">$00</span>が入っている。</p>
+
+<p><code><span class="r">$C1/FB8C</span></code>では、<code>[$00:1A00]</code>, <code>[$00:1A40]</code>, <code>[$00:1A80]</code>と、敵種類1～4の敵IDを読み込み、<span class="formula">$D1</span>と減算比較してゼロフラグ判定をしている。<br>
+現時点では、「最終編ラストバトルかつ、オディオアイ・マウスが倒されている状態で、オディオモールだけが生存」という状況のため、ピュアオディオはいない。</p>
+
+<p>以上から、ループ4周目頭で<code><span class="r">$C1/FB84</span></code>でゼロフラグが立ち、<code><span class="r">$C1/FBA9</span></code>に分岐することになる。<br>
+<code><span class="r">$C1/FBA9</span></code>以降の処理を見ると、<code>[$00:1AC0]</code>に<span class="formula">$D1</span>、<code>[$00:1AC1]</code>に<span class="formula">$FF</span>、<code>[$00:1ACA]</code>に<span class="formula">$00</span>を書き込んでいる。<br>
+つまり、ここで敵種類4の敵IDが入る<code>[$00:1AC0]</code>に<span class="formula">$D1</span>（ピュアオディオ）、<code>[$00:1AC1]</code>の敵種類存在状態に<span class="formula">$FF</span>が登録された。<br>
+こうしてピュアオディオが敵パーティに加わったことになる。</p>
+
+<p>ジャンプ先の<code>$C1:FC0A</code>以降はこれまでも紹介したことがあるが、敵データIDから、敵データのロード＆<code>$00:1AC0</code>～への書き込み処理になる。<br>
+更にその後は<code>$C1:FC3F</code>～<code>$C1:FC58</code>で技1～4の反撃属性1/反撃属性2/使用不可になるステータス異常を書き込む。<br>
+これでピュアオディオのステータスの大半がセットされたことになる。</p>
+
+<p>ひとつ問題なのは、ピュアオディオは敵パーティデータにデータがないので、初期座標と向きが敵パーティデータから読み出せない。<br>
+つまり、他の敵キャラとは異なる方法で初期座標と向きを設定していることになる。</p>
+
+<p>これまでにも紹介したことがある、敵IDや敵座標セット用サブルーチン<code>$C1:FBBE</code>～<code>$C1:FBFD</code>自体は今回でも処理が行われる。</p>
+
+<div class="code-container"><pre>
+$C1/FBBE STY $12    [$00:0312]   ;Yを[$00:0312]に書き込み
+$C1/FBC0 LDY $1E    [$00:031E]   ;Yに[$00:031E](1AC0)をロード
+$C1/FBC2 LDA $10    [$00:0310]   ;Aに[$00:0310]($D1)をロード
+$C1/FBC4 STA $0000,y[$00:1B40]   ;Aを[$00:1B40](敵ID $D1 ピュアオディオ)に書き込み
+$C1/FBC7 LDA #$FF                ;Aに$FFをロード
+$C1/FBC9 STA $0001,y[$00:1B41]   ;Aを[$00:1B41](戦闘状態$FF)に書き込み
+$C1/FBCC LDA #$00                ;Aに$00をロード
+$C1/FBCE STA $0005,y[$00:1B45]   ;Aを[$00:1B45]に書き込み
+$C1/FBD1 STA $0006,y[$00:1B46]   ;Aを[$00:1B46]に書き込み
+$C1/FBD4 STA $0007,y[$00:1B47]   ;Aを[$00:1B47]に書き込み
+$C1/FBD7 LDA $12    [$00:0312]   ;Aに[$00:0312]をロード
+$C1/FBD9 STA $0002,y[$00:1B42]   ;Aを[$00:1B42]に書き込み
+$C1/FBDC LDA $13    [$00:0313]   ;Aに[$00:0313]をロード
+$C1/FBDE STA $0003,y[$00:1B43]   ;Aを[$00:1B43]に書き込み
+$C1/FBE1 LDA $D60008,x[$D6:1B48] ;Aに[$D6:1B48]($69)をロード
+$C1/FBE5 STA $10    [$00:0310]   ;Aを[$00:0310]($69)に書き込み
+$C1/FBE7 AND #$C0                ;Aと$C0で論理積
+$C1/FBE9 STA $0004,y[$00:1B44]   ;A($40)を[$00:1B44](向き)に書き込み
+$C1/FBEC LDA $10    [$00:0310]   ;Aに[$00:0310]($69)をロード
+$C1/FBEE AND #$38                ;Aと$38で論理積
+$C1/FBF0 LSR A                   ;Aを論理右シフト　(/2)
+$C1/FBF1 LSR A                   ;Aを論理右シフト　(/2)
+$C1/FBF2 LSR A                   ;Aを論理右シフト　(/2)
+$C1/FBF3 STA $000A,y[$00:1B4A]   ;A($05)を[$00:1B4A](現在のマス目のX座標)に書き込み
+$C1/FBF6 LDA $10    [$00:0310]   ;Aに[$00:0310]($69)をロード
+$C1/FBF8 AND #$07                ;Aと$07で論理積
+$C1/FBFA STA $000B,y[$00:1B4B]   ;A($01)を[$00:1B4B](現在のマス目のY座標)に書き込み
+$C1/FBFD JSR $FC78  [$C1:FC78]   ;[$C1:FC78]へジャンプ
+</pre></div>
+
+<p>本来、<code><span class="r">$C1/FBE1</span></code>でロードする<code>$D60008,x</code>（<code>[$D6:1B48]</code>）は、敵パーティデータの向き/初期座標が記録されたアドレスになる。<br>
+なのだが、敵パーティデータが記録されているアドレスは<code>$D6:4280</code>～<code>$D6:512E</code>なのに、範囲外の<code>$D6:1B48</code>が呼び出されている。<br>
+敵パーティデータにピュアオディオが登録されていないため、上サブルーチンでは<code>X</code>の値が正しく計算されておらず（X:1B40）、敵パーティデータ内のアドレスが呼び出せていない。<br>
+それならそれで、<code>[$D6:1B48]</code>(=<span class="formula">$69</span>)でピュアオディオの初期位置や向きが正しく計算されているなら問題がないのだが、上の結果を見ると、</p>
+
+<table>
+<thead>
+	<tr><th>内容</th><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>向き</td><td><code>[$00:1B44]</code></td><td><span class="formula">$40(%0100 0000)</span>/左下</td></tr>
+	<tr><td>X座標</td><td><code>[$00:1B4A]</code></td><td><span class="formula">$05</span></td></tr>
+	<tr><td>Y座標</td><td><code>[$00:1B4B]</code></td><td><span class="formula">$01</span></td></tr>
+</tbody>
+</table>
+
+<p>ピュアオディオの初期での向きは左下なので合っている。<br>
+だが、座標は合っていない。<br>
+座標(5,1)だと以下の位置になってしまう（敵の左上マスが原点(0,0)にあたる）。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□★■■<br>
+□□□□□■■■<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>★が座標<span class="formula">(5,1)</span>である。<br>
+座標は敵の左上マスで指定されるため、横3マス×縦2マスサイズのピュアオディオは戦闘フィールドからはみ出すことになる。<br>
+そもそもX座標もY座標も実際のゲームでの出現位置とはまったく一致していない。</p>
+
+<p>ということで、向きだけは上の処理で左下向きに決定されるのだが、座標についてはピュアオディオ用の専用処理で修正が入る。<br>
+<code><span class="r">$C1/7BF8</span></code>の続きにサブルーチンが戻ってくる。</p>
+
+<div class="code-container"><pre>
+$C1/7BFB LDA #$80                ;Aに$80をロード
+$C1/7BFD STA $1B51  [$00:1B51]   ;Aを[$00:1B51]（敵番号5の戦闘状態）に書き込み
+$C1/7C00 LDX #$1B40              ;Xに$1B40をロード
+$C1/7C03 LDA #$02                ;Aに$02をロード
+$C1/7C05 STA $000A,x[$00:1B4A]   ;Aを[$00:1B4A]（敵番号4のマス目のX座標）に書き込み
+$C1/7C08 INC A                   ;Aをインクリメント +1
+$C1/7C09 STA $000B,x[$00:1B4B]   ;Aを[$00:1B4B]（敵番号4のマス目のY座標）に書き込み
+$C1/7C0C LDA #$06                ;Aに$06をロード
+$C1/7C0E STA $9E    [$00:039E]   ;Aを[$00:039E]に書き込み
+$C1/7C10 LDX #$1AC0              ;Xに$1AC0をロード
+$C1/7C13 STX $9A    [$00:039A]   ;Xを[$00:039A]に書き込み
+$C1/7C15 JSR $63F6  [$C1:63F6]   ;[$C1:63F6]へジャンプ
+</pre></div>
+
+<p>敵4体目が登録されたため、敵番号5戦闘状態<code>[$00:1B51]</code>に終了を意味する<span class="formula">$80</span>を書き込む。<br>
+更に、先の処理で妙な位置に指定された初期座標アドレス<code>[$00:1B4A]</code><code>[$00:1B4B]</code>を修正する。<br>
+上処理を見ると<code>[$00:1B4A]</code>に<span class="formula">$02</span>、<code>[$00:1B4B]</code>に<span class="formula">$03</span>を書き込んでいる。<br>
+つまり、初期座標が<span class="formula">(2,3)</span>に決定した。この位置はピュアオディオ（横3マス×縦2マス）の左上位置になる。<br>
+下図の★が座標<span class="formula">(2,3)</span>である。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□★■■□□<br>
+□□■■■□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>上ではピュアオディオが占める位置を■で書き込んでいるが、実際には縦幅と横幅を計算・書き込む必要がある。<br>
+それが<code><span class="r">$C1/63F6</span></code>からの処理だが、重要な箇所だけ抜粋する。<br>
+敵種類4の横の幅は<code>[$00:1AC3]</code>、縦の幅は<code>[$00:1AC4]</code>に書き込まれる。</p>
+
+<div class="code-container"><pre>
+$C1/63F6 PHX                     ;Xをスタックにプッシュ
+$C1/63F7 JSR $65E9  [$C1:65E9]   ;[$C1:65E9]へジャンプ
+;
+$C1/65E9 STX $9A    [$00:039A]   ;X(1AC0)を[$00:039A]に書き込み
+$C1/65EB LDA $0000,x[$00:1AC0]   ;Aに[$00:1AC0]（敵種類4　ピュアオディオ敵ID$D1）をロード
+;（中略）
+$C1/660A JSR $6706  [$C1:6706]   ;[$C1:6706]へジャンプ
+;（中略）
+$C1/6706 JSR $6612  [$C1:6612]   ;[$C1:6612]へジャンプ
+;（中略）
+$C1/6612 STZ $A5    [$00:03A5]   ;[$00:03A5]に$00を書き込み
+$C1/6614 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/6616 AND #$00FF              ;Aと$00FFで論理積
+$C1/6619 STA $10    [$00:0310]   ;A($00EC)を[$00:0311][$00:0310]に書き込み
+$C1/661B ASL A                   ;Aを算術左シフト *2
+$C1/661C ADC $10    [$00:0310]   ;A + [$00:0311][$00:0310]=02C4
+$C1/661E ADC $D50050[$D5:0050]   ;A + [$D5:0051][$D5:0050]=FC3D
+$C1/6622 TAX                     ;Aの値(FC3D)をXレジスタに転送
+$C1/6623 LDA $D50000,x[$D5:FC3D] ;Aに[$D5:FC3E][$D5:FC3D](88D9)をロード
+$C1/6627 STA $A2    [$00:03A2]   ;A(88D9)を[$00:03A3][$00:03A2]に書き込み
+$C1/6629 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/662B LDA $D50002,x[$D5:FC3F] ;Aに[$D5:FC3F]($DA)をロード
+$C1/662F STA $9C    [$00:039C]   ;A($DA)を[$00:039C]に書き込み
+;（中略）
+$C1/663D JSR $6B43  [$C1:6B43]   ;[$C1:6B43]へジャンプ
+</pre></div>
+
+<p>敵の縦・横幅は、敵キャラデータの中にはなく、上のサブルーチンで敵ごとに計算している。<br>
+まず重要なのが<code><span class="r">$C1/662B</span></code>でロードする<code>[$D5:FC3F]</code>で、<code>[$D5:FC3F]</code>のアドレス計算がそれ以前の処理だが詳細は省略。<br>
+<code>[$D5:FC3F]</code>には<span class="formula">$DA</span>が格納されており、<code>[$00:039C]</code>に書き込まれる。</p>
+
+<p>この後の処理は（たぶん）グラフィック関連なので少し省略する。<br>
+敵の縦・横幅のサブルーチンの一部は<span class="tri"><a href="program24_3.html">味方との戦闘 &gt; 最終編オルステッド主人公時(1)</a></span>でも紹介したが、そのあたりが以下の処理。</p>
+
+<div class="code-container"><pre>
+$C1/6641 LDA $9C    [$00:039C]  ;Aに[$00:039C]をロード
+$C1/6643 AND #$38               ;Aと$38で論理積
+$C1/6645 LSR A                  ;Aを論理右シフト　(/2)
+$C1/6646 STA $10    [$00:0310]  ;Aを[$00:0310]に書き込み
+$C1/6648 LSR A                  ;Aを論理右シフト　(/2)
+$C1/6649 LSR A                  ;Aを論理右シフト　(/2)
+$C1/664A STA $20    [$00:0320]  ;Aを[$00:0320]に書き込み
+$C1/664C LDA $9C    [$00:039C]  ;Aに[$00:039C]をロード
+$C1/664E AND #$07               ;Aと$07で論理積
+$C1/6650 CMP #$07               ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/6652 BEQ $08    [$665C]     ;ゼロフラグが立っているとき[$665C]分岐
+$C1/6654 STA $21    [$00:0321]  ;Aを[$00:0321]に書き込み
+$C1/6656 ASL A                  ;Aを算術左シフト *2
+$C1/6657 ADC $21    [$00:0321]  ;A + [$00:0321]
+$C1/6659 STA $11    [$00:0311]  ;Aを[$00:0311]に書き込み
+$C1/665B RTS                    ;サブルーチン戻り
+
+$C1/670C LDX $9A    [$00:039A]  ;Xに[$00:039A]をロード
+$C1/670E LDA $10    [$00:0310]  ;Aに[$00:0310]をロード
+$C1/6710 STA $0002,x[$00:1AC2]  ;Aを[$00:1AC2]に書き込み
+$C1/6713 LDA $11    [$00:0311]  ;Aに[$00:0311]をロード
+$C1/6715 STA $0003,x[$00:1AC3]  ;Aを[$00:1AC3]に書き込み
+$C1/6718 LDA $20    [$00:0320]  ;Aに[$00:0320]をロード
+$C1/671A STA $0004,x[$00:1AC4]  ;Aを[$00:1AC4](敵種類4　横の幅)に書き込み
+$C1/671D LDA $21    [$00:0321]  ;Aに[$00:0321]をロード
+$C1/671F STA $0005,x[$00:1AC5]  ;Aを[$00:1AC5](敵種類4　縦の幅)に書き込み
+$C1/6722 LDY #$3000             ;Yに$3000をロード
+$C1/6725 JSR $6665  [$C1:6665]  ;[$C1:6665]へジャンプ
+</pre></div>
+
+<p><span class="formula"><code>[$D5:FC3F]</code> = <code>[$00:039C]</code> = $DA</span>を元として計算した以下の値が、敵種類4のアドレスに以下のように書き込まれる。</p>
+
+<table>
+<thead>
+	<tr><th>敵種類4アドレス</th><th>元アドレス</th><th>計算値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:1AC2]</code></td><td><code>[$00:0310]</code></td><td><span class="formula">$DA</span> &#x26; <span class="formula">$38</span> /2 = <span class="formula">$0C</span></td></tr>
+	<tr><td><code>[$00:1AC3]</code></td><td><code>[$00:0311]</code></td><td><span class="formula">$DA</span> &#x26; <span class="formula">$07</span> *2 + <span class="formula">$DA</span> &#x26; <span class="formula">$07</span> = <span class="formula">$06</span></td></tr>
+	<tr><td><code>[$00:1AC4]</code></td><td><code>[$00:0320]</code></td><td><span class="formula">$DA</span> &#x26; <span class="formula">$38</span> /2/2/2 = <span class="formula">$03</span></td></tr>
+	<tr><td><code>[$00:1AC5]</code></td><td><code>[$00:0321]</code></td><td><span class="formula">$DA</span> &#x26; <span class="formula">$07</span> = <span class="formula">$02</span></td></tr>
+</tbody>
+</table>
+
+<p>ピュアオディオの横幅が<span class="formula">$03</span>、縦幅が<span class="formula">$02</span>と計算されて<code>[$00:1AC4]</code><code>[$00:1AC5]</code>にそれぞれ書き込まれたことがわかる。</p>
+
+<p>なお、このあたりまでが、最後のオディオアイまたはマウスを撃破して、戦闘フィールドにオディオモールだけが残った状態になり、サウンドも一時消えたタイミングである。<br>
+この後、BGMが切り替わり、オディオモールがピュアオディオ初期配置へと移動し始める。<br>
+BGM切り替わり～オディオモール移動開始までは、いわばウェイトをかけて、キャラが動く処理などは行われないのだが、そのウェイト処理が以下。</p>
+
+<div class="code-container"><pre>
+;（中略）
+$C1/614D BPL $FB    [$614A]      ;ネガティブフラグが立っていないとき[$614A]分岐
+$C1/614A LDA $4212  [$00:4212]   ;Aに[$00:4212]をロード
+*** NMI ;マスク不可能割り込み
+$00/00F8 JMP $C1856C[$C1:856C]   ;[$C1:856C]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C1/66BC DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/66BE BNE $CA    [$668A]      ;ゼロフラグが立っていないとき[$668A]分岐
+$C1/668A LDY $1E    [$00:031E]   ;Yに[$00:031E]をロード
+$C1/668C STY $2116  [$00:2116]   ;Yを[$00:2116]に書き込み
+$C1/668F LDY $12    [$00:0312]   ;Yに[$00:0312]をロード
+$C1/6691 STY $4302  [$00:4302]   ;Yを[$00:4302]に書き込み
+$C1/6694 LDA $12    [$00:0312]   ;Aに[$00:0312]をロード
+$C1/6696 CLC                     ;キャリーフラグクリア
+$C1/6697 ADC #$80                ;A + $80
+$C1/6699 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/669B BCC $02    [$669F]      ;キャリーフラグが立っていないとき[$669F]分岐
+$C1/669D INC $13    [$00:0313]   ;A[$00:0313]をインクリメント +1
+$C1/669F LDA $0000,x[$00:1AC0]   ;Aに[$00:1AC0]をロード
+$C1/66A2 CMP #$D1                ;Aと$D1を減算比較（ステータスレジスタ変更のみ）
+$C1/66A4 BNE $03    [$66A9]      ;ゼロフラグが立っていないとき[$66A9]分岐
+$C1/66A6 JSR $6145  [$C1:6145]   ;[$C1:6145]へジャンプ
+;
+$C1/6145 LDA $4212  [$00:4212]   ;Aに[$00:4212]をロード
+$C1/6148 BMI $FB    [$6145]      ;ネガティブフラグが立っているとき[$6145]分岐
+;（中略）
+</pre></div>
+
+<p><code><span class="r">$C1/6145</span></code>～<code><span class="r">$C1/614F</span></code>はコントローラーのボタン判定で、何かしらのボタンを押すまでループ処理を繰り返し、1フレーム毎にNMIという割り込み処理で強引に終了させている。<br>
+本作では、「その場面で必要な何らかの処理→コントローラーのボタン判定ループ→ボタンが押されないならNMIで割り込んで次処理」を1フレーム毎に繰り返す、がプログラムの基本である。<br>
+ここでは、「その場面で必要な何らかの処理」が、戦闘用タイマー<code>[$7E:FEF0]</code>を減らすことくらいなのである。<br>
+上処理を見ると<code><span class="r">$C1/669F</span></code>で、敵種類4の<code>[$00:1AC0]</code>（敵ID）と<span class="formula">$D1</span>を減算比較しているが、敵ID<span class="formula">$D1</span>、つまりピュアオディオだと<code><span class="r">$C1/66A4</span></code>でゼロフラグが立って、コントローラーのボタン判定ループに移行する。<br>
+つまり、このタイミングでは必要な処理がここで終了となっており、演出上ウェイトをかけていることがわかる。<br>
+ピュアオディオの敵IDを指定しているので、ピュアオディオ戦専用処理ということになる。<br>
+ちなみにこのウェイトは36回（36フレーム）分である。<code>[$00:0308]</code>のデクリメントでループ回数が指定されている。<br>
+1秒で60フレームなので、だいたい0.5秒くらいになる。</p>
+
+<p>さて、ピュアオディオ戦に移行する時に重要な処理がもうひとつある。<br>
+ピュアオディオの初期位置にいる味方キャラの処理である。<br>
+実際にやってみればわかるとおりに、ピュアオディオの初期位置にいる味方キャラは戦闘フィールド隅に強制的に移動させられるが、この処理はどうなっているのか。</p>
+
+<p>戦闘フィールド上の居場所の処理であるから、どのマスに誰がいるのかを把握しなければならない。<br>
+<code>$00:04C8</code>～<code>$00:04FE</code>が戦闘フィールドの状況であり、敵味方の居場所及び、ダメージフィールドの状態を記録できるようになっている。<br>
+<code>$00:04??</code>の<code>??</code>部分のみが以下。</p>
+
+<table>
+<tbody>
+	<tr><td>C8</td><td>C9</td><td>CA</td><td>CB</td><td>CC</td><td>CD</td><td>CE</td></tr>
+	<tr><td>D0</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td></tr>
+	<tr><td>D8</td><td>D9</td><td>DA</td><td>DB</td><td>DC</td><td>DD</td><td>DE</td></tr>
+	<tr><td>E0</td><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td></tr>
+	<tr><td>E8</td><td>E9</td><td>EA</td><td>EB</td><td>EC</td><td>ED</td><td>EE</td></tr>
+	<tr><td>F0</td><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td></tr>
+	<tr><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td></tr>
+</tbody>
+</table>
+
+<p>つまり、ピュアオディオの初期位置は、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:04E2</code></td><td>ピュアオディオ初期位置1</td></tr>
+	<tr><td><code>$00:04E3</code></td><td>ピュアオディオ初期位置2</td></tr>
+	<tr><td><code>$00:04E4</code></td><td>ピュアオディオ初期位置3</td></tr>
+	<tr><td><code>$00:04EA</code></td><td>ピュアオディオ初期位置4</td></tr>
+	<tr><td><code>$00:04EB</code></td><td>ピュアオディオ初期位置5</td></tr>
+	<tr><td><code>$00:04EC</code></td><td>ピュアオディオ初期位置6</td></tr>
+</tbody>
+</table>
+
+<p>にあたる。<br>
+便宜上、上のようにピュアオディオ位置1～6と番号を振っておく。</p>
+
+<p>これら座標の処理は、<code><span class="r">$C1/7C15</span></code>の戻り位置、<code><span class="r">$C1/7C18</span></code>から処理が開始になる。</p>
+
+<div class="code-container"><pre>
+$C1/7C18 LDX #$1B40              ;Xに$1B40をロード
+$C1/7C1B JSR $51FB  [$C1:51FB]   ;[$C1:51FB]へジャンプ
+;
+$C1/51FB LDA #$10                ;Aに$10をロード
+$C1/51FD STA $12    [$00:0312]   ;A($10)を[$00:0312]に書き込み
+$C1/51FF LDY $0002,x[$00:1B42]   ;Yに[$00:1B42]をロード
+$C1/5202 LDA $0004,y[$00:1AC4]   ;Aに[$00:1AC4](ピュアオディオ横幅 $03)をロード
+$C1/5205 STA $0A    [$00:030A]   ;A($03)を[$00:030A]に書き込み
+$C1/5207 LDA $0005,y[$00:1AC5]   ;Aに[$00:1AC5](ピュアオディオ縦幅 $02)をロード
+$C1/520A STA $09    [$00:0309]   ;A($02)を[$00:0309]に書き込み
+$C1/520C LDA $000B,x[$00:1B4B]   ;Aに[$00:1B4B]（敵番号4のマス目のY座標）をロード
+$C1/520F ASL A                   ;Aを算術左シフト *2
+$C1/5210 ASL A                   ;Aを算術左シフト *2
+$C1/5211 ASL A                   ;Aを算術左シフト *2
+$C1/5212 ADC $000A,x[$00:1B4A]   ;A + [$00:1B4A]（敵番号4のマス目のX座標）
+$C1/5215 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/5217 STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/5219 LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/521B TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/521C LSR A                   ;Aを論理右シフト　(/2)
+$C1/521D LSR A                   ;Aを論理右シフト　(/2)
+$C1/521E LSR A                   ;Aを論理右シフト　(/2)
+$C1/521F LSR A                   ;Aを論理右シフト　(/2)
+$C1/5220 INC A                   ;Aをインクリメント +1
+$C1/5221 ORA $12    [$00:0312]   ;Aと[$00:0312]($10)で論理和
+$C1/5223 STA $12    [$00:0312]   ;A($15)を[$00:0312]に書き込み
+$C1/5225 LDA $0A    [$00:030A]   ;Aに[$00:030A]($03)をロード
+$C1/5227 STA $08    [$00:0308]   ;A($03)を[$00:0308]に書き込み
+</pre></div>
+
+<p>ここまでがピュアオディオの初期位置マス判定処理のための準備である。<br>
+要するに、初期位置の座標から、横方向は横幅の分、縦方向は縦幅の分だけマス目のアドレスをチェックしていくことになる。</p>
+
+<div class="code-container"><pre>
+;ループ処理ここから
+$C1/5229 LDA $04C8,y[$00:04E4]   ;Aに[$04C8,y](ピュアオディオ初期位置n)をロード
+$C1/522C AND #$F0                ;Aと$F0で論理積
+$C1/522E ORA $12    [$00:0312]   ;Aと[$00:0312]($15)で論理和
+$C1/5230 STA $04C8,y[$00:04E4]   ;Aを[$04C8,y](ピュアオディオ初期位置n)に書き込み
+$C1/5233 INY                     ;Yをインクリメント +1
+$C1/5234 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/5236 BNE $F1    [$5229]      ;ゼロフラグが立っていないとき[$5229]分岐
+;ゼロフラグON（横1列分アドレスチェック後）
+$C1/5238 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/523A CLC                     ;キャリーフラグクリア
+$C1/523B ADC #$08                ;A + $08
+$C1/523D STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/523F LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/5241 DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/5243 BNE $E0    [$5225]      ;ゼロフラグが立っていないとき[$5225]分岐
+;ループ処理ここまで
+$C1/5245 RTS                     ;サブルーチン戻り
+;
+$C1/7D2B JSR $7D2E  [$C1:7D2E]   ;[$C1:7D2E]へジャンプ
+;
+$C1/7D2E JSR $7D37  [$C1:7D37]   ;[$C1:7D37]へジャンプ
+;
+$C1/7D37 JSR $7D3A  [$C1:7D3A]   ;[$C1:7D3A]へジャンプ
+;
+$C1/7D3A JSR $6145  [$C1:6145]   ;[$C1:6145]へジャンプ
+</pre></div>
+
+<p><code>$00:04C8</code>～<code>$00:04FE</code>の戦闘フィールドの状況だが、何もないのなら<span class="formula">$00</span>が入る。<br>
+上1桁か下1桁に<span class="formula">0</span>以外の数値が入っている場合は味方キャラまたは敵キャラ、更にはダメージフィールドが存在していることを示す。<br>
+上1桁が<span class="formula">0</span>なら味方キャラ、<span class="formula">1</span>なら敵キャラ、<span class="formula">8</span>以上ならダメージフィールドが存在していることになる。<br>
+つまり、初期位置のアドレスを呼び出して、<span class="formula">$F0</span>と論理積を取ると上1桁だけが取り出せるのだが、この戦闘ではダメージフィールドを作ることができないので、<span class="formula">8</span>以上の値は入ることがない。<br>
+また、オディオモールは初期位置から動かないし動かせないため、ピュアオディオ初期位置にはいない。<br>
+つまり、ピュアオディオ戦移行のタイミングで、ピュアオディオ初期位置マスには、何もないカラマスか、味方キャラがいるかのどちらかなのである。<br>
+よって、<span class="formula">$F0</span>と論理積を取ると必ず<span class="formula">$00</span>である。<br>
+<code><span class="r">$C1/522E</span></code>は、<code>A</code>+<code>[$00:0312]</code>(<span class="formula">$15</span>)だが、上の理由から必ず<span class="formula">0+$15</span>の計算になり、<span class="formula">$15</span>がピュアオディオ初期位置マスに書き込まれる。</p>
+
+<p>では、<span class="formula">$15</span>は何を意味するのか。<br>
+戦闘フィールドの状況は、上1桁が1なら敵キャラがいる扱いである。<br>
+下1桁は1～Eが入り、これは敵番号<span class="formula">+1</span>にあたる。<br>
+つまり、<span class="formula">$15</span>は「敵番号4＝ピュアオディオがいるマス」を意味する。<br>
+ここで、ピュアオディオが該当マスにいる処理がなされたことになる。<br>
+味方キャラが初期位置マスに居た場合の処理はまだされていない。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:04E2</code></td><td>ピュアオディオ初期位置1</td><td><span class="formula">$15</span></td></tr>
+	<tr><td><code>$00:04E3</code></td><td>ピュアオディオ初期位置2</td><td><span class="formula">$15</span></td></tr>
+	<tr><td><code>$00:04E4</code></td><td>ピュアオディオ初期位置3</td><td><span class="formula">$15</span></td></tr>
+	<tr><td><code>$00:04EA</code></td><td>ピュアオディオ初期位置4</td><td><span class="formula">$15</span></td></tr>
+	<tr><td><code>$00:04EB</code></td><td>ピュアオディオ初期位置5</td><td><span class="formula">$15</span></td></tr>
+	<tr><td><code>$00:04EC</code></td><td>ピュアオディオ初期位置6</td><td><span class="formula">$15</span></td></tr>
+</tbody>
+</table>
+
+<p><code><span class="r">$C1/5245</span></code>まで処理を終えると、上のように各アドレスに値が入ったことになる。</p>
+
+<p>このままでは、味方キャラが初期位置マスに居た場合、該当キャラが消えてしまうことになる。<br>
+味方キャラの座標は戦闘中の味方キャラデータの<code>$00:1C18+40n</code>にX座標、<code>$00:1C19+40n</code>にY座標が記録されているため、完全に消えてしまったのではないが、この後の処理で新たな座標が決まる。<br>
+上処理の後少しウェイトがかかるのでやや処理が飛ぶが、以下が味方キャラの座標の処理である。</p>
+
+<div class="code-container"><pre>
+$C1/7D36 RTS                     ;サブルーチン戻り
+;
+$C1/7C21 JSR $7DAB  [$C1:7DAB]   ;[$C1:7DAB]へジャンプ
+;
+$C1/7DAB LDX #$1C00              ;Xに$1C00をロード
+$C1/7DAE JSR $7DC4  [$C1:7DC4]   ;[$C1:7DC4]へジャンプ
+;
+$C1/7DC4 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01](味方キャラ1 戦闘状態)をロード
+$C1/7DC7 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/7DC9 BNE $25    [$7DF0]      ;ゼロフラグが立っていないとき[$7DF0]分岐
+$C1/7DCB LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]（味方キャラ1 Y座標)をロード
+$C1/7DCE ASL A                   ;Aを算術左シフト *2
+$C1/7DCF ASL A                   ;Aを算術左シフト *2
+$C1/7DD0 ASL A                   ;Aを算術左シフト *2
+$C1/7DD1 ADC $0018,x[$00:1C18]   ;A + [$00:1C18]（味方キャラ1 X座標)
+$C1/7DD4 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/7DD6 STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/7DD8 LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/7DDA LDA $04C8,y[$00:04E3]   ;Aに[$00:04E3]をロード
+$C1/7DDD BIT #$10                ;Aと$10で論理積（ステータスフラグ変更のみ）
+$C1/7DDF BEQ $0F    [$7DF0]      ;ゼロフラグが立っているとき[$7DF0]分岐
+$C1/7DE1 STZ $0005,x[$00:1C05]   ;[$00:1C05]に$00を書き込み
+$C1/7DE4 JSR $190F  [$C1:190F]   ;[$C1:190F]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/7DC4</span></code>からの処理だが、まず味方キャラ1の戦闘状態が通常（<span class="formula">$FF</span>）かを判定している。このタイミングで戦闘離脱（<span class="formula">$00</span>）なら、座標判定の必要はないためである。<br>
+ここでは例として、ピュアオディオ戦移行時、味方キャラ1の座標が<span class="formula">(3,3)</span>の場合だとしよう。<br>
+つまり下図の「１」、<code>$00:04E3</code>に味方キャラ1がいるとする。<br>
+ピュアオディオ初期位置と被るマスである。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□★１■□□<br>
+□□■■■□□<br>
+□□□□□□□<br>
+□□□□□□□
+</div>
+
+<p>さて、<code><span class="r">$C1/7DCB</span></code>でまず味方キャラ1のY座標<code>[$00:1C19]</code>をロードする。ここでは<code>[$00:1C19]</code> = <span class="formula">$03</span>である。<br>
+<code><span class="r">$C1/7DCE</span></code>～<code><span class="r">$C1/7DD0</span></code>で算術左シフトを3回行ってから、<code><span class="r">$C1/7DD1</span></code>で<code>[$00:1C18]</code>（味方キャラ1 X座標) = <span class="formula">$03</span>を<code>A</code>に加算している。<br>
+これで何を計算したのか。<br>
+座標は0～6のいずれかなので、2進数だと3ビット分の値で表すことができる。<br>
+<span class="formula"><code>[$00:1C19]</code> = $03 = %0000 0011</span>である。<br>
+算術左シフトを3回行うと、桁が3つ左にズレるから、<span class="formula">%0001 1000</span>となり、下3ビットが空く。<br>
+ここにX座標<span class="formula"> = $03 = %0000 0011</span>を加算すると、下3ビット部分にX座標が入る。<br>
+よって、<code><span class="r">$C1/7DD1</span></code>で計算される<span class="formula">$1B = %0001 1011</span>は、下から3ビットがX座標、そこから更に3ビット分がY座標、ということになる。<br>
+左上座標（原点位置）のアドレス<code>$00:04C8</code>に、<span class="formula">$1B</span>を足すと、ちょうど味方キャラ1がいる位置のアドレス<code>$00:04E3</code>が計算できるのだ。<br>
+<code><span class="r">$C1/7DDA</span></code>で呼び出した<code>[$04C8,y]</code>が味方キャラ1の座標<code>[$00:04E3]</code>である。<br>
+ここにはピュアオディオがいるので、先の処理で<span class="formula">$15</span>が入っている。<br>
+<code><span class="r">$C1/7DDD</span></code>で、<span class="formula">$10</span>と論理積を取っている。実質、上1桁が1かどうか（敵がいるかどうか）の判定である。<br>
+<span class="formula">$15 &amp; $10 = $10</span>であり、<code><span class="r">$C1/7DDF</span></code>でゼロフラグが立たない。<br>
+ここで、味方キャラ1とピュアオディオの位置が被っているという判定がなされたことになる。</p>
+
+<p>この後の処理の説明は少し飛ばして、座標計算部分を紹介する。</p>
+
+<div class="code-container"><pre>
+$C1/7DEA JSR $7DF1  [$C1:7DF1]   ;[$C1:7DF1]へジャンプ
+;
+$C1/7DF1 LDA $0018,x[$00:1C18]   ;Aに[$00:1C18]（味方キャラ1 X座標$03)をロード
+$C1/7DF4 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C1/7DF6 BEQ $0F    [$7E07]      ;ゼロフラグが立っているとき[$7E07]分岐
+$C1/7DF8 LDY #$7E6E              ;Yに$7E6Eをロード
+$C1/7DFB LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]（味方キャラ1 Y座標$03)をロード
+$C1/7DFE CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/7E00 BEQ $12    [$7E14]      ;ゼロフラグが立っているとき[$7E14]分岐
+</pre></div>
+
+<p>まず、味方キャラの座標が、ピュアオディオの位置のどこに被っているかどうか判定する。<br>
+<code><span class="r">$C1/7DF1</span></code>～<code><span class="r">$C1/7DF6</span></code>の処理を見ると、X座標=<span class="formula">$02</span>なら<code><span class="r">$C1/7E07</span></code>へ、それ以外は<code><span class="r">$C1/7DF8</span></code>に進む。<br>
+つまり、ピュアオディオのいるマスの一番左のいずれかのマスにいるかどうかの分岐である。下図の●位置にあたる。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□●■■□□<br>
+□□●■■□□<br>
+□□□□□□□<br>
+□□□□□□□
+</div>
+
+<p>ひとまず今回は味方キャラ1の座標が<span class="formula">(3,3)</span>で話を進めるので、<code><span class="r">$C1/7DF8</span></code>に進む。<br>
+この場合は<code>Y</code>に$7E6Eをロードし、更にY座標の判定<code><span class="r">$C1/7DFB</span></code>～<code><span class="r">$C1/7E00</span></code>に進む。<br>
+こちらの判定はY座標=<span class="formula">$03</span>なら<code><span class="r">$C1/7E14</span></code>、そうでなければ<code><span class="r">$C1/7E02</span></code>に進む。<br>
+つまり、ピュアオディオのいるマスの一番上列のいずれかのマスにいるかどうかの分岐である。下図の●位置にあたる。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□●●●□□<br>
+□□■■■□□<br>
+□□□□□□□<br>
+□□□□□□□
+</div>
+
+<p><code><span class="r">$C1/7E02</span></code>以降を見ると以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C1/7E02 LDY #$7E76              ;Yに$7E76をロード
+$C1/7E05 BRA $0D    [$7E14]      ;フラグにかかわりなく常に分岐[$7E14]
+$C1/7E07 LDY #$7E5E              ;Yに$7E5Eをロード
+$C1/7E0A LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]をロード
+$C1/7E0D CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/7E0F BEQ $03    [$7E14]      ;ゼロフラグが立っているとき[$7E14]分岐
+$C1/7E11 LDY #$7E66              ;Yに$7E66をロード
+</pre></div>
+
+<p>分岐によって<code>Y</code>にロードする値が変わってくることがわかる。<br>
+整理すると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>パターン</th><th>条件</th><th>Yの値</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E5E</td></td></tr>
+	<tr><td>2</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E66</td></td></tr>
+	<tr><td>3</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E6E</td></td></tr>
+	<tr><td>4</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E76</td></td></tr>
+</tbody>
+</table>
+
+<div class="mono">
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□１３３□□<br>
+□□２４４□□<br>
+□□□□□□□<br>
+□□□□□□□
+</div>
+
+<p>以上のように、味方キャラ位置によって、<code>Y</code>に読み込まれる値が変わる。<br>
+また、最終的にどの分岐も<code><span class="r">$C1/7E14</span></code>に進む。<br>
+以上の分岐により、味方キャラが吹き飛ぶマスがどこになるか決まる。<br>
+だいたい察しがつくが、1が左上隅、2が左下隅、3が右上隅、4が右下隅である。<br>
+ただ、3と4は2マス分あるから、例えば3に味方が2キャラいた場合はどうなるのか。<br>
+更に言えば、元々他の味方キャラが隅に居た場合はどうなるのか。<br>
+その処理は後を見ていくとわかる。<br>
+ここでは引き続き味方キャラ1の座標が<span class="formula">(3,3)</span>で処理を見てみる。<br>
+つまり、<code>Y</code>にロードする値が<span class="formula">$7E6E</span>である。</p>
+
+<div class="code-container"><pre>
+$C1/7E14 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み（X:1C00）
+$C1/7E16 TYX                     ;Yレジスタの値（Y:7E6E）をXレジスタに転送
+$C1/7E17 LDA $C10001,x[$C1:7E6F] ;Aに[$C10001,x]($C1:7E6F = $00)をロード
+$C1/7E1B ASL A                   ;Aを算術左シフト *2
+$C1/7E1C ASL A                   ;Aを算術左シフト *2
+$C1/7E1D ASL A                   ;Aを算術左シフト *2
+$C1/7E1E ADC $C10000,x[$C1:7E6E] ;A($00) + [$C10000,x]($C1:7E6E = $06)
+$C1/7E22 STA $10    [$00:0310]   ;A($06)を[$00:0310]に書き込み
+$C1/7E24 STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/7E26 LDY $10    [$00:0310]   ;Yに[$00:0311][$00:0310]($0006)をロード
+$C1/7E28 LDA $04C8,y[$00:04CE]   ;Aに[$04C8,y]($00:04CE フィールド右上マス)をロード
+$C1/7E2B AND #$0F                ;Aと$0Fで論理積
+$C1/7E2D BEQ $04    [$7E33]      ;ゼロフラグが立っているとき[$7E33]分岐
+;ゼロフラグOFF
+$C1/7E2F INX                     ;Xをインクリメント +1
+$C1/7E30 INX                     ;Xをインクリメント +1
+$C1/7E31 BRA $E4    [$7E17]      ;フラグにかかわりなく常に分岐[$7E17]
+</pre></div>
+
+<p><code>Y</code>に書き込んだ<span class="formula">$7E6E</span>は、<code><span class="r">$C1/7E16</span></code>で<code>X</code>にコピーされる。<br>
+<code><span class="r">$C1/7E17</span></code>でロードする<code>[$C10001,x]</code>及び、<code><span class="r">$C1/7E1E</span></code>で呼び出される<code>[$C10000,x]</code>は、<code>X</code>の値によって呼び出し先が変わることになる。</p>
+
+<table>
+<thead>
+	<tr><th>パターン</th><th>条件</th><th><code>Y</code>の値</th><th><code>$C10001,x</code></th><th><code>$C10000,x</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E5E</span></td><td><code>$C1:7E5E</code>(<span class="formula">$00</span>)</td><td><code>$C1:7E5F</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td>2</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E66</span></td><td><code>$C1:7E66</code>(<span class="formula">$00</span>)</td><td><code>$C1:7E67</code>(<span class="formula">$06</span>)</td></tr>
+	<tr><td>3</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E6E</span></td><td><code>$C1:7E6E</code>(<span class="formula">$06</span>)</td><td><code>$C1:7E6F</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td>4</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E76</span></td><td><code>$C1:7E76</code>(<span class="formula">$06</span>)</td><td><code>$C1:7E77</code>(<span class="formula">$06</span>)</td></tr>
+</tbody>
+</table>
+
+<p><code>$C1:7E5E</code>以降は、このピュアオディオ戦用の計算用数値が格納されていて、上のように呼び出されることになる。</p>
+
+<p><code><span class="r">$C1/7E17</span></code>～<code><span class="r">$C1/7E22</span></code>の処理は、先にもあったとおり、下3ビットにX座標、その上の3ビットにY座標を入れる処理である。<br>
+その座標が、吹き飛ばされる先の座標の仮値である。<br>
+つまり、</p>
+
+<table>
+<thead>
+	<tr><th>パターン</th><th>条件</th><th><code>Y</code>の値</th><th>飛び先座標アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">(0,0)</span></td><td><code>$00:04C8</code></td></tr>
+	<tr><td>2</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">(0,6)</span></td><td><code>$00:04F8</code></td></tr>
+	<tr><td>3</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">(6,0)</span></td><td><code>$00:04CE</code></td></tr>
+	<tr><td>4</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">(6,6)</span></td><td><code>$00:04FE</code></td></tr>
+</tbody>
+</table>
+
+<div class="mono">
+１□□□□□３<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□１３３□□<br>
+□□２４４□□<br>
+□□□□□□□<br>
+２□□□□□４
+</div>
+
+<p>ということになる。<br>
+<code><span class="r">$C1/7E28</span></code>でロードする<code>[$04C8,y]</code>は対応マスのアドレスの値である。<br>
+該当のマスに既に味方キャラがいるかどうかを、<code><span class="r">$C1/7E2B</span></code>で、対応マスのアドレスの値と<span class="formula">$0F</span>で論理積を取ることでゼロフラグ判定している。<br>
+味方キャラがいる場合、<span class="formula">$01</span>～<span class="formula">$04</span>のいずれかの値が入っているから、<span class="formula">$0F</span>と論理積を取った時にゼロフラグが立つ時は該当マスに味方はいない。<br>
+よって<code><span class="r">$C1/7E33</span></code>に進む。<br>
+ゼロフラグが立たない、つまり既に味方キャラが居る場合、<code><span class="r">$C1/7E2F</span></code>～<code><span class="r">$C1/7E31</span></code>の処理を行うが、ここでの処理を見ると<code>X</code>を<span class="formula">+2</span>して<code><span class="r">$C1/7E17</span></code>へ戻る。<br>
+そうなると呼び出し先アドレスと値が変わる。</p>
+
+<table>
+<thead>
+	<tr><th>パターン</th><th>条件</th><th>Yの値</th><th><code>$C10001,x+2</code></th><th><code>$C10000,x+2</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E5E</span></td><td><code>$C1:7E60</code>(<span class="formula">$00</span>)</td><td><code>$C1:7E61</code>(<span class="formula">$01</span>)</td></tr>
+	<tr><td>2</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E66</span></td><td><code>$C1:7E68</code>(<span class="formula">$00</span>)</td><td><code>$C1:7E69</code>(<span class="formula">$05</span>)</td></tr>
+	<tr><td>3</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E6E</span></td><td><code>$C1:7E70</code>(<span class="formula">$06</span>)</td><td><code>$C1:7E71</code>(<span class="formula">$01</span>)</td></tr>
+	<tr><td>4</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E76</span></td><td><code>$C1:7E78</code>(<span class="formula">$06</span>)</td><td><code>$C1:7E79</code>(<span class="formula">$05</span>)</td></tr>
+</tbody>
+</table>
+
+<div class="mono">
+□□□□□□□<br>
+１□□□□□３<br>
+□□□□□□□<br>
+□□１３３□□<br>
+□□２４４□□<br>
+２□□□□□４<br>
+□□□□□□□
+</div>
+
+<p>1マスずれた位置が指定された。<br>
+その位置にも味方がいる場合は再び<code><span class="r">$C1/7E2F</span></code>～<code><span class="r">$C1/7E31</span></code>で<code>X</code>を<span class="formula">+2</span>して<code><span class="r">$C1/7E17</span></code>へ戻る（合計で<code>X</code>を<span class="formula">+4</span>）、というように、味方がいない位置が見つかるまでループしていく。<br>
+<code>X</code>を<span class="formula">+4</span>した時は、</p>
+
+<table>
+<thead>
+	<tr><th>パターン</th><th>条件</th><th><code>Y</code>の値</th><th><code>$C10001,x+2</code></th><th><code>$C10000,x+4</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E5E</span></td><td><code>$C1:7E62</code>(<span class="formula">$01</span>)</td><td><code>$C1:7E63</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td>2</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E66</span></td><td><code>$C1:7E6A</code>(<span class="formula">$01</span>)</td><td><code>$C1:7E6B</code>(<span class="formula">$06</span>)</td></tr>
+	<tr><td>3</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E6E</span></td><td><code>$C1:7E72</code>(<span class="formula">$05</span>)</td><td><code>$C1:7E73</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td>4</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E76</span></td><td><code>$C1:7E7A</code>(<span class="formula">$05</span>)</td><td><code>$C1:7E7B</code>(<span class="formula">$06</span>)</td></tr>
+</tbody>
+</table>
+
+<div class="mono">
+□１□□□３□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□１３３□□<br>
+□□２４４□□<br>
+□□□□□□□<br>
+□２□□□４□
+</div>
+
+<p><code>X</code>を<span class="formula">+6</span>した時は、</p>
+
+<table>
+<thead>
+	<tr><th>パターン</th><th>条件</th><th>Yの値</th><th><code>$C10001,x+2</code></th><th><code>$C10000,x+4</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E5E</span></td><td><code>$C1:7E64</code>(<span class="formula">$01</span>)</td><td><code>$C1:7E65</code>(<span class="formula">$01</span>)</td></tr>
+	<tr><td>2</td><td>X座標=<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E66</span></td><td><code>$C1:7E6C</code>(<span class="formula">$01</span>)</td><td><code>$C1:7E6D</code>(<span class="formula">$05</span>)</td></tr>
+	<tr><td>3</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標=<span class="formula">$03</span></td><td><span class="formula">$7E6E</span></td><td><code>$C1:7E74</code>(<span class="formula">$05</span>)</td><td><code>$C1:7E75</code>(<span class="formula">$01</span>)</td></tr>
+	<tr><td>4</td><td>X座標&#x2260;<span class="formula">$02</span>　かつ　Y座標&#x2260;<span class="formula">$03</span></td><td><span class="formula">$7E76</span></td><td><code>$C1:7E7C</code>(<span class="formula">$05</span>)</td><td><code>$C1:7E7D</code>(<span class="formula">$05</span>)</td></tr>
+</tbody>
+</table>
+
+<div class="mono">
+□□□□□□□<br>
+□１□□□３□<br>
+□□□□□□□<br>
+□□１３３□□<br>
+□□２４４□□<br>
+□２□□□４□<br>
+□□□□□□□
+</div>
+
+<p>ということになる。<br>
+味方は最大4キャラだから、判定はここまでのはずである。<br>
+たとえば、以下のような配置だったら、●位置の味方キャラはパターン3で右上に吹き飛ぶはずだ。</p>
+
+<div class="mono">
+□□□□□味味<br>
+□□□□□□味<br>
+□□□□□□□<br>
+□□■●■□□<br>
+□□■■■□□<br>
+□□□□□□□<br>
+□□□□□□□
+</div>
+
+だが、<span class="formula">(5,0), (6,0), (6,1)</span>は既に味方キャラがいるので、飛ぶ位置は<span class="formula">(5,1)</span>になる、ということである。
+
+<div class="mono">
+□□□□□味味<br>
+□□□□□●味<br>
+□□□□□□□<br>
+□□■■■□□<br>
+□□■■■□□<br>
+□□□□□□□<br>
+□□□□□□□
+</div>
+
+<p>この判定を味方キャラ1から順に行うから、味方キャラ1が右上<span class="formula">(6,0)</span>に飛んだ後に味方キャラ2も右上に飛ぶ場合もあり得る。<br>
+その時は既に味方キャラ1が該当位置のアドレスに書き込まれているから、ループ処理で次のマスを判定する。</p>
+
+<p>以下、飛ぶ先のマスが決まった<code><span class="r">$C1/7E33</span></code>以降の処理。<br>
+<span class="formula">(3,3)</span>にいた場合、<span class="formula">(6,0)</span>に味方キャラが既にいない状態なら<span class="formula">(6,0)</span>、アドレスだと<code>[$00:04CE]</code>に飛ぶことになるが、座標関連の書き込みが以下。</p>
+
+<div class="code-container"><pre>
+$C1/7E33 LDA $C10000,x[$C1:7E6E] ;Aに[$C1:7E6E]($06)をロード
+$C1/7E37 STA $10    [$00:0310]   ;A($06)を[$00:0310]に書き込み
+$C1/7E39 LDA $C10001,x[$C1:7E6F] ;Aに[$C1:7E6F]($00)をロード
+$C1/7E3D STA $11    [$00:0311]   ;A($00)を[$00:0311]に書き込み
+$C1/7E3F LDX $60    [$00:0360]   ;Xに[$00:0360]をロード
+$C1/7E41 LDA $10    [$00:0310]   ;Aに[$00:0310]($06)をロード
+$C1/7E43 STA $001A,x[$00:1C1A]   ;A($06)を[$00:1C1A](味方キャラ1 X座標仮値)に書き込み
+$C1/7E46 LDA $11    [$00:0311]   ;Aに[$00:0311]($00)をロード
+$C1/7E48 STA $001B,x[$00:1C1B]   ;A($00)を[$00:1C1B](味方キャラ1 Y座標仮値)に書き込み
+$C1/7E4B TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/7E4C ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/7E4D ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/7E4E ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/7E4F AND #$03                ;Aと$03で論理積
+$C1/7E51 INC A                   ;Aをインクリメント +1
+$C1/7E52 ORA $04C8,y[$00:04CE]   ;A($01)と[$00:04CE]($00)で論理和
+$C1/7E55 STA $04C8,y[$00:04CE]   ;Aを[$00:04CE]($01)に書き込み
+$C1/7E58 LDA #$00                ;Aに$00をロード
+$C1/7E5A STA $003B,x[$00:1C3B]   ;Aを[$00:1C3B]に書き込み
+$C1/7E5D RTS                     ;サブルーチン戻り
+;
+$C1/7DED JSR $C733  [$C1:C733]   ;[$C1:C733]へジャンプ
+</pre></div>
+
+<p>X座標の<span class="formula">$06</span>は、<code>[$C1:7E6E]</code>→<code>[$00:0310]</code>→<code>[$00:1C1A]</code>と書き込まれ、Y座標の<span class="formula">$00</span>は<code>[$C1:7E6F]</code>→<code>[$00:0311]</code>→<code>[$00:1C1B]</code>と書き込まれる。<br>
+<code>[$00:1C1A]</code>と<code>[$00:1C1B]</code>は、味方キャラ1のX座標仮値・Y座標仮値である。<br>
+後で実際の座標のアドレス<code>[$00:1C18]</code><code>[$00:1C19]</code>に書き込まれる。<br>
+また、<code><span class="r">$C1/7E4B</span></code>～では、味方キャラの番号を算出している。<br>
+この時点での<code>X</code>は味方キャラ番号により、<span class="formula">$1C00, $1C40, $1C80, $1CC0</span>だから、<code>X</code>レジスタの値を<code>A</code>レジスタに転送すると下2桁だけ、<span class="formula">$00</span>, <span class="formula">$40</span>, <span class="formula">$80</span>, <span class="formula">$C0</span>が転送される。<br>
+この値をキャリーフラグ含め左ローテート3回し、<span class="formula">$03</span>と論理積をとってインクリメント<span class="formula">+1</span>すると<span class="formula">$01</span>, <span class="formula">$02</span>, <span class="formula">$03</span>, <span class="formula">$04</span>になり、この値を飛ばされる先のマスに対応したアドレスに書き込むことで、該当キャラの位置が確定となった。</p>
+
+<div class="code-container"><pre>
+$C1/4450 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01](味方キャラID)をロード
+$C1/4453 CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/4455 BNE $14    [$446B]      ;ゼロフラグが立っていないとき[$446B]分岐
+$C1/446B INC $0006,x[$00:1C06]   ;[$00:1C06](タメ時間ありの技発動までの時間)をインクリメント +1
+$C1/446E LDA $0006,x[$00:1C06]   ;Aに[$00:1C06](タメ時間ありの技発動までの時間)をロード
+$C1/4471 CMP $0007,x[$00:1C07]   ;Aと[$00:1C07](実行しようとしている技のタメ時間)を減算比較（ステータスレジスタ変更のみ）
+$C1/4474 BNE $24    [$449A]      ;ゼロフラグが立っていないとき[$449A]分岐
+$C1/4476 LDA $001A,x[$00:1C1A]   ;Aに[$00:1C1A](味方キャラ1 X座標仮値)をロード
+$C1/4479 STA $0018,x[$00:1C18]   ;Aを[$00:1C18](味方キャラ1 X座標)に書き込み
+$C1/447C LDA $001B,x[$00:1C1B]   ;Aに[$00:1C1B](味方キャラ1 Y座標仮値)をロード
+$C1/447F STA $0019,x[$00:1C19]   ;Aを[$00:1C19](味方キャラ1 Y座標)に書き込み
+$C1/4482 JSR $45D5  [$C1:45D5]   ;[$C1:45D5]へジャンプ
+</pre></div>
+
+<p><code>[$00:1C1A]</code>→<code>[$00:1C18]</code>、<code>[$00:1C1B]</code>→<code>[$00:1C19]</code>の処理は上の通り。</p>
+
+<p>以上が、</p>
+
+<ul>
+	<li>オディオモールのみ残るとピュアオディオ戦に移行する</li>
+	<li>ピュアオディオ戦に移行する時、ピュアオディオ初期位置にいる味方キャラはフィールド隅に強制的に移動させられる</li>
+</ul>
+
+<p>という一連の処理の流れである。<br>
+フィールド隅に飛ぶ場合の法則も、処理からわかった。<br>
+味方1人分の処理の後に実際に該当のフィールド隅に飛ぶ処理をしてから2人目の判定に移るので、4キャラとも吹き飛ぶケースでは、ゲーム画面をよく見ていると、ほんの僅かだが4キャラ吹き飛ぶタイミングがずれている。</p>
+
+<p>この後も処理は続くが、とりあえずピュアオディオ戦移行判定と初期位置による味方キャラの吹き飛ばし処理の説明は以上である。<br>
+ただ、ここまでだと、ピュアオディオ出現の処理はなされていても、最後に残っていたオディオモールの処理まで行っていない。<br>
+ついでなので、倒していないはずのオディオモールを削除する処理を紹介する。<br>
+ゲーム画面上ではオディオモールが画面中央に移動してピュアオディオに変わる、という演出だが、実際にはオディオモールという敵自体はいなくなるから、オディオモールが最初からいた座標のアドレスや、オディオモール関係の値が入る<code>$00:1B2?</code>に、何らかの処理を行わなければならない。</p>
+
+<p>オディオモール初期位置は、<code>$00:04CB</code>と<code>$00:04D3</code>で、味方側からの向き変えや吹き飛ばしは無効、オディオモール自身が移動をすることもない。</p>
+
+<table>
+<tbody>
+	<tr><td>C8</td><td>C9</td><td>CA</td><td style="background:#ddd;">CB</td><td>CC</td><td>CD</td><td>CE</td></tr>
+	<tr><td>D0</td><td>D1</td><td>D2</td><td style="background:#ddd;">D3</td><td>D4</td><td>D5</td><td>D6</td></tr>
+	<tr><td>D8</td><td>D9</td><td>DA</td><td>DB</td><td>DC</td><td>DD</td><td>DE</td></tr>
+	<tr><td>E0</td><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td></tr>
+	<tr><td>E8</td><td>E9</td><td>EA</td><td>EB</td><td>EC</td><td>ED</td><td>EE</td></tr>
+	<tr><td>F0</td><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td></tr>
+	<tr><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td></tr>
+</tbody>
+</table>
+
+<p>戦闘開始の時点で、敵番号3のオディオモールは、<code>$00:04CB</code>・<code>$00:04D3</code>に<span class="formula">$13</span>が入ることになる。<br>
+また、オディオ戦ではダメージフィールドを生成できないため、上の戦闘フィールドの状況にダメージフィールド関係の値が加算されることはない。</p>
+
+<p>まず、オディオモールの座標に関する処理だが、上の味方キャラの吹き飛ばしの処理の後に実行される。</p>
+
+<div class="code-container"><pre>
+$C1/7C2A JSR $4277  [$C1:4277]   ;[$C1:4277]へジャンプ
+;
+$C1/4277 LDA $000B,x[$00:1B2B]   ;Aに[$00:1B2B]をロード
+$C1/427A ASL A                   ;Aを算術左シフト *2
+$C1/427B ASL A                   ;Aを算術左シフト *2
+$C1/427C ASL A                   ;Aを算術左シフト *2
+$C1/427D ADC $000A,x[$00:1B2A]   ;A + [$00:1B2A]
+$C1/4280 STA $14    [$00:0314]   ;Aを[$00:0314]に書き込み
+$C1/4282 STZ $15    [$00:0315]   ;[$00:0315]に$00を書き込み
+$C1/4284 LDY $14    [$00:0314]   ;Yに[$00:0314]をロード
+$C1/4286 LDA $0B    [$00:030B]   ;Aに[$00:030B]をロード
+$C1/4288 STA $09    [$00:0309]   ;Aを[$00:0309]に書き込み
+;敵の横幅確認ループ開始（1回目）
+$C1/428A LDA $0A    [$00:030A]   ;Aに[$00:030A]をロード
+$C1/428C STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+$C1/428E LDA $04C8,y[$00:04CB]   ;Aに[$00:04CB](オディオモール初期位置1)をロード
+$C1/4291 AND #$E0                ;Aと$E0で論理積
+$C1/4293 STA $04C8,y[$00:04CB]   ;Aを[$00:04CB](オディオモール初期位置1)に書き込み
+$C1/4296 INY                     ;Yをインクリメント +1
+$C1/4297 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/4299 BNE $F3    [$428E]      ;ゼロフラグが立っていないとき[$428E]分岐
+$C1/429B REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/429D TYA                     ;Yレジスタの値をAレジスタに転送
+$C1/429E ADC $12    [$00:0312]   ;A + [$00:0312]
+$C1/42A0 AND #$00FF              ;Aと$00FFで論理積
+$C1/42A3 TAY                     ;Aの値をYレジスタに転送
+$C1/42A4 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/42A6 DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/42A8 BNE $E0    [$428A]      ;ゼロフラグが立っていないとき[$428A]分岐
+;敵の横幅確認ループ開始（1回目）ここまで
+;敵の横幅確認ループ開始（2回目）
+$C1/428A LDA $0A    [$00:030A]   ;Aに[$00:030A]をロード
+$C1/428C STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+$C1/428E LDA $04C8,y[$00:04D3]   ;Aに[$00:04D3](オディオモール初期位置2)をロード
+$C1/4291 AND #$E0                ;Aと$E0で論理積
+$C1/4293 STA $04C8,y[$00:04D3]   ;Aを[$00:04D3](オディオモール初期位置2)に書き込み
+$C1/4296 INY                     ;Yをインクリメント +1
+$C1/4297 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/4299 BNE $F3    [$428E]      ;ゼロフラグが立っていないとき[$428E]分岐
+$C1/429B REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/429D TYA                     ;Yレジスタの値をAレジスタに転送
+$C1/429E ADC $12    [$00:0312]   ;A + [$00:0312]
+$C1/42A0 AND #$00FF              ;Aと$00FFで論理積
+$C1/42A3 TAY                     ;Aの値をYレジスタに転送
+$C1/42A4 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/42A6 DEC $09    [$00:0309]   ;[$00:0309]をデクリメント -1
+$C1/42A8 BNE $E0    [$428A]      ;ゼロフラグが立っていないとき[$428A]分岐
+;敵の横幅確認ループ開始（2回目）ここまで
+$C1/42AA RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/4277</span></code>～<code><span class="r">$C1/42AA</span></code>は、<span class="tri"><a href="program32.html">位置変化・向き変え</a></span>での吹き飛ばし処理で紹介した、「敵がどこかに移動する場合、元の座標に誰もいない状態にする」というサブルーチンである。<br>
+重要な部分は<code><span class="r">$C1/428E</span></code>～<code><span class="r">$C1/4293</span></code>で、オディオモールがいたアドレスをロードし（この時点では<span class="formula">$13</span>）、<span class="formula">$E0</span>と論理積を取った値をアドレスに描き戻す。<br>
+<span class="formula">$E0</span>と論理積を取ると、ダメージフィールドの値だけが残るのだが、ダメージフィールドは発生しない戦闘だから、<span class="formula">$13 &#x26; $E0 = $00</span>、つまり誰もいないしダメージフィールドも存在しない、という状況になる。<br>
+こうして<code>$00:04CB</code>・<code>$00:04D3</code>に<span class="formula">$00</span>が入って、オディオモールがいない状態になった。</p>
+
+<p>もうひとつ必要な処理は戦闘状態である。<br>
+敵番号2のオディオモールは、<code>$00:1B21</code>に戦闘状態（<span class="formula">$00</span>なら戦闘離脱、<span class="formula">$FF</span>なら通常）が入っており、ピュアオディオ出現までは通常状態の<span class="formula">$FF</span>が入っている。<br>
+ピュアオディオの出現条件のひとつが、オディオモールの戦闘状態が<span class="formula">$FF</span>である（<code>$00:1B21</code>に<span class="formula">$FF</span>が入っている）だから当然である。<br>
+だがピュアオディオが出現したら、<code>$00:1B21</code>に<span class="formula">$00</span>を入れて戦闘離脱状態にしなければフィールドに残ってしまう。<br>
+その処理が下である。</p>
+
+<div class="code-container"><pre>
+$C1/7CCA RTS                     ;サブルーチン戻り
+;
+$C1/7C30 LDA #$00                ;Aに$00をロード
+$C1/7C32 STA $1B21  [$00:1B21]   ;Aを[$00:1B21]に書き込み
+$C1/7C35 LDX #$1B40              ;Xに$1B40をロード
+$C1/7C38 JSR $51FB  [$C1:51FB]   ;[$C1:51FB]へジャンプ
+</pre></div>
+
+<p>処理自体はシンプルで、<code><span class="r">$C1/7C30</span></code>で<code>A</code>にロードした<span class="formula">$00</span>を、<code><span class="r">$C1/7C32</span></code>で<code>[$00:1B21]</code>に書き入れるのみである。<br>
+実際にはこの処理までに、オディオモールがマップ中央まで移動してくる。<br>
+直前まで、オディオモールを中央に移動させる処理、つまりオディオモールのいる位置（ドット単位での座標）が必要なので、<code>[$00:1B21]</code>の戦闘状態が<span class="formula">$FF</span>でなければならない。<br>
+移動が終わると削除して、ピュアオディオのドット絵を出現させる処理へ移行する、という仕組みである。</p>
+
+<p>以上でピュアオディオ関係の説明を終了とする。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program32.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program34.html"><span class="button">&#9654;次 ステータス変動</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

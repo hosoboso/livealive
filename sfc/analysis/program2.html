@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; テレポートの仕様解説">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; テレポートの仕様解説">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; テレポートの仕様解説</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; テレポートの仕様解説</h1>
+<h2>テレポートの仕様解説</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>本作のデータや各種計算式（ダメージ量の算出方法など）を掲載している、<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様には、アキラがパーティにいる時に「逃げる」コマンドの代わりになる「テレポート」についても<a href="https://rodgersia.ninpou.jp/livealive/terepo.txt" target="_blank">仕様解説</a>がある。<br>
+ここでは、仕様解説を元にして、プログラムではどうなっているのかなどについて、少し踏み込んだ説明をする。</p>
+
+<p>また、「テレポート」で使われている疑似乱数計算方法は、近未来編のアイテム改造の確率計算など、他の場所でも使われていることも判明したので、乱数の計算方法と共に別ページで紹介していく。</p>
+
+<p>このページでは、「テレポート」について説明をする。</p>
+
+<p>以下、<a href="https://rodgersia.ninpou.jp/livealive/terepo.txt" target="_blank">「世界の合言葉は森部」様による、テレポートの仕様の説明テキストファイル</a>から引用した。</p>
+
+<blockquote><p>C0/378F-<br>
+<br>
+乱数１：128以上でテレポート先変更なし (Y:48EF+00)<br>
+<br>
+乱数１：128未満でテレポートイベント発生<br>
+ （ 乱数２・３・４は0～98までの様子）<br>
+　乱数２：66～98以上で台所に<br>
+　乱数２：0～32でトイレに<br>
+　乱数２：33～65で風呂に<br>
+　　乱数３：0～32、66～98何も起こらず<br>
+　　乱数３：33～65で<br>
+　　　乱数４：33～98で何も起こらず<br>
+　　　乱数４：0～32で妙子イベント<br>
+<br>
+妙子イベントは1/2*1/3*1/3*1/3で1/54だろうか？</p></blockquote>
+
+<p>ここで、</p>
+
+<p>C0/378F-<br>
+(Y:48EF+00)</p>
+
+<p>という、2ヶ所の謎の文字列が何か気になる方もいらっしゃるかもしれない（筆者もだが）。<br>
+これは、本作におけるプログラムに関連した数値である。<br>
+<a href="index.html">前ページ</a>の、スーパーファミコンのプログラム・65C816関連の基礎知識を読んでいただいたという前提で説明をする。</p>
+
+<p>上の「C0/378F-」は、「ライブ・ア・ライブ」のゲームソフト内データのアドレス「<code>10378F</code>」以降に記録されている文字列3バイト（つまり、10378F, 103790, 103791番目の文字）を、スーパーファミコンのメモリ領域にロードした時の位置である。<br>
+その3バイトの文字列は「<code>20 00 B9</code>」で、65C816においては「<code>JSR $B900</code>」という命令になる。<br>
+この<code>JSR</code>という命令は「Jump to Subroutine」、指示された位置に記してある計算手順へジャンプしろという指示になる。<br>
+位置は<code>$B900</code>と指定されており、細かい説明は省くが、スーパーファミコンのメモリ領域における<code>$C0/B900</code>という位置を意味している。<br>
+この<code>$C0/B900</code>から始まるサブルーチン（プログラム）で、テレポート先を決める計算が行われている、という意味での「C0/378F-」なのである。</p>
+
+<p>「Y:48EF+00」についてだが、前ページの「レジスタ」の項目で説明した、「インデックスレジスタ<code>Y</code>」が関係してくる。<br>
+「<code>JSR $B900</code>」が実行されるタイミングで、インデックスレジスタ<code>Y</code>には16進法2バイト分の「<span class="formula">48EF</span>」という値が記録されている。16進数の値なので、この先では「<span class="formula">$48EF</span>」と、頭に「$」を付けて、10進数とは区別する。<br>
+（※なお、乱数１が<span class="formula">48EF</span>である、という意味ではない）</p>
+
+<p>「<code>JSR $B900</code>」の後に実行される命令で、まず、乱数１を算出する（乱数計算方法は次のページで紹介している）。<br>
+次に、「乱数１が128以上かどうか？」という判定が入り、128以上なら判定後に通常の「逃げる」を行うサブルーチンに移動する。<br>
+128未満だと、「インデックスレジスタ<code>Y</code>の値を<span class="formula">+3</span>する = <span class="formula">$48F2</span>」という処理をしてから、テレポート先を決める乱数２以降の判定が始まる。<br>
+ここでの<span class="formula">+3</span>は16進数表記での足し算なので<span class="formula">$48EF + $3</span>だと一番下の位の<span class="formula">$F</span>が繰り上がり、2番目の位が<span class="formula">$E</span>から<span class="formula">$F</span>になり、結果、答えが<span class="formula">$48F2</span>となる、という点に注意。</p>
+
+<p>乱数２以降の判定は、以下のように行われる。</p>
+
+<ol>
+	<li>最初に「乱数２は<span class="formula">66</span>以上か」を判定して、<span class="formula">66</span>以上なら台所に飛ぶ。<br><span class="formula">66</span>未満なら2.へ。</li>
+	<li>「インデックスレジスタ<code>Y</code>の値を<span class="formula">+2</span>する = <span class="formula">48F4</span>」という処理をしてから、「乱数２は<span class="formula">33</span>以上か」を判定して、<span class="formula">33</span>以上なら風呂に飛ぶ。<br><span class="formula">33</span>未満なら3.へ。</li>
+	<li>「インデックスレジスタ<code>Y</code>の値を<span class="formula">+2</span>する = <span class="formula">48F6</span>」という処理をしてから、トイレに飛ぶ。</li>
+</ol>
+
+<p>つまりテレポート失敗時は必ずインデックスレジスタ<code>Y</code>の値が増え、その値でどこに飛ぶか判断可能であるから、<br>
+<code>Y:48EF+00</code><br>
+と、インデックスレジスタY「<code>Y:48EF</code>」が「<code>+00</code>」されていく、という意味で記してあるのだろう。</p>
+
+<hr>
+
+<p>ここまでは実際のプログラムは紹介せずに説明したが、この先は一歩踏み込んで、実際のプログラムを紹介しながら説明する。<br>
+ただし、乱数の計算方法については別ページとする。<br>
+実は本作における乱数の計算方法は2種類ある。<br>
+戦闘中で乱数が必要となった時に計算して作る「戦闘用乱数」と、マップ（フィールド）にいる時に1/60秒に1回のサブルーチンで計算されて作られる「マップ乱数」である。<br>
+このふたつは、計算方法も全く異なるし、それぞれの説明で1ページ分を要するので、ここではあくまでもテレポートの仕様に絞る。</p>
+
+<p>以下、テレポートコマンド実行時の、重要な部分のみ抜粋したサブルーチンである。<br>
+わかりやすいよう一応色分けをしてみたが、赤い文字の<code><span class="r">$C0/378F</span></code>はメモリ領域のアドレスで、青い文字の<code><span style="color: #0000FF;">JSR</span> $B900</code>はそのアドレスに書かれた命令文である。<br>
+インデックスレジスタ<code>Y</code>に収納された値を「<code>Y:48EF</code>」のように併記する。<br>
+セミコロン「;」の後はコメント扱いで処理の簡単な解説。<br>
+以下、アキュムレータは<code>A</code>、インデックスレジスタXは<code>X</code>、インデックスレジスタYは<code>Y</code>とする。<br>
+ここまでで説明していない用語も混ざっているが、わからなくても特に問題はない。<br>
+また、乱数生成のサブルーチンについては省略した。<br>
+「ここでの乱数生成にはマップ乱数生成のサブルーチンを2回使っている」「マップ乱数を生成すると、その乱数が<code>X</code>に入った状態になる」ことだけ覚えていただければ良い。<br>
+詳しい説明は後に記してある。</p>
+
+<div class="code-container"><pre>
+$C0/378F JSR $B900    ;Y:48EF [$C0:B900]へジャンプ
+
+;（$C0:B900～の処理省略。ここで1つ目のマップ乱数を生成して、Xレジスタに乱数が入る）
+
+$C0/3792 PLB          ;Y:48EF DBレジスタにスタックから値をプル
+$C0/3793 CPX #$0080   ;Y:48EF Xの数値と$0080(10進数の128)を減算比較（X - $0080）
+$C0/3796 BCS $05      ;Y:48EF キャリーフラグが立っているなら[$C0:379D]へ（テレポート成功）
+;この先はテレポート失敗時の処理
+$C0/3798 INY          ;Y:48EF Yをインクリメント
+$C0/3799 INY          ;Y:48F0 Yをインクリメント
+$C0/379A BRL $E404    ;Y:48F1 [$C0:1BA1]へジャンプ
+
+$C0/1BA1 LDA $00022E  ;Y:48F1 Aに[$00:022E]の値をロード
+;（省略）
+$C0/1C23 INY          ;Y:48F1 Yをインクリメント
+;（省略）
+$C0/1C2A JMP ($429F,x);Y:48F2 「$C0:$429F + X」へジャンプ
+;（テレポート失敗時は$C0:37A4へジャンプ）
+
+$C0/37A4 PHB          ;Y:48F2 DBレジスタの値をスタックに積む
+;（省略）
+$C0/37AC JSR $B900    ;Y:48EF [$C0:B900]へジャンプ
+
+;（$C0:B900～の処理省略。ここで2つ目のマップ乱数を生成して、Xレジスタに乱数が入る）
+
+$C0/37AF PLB          ;Y:48F2 DBレジスタにスタックから値をプル
+$C0/37B0 CPX #$0042   ;Y:48F2 Xの数値と$0042(10進数の66)を減算比較（X - $0042）
+$C0/37B3 BCS $0C      ;Y:48F2 キャリーフラグが立っているなら[$C0/37C1]へジャンプ
+$C0/37B5 INY          ;Y:48F2 Yをインクリメント
+$C0/37B6 INY          ;Y:48F3 Yをインクリメント
+$C0/37B7 CPX #$0021   ;Y:48F4 Xの数値と$0021(10進数の33)を減算比較（X - $0021）
+$C0/37BA BCS $05      ;Y:48F4 キャリーフラグが立っているなら[$C0/37C1]へジャンプ
+$C0/37BC INY          ;Y:48F4 Yをインクリメント
+$C0/37BD INY          ;Y:48F5 Yをインクリメント
+$C0/37BE BRL $E3E0    ;Y:48F6 [$C0:1BA1]へジャンプ
+</pre></div>
+
+<h4>乱数１の判定</h4>
+
+<p>さて、「乱数１が128以上かどうか？」という判定はどこかというと、以下の部分になる。</p>
+
+<div class="code-container"><pre>
+$C0/3793 CPX #$0080   ;Y:48EF Xの数値と$0080(10進数の128)を減算比較（X - $0080）
+$C0/3796 BCS $05      ;Y:48EF キャリーフラグが立っているなら[$C0:379D]へ（テレポート成功）
+</pre></div>
+
+<p>※厳密には「<code>X</code>の数値」というのは2バイト（16進数で4文字分）になるのだが、ここでは下2桁分、1バイトを取り出して計算をする。<br>
+16進数1バイトの最小値は<span class="formula">$00</span>で最大値は<span class="formula">$FF</span>。10進数なら最小値は<span class="formula">0</span>で最大値は<span class="formula">255</span>に当たる。</p>
+
+<p>キャリーフラグについては前ページで説明したが、「2進数で計算した時、足し算で繰り上がりが起きた　または　引き算で繰り下がりが起きなかった」時にキャリーフラグが立つ、という仕組みのことである。理屈は抜きにしてそういうものと思っておいていただければ問題ない（もちろん理屈がわかるに越したことはない）。</p>
+
+<p><code>X</code>に入っている値が乱数１であり、「<span class="formula"><code>X</code> - $0080</span>」を計算しろという命令が「<code>CPX #$0080</code>」にあたる。<br>
+「<code>$0080</code>」とは、「16進数の<span class="formula">80</span>」のことであり、10進数の<span class="formula">128</span>である。<br>
+差を取っているので、<br>
+「計算結果が0か正の数なら、乱数１は<span class="formula">128</span>以上なのでテレポート成功」<br>
+「計算結果が負の数なら、乱数１は<span class="formula">128</span>未満なのでテレポート失敗」<br>
+となり、条件分岐として使えるのである。<br>
+だが実際には、<br>
+「計算した結果キャリーフラグが立ったら<code>[$C0:379D]</code>へ（テレポート成功）」<br>
+という条件である。<br>
+これはどういうことか説明をする。</p>
+
+<p>例として、乱数１（<code>X</code>）が<span class="formula">$AB</span>（10進数の<span class="formula">171</span>）だったら、テレポート成功パターンである。<br>
+計算は以下のようになる。</p>
+
+<p class="formula"><code>X</code> - $0080 = $AB - $80</p>
+
+<p>この計算を行うとキャリーフラグが立つかどうかを調べるのだが、引き算なので、「2進数で計算した時、引き算で繰り下がりが起きなかった」時にキャリーフラグが立つ。<br>
+「<span class="formula">$AB</span>」と「<span class="formula">$80</span>」を2進数に変換すると、それぞれ、「<span class="formula">10101011</span>」「<span class="formula">10000000</span>」である。<br>
+頭に「$」をつけると16進数であることを表すのと同じく、頭に「%」をつけると2進法表記を意味する。<br>
+では実際に引き算をするが、2進数の引き算も、普段の10進数の引き算と考え方は同じで、それぞれの位で引き算をすれば良い。桁数の多い引き算を筆算でする（縦に数字を並べて上から下を引く）場合と同じようなイメージである。</p>
+
+<p class="formula">$AB - $80 = %10101011 - %10000000 = %00101011</p>
+
+<p>2進数だと8桁になっているが、たとえば一番下の1桁目（2<sup>0</sup>の位）や2桁目（2<sup>1</sup>の位）は「<span class="formula">1 - 0 = 1</span>」だし、3桁目（2<sup>2</sup>の位）は「<span class="formula">0 - 0 = 0</span>」ととても単純である。<br>
+8桁目（2<sup>7</sup>の位）は「<span class="formula">1 - 1 = 0</span>」。<br>
+つまり、どの位も繰り下がりが起きていない。<br>
+引き算で繰り下がりが起きなかったので、キャリーフラグが立つ。</p>
+
+<p>逆に、<span class="formula">%10000000</span>を引く時に繰り下がりが起こるのは、8桁目が0の時の時、つまりXが<span class="formula">%10000000</span>より小さい時だけである。<br>
+10進法だと<span class="formula">128</span>未満だと引き算で繰り下がりが起きるので、キャリーフラグが立たない。</p>
+
+<p>ということで、<br>
+「キャリーフラグが立つなら、乱数１は<span class="formula">128</span>以上なのでテレポート成功」<br>
+「キャリーフラグが立たないなら、乱数１は<span class="formula">128</span>未満なのでテレポート失敗」<br>
+という処理が行われ、確率がそれぞれ1/2で分岐している。<br>
+また、乱数１が<span class="formula">128</span>未満の時、つまりテレポート失敗の時は、飛び先を決めるため、以下の乱数２の判定へ移行する。</p>
+
+<h4>乱数２の判定</h4>
+
+<p>乱数２の判定が行われているのは以下。</p>
+
+<div class="code-container"><pre>
+$C0/37B0 CPX #$0042   ;Y:48F2 Xの数値と$0042(10進数の66)を減算比較（X - $0042）
+$C0/37B3 BCS $0C      ;Y:48F2 キャリーフラグが立っているなら[$C0/37C1]へジャンプ
+</pre></div>
+
+<p>ここで<code>X</code>と16進数<span class="formula">0042</span>(10進数の<span class="formula">66</span>)の数値の比較をしている。<br>
+この時に<code>X</code>に入っているのは乱数１ではなく乱数２である。<br>
+上ではかなり端折ったが、乱数１の判定から乱数２の判定までにも色々な計算や値の読み込みが行われているので、ここでは既に<code>X</code>に乱数２が収納されている。<br>
+<code>CPX #$0042</code>の結果、キャリーフラグが立ったら乱数２の値は<span class="formula">66</span>以上ということであり、台所に飛ぶことが決定され、これより後の乱数比較はスキップし、<code>$C0:37C1</code>にジャンプする。<br>
+<span class="formula">66</span>未満なら続けて以下の処理が行われる。</p>
+
+<div class="code-container"><pre>
+$C0/37B5 INY          ;Y:48F2 Yをインクリメント
+$C0/37B6 INY          ;Y:48F3 Yをインクリメント
+$C0/37B7 CPX #$0021   ;Y:48F4 Xの数値と$0021(10進数の33)を減算比較（X - $0021）
+$C0/37BA BCS $05      ;Y:48F4 キャリーフラグが立っているなら[$C0/37C1]へジャンプ
+</pre></div>
+
+<p><code>INY</code>は、<code>Y</code>の値を＋1する命令なので、2回行うことで<code>Y</code>の値が<span class="formula">48F2</span>から<span class="formula">48F4</span>まで増加。<br>
+その後に、<code>CPX #$0021</code>で、<code>X</code>と16進数<span class="formula">0021</span>(10進数の<span class="formula">33</span>)の数値の比較をしている。<br>
+キャリーフラグが立ったら乱数２の値は<span class="formula">33</span>以上である。<span class="formula">66</span>以上は既に先に判定済みなので、ここでキャリーフラグが立つのは<span class="formula">33</span>以上<span class="formula">66</span>未満ということ。<br>
+この時点で、風呂に飛ぶことだけは決定になり、<code>$C0:37C1</code>へジャンプする。風呂に飛んだ後の判定は更に後に行われる。</p>
+
+<p>ここまで処理した結果、キャリーフラグが立っていないのなら、<code>X</code>の値は<span class="formula">33</span>未満ということである。<br>
+この時点でトイレに飛ぶことが決定。</p>
+
+<div class="code-container"><pre>
+$C0/37BC INY          ;Y:48F4 Yをインクリメント
+$C0/37BD INY          ;Y:48F5 Yをインクリメント
+$C0/37BE BRL $E3E0    ;Y:48F6 [$C0:1BA1]へジャンプ
+</pre></div>
+
+<p><code>INY</code>で<span class="formula">48F6</span>までYが増えた後に、<code>$C0:1BA1</code>へジャンプする。</p>
+
+<h4>乱数３と乱数４の判定</h4>
+
+<p>風呂に飛ぶ場合のみ乱数３以降を判定する。<br>
+乱数２で既に風呂に飛ぶことだけは決定しているので、バトル画面から暗転し、風呂のマップやBGMの読み込みが終わったあたりで乱数３の判定が入るようだ。<br>
+乱数３以降の判定のプログラム（サブルーチン）は、乱数２における<code>$C0/37AF～$C0/37BE</code>を再度使っている。</p>
+
+<h4>最終編について</h4>
+
+<p>最終編については以下のようになっている。</p>
+
+<blockquote><p>最終編：<br>
+乱数２回判定で両方128未満なら心のダンジョン<br>
+合わせて確率1/4か？<br>
+<br>
+その後２回判定して同様に128前後で分けて、テレポート先を４つから選んでいる<br>
+<br>
+小小:子供＆悪夢のヘルメットの前のエリアの左上<br>
+小大:同エリアの左下<br>
+大小:血の魔装の下の方<br>
+大大:大臣の左の方</p></blockquote>
+
+<p>この判定も<code>$C0/3793～</code>のサブルーチンが使われている。<br>
+ただこの時は<code>$C0/378F</code>の時点で<code>Y:4272</code>である（<code>Y</code>の値で何のシナリオでのテレポートが判断できるということでもありそうだ）。<br>
+心のダンジョンに飛ぶかどうか、<code>$C0/3793～</code>のサブルーチンを2回使い、どちらもキャリーフラグが立たない時は心のダンジョンに飛ぶ。<br>
+ただしサブルーチン1回目でキャリーフラグが立った、つまり乱数が128以上だったら、2回目の判定はいちいちやらないで「逃げる」成功パターンとなる。</p>
+
+<p>心のダンジョンに飛ぶ場合の2回判定もやはり<code>$C0/3793～</code>のサブルーチンが使われるが、こちらは必ず2回判定で、行き先が上の通りに決まる。</p>
+
+<p>また、心のダンジョンに飛んでからは、判定が入らなくなる。<br>
+「<code>JSR $B900</code>」そのものが実行されなくなるので、心のダンジョンに飛ぶことに対応した何らかのフラグが立ち、「<code>JSR $B900</code>」を行わないようになるのだろう。</p>
+
+<p>なお、テレポートが失敗しない時期のフラグなどについては、<span class="tri"><a href="program15.html">「逃げる」「テレポート」のフラグ</a></span>で説明している。</p>
+
+<hr>
+
+<p>要するに本作では、</p>
+
+<ul>
+	<li>0～255の乱数を1/2の確率で（0～127, 128～255）分岐させるサブルーチンが<code>$C0/3793～</code></li>
+	<li>0～98の乱数を1/3の確率で（0～32, 33～65, 66～98）分岐させるサブルーチンが<code>$C0/37AF～</code></li>
+</ul>
+
+<p>と、いうことになる。</p>
+
+<p>先に述べたが、テレポート用の乱数は、「マップ乱数」生成用のサブルーチンが使われている。<br>
+「マップ乱数」を作るサブルーチンは、マップ（フィールド）に居る時、1フレームにつき1回処理されて、秒間60個ペースで乱数を作り続けているのだが、それとは別に、ランダムに起きるイベントの時にも「マップ乱数」のサブルーチンを利用して乱数を作ってイベント分岐の処理をしている。<br>
+筆者が確認した限りでは、テレポート以外に、以下に利用されている。</p>
+
+<ul>
+	<li>近未来編のアイテム改造</li>
+	<li>たい焼き屋の手伝い時の客</li>
+	<li>チビッコハウスの教室のオルガンの曲</li>
+	<li>チビッコハウスの物干し竿下のアイテムの取得順序</li>
+	<li>西部編・デロスに罠アイテムを依頼した時の行動</li>
+</ul>
+
+<p>これらは「マップ乱数」用サブルーチンを利用して作った乱数で、イベント分岐を発生させている。<br>
+<a href="program3.html">次ページ</a>にて紹介する。</p>
+
+
+<script>//ソースコード色分け処理
+window.addEventListener('DOMContentLoaded', () => {
+  const codeBlocks = document.querySelectorAll('.code-container pre');
+
+  const mnemonics = "LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM";
+  const mnemonicRegex = new RegExp(`\\b(${mnemonics})\\b`, 'g');
+
+  codeBlocks.forEach(block => {
+    // 改行で分割し、1行ずつ処理
+    let lines = block.innerHTML.split('\n');
+    
+    let highlightedLines = lines.map(line => {
+      if (line.trim() === "") return line;
+
+      // 1. 行番号の処理 (行頭を赤くする)
+      line = line.replace(/^(\$..\/....)/, '<span class="r">$1</span>');
+
+      // 2. コメントとコード部分に分ける
+      let parts = line.split(/(;.*)/); 
+
+      // 3. コード部分のみニーモニック置換
+      if (parts[0]) {
+        parts[0] = parts[0].replace(mnemonicRegex, '<span class="mnemonic">$1</span>');
+      }
+
+      // 4. コメント部分をグレーにする
+      if (parts[1]) {
+        parts[1] = `<span class="comment">${parts[1]}</span>`;
+      }
+
+      return parts.join('');
+    });
+
+    block.innerHTML = highlightedLines.join('\n');
+  });
+});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program3.html"><span class="button">&#9654;次　アイテム改造</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

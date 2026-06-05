@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージ計算式の解説">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージ計算式の解説">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ダメージ計算式の解説</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ダメージ計算式の解説</h1>
+<h2>ダメージ計算式の解説</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様で紹介している、ダメージ計算式はプログラム上ではどうなっているのかを、このページで説明する。</p>
+
+<blockquote class="breakword">・単発ダメージ：<br>
+(<span style="color:#6c6c75;">(</span>(min(max<span style="color:#6c6c75;">(</span>(8+技LV+自LV-敵LV),1<span style="color:#6c6c75;">)</span>,24)<wbr>*LV差係数/8+(自能力値*係数))<wbr>*(<span style="color:#6c6c75;">(</span>255-敵能力値<span style="color:#6c6c75;">)</span>/2)/256<span style="color:#6c6c75;">)</span>*2+攻撃力)<wbr>*乱数(1～1.25)<br>
+（乱数幅は厳密には単発ダメージ*(0～63)/256）</blockquote>
+
+<p>最後の「乱数」は、戦闘用乱数のことなのだが、乱数計算についての説明は後回しにして、まずは乱数以外の部分のサブルーチンを説明する。<br>
+乱数計算については<span class="tri"><a href="program5.html">次ページ</a></span>で解説しているので参照のこと。</p>
+
+<p>また、<span class="tri"><a href="index.html">プログラミング関係解説＆調査トップページ</a></span>にひととおり目を通して、スーパーファミコンの仕様や65C816向けのアセンブリ言語の基本知識を頭の片隅に置いた状態で読み進めていただきたい。</p>
+
+<p>まず改めて、単発ダメージの計算式を見ると、掛け算や割り算が混ざっている。<br>
+だが基本知識に記した通り、65C816には乗除算の機能がないため、代わりの方法で乗除算を行っている。</p>
+
+<p>上の単発ダメージの計算式だと、「<span class="formula">*2</span>」は<span class="formula">×2</span>の命令である<code><span style="color: #0000FF;">ASL</span></code>を使えば良い。<br>
+「<span class="formula">/2</span>」や「<span class="formula">/8</span>」は、<span class="formula">÷2</span>の命令である<code><span style="color: #0000FF;">LSR</span></code>を使えばよい。3回連続で使うと「<span class="formula">÷8</span>」が実行できる。<br>
+掛け算である「*LV差係数」は、コプロセッサを利用した処理を行っている。</p>
+
+<p>更に、割り算の「<span class="formula">/256</span>」は、「16bitモードでメモリに入れた数値の、ひとつ上のアドレスを値を取得することで、実質÷256を実行する」という方法を使っている。詳しい説明は該当部分の解説で行う。</p>
+
+<p>掛け算は、最初の数を「被乗数」、×の後の数を「乗数」としている。<br>
+つまり「被乗数」×「乗数」である。</p>
+
+<p>話を戻して、単発ダメージの計算は、<code><span class="r">$C1/77CE</span></code>から開始され、<code><span class="r">$C1/782D</span></code>にてアキュムレータ（以下<code>A</code>とする）に単発ダメージの計算値が入る仕組みになっている。<br>
+計算の前には、使用する技についてのデータや、ダメージ計算に使うための味方と敵のステータスが読み込みされたり、事前に計算も行われるが、そのあたりは省く。<br>
+細かい説明は後で行う。</p>
+
+<p>65C816では数値を扱う上で、8bitモードと16bitモードのどちらで計算しているかが重要であることも先に記したが、下のサブルーチンは<code>A</code>が8bitモードで計算が開始になっている。<br>
+切り替えている場所（命令）には「Aを16bit幅に変更」などと説明をしてある。</p>
+
+<div class="code-container"><pre>
+$C1/77CE LDA #$08   ;Aに$08（=8）をロード
+$C1/77D0 CLC        ;キャリーフラグクリア
+$C1/77D1 ADC $7E900C;A + [$7E:900C]（=技LV＋自LV）
+$C1/77D5 BCC $02    ;キャリーフラグが立っていないなら$C1/77D9へ
+$C1/77D9 SEC        ;キャリーフラグを立てる
+$C1/77DA SBC $25    ;A - [$00:0325]（=敵LV）
+$C1/77DC BCC $08    ;キャリーフラグが立っていないなら$C1/77E6へ
+$C1/77DE CMP #$18   ;Aと$18（24）を減算比較
+$C1/77E0 BCC $06    ;キャリーフラグが立っていないなら$C1/77E8へ
+
+;※ここから符号付8bit × 8bit処理：
+$C1/77E8 STA $4202  ;Aを被乗数として[$00:4202]にセット
+$C1/77EB LDA $7E900B;Aに[$7E:900B]（=技データ10）をロード
+$C1/77EF AND #$FC   ;Aと$FC（=252）で論理積（技データ10からLV差係数算出）
+$C1/77F1 STA $4203  ;A(=LV差係数)を乗数として[$00:4203]にセット
+$C1/77F4 REP #$21   ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/77F6 LDA $7E900E;Aに[$7E:900E]（計算済みの「自能力値*係数」）をロード
+$C1/77FA AND #$00FF ;Aと$00FFで論理積（Aの上位バイトを00に、下位バイトはそのまま）
+$C1/77FD STA $20    ;Aを[$00:0320]に書き込み（「自能力値*係数」を書き込み）
+$C1/77FF LDA $4216  ;掛け算の結果[$00:4216]をAにロード
+;※8bit × 8bit処理はここまで
+
+$C1/7802 LSR A      ;論理右シフト（A/2）
+$C1/7803 LSR A      ;論理右シフト（A/2）
+$C1/7804 LSR A      ;論理右シフト（A/2）
+$C1/7805 CLC        ;キャリーフラグクリア
+$C1/7806 ADC $20    ;A + [$00:0320](=自能力値*係数)
+
+;※符号付16bit × 8bit
+$C1/7808 SEP #$20   ;MフラグON。Aは8bit幅
+$C1/780A STA $211B  ;Aを被乗数下位バイトとして[$00:211B]にセット
+$C1/780D XBA        ;Aの上位バイトと下位バイトを交換
+$C1/780E STA $211B  ;Aを被乗数上位バイトとして[$00:211B]に書き込み
+$C1/7811 LDA #$FF   ;Aに$FF(=255)をロード
+$C1/7813 SEC        ;キャリーフラグを立てる
+$C1/7814 SBC $26    ;A(=255) - [$00:0326]（=敵能力値）
+$C1/7816 LSR A      ;論理右シフト（A/2）
+$C1/7817 STA $211C  ;
+$C1/781A STA $211C  ;Aを乗数として[$00:211C]にセット
+$C1/781D LDA $7E900F;Aに[$7E:900F]をロード（攻撃側が味方の時の攻撃力）
+$C1/7821 STA $22    ;Aを[$00:0322]に書き込み
+$C1/7823 STZ $23    ;[$00:0323]に1バイトの00を書き込み
+$C1/7825 REP #$21   ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/7827 LDA $2135  ;掛け算の結果の中央部分2バイトをAにロード
+;※16bit × 8bit処理はここまで
+
+$C1/782A ASL A      ;算術左シフト（A*2）
+$C1/782B ADC $22    ;A + [$00:0322]（=攻撃力）
+$C1/782D STA $20    ;Aを[$00:0320]に書き込み
+</pre></div>
+
+<p>では、部分ごとに何が行われているか説明する。<br>
+まず<br>
+<span class="formula">min(max((8+技LV+自LV-敵LV),1),24)</span><br>
+の計算である。</p>
+
+<div class="code-container"><pre>
+$C1/77CE LDA #$08   ;Aに$08（=8）をロード
+$C1/77D0 CLC        ;キャリーフラグクリア
+$C1/77D1 ADC $7E900C;A + [$7E:900C]（=技LV＋自LV）
+$C1/77D5 BCC $02    ;キャリーフラグが立っていないなら$C1/77D9へ
+$C1/77D9 SEC        ;キャリーフラグを立てる
+$C1/77DA SBC $25    ;A - [$00:0325]（=敵LV）
+$C1/77DC BCC $08    ;キャリーフラグが立っていないなら$C1/77E6へ
+$C1/77DE CMP #$18   ;Aと$18（24）を減算比較
+$C1/77E0 BCC $06    ;キャリーフラグが立っていないなら$C1/77E8へ
+</pre></div>
+
+<p>ここは計算部分だけ抜粋してあるのだが、ここまでにメモリ<code>[$7E:900C]</code>に<span class="formula">技LV＋自LV</span>の結果、<code>[$00:0325]</code>に敵LVが入っている。</p>
+
+<p><code>[$7E:900C]</code>及び、<code>[$00:0325]</code>については、<a href="#memorycalc">このページの一番下</a>で、別途説明する。</p>
+
+<p><code><span class="r">$C1/77CE</span></code>で16進数の<span class="formula">$08</span>、10進数の<span class="formula">8</span>を<code>A</code>にロードし、<code><span class="r">$C1/77D1</span></code>で「<span class="formula">技LV＋自LV</span>」を足して、<code><span class="r">$C1/77DA</span></code>で敵LVを引いた。<br>
+減算後のキャリーフラグについては、<span class="tri"><a href="index.html">プログラミング関係解説＆調査トップページ</a></span>及び、<span class="tri"><a href="program2.html">テレポートの仕様簡易解説</a></span>で説明したが、キャリーフラグが立つ場合は減算結果で0以下の時。<br>
+正の数（1以上）なら、キャリーフラグが立たない。<br>
+次の<code><span class="r">$C1/77DC</span></code>の「キャリーフラグが立っていないなら<code><span class="r">$C1/77E6</span></code>へ」という分岐が起こるが、ここが<br>
+<span class="formula">max((8+技LV+自LV-敵LV),1)</span><br>
+の部分である。<br>
+上ではキャリーフラグが立った後の<code><span class="r">$C1/77E6</span>～</code>以降の処理は乗せていないが、<code><span class="r">$C1/77E6</span>～</code>で結果が1になる。</p>
+
+<p>続いて、「<span class="formula">8+技LV+自LV-敵LV</span>」が1以上なら<code><span class="r">$C1/77DE</span></code>で16進数の<span class="formula">18</span>（10進数の<span class="formula">24</span>）を引いて、同じようにキャリーフラグが立つかどうかを判定する。<br>
+<span class="formula">min((8+技LV+自LV-敵LV),24)</span><br>
+の部分である。<br>
+「<span class="formula">8+技LV+自LV-敵LV</span>」の方が小さい場合はキャリーフラグが立って<code><span class="r">$C1/77E8</span></code>へ飛び、そうでない場合はそのまま計算が続いて計算結果を16進数の<span class="formula">18</span>（10進数の<span class="formula">24</span>）とする。</p>
+
+<p>続いて、「<span class="formula">*LV差係数</span>」の処理が行われるが、乗算なので、<br>
+<a href="https://donkeyhacks.zouri.jp/databank/65C816/function/65c816timedivide.html" target="_blank">乗除算 - 65C816命令表　ロード･ストア命令</a><br>
+にある符号付8bit × 8bitの方法で計算が行われる。<br>
+ちなみに「符号付」とは正と負の両方の数値、「符号なし」は0と正の数値のみを意味する。<a href="https://ja.wikipedia.org/wiki/%E7%AC%A6%E5%8F%B7%E5%B1%9E%E6%80%A7" target="_blank">符号属性 - Wikipedia</a>も参照。</p>
+
+<p>※余談だが、<a href="https://donkeyhacks.zouri.jp/databank/65C816/function/65c816timedivide.html" target="_blank">乗除算 - 65C816命令表　ロード･ストア命令</a>の冒頭に、乗除算は、「BGモード7の拡縮回転用マトリクスを使って計算しています」とある。<br>
+どういう意味かというと、スーパーファミコンの特徴のひとつである、画像の拡大・縮小・回転機能を使って乗除算の計算をする仕組み、ということである。<br>
+ただしこれは、符号付16bit x 8bitの、<code>$211B～$211C</code>を使う時のみ。<br>
+本作で言えば、ＳＦ編キャプテンスクウェア開始時に、キャプテンスクウェアが回転しながら拡大される演出があるが、あの時に使われている。戦闘開始時に画面全体が三角形に切り抜かれつつ回転してブラックアウトする演出も同様。<br>
+つまり、これら演出の最中は拡大・縮小・回転機能を使用しているため、<code>$211B～$211C</code>を使う計算を行うことはできない（やろうとするとエラーになるらしい。<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/mul.md" target="_blank">snes-docs-ja / 乗算</a>を参照）。</p>
+
+<div class="code-container"><pre>
+;※ここから符号付8bit × 8bit処理：
+$C1/77E8 STA $4202  ;Aを被乗数として[$00:4202]にセット
+$C1/77EB LDA $7E900B;Aに[$7E:900B]（=技データ10）をロード
+$C1/77EF AND #$FC   ;Aと$FC（=252）で論理積（技データ10からLV差係数算出）
+$C1/77F1 STA $4203  ;A(=LV差係数)を乗数として[$00:4203]にセット
+$C1/77F4 REP #$21   ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/77F6 LDA $7E900E;Aに[$7E:900E]（計算済みの「自能力値*係数」）をロード
+$C1/77FA AND #$00FF ;Aと$00FFで論理積（Aの上位バイトを00に、下位バイトはそのまま）
+$C1/77FD STA $20    ;Aを[$00:0320]に書き込み（「自能力値*係数」を書き込み）
+$C1/77FF LDA $4216  ;掛け算の結果[$00:4216]をAにロード
+;※8bit × 8bit処理はここまで
+</pre></div>
+
+<p>形式としては、<code><span style="color: #0000FF;">STA</span> $4202</code>の時点で<code>A</code>に入っている数値（ここまでの計算値）と、<code><span style="color: #0000FF;">STA</span> $4203</code>の時点で<code>A</code>に入っている数値とを掛け算して、その結果が<code>[$00:4216]</code>に出力されることになっている。<br>
+また、答えは16bitで出力されるため、答えを<code>A</code>に16bit（16進数4文字分）で出力するのなら、事前に<code>A</code>を16bitモードに切り替える必要がある。<br>
+<code><span style="color: #0000FF;">STA</span> $4203</code>の前の、</p>
+
+<div class="code-container"><pre>
+$C1/77EB LDA $7E900B;Aに[$7E:900B]（=技データ10）をロード
+$C1/77EF AND #$FC   ;Aと$FC（=252）で論理積（技データ10からLV差係数算出）
+</pre></div>
+
+<p>この部分でLV差係数を計算し、<code>A</code>に入れている。<br>
+技データについては、<span class="tri"><a href="index.html">プログラミング関係解説＆調査トップページ</a></span>でも触れたが、本作の技のデータは、それぞれの技について、25バイト分の領域を使って記録されており、便宜上25個のデータに順に0から24の番号を付けておく。<br>
+その中の11バイト目の「技データ10」に、LV差係数が格納されている。<br>
+例えば「ローキック」だと16進数で「<span class="formula">0A</span>」という数値であり、2進数だと「<span class="formula">00001010</span>」である。<br>
+2進数での上6桁がLV差係数にあたる。<br>
+ある数値から特定の場所を取り出す方法として、論理積を取る方法があることも、先に記した通りである。<br>
+2進数の上6桁を取り出すために、<code><span class="r">$C1/77EF</span></code>では、技データ10と<span class="formula">$FC</span>（2進数<span class="formula">11111100</span>）で論理積を取っている。<br>
+論理積を取ることで求めたLV差係数は、次の<code><span class="r">$C1/77F1</span></code>で乗数として<code>[$00:4203]</code>にセットされる。</p>
+
+<p>掛け算の処理に少し時間がかかるので、<code><span class="r">$C1/77F4</span>～<span class="r">$C1/77FD</span></code>で別処理をしている。<br>
+この後の計算には「<span class="formula">自能力値*係数</span>」の数値が必要だが、ここまでで<code>[$7E:900E]</code>に格納済みなので、<code><span class="r">$C1/77F6</span></code>にて<code>A</code>にロードしている。<br>
+ただし、それより前の<code><span style="color: #0000FF;">REP</span> #$21</code>という処理で<code>A</code>は16bitモードに切り替わっている。<br>
+よって、この時は<code>A</code>に4桁の数値が読み込まれている。</p>
+
+<p>さて、<code><span class="r">$C1/77F6</span></code>に書かれている<code><span style="color: #0000FF;">LDA</span></code>という命令は、<code>A</code>に指定の数値をロードしろという命令である。<br>
+ここでは<code><span style="color: #0000FF;">LDA</span> $7E900E</code>と書かれており、<code>[$7E:900E]</code>（＝「<span class="formula">自能力値*係数</span>」）というアドレスが指定されている。<br>
+8bitモードなら、<code>[$7E:900E]</code>の下2桁だけが読み込まれて<code>A</code>に収納されるのであるが、<code><span style="color: #0000FF;">LDA</span></code>を16bitモードで実行するため、指定アドレスの内容を下位バイトとして、指定アドレス+1にある内容を上位バイトとして、合計4桁で読み込む。<br>
+ここでいえば「<code>[$7E:900E]</code>の数値を下2桁、<code>[$7E:900F]</code>の数値を上2桁」として読み込むことになる。<br>
+必要なのは<code>[$7E:900E]</code>だけで、<code>[$7E:900F]</code>の数値は必要がない。<br>
+しかも、後々で<code>A</code>の上2桁が計算に必要になるので（後述）、上2桁に読み込まれた<code>[$7E:900F]</code>の数値は削除しておきたい。<br>
+そこで、<code>A</code>の上位8bitに「<span class="formula">00</span>」を入れる処理をしたのが、<code><span class="r">$C1/77FA</span></code>である。<br>
+ここでは<code>A</code>と<span class="formula">$00FF</span>で論理積を取ることで、上2桁は<span class="formula">00</span>、下2桁に「<span class="formula">自能力値*係数</span>」を残している。<br>
+そして、<code><span class="r">$C1/77FD</span></code>では<code>[$00:0320]</code>に「上2桁は<span class="formula">00</span>、下2桁に<span class="formula">自能力値*係数</span>」を格納している。</p>
+
+<p>というように掛け算処理の時間を稼いだところで、<code><span class="r">$C1/77FF</span></code>で掛け算の結果<code>[$00:4216]</code>を<code>A</code>にロードし、「<span class="formula">*LV差係数</span>」までの計算が終了。</p>
+
+<div class="code-container"><pre>
+$C1/7802 LSR A      ;論理右シフト（A/2）
+$C1/7803 LSR A      ;論理右シフト（A/2）
+$C1/7804 LSR A      ;論理右シフト（A/2）
+$C1/7805 CLC        ;キャリーフラグクリア
+$C1/7806 ADC $20    ;A + [$00:0320](=自能力値*係数)
+</pre></div>
+
+<p><code>$C1/7802～$C1/7804</code>では、「<code><span style="color: #0000FF;">LSR</span> A</code>」という同じ処理を3回繰り返している。<br>
+先に記したとおり、これは「<code>A</code>を<span class="formula">÷2</span>して新たに<code>A</code>に入れる」処理であり、3回繰り返すと<span class="formula">÷8</span>ということになる。<br>
+これで、</p>
+
+<p class="breakword"><span class="formula">(min(max<span style="color:#6c6c75;">(</span>(8+技LV+自LV-敵LV),1<span style="color:#6c6c75;">)</span>,24)<wbr>*LV差係数<span style="font-weight:bold;">/8</span></span></p>
+
+<p>まで計算できたことになる。<br>
+更に<code><span class="r">$C1/7806</span></code>では、<code>[$00:0320]</code>を足し算しているが、<code><span class="r">$C1/77FD</span></code>で「上2桁は<span class="formula">00</span>、下2桁に<span class="formula">自能力値*係数</span>」を<code>[$00:0320]</code>に格納したので、</p>
+
+<p class="breakword"><span class="formula">(min(max<span style="color:#6c6c75;">(</span>(8+技LV+自LV-敵LV),1<span style="color:#6c6c75;">)</span>,24)<wbr>*LV差係数/8<span style="font-weight:bold;">+(自能力値*係数)</span></span></p>
+
+<p>という足し算を行ったことになる。</p>
+
+<p>残りの<br>
+<span class="formula">*((255-敵能力値)/2)/256)*2+攻撃力</span><br>
+の処理は以下のようになっている。<br>
+乗算部分は、<br>
+<a href="https://donkeyhacks.zouri.jp/databank/65C816/function/65c816timedivide.html" target="_blank">乗除算 - 65C816命令表　ロード･ストア命令</a><br>
+にある符号付16bit × 8bitの処理を使っている。<br>
+16bit × 8bitとは、<span class="formula">$12AB × $34</span>のように、16進法の4桁の数字と、16進法の2桁の数字の掛け算のことである。<br>
+ここまで基本的に8bit（16進法で2桁）での計算をしてきたが、どうしてここで4桁の計算になるのかは後でわかる。</p>
+
+<div class="code-container"><pre>
+;※符号付16bit × 8bit
+$C1/7808 SEP #$20   ;MフラグON。Aは8bit幅
+$C1/780A STA $211B  ;Aを被乗数下位バイトとして[$00:211B]にセット
+$C1/780D XBA        ;Aの上位バイトと下位バイトを交換
+$C1/780E STA $211B  ;Aを被乗数上位バイトとして[$00:211B]に書き込み
+$C1/7811 LDA #$FF   ;Aに$FF(=255)をロード
+$C1/7813 SEC        ;キャリーフラグを立てる
+$C1/7814 SBC $26    ;A(=255) - [$00:0326]（=敵能力値）
+$C1/7816 LSR A      ;論理右シフト（A/2）
+$C1/7817 STA $211C  ;
+$C1/781A STA $211C  ;Aを乗数として[$00:211C]にセット
+$C1/781D LDA $7E900F;Aに[$7E:900F]をロード（攻撃側が味方の時の攻撃力）
+$C1/7821 STA $22    ;Aを[$00:0322]に書き込み
+$C1/7823 STZ $23    ;[$00:0323]に1バイトの00を書き込み
+$C1/7825 REP #$21   ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/7827 LDA $2135  ;掛け算の結果の中央部分1バイトをAにロード
+;※16bit × 8bit処理はここまで
+</pre></div>
+
+<p>16bit × 8bitの計算では、</p>
+
+<ol>
+	<li>最初の<code><span style="color: #0000FF;">STA</span> $211B</code>で16bitの被乗数の下2桁をセットする</li>
+	<li>次の<code><span style="color: #0000FF;">STA</span> $211B</code>で16bitの被乗数の上2桁をセットする</li>
+	<li>最後に<code><span style="color: #0000FF;">STA</span> $211C</code>で8bitの乗数をセットする</li>
+	<li><code>[$00:2134][$00:2135][$00:2136]</code>に掛け算の結果が出力される</li>
+</ol>
+
+<p>という手順を踏む。<br>
+掛け算の結果がアドレス3ヶ所に分けて出力されるが、これは結果が16進数で6桁まで、つまり24ビットまで出力可能であるという意味である。
+まとめてアドレス2つ分を<code>A</code>に取得したいのなら、事前に<code>A</code>を16bitモードに切り替えてから[$00:2134]をロードすれば、ひとつ上の[$00:2135]も一緒に取得できる、といった処理も可能である。</p>
+
+<p>16bit × 8bitの処理だが、まず、これまでの計算結果を<code><span class="r">$C1/780A</span></code>で「16bitの被乗数の下2桁」としてセットする。</p>
+
+<p>次に<code><span class="r">$C1/780D</span></code>で<code><span style="color: #0000FF;">XBA</span></code>という命令が入っているが、これは<code>A</code>に入っている値の上2桁と下2桁を交換しろという意味である。<br>
+少し話が戻るが、</p>
+
+<div class="code-container"><pre>
+$C1/77FA AND #$00FF ;Aと$00FFで論理積（Aの上位バイトを00に、下位バイトはそのまま）
+</pre></div>
+
+<p>ここで必ず、<code>A</code>の上2桁は「<span class="formula">00</span>」になっており、以降の計算も8ビット（下2桁）でしか行っていないので、<code><span style="color: #0000FF;">XBA</span></code>を行うと、上2桁の<span class="formula">00</span>が下2桁に移動する。つまり下2桁は必ず「<span class="formula">00</span>」になる。<br>
+この状態で、<code><span class="r">$C1/780E</span></code>の<code><span style="color: #0000FF;">STA</span> $211B</code>を実行した場合、被乗数上位バイトとして<code>[$00:211B]</code>に書き込まれるのは「<span class="formula">00</span>」。<br>
+よって、16bit × 8bitの計算をするのに、16bit部分は「<span class="formula">00??</span>」（<span class="formula">??</span>がこれまでの計算結果）という数値が入ることになる。</p>
+
+<p>続いて、<code><span style="color: #0000FF;">STA</span> $211C</code>で乗数をセットする。<br>
+掛け算したい値は、「<span class="formula">(255-敵能力値)/2</span>」である。</p>
+
+<div class="code-container"><pre>
+$C1/7811 LDA #$FF   ;Aに$FF(=255)をロード
+$C1/7813 SEC        ;キャリーフラグを立てる
+$C1/7814 SBC $26    ;A(=255) - [$00:0326]（=敵能力値）
+$C1/7816 LSR A      ;論理右シフト（A/2）
+$C1/7817 STA $211C  ;Aを乗数として[$00:211C]にセット
+$C1/781A STA $211C  ;Aを乗数として[$00:211C]にセット
+</pre></div>
+
+<p><code><span class="r">$C1/7811</span></code>で16進数の<span class="formula">FF</span>、つまり10進数の<span class="formula">255</span>をロードして、<code><span class="r">$C1/7814</span></code>では<span class="formula">255</span>から、<code>[$00:0326]</code>にセット済みの敵能力値を引く。<br>
+更に<code><span class="r">$C1/7816</span></code>の<code><span style="color: #0000FF;">LSR</span></code>で<span class="formula">÷2</span>を行って、「<span class="formula">(255-敵能力値)/2</span>」となる。<br>
+これを<code><span class="r">$C1/7817</span></code>で乗数としてセット。<br>
+（<code><span style="color: #0000FF;">STA</span> $211C</code>が2回連続な理由はよくわからないが、多分計算時間を稼いでいるのだろう）<br>
+この乗算も少し時間がかかるので、他の処理をして時間稼ぎ。</p>
+
+<div class="code-container"><pre>
+$C1/781D LDA $7E900F;Aに[$7E:900F]をロード（攻撃側が味方の時の攻撃力）
+$C1/7821 STA $22    ;Aを[$00:0322]に書き込み
+$C1/7823 STZ $23    ;[$00:0323]に1バイトの00を書き込み
+$C1/7825 REP #$21   ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/7827 LDA $2135  ;掛け算の結果の中央部分1バイトをAにロード
+</pre></div>
+
+<p>最後に「<span class="formula">+攻撃力</span>」するので、その値を<code>[$7E:900F]</code>から<code>A</code>にロードする。<br>
+（攻撃力が関わらない技なら<span class="formula">0</span>）<br>
+その値を<code>[$00:0322]</code>に書き込み保存。<br>
+そして<code><span class="r">$C1/7827</span></code>で、掛け算の答えを<code>A</code>にロードする。<br>
+だがここでロードした値は、「掛け算の結果の中央部分1バイト」である。<br>
+先に述べた通り、符号付16bit × 8bitの計算では、答えが符号付24bitで出力される。<br>
+16進数でいえば6桁分で、順に、<br>
+<code>[$00:2134][$00:2135][$00:2136]</code><br>
+の3つに分割されて出力される。<br>
+<code><span class="r">$C1/7827</span></code>では、答えの中央にあたる<code>[$00:2135]</code>をロードしている。</p>
+
+<div class="place"><p>例：<span class="formula">$12AB × $34 = $03CABC</span><br>
+（10進法なら<span class="formula">4779 × 52 = 248508</span>）<br>
+この場合なら、<br>
+<code>[$00:2134]</code> = <span class="formula">$03</span><br>
+<code>[$00:2135]</code> = <span class="formula">$CA</span><br>
+<code>[$00:2136]</code> = <span class="formula">$BC</span><br>
+のように2桁（1バイト）ずつ3分割されて答えが出力される。</p></div>
+
+<p>さて、16進数の数値で、下2桁部分は捨てて、次の2桁だけ抜き出すことが何を意味するかは、既に<span class="tri"><a href="index.html">プログラミング関係解説＆調査トップページ</a></span>の「掛け算と割り算」「8bitモードと16bitモードの応用」で書いた通り、<br>
+「<span class="formula">16<sup>2</sup> = 256</span>で割り算をすることと同義」<br>
+なのである。<br>
+つまり、「<span class="formula">*((255-敵能力値)/2)/256</span>」の、最後の「<span class="formula">/256</span>」部分は、「掛け算の結果の中央部分1バイト」を取り出すことにより行われたということになる。<br>
+（こういった処理が、アセンブリ言語のプログラミングに慣れていないと理解に難しい部分である）</p>
+
+<p>長くなったが、ここまでで、</p>
+
+<p class="breakword"><span class="formula"><span style="color:#6c6c75;">(</span>(min(max<span style="color:#6c6c75;">(</span>(8+技LV+自LV-敵LV),1<span style="color:#6c6c75;">)</span>,24)<wbr>*LV差係数/8+(自能力値*係数))<wbr>*(<span style="color:#6c6c75;">(</span>255-敵能力値<span style="color:#6c6c75;">)</span>/2)/256<span style="color:#6c6c75;">)</span></span></p>
+
+<p>が計算された、ということになる。</p>
+
+<div class="code-container"><pre>
+$C1/782A ASL A      ;算術左シフト（A*2）
+$C1/782B ADC $22    ;A + [$00:0322]（攻撃力）
+$C1/782D STA $20    ;Aを[$00:0320]に書き込み
+</pre></div>
+
+<p>これが最後の処理である。<br>
+<code><span style="color: #0000FF;">ASL</span></code>で<span class="formula">*2</span>の処理をし、<code><span class="r">$C1/782B</span></code>で<code>[$00:0322]</code>に格納した攻撃力を足して、計算終了である。<br>
+この値は<code>[$00:0320]</code>に格納されて、後で乱数計算にも使われるが、ここでは省く。</p>
+
+<p>以上で、</p>
+
+<p class="breakword"><span class="formula"><span style="color:#6c6c75;">(</span>(min(max<span style="color:#6c6c75;">(</span>(8+技LV+自LV-敵LV),1<span style="color:#6c6c75;">)</span>,24)<wbr>*LV差係数/8+(自能力値*係数))<wbr>*(<span style="color:#6c6c75;">(</span>255-敵能力値<span style="color:#6c6c75;">)</span>/2)/256<span style="color:#6c6c75;">)</span>*2+攻撃力</span></p>
+
+<p>が計算できた。</p>
+
+<p>最後に例として、アキラがクルセイダーＲＳに「ローキック」を正面から当てる時、実際に<code>A</code>がどう変化していくかを紹介しておく。<br>
+「ローキック」は技LV<span class="formula">2</span>、LV差係数<span class="formula">8</span>、自依存は力<span class="formula">1/2</span>、敵依存は体、攻撃力依存あり。<br>
+アキラはレベル<span class="formula">7</span>、力は<span class="formula">25</span>、攻撃力は<span class="formula">16</span>。<br>
+クルセイダーＲＳはレベル<span class="formula">7</span>、体<span class="formula">30</span>である。<br>
+（すべて10進数表記、プログラム内では16進数にして計算する必要がある）<br>
+<code>A</code>を仮にxxxxから開始としておく。</p>
+
+<div class="code-container"><pre>
+$C1/77CE LDA #$08   ;A:xxxx Aに$08（=8）をロード
+$C1/77D0 CLC        ;A:xx08 キャリーフラグクリア
+$C1/77D1 ADC $7E900C;A:xx08 A + [$7E:900C]（=技LV2＋自LV7。$08+$02+$07=$11）
+$C1/77D5 BCC $02    ;A:xx11 キャリーフラグが立っていないなら$C1/77D9へ
+$C1/77D9 SEC        ;A:xx11 キャリーフラグを立てる
+$C1/77DA SBC $25    ;A:xx11 A - [$00:0325]（=敵LV7。$11-$07=$0A）
+$C1/77DC BCC $08    ;A:xx0A キャリーフラグが立っていないなら$C1/77E6へ
+$C1/77DE CMP #$18   ;A:xx0A Aと$18（24）を減算比較（$0A-$18、負の値）
+$C1/77E0 BCC $06    ;A:xx0A キャリーフラグが立っていないなら$C1/77E8へ
+
+;※ここから符号付8bit × 8bit処理：
+$C1/77E8 STA $4202  ;A:xx0A Aを被乗数として[$00:4202]にセット（$0Aをセット）
+$C1/77EB LDA $7E900B;A:xx0A Aに[$7E:900B]（=技データ10、$0A）をロード
+$C1/77EF AND #$FC   ;A:xx0A Aと$FC（=252）で論理積（技データ10からLV差係数算出、$0A AND $FC = $08）
+$C1/77F1 STA $4203  ;A:xx08 A(=LV差係数$08)を乗数として[$00:4203]にセット
+$C1/77F4 REP #$21   ;A:xx08 Aを16bit幅に変更、キャリーフラグクリア
+$C1/77F6 LDA $7E900E;A:xx08 Aに[$7E:900E]（計算済みの「自能力値*係数=trunc(25/2)=12=$0C」）をロード
+$C1/77FA AND #$00FF ;A:xx0C Aと$00FFで論理積（Aの上位バイトを00に、下位バイトはそのまま）
+$C1/77FD STA $20    ;A:000C Aを[$00:0320]に書き込み（「自能力値*係数=$0C」を書き込み）
+$C1/77FF LDA $4216  ;A:000C 掛け算の結果[$00:4216]をAにロード（$0A×$08 = $50）
+;※8bit × 8bit処理はここまで
+
+$C1/7802 LSR A      ;A:0050 論理右シフト（A/2）　$50/$02 = $28
+$C1/7803 LSR A      ;A:0028 論理右シフト（A/2）　$28/$02 = $14
+$C1/7804 LSR A      ;A:0014 論理右シフト（A/2）　$14/$02 = $0A
+$C1/7805 CLC        ;A:000A キャリーフラグクリア
+$C1/7806 ADC $20    ;A:000A A + [$00:0320](=自能力値*係数)　$0A + $0C = $16
+
+;※符号付16bit × 8bit
+$C1/7808 SEP #$20   ;A:0016 MフラグON。Aは8bit幅
+$C1/780A STA $211B  ;A:0016 A（$16）を被乗数下位バイトとして[$00:211B]にセット
+$C1/780D XBA        ;A:0016 Aの上位バイトと下位バイトを交換
+$C1/780E STA $211B  ;A:1600 A（$00）を被乗数上位バイトとして[$00:211B]に書き込み
+$C1/7811 LDA #$FF   ;A:1600 Aに$FF(=255)をロード
+$C1/7813 SEC        ;A:16FF キャリーフラグを立てる
+$C1/7814 SBC $26    ;A:16FF A(=255) - [$00:0326]（=敵能力値 = 30 = $1E）　$FF - $1E = $E1
+$C1/7816 LSR A      ;A:16E1 論理右シフト（A/2）　$E1/$02 = $70
+$C1/7817 STA $211C  ;
+$C1/781A STA $211C  ;A:1670 A（$70）を乗数として[$00:211C]にセット
+$C1/781D LDA $7E900F;A:1670 Aに[$7E:900F]をロード（攻撃側が味方の時の攻撃力 = 16 = $10）
+$C1/7821 STA $22    ;A:1610 A（$10）を[$00:0322]に書き込み
+$C1/7823 STZ $23    ;A:1610 [$00:0323]に1バイトの00を書き込み
+$C1/7825 REP #$21   ;A:1610 Aを16bit幅に変更、キャリーフラグクリア
+$C1/7827 LDA $2135  ;A:1610 掛け算の結果の中央部分1バイトをAにロード　$0016 × $70 = $0009A0, 中央部分1バイトは「$09」
+;※16bit × 8bit処理はここまで
+
+$C1/782A ASL A      ;A:0009 算術左シフト（A*2）　$09×$02 = $12
+$C1/782B ADC $22    ;A:0012 A + [$00:0322]（=攻撃力$10）　$12 + $10 = $22
+$C1/782D STA $20    ;A:0022 A（$22）を[$00:0320]に書き込み
+</pre></div>
+
+<p>単発ダメージ量は<span class="formula">$22 = 34</span>となり、これに乱数を加えた値が実際のダメージ量となる。<br>
+<span class="tri"><a href="program5.html">次ページ</a></span>では、乱数の計算について説明する。</p>
+
+<h3 id="memorycalc">付録　<code>[$7E:900C]</code>及び、<code>[$00:0325]</code>について</h3>
+
+<p>上の説明では端折った、<code>[$7E:900C]</code>（「技LV＋自LV」）及び、<code>[$00:0325]</code>（敵レベル）について説明する。</p>
+
+<h5><code>[$7E:900C]</code>（「技LV＋自LV」）</h5>
+
+<p>メモリ<code>[$7E:900C]</code>には「技LV＋自LV」が入っている、と述べたが、その部分について説明をする。<br>
+上では<code><span class="r">$C1/77CE</span></code>からのプログラム実行結果について紹介をしたが、それ以前であらかじめ、「技LV＋自LV」が計算されている。<br>
+該当部分は以下になる。</p>
+
+<div class="code-container"><pre>
+$C1/DF05 LDA $7E9021[$7E:9021]  ;Aに[$7E:9021]（=技データ17）をロード
+$C1/DF09 AND #$0F               ;Aと$0Fで論理積（技データ17から技LV算出）
+$C1/DF0B CLC                    ;キャリーフラグをクリア
+$C1/DF0C RTS                    ;サブルーチン終わり
+;
+$C1/DEEF ADC $0038,y[$00:1C??]  ;A + [$00:1C??]（=技使用者のレベル現在値）
+$C1/DEF2 BCS $01    [$DEF5]     ;キャリーフラグが立っている場合[$C1/DEF5]へジャンプ
+$C1/DEF4 RTS                    ;サブルーチン終わり
+;
+$C1/D562 STA $7E900C[$7E:900C]  ;Aを[$7E:900C]に書き込み
+</pre></div>
+
+<p>最初の<code>[$7E:9021]</code>を読み込みしている部分だが、これは攻撃側の「技データ17」の読み込みである。<br>
+「技データ17」には、16進数の上1桁に「技の発動時間」、下1桁に「技LV」が格納されている。<br>
+そこで、次の<code><span style="color: #0000FF;">AND</span> #$0F</code>で、<code>A</code>と<span class="formula">$0F</span>で論理積を取ることにより、技LVだけ算出できる。</p>
+
+<p>次に、<code><span style="color: #0000FF;">ADC</span> $0038,y</code>の部分だが、「<code>$0038,y</code>」は「<code>$0038</code>に<code>Y</code>レジスタの値を加えた位置のメモリ」を意味する。<br>
+ここでの<code>Y</code>レジスタの下2桁には、パーティメンバーによって割り振られた番号が入っている。<br>
+<span class="formula">00</span>なら1人目、<span class="formula">40</span>なら2人目、<span class="formula">80</span>なら3人目、<span class="formula">C0</span>なら4人目である。<br>
+よって、<code>[$00:1C??]</code>は、<code>[$00:1C38]</code>,<code>[$00:1C78]</code>,<code>[$00:1CB8]</code>,<code>[$00:1CF8]</code>のどれかである。<br>
+ここに収納された値は、それぞれ、「1人目のレベル現在値」「2人目のレベル現在値」「3人目のレベル現在値」「4人目のレベル現在値」である。<br>
+つまりここで、<code>A</code>に入っていた「技LV」と、「技使用者のレベル現在値」が足されたことになる。<br>
+（わざわざ「現在値」としたのは、戦闘中、バフやデバフでレベルが変動するためである）</p>
+
+<p>なお、「<code><span style="color: #0000FF;">ADC</span></code>」で足し算をする時は、キャリーフラグが立っているかどうかで挙動が変わり、キャリーフラグが立っていると「足し算の時に、更に繰り上がり分の<span class="formula">+1</span>を行う」という判断がされてしまうので、<code><span class="r">$C1/DF0B</span> <span style="color: #0000FF;">CLC</span></code>では一度キャリーフラグをクリアしている。<br>
+最終的に、<code><span class="r">$C1/D562</span></code>で、計算した「技LV」＋「自LV」が、<code>[$7E:900C]</code>に書き込まれることとなり、後でダメージ計算に使われることになる。</p>
+
+<p>また、<code><span class="r">$C1/DEF2</span></code>では、「技LV」＋「自LV」を計算した結果キャリーフラグが立つなら<code>[<span class="r">$C1/DEF5</span>]</code>へジャンプ、という指示がある。<br>
+2桁の16進数の足し算でキャリーフラグが立つということは、16進数3桁目にまで値があふれたという意味であり、16進数だと<span class="formula">100</span>以上、10進数だと<span class="formula">256</span>以上になった時である。<br>
+「技LV」は、このゲームの仕様上、<span class="formula">0～15</span>（16進数で<span class="formula">0～F</span>）しか指定ができない。<br>
+「自LV」は、10進数で<span class="formula">1～99</span>、16進数なら最大で<span class="formula">63</span>である。<br>
+ということは最大値同士を足した場合、10進数なら<span class="formula">15 + 99 = 114</span>であるから、キャリーフラグが立つことはないのでは？　という気もする。<br>
+だが、「自LV」についてはステータスアップ（バフ）を使うと、戦闘中には<span class="formula">99</span>以上に増加することもあるらしい。<br>
+どうやらこのために、キャリーフラグが立った時用の処理を別に用意しているようだ。<br>
+（何らかの理由で数値計算がバグった時用の対策も兼ねているのかもしれない。なおここでは関係ないが、レベルはデバフにより0まで落ちることもある）<br>
+また、キャリーフラグが立った場合の<code>[<span class="r">$C1/DEF5</span>]</code>の処理は、以下のようになっている。</p>
+
+<div class="code-container"><pre>
+$C1/DEF5 LDA #$FF ;Aに$FF（10進数255）を書き込む
+$C1/DEF7 RTS      ;サブルーチン終わり
+</pre></div>
+
+<p>つまり、足し算結果が16進数で<span class="formula">100</span>以上、10進数で<span class="formula">256</span>以上になった場合は、頭打ちとなって16進数で<span class="formula">FF</span>、10進数で<span class="formula">255</span>に上書きされるのである。</p>
+
+<h5><code>[$00:0325]</code>（敵レベル）</h5>
+
+<p>攻撃対象の敵の元々のレベルは、<code><span class="r">$C1/E0D0</span></code>の<code><span style="color: #0000FF;">LDA</span> $7E9000,x</code>で呼び出される。<br>
+敵は複数体出現することもあり、本作では最大で15体まで敵が出現するので、<code>x</code>には敵に順に割り振られた番号が入る。<br>
+ここでは順に<code>1B00</code>, <code>1B10</code>, <code>1B20</code>, <code>1B30</code>,～,<code>1BF0</code>が<code>X</code>に入る。<br>
+1体目なら<code>1B00</code>なので、<code>[$7E:AB00]</code>に敵のレベルが格納されており、<code>A</code>にロードされた後、一度<code><span style="color: #0000FF;">STA</span> $10</code>でメモリ<code>[$00:0310]</code>に書き込まれる。</p>
+
+<p>この後に、敵の状態から「敵の現在のレベル」が計算される。<br>
+その計算の過程は省くが、バフ・デバフによる変動や、攻撃される向きによる補正が計算された結果、その値は<code><span class="r">$C1/E120</span></code>の<code><span style="color: #0000FF;">STA</span> $7E900A,x</code>で、該当アドレスに書き込まれる。<br>
+敵1体目の時は<code>[$7E:AB0A]</code>である。<br>
+この値は<code><span class="r">$C1/D998</span></code>の<code><span style="color: #0000FF;">LDA</span> $7E900A,x</code>で読み込まれて、<code><span class="r">$C1/D99C</span></code>の<code><span style="color: #0000FF;">STA</span> $25</code>で<code>[$00:0325]</code>に書き込まれ、単発ダメージ量計算の際に<code>[$00:0325]</code>から読み出される。</p>
+
+<p>敵1体目なら該当部分は以下の通り。</p>
+
+<div class="code-container"><pre>
+$C1/E0D0 LDA $7E9000,x[$7E:AB00]
+$C1/E0D4 STA $10    [$00:0310]  
+</pre></div>
+<br>
+<div class="code-container"><pre>
+$C1/E11E LDA $10    [$00:0310]  
+$C1/E120 STA $7E900A,x[$7E:AB0A]
+</pre></div>
+<br>
+<div class="code-container"><pre>
+$C1/D998 LDA $7E900A,x[$7E:AB0A]
+$C1/D99C STA $25    [$00:0325]  
+</pre></div>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program3.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program5.html"><span class="button">&#9654;次　戦闘用乱数計算</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

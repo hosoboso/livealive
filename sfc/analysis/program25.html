@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; かわひもバグ">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; かわひもバグ">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; かわひもバグ</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; かわひもバグ</h1>
+<h2>かわひもバグ</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<div style="border:thick double #ce3232; padding: .2em;"><span style="font-weight:bold;">注意！</span><br>
+このバグを実行すると、ゲームが進行不能になります。<br>
+ゲームソフトにも何らかの損傷があるかもしれませんので、実行しないでください。<br>
+もし実行して何らかの不具合が生じたとしても、筆者は一切の責任を負いません。</div>
+
+<p>SFC版「ライブ・ア・ライブ」には幾つかバグがあり、中にはＳＦ編のように、「パワージャッキを使いすぎて詰む」などといった仕様上の問題で進行不可能になる場合がある。<br>
+だが、今回紹介するバグは、表示自体もバグり、進行不能となってしまう、かなり致命的なバグである。<br>
+セーブデータにセーブさえしなければ、リセットすると解消されるはずであるが、最悪、ゲームソフト自体に損傷を生じる可能性もあるため、実行するべきではない。<br>
+以上をご理解いただいた上でお読みいただくようお願いする次第である。</p>
+
+<p>原始編では、序盤にべると出会った後、朝になるとざきがポゴたちの集落を襲撃してくる。<br>
+べるは縄でぐるぐる巻きにされて捕まってしまうが、ポゴとゴリが救出に来て、べるの縄を解く。<br>
+このイベントの最中に、合成アイテム「かわひも」が、持ち物に1個加わる。<br>
+演出上、べるを縛っていた縄が「かわひも」として持ち物に追加された、ということなのだろう。</p>
+
+<p>この時、「かわひも」を99個所持していると起こるのがかわひもバグである。<br>
+アイテムを99個所持している時に、フィールド上で更にもう1個もらったり拾った時に、「このアイテムは　それ以上持てません。」と表示されて入手できない。<br>
+中世編序盤に、城下町の人から無限にもらえる「こんなモン」や、なおり草群生地で「なおり草」を集めまくった時などが、比較的簡単に確認できる場面である。<br>
+近未来編のたい焼き屋の手伝いなど、時間さえかければ、見ることのできる場面は割と多い。<br>
+戦闘勝利時にアイテムを得た時は特に表示はないものの、99個を越えていたら自動的に切り捨てられている。</p>
+
+<p>では、原始編のイベント前に既に「かわひも」を99個所持しているとどうなるか。<br>
+べるの縄を解くモーションの後、唐突に<br>
+「このアイテムは　もう持てない！！」<br>
+というテキストが表示され、そのテキストをAボタンで消すと、操作キャラのポゴの表示がおかしくなる。具体的には肉のアイコンになってしまう。<br>
+そして、イベント中なのに自由に行動可能になって、音楽も通常時の「いいお天気でしょ！」に変わる。ゴリも後からついてくる（位置はすこしずれる）。<br>
+だが、これ以上イベントは進行しなくなる。<br>
+移動可能なのは、ポゴたちが入ってきた上の通路のみで、通路に入るとポゴの表示は元に戻り、一見すると通常状態に戻っている。<br>
+下に行くとイベント開始前の状態に戻っている。<br>
+だがイベントを発生させてみると、「かわひも」が99個の状態である限り同じようにバグってしまう。<br>
+本作はアイテムを捨てることができず、この状況では合成屋に行くこともできないため、「かわひも」の数を減らすことができない。<br>
+つまり、「かわひも」が99個の時点で詰みである。<br>
+もし「かわひも」を99個所持していたとしても、ざき襲撃イベントまでに合成屋を利用して、「かわひも」を材料に使うアイテムを合成し、「かわひも」の個数を減らせばバグは回避可能であるが、ざき襲撃イベントを起こしてしまうとどうしようもない。</p>
+
+<p>なお、肉アイコンになった後に、上に停まっている石の車を調べると、再び石の車が暴走するイベントが起こるが、べるが画面外に吹き飛ばされてしまい、何のボタンを押しても反応しなくなる。こうなるとリセットしかない。</p>
+
+<p>通常プレイの範囲では、ざきが襲撃してくる時点で「かわひも」を99個所持というのはほぼありえないだろう。<br>
+アイテム合成を利用して「かわひも」を99個まで増やすこと自体はこの時点でも可能だが、やる必要がない。<br>
+「かわひも」はアイテム合成にしか使い道がないので、作ったら何かしらのアイテムを合成する材料として消費するだろう。<br>
+また、このタイミングで「かわひも」を99個入手するためには、材料となる「ホネ」「かたい石」「ケガワ」を大量に用意する必要があり、狩場で大量のザコを倒して入手するか、20人部屋のミニゲームを100回近くこなし、更に合成屋でひたすら合成を繰り返さなければならない。<br>
+そこまでするのは、よほどのやりこみプレイヤーであろう。<br>
+このため、通常プレイでこのバグに遭遇することはまずないと思われる。<br>
+少なくともＳＦ編のパワージャッキの件よりも、遭遇する可能性は段違いに低く、そのために製品版でも見過ごされたバグではないかと推測される。</p>
+
+<p>ちなみに、集落を追い出されたタイミングで「どでかホネ肉」を3個入手できるが、「どでかホネ肉」は集落を追い出されるまでに入手することが不可能なので、「かわひも」のようなバグは起こらないはずである。</p>
+
+<h3>実際の画像</h3>
+
+<p>このバグはオリジナルのスーパーファミコン版だけではなく、バーチャルコンソール版でも発生する。<br>
+実際に確認したところ、キャラのドット絵までバグってしまうという、かなり危険なバグなのだが、特に修正はされていないことがわかった。<br>
+セレクトバグや功夫編修行の技習得バグなどもオリジナル版のままであることからしても、バーチャルコンソール版の「ライブ・ア・ライブ」はオリジナル版のプログラムをそのまま使用しているのではないか、と思われる。</p>
+
+<p>筆者が実際に確認してみた写真を掲載する。<br>
+ニンテンドー3DSのバーチャルコンソールのため、3DSの画面を直接写真に撮っている。<br>
+しつこいようだが、もし実際に試してみるつもりなら自己責任で。<br>
+筆者は、「かわひも」を98個まで増やした時点でセーブし、その後はバグ発生後にリセットしたが、特にゲームプレイに支障はなかった。<br>
+ちなみに、序盤で20人部屋のミニゲームを利用して「かわひも」を集める場合、99個にするには1時間半ほどはかかる（手際が良ければもっと短縮できると思う）。</p>
+
+<div class="flexwrap">
+
+<div class="flexitem">
+<div class="modal-set">
+	<div class="imgbox"><a href="img/3dsvc_1.jpg" class="modal-link">
+		<img src="img/3dsvc_1.jpg" alt="かわひも　99個" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+</div>
+
+<div class="flexitem">
+<div class="modal-set">
+	<div class="imgbox"><a href="img/3dsvc_2.jpg" class="modal-link">
+		<img src="img/3dsvc_2.jpg" alt="かこのアイテムは　もう持てない！！" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+</div>
+
+<div class="flexitem">
+<div class="modal-set">
+	<div class="imgbox"><a href="img/3dsvc_3.jpg" class="modal-link">
+		<img src="img/3dsvc_3.jpg" alt="バグ発生" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+</div>
+
+</div>
+
+
+<h3>原因</h3>
+
+<p>かわひもバグの原因は、アイテム所持数が99個を越えてオーバーフローしたことではない。<br>
+10進数での<span class="formula">99</span>は16進数での<span class="formula">$63</span>にあたるが、アイテムの個数が<span class="formula">$63</span>を越えた場合の処理自体はきちんとされている。<br>
+その後の「このアイテムは　もう持てない！！」の表示後の処理が問題である。</p>
+
+ちなみに「このアイテムは　もう持てない！！」という表示は原始編のみで、他シナリオだと「このアイテムは　それ以上持てません。」である。
+<p>シナリオにより表記を変えた理由はよくわからないが、「このアイテムは　もう持てない！！」という表示だからバグが発生するのではない。<br>
+ポゴたちの集落や、クー族の集落など、アイテムが拾える場所において、既に99個所持しているアイテムを拾った場合、「このアイテムは　もう持てない！！」と表示されてアイテムが入手できないが、バグることはない。</p>
+
+<p>本作では、フィールドにおけるイベントでアイテムが増える時、該当アイテムの所持数が既に99個だと、所持数のチェックをした後、<br>
+「このアイテムは　もう持てない！！」または「このアイテムは　それ以上持てません。」<br>
+とウィンドウに表示して、<span style="font-weight:bold;">該当イベントを強制終了させる</span>という処理が入るようである。</p>
+
+<p>例えば近未来編のたい焼き屋の手伝いであれば、客に合った値段を選択してたい焼きを売ると、売値に対応した回復アイテムがもらえるが、その回復アイテムの所持数が99個未満なら、</p>
+
+<div style="border: 1px solid gray; padding: .1em;"><p>無法松「ごくろうだったな。<br>
+　これ持ってけ。</p>
+<p>『こ　これは‥‥<br>
+　（アイテム名）じゃねーか！</p></div>
+
+<p>という会話になり、回復アイテムを入手できる。<br>
+だが、99個所持している場合、</p>
+
+<div style="border: 1px solid gray; padding: .1em;"><p>無法松「ごくろうだったな。<br>
+　これ持ってけ。</p>
+<p>このアイテムは　それ以上<br>
+持てません。</p></div>
+
+<p>と表示されて、アキラの入手時セリフはカットされてイベントが終了になる。<br>
+これはアイテムを拾う時などでも同様であり、箪笥や宝箱、壺などをAボタンで調べた時、中身のアイテムを既に99個所持していたら、「このアイテムは　もう持てない！！」または「このアイテムは　それ以上持てません。」と表示されて終了となる。<br>
+（このため、拾えなかったアイテムが何だったのかは、「持ち物欄で所持数が99個のアイテムのどれか」ということしかわからない）<br>
+この強制終了では何の問題も起こらない。<br>
+ただ、アイテムが入手できず、フィールド上においてプレイヤーがキャラを操作できる通常状態に戻るというだけである。</p>
+
+<p>ほとんどの場合は、何かをもらう（拾う）イベントにおいて、所持数99の時点でイベント終了で問題は起こらない。<br>
+まず、アイテムの所持数が最大まで増やせるシナリオが限定されている。<br>
+近未来・原始・中世・最終編の4シナリオのみであり、これらのシナリオであっても、「99個以上に増やせる可能性があるアイテムを、イベントの途中でもらう」というケースは原始編の「かわひも」のみである。<br>
+しかもこの「かわひも」の入手タイミングは、イベントの真っ最中、べるの縄を解いた直後である。<br>
+ここでイベントを中断され、更に「フィールド上においてプレイヤーがキャラを操作できる通常状態に戻る」という処理が入ると、続けて発生する敵との戦闘に進めず、進行不能バグが発生することになる。<br>
+ちなみに、<br>
+「フィールド上においてプレイヤーがキャラを操作できる通常状態に戻る」<br>
+という処理の中に、各シナリオにおけるフィールド上の通常BGMに戻す処理も含まれており、ざき襲撃時のBGM「KISS OF JEALOUSY」（原始編通常戦闘曲）が、かわひもバグ発生直後に「いいお天気でしょ！」（原始編フィールドの通常BGM）に変更される原因になっている。</p>
+
+<p>ポゴのグラフィックまでも変わってしまうのは、通常状態に戻った時にスプライト（キャラクターのドット絵）の読み込みアドレスがズレてしまうからのようだ。<br>
+筆者はグラフィック関係については詳しくないので、ここでは触れないこととする。</p>
+
+
+<h3>サブルーチン</h3>
+
+<p>実際の処理は以下のようになっている。<br>
+以下のサブルーチンは、<a href="program14.html">キューブのバッテリーの判定の仕様</a>で紹介した、取得アイテムの処理とほぼ同一である。</p>
+
+<div class="code-container"><pre>
+$C0/227D LDA $8E00,y[$7F:C6C4]   ;Aに[$7F:C6C4](=$31, 「かわひも」のアイテムID)をロード
+$C0/2280 STA $00013D[$00:013D]   ;A(=$31)を[$00:013D]に書き込み
+$C0/2284 INY                     ;Yをインクリメント +1
+$C0/2285 PHY                     ;Yをスタックへプッシュ
+$C0/2286 JSR $47DA  [$C0:47DA]   ;[$C0:47DA]へジャンプ
+;
+$C0/47DA LDA $00013D[$00:013D]   ;Aに[$00:013D](=$31)をロード
+$C0/47DE BEQ $4B    [$482B]      ;ゼロフラグが立っているとき[$482B]分岐
+$C0/47E0 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/47E1 LDA #$D5                ;Aに$D5をロード
+$C0/47E3 PHA                     ;Aをスタックにプッシュ
+$C0/47E4 PLB                     ;DBレジスタに値をプル
+$C0/47E5 JSR $487F  [$C0:487F]   ;[$C0:487F]へジャンプ
+</pre></div>
+
+<p>これがイベント寸前の処理で、<code>[$7F:C6C4]</code>をロードして<code>[$00:013D]</code>に書き込んでいる。<br>
+この<code>[$7F:C???]</code>あたりに入っているのはシナリオ進行上必要な値で、各シナリオで変動するが、原始編だと<code>[$7F:C6C4]</code>に入っているのは<span class="formula">$31</span>。<br>
+これは「かわひも」のアイテムIDにあたる。<br>
+つまりアイテム名の呼び出しであり、キューブのバッテリーの時も同じサブルーチンが使われていた。</p>
+
+<div class="code-container"><pre>
+$C0/47E8 LDA #$00                ;Aに$00をロード
+$C0/47EA PHA                     ;Aをスタックにプッシュ
+$C0/47EB PLB                     ;DBレジスタに値をプル
+$C0/47EC PHX                     ;Xをスタックにプッシュ
+$C0/47ED PHY                     ;Yをスタックへプッシュ
+;
+;持ち物欄のアイテムIDチェック ループ処理（X:0B28 Y:0C28から開始）
+$C0/47EE LDA $00,x               ;Aに[$00:0B28～]をロード
+$C0/47F0 CMP $013D  [$00:013D]   ;Aと[$00:013D](=$31)を減算比較（ステータスレジスタ変更のみ）
+$C0/47F3 BEQ $1C    [$4811]      ;ゼロフラグが立っているとき[$4811]分岐
+$C0/47F5 INX                     ;Xをインクリメント +1
+$C0/47F6 INY                     ;Yをインクリメント +1
+$C0/47F7 CPX #$0C00              ;Xと$0C00を減算比較（ステータスレジスタ変更のみ）
+$C0/47FA BNE $F2    [$47EE]      ;ゼロフラグが立っていないとき[$47EE]分岐
+;ループ終了
+;
+;$C0/47F3でゼロフラグON（「かわひも」を既に所持済み）
+$C0/4811 LDA $0000,y             ;Aに[$0000,y]をロード
+$C0/4814 CMP #$63                ;Aと$63を減算比較（ステータスレジスタ変更のみ）
+$C0/4816 BCS $F4    [$480C]      ;キャリーフラグが立っているとき[$480C]分岐
+$C0/4818 INC A                   ;Aをインクリメント +1
+$C0/4819 STA $0000,y             ;Aを[$0000,y]に書き込み
+$C0/481C PLY                     ;Yレジスタにスタックからプル
+$C0/481D PLX                     ;Xレジスタにスタックからプル
+$C0/481E BRA $0A    [$482A]      ;フラグにかかわりなく常に分岐[$482A]
+;
+$C0/482A PLB                     ;DBレジスタに値をプル
+$C0/482B CLC                     ;キャリーフラグクリア
+$C0/482C RTS                     ;サブルーチン戻り
+;
+;$C0/4816でキャリーフラグON（「かわひも」所持数が$63）
+$C0/480C PLY                     ;Yレジスタにスタックからプル
+$C0/480D PLX                     ;Xレジスタにスタックからプル
+$C0/480E PLB                     ;DBレジスタに値をプル
+$C0/480F SEC                     ;キャリーフラグON
+$C0/4810 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここが、持ち物欄に入手したアイテムを書き込むサブルーチンである。<br>
+持ち物欄関係のアドレスは、シナリオにより変わる。<br>
+原始編だと、持ち物欄に入っているアイテムIDは<code>$00:0B28</code>～<code>$00:0B4C</code>、持ち物欄に入っているアイテムIDの各個数は<code>$00:0C28</code>～<code>$00:0C4C</code>である。<br>
+つまり、原始編では、所持できるアイテム種類は最大37種類である。これは持ち物欄でカーソルを下まで移動させてみるとわかる。</p>
+
+<p>このため、<code>$C0/47EE</code>～のアイテムIDチェックのループ処理は、<code>[$00:0B28]</code>のチェックから開始になる。<br>
+<code>[$00:013D]</code>に入っている、「かわひも」のアイテムID<span class="formula">$31</span>と一致する場合は<code>$C0/47F3</code>でループを抜ける。<br>
+アイテム欄に「かわひも」がひとつもない場合はアイテム欄の最後までチェックをする。つまり<code>X</code>が<span class="formula">$0C00</span>に増加するまでチェックし、なかった場合は<code>$C0/47FC</code>に進む。</p>
+
+<p>ただ、<code>$C0/47F7</code>が<code>CPX #$0C00</code>で、アイテムIDチェックは最大で<code>[$00:0BFF]</code>まで行うように指定されていることがわかる。<br>
+このサブルーチンはどのシナリオでも共通なので、中世編・最終編のアイテムIDが入る最後のアドレス<code>$00:0BFF</code>までチェックするように<code>CPX #$0C00</code>が指定されていると思われるが、原始編の場合は<code>$00:0B4C</code>までで事足りるので、<code>$00:0B4C</code>より後のチェックは意味がない（原始編では<span class="formula">00</span>で埋まっている）。<br>
+シナリオ毎にループ回数を決めて分岐させるよりもこちらの方が都合が良いのかもしれないが、何にしても筆者には理由はわからない。</p>
+
+<p>さて、今回重要なのは、既に「かわひも」の所持数が<span class="formula">99</span>だった場合、つまり、16進数の<span class="formula">$63</span>だった場合なので、持ち物欄のどこかに「かわひも」があり、<code>$C0/47F3</code>でループを抜けたという前提で後の処理を見ていく。<br>
+ループを抜けると<code>$C0/4811</code>にジャンプし、「かわひも」の所持数をチェックする。<br>
+<code>$C0/4814</code>で<span class="formula">$63</span>（10進数<span class="formula">99</span>）と減算比較しているので、「かわひも」の所持数が<span class="formula">99</span>ならキャリーフラグが立ち、<code>$C0/480C</code>にジャンプする。<br>
+所持数<span class="formula">99</span>未満なら<code>$C0/4816</code>以降の処理で、「かわひも」の所持数を<span class="formula">+1</span>している。</p>
+
+<p>この個数による分岐で重要なのは、「かわひも」所持数が<span class="formula">$63</span>だと、<code>$C0/480F</code>でキャリーフラグがONの状態でサブルーチンの処理が終わる。<br>
+「かわひも」所持数が<span class="formula">$63</span>未満の時は、<code>$C0/482B</code>でキャリーフラグがOFFの状態でサブルーチンの処理が終わる。<br>
+この違いにより、この先の処理が変わる。</p>
+
+<div class="code-container"><pre>
+$C0/2289 PLY                     ;Yレジスタにスタックからプル
+$C0/228A BCS $03    [$228F]      ;キャリーフラグが立っているとき[$228F]分岐
+;キャリーフラグなし（「かわひも」所持数が$63未満）
+$C0/228C BRL $F912  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+
+;キャリーフラグあり（「かわひも」所持数が$63）
+$C0/228F PLB                     ;DBレジスタに値をプル
+$C0/2290 LDA #$FF                ;Aに$FFをロード
+$C0/2292 BRL $F8F8  [$1B8D]      ;フラグにかかわりなく常に分岐[$1B8D]
+</pre></div>
+
+<p>サブルーチンの処理が終わった後の戻り先は<code>C0/2289</code>になるのだが、<code>$C0/228A</code>でキャリーフラグによる分岐がある。<br>
+つまりここで、「かわひも」所持数が<span class="formula">$63</span>だったかどうかで処理が分岐になる。<br>
+「かわひも」所持数が<span class="formula">$63</span>未満だった場合なら、ジャンプ先は<code>$C0/1BA1</code>。<br>
+「かわひも」所持数が<span class="formula">$63</span>だった場合なら、ジャンプ先は<code>$C0/1B8D</code>である。<br>
+つまり全く別のアドレスに飛ぶ。</p>
+
+<p>「かわひも」所持数が<span class="formula">$63</span>だった場合の<code>$C0/1B8D</code>～が、「このアイテムは　もう持てない！！」をウィンドウで表示し、プレイヤーがウィンドウをAボタンで消すと、フィールド上においてプレイヤーがキャラを操作できる通常状態に戻す、というサブルーチンである。<br>
+「このアイテムは　もう持てない！！」の後に、「かわひも」所持数が<span class="formula">$63</span>未満だった時の処理に合流することはないので進行不能バグとなってしまう。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program14.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program13.html"><span class="button">&#9654;次　現代編ワタナベイベント</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<script>let arrowOn=true;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

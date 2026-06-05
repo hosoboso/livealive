@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常 &gt; 武器の追加効果">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常 &gt; 武器の追加効果">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常 &gt; 武器の追加効果</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program18.html">状態異常</a> &gt; 武器の追加効果</h1>
+<h2>武器の追加効果の状態異常</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="program18.html">前ページ</a>の続き。<br>
+ここでは、武器の追加効果として発生する状態異常について説明する。</p>
+
+<p>世界の合言葉は森部様によれば、状態異常の発生条件は以下の通りである。</p>
+
+<blockquote>　・武器固有状態異常発生条件：<br>
+技が武器影響ありで、技自体に状態異常がない時？<br>
+　・武器固有状態異常発生率：<br>
+((0～15)>敵LV)のとき状態異常（異常時間は自LV*8）</blockquote>
+
+<p>まず、武器の追加効果についてだが、アイテムデータの15番目に状態異常追加効果の値が入っている。<br>
+といっても、値が入っているのは以下の2種類のみで、他のアイテムには<span class="formula">$00</span>が入っている。</p>
+
+<table>
+<thead>
+	<tr><th>アイテム名</th><th>アイテムデータ15</th><th>状態異常</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヨシユキ</td><td><span class="formula">$10</span></td><td>マヒ</td></tr>
+	<tr><td>ムラサメ</td><td><span class="formula">$20</span></td><td>眠り</td></tr>
+</tbody>
+</table>
+
+<p>値は8ビットが上から石化・酔い・眠り・マヒ・毒・腕かため・足かため・首かために対応しているので、「ヨシユキ」（<span class="formula">%0001 0000</span>）はマヒ、「ムラサメ」（<span class="formula">%0010 0000</span>）は眠りである。<br>
+「ヨシユキ」はとらわれの男と最終編のおぼろ丸、「ムラサメ」は最終編のおぼろ丸しか装備できない。<br>
+幕末編なら実質とらわれの男専用能力で、最終編なら実質おぼろ丸専用能力のようなものである。<br>
+また、シナリオ別キャラデータ<span class="formula">$02</span>には、右装備のアイテムデータ15の値、つまり追加効果の値が入るようになっている。この値は戦闘開始時に更新されるようになっており、装備変更だけでは変わらないようである。<br>
+おぼろ丸のシナリオ別キャラデータ<span class="formula">$02</span>のアドレスは<code>$00:0EC2</code>で、とらわれの男だと幕末編の<code>$00:0F02</code>である。<br>
+つまり、幕末編において、とらわれの男がパーティに居る時、<code>$00:0F02</code>には常に「ヨシユキ」の追加効果の値<span class="formula">$10</span>が入ったままになっている。</p>
+
+<p>状態異常発生率の計算から、武器による状態異常は、敵のレベルが一定値以下でなければ全く効果がない、ということがわかる。<br>
+ただし敵のレベルは、バフ・デバフなどの値が反映された現在値なので、レベルが高い相手でも、デバフによりレベルダウンできるのであれば、武器による状態異常を発生させることは可能となっている。</p>
+
+<p>更に発生条件は、使用技が「攻撃力依存」あり、かつ状態異常を発生させない時、のようである。<br>
+該当する技は、とらわれの男の「北辰一刀流」、おぼろ丸の「忍び斬り」「十文字斬り」「忍法矢車草」ということになる。<br>
+攻撃力依存ありの「影一文字」は石化の状態異常を発生させるので、武器の追加効果は発動しない。</p>
+
+<p>以上より、シナリオ別キャラデータ<span class="formula">$02</span>の値、技データ15（下1ビットが攻撃力依存のON・OFF）及び、技データ08（発生させる状態異常）か技データ18（状態異常関連値）が判定に使われるはずである。<br>
+技で発生する状態異常と異なるのは、使用者のレベルから状態異常継続時間が計算される点である。<br>
+戦闘中の味方キャラ4人分のデータは、順に<code>$00:1C00</code>～、<code>$00:1C40</code>～、<code>$00:1C80</code>～、<code>$00:1CC0</code>～に入るが、各アドレスに+<span class="formula">$38</span>すると「レベル(現在値)」である。<br>
+敵キャラデータは引き続き以下のアドレスの値を使う。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:AA07</code></td><td>状態異常</td></tr>
+	<tr><td><code>$7E:AA08</code></td><td>首かため 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA09</code></td><td>足かため 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0A</code></td><td>腕かため 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0B</code></td><td>毒 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0C</code></td><td>マヒ 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0D</code></td><td>眠り 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AA0E</code></td><td>酔い 状態異常継続時間</td></tr>
+	<tr><td><code>$7E:AB00</code></td><td>レベル(現在値)</td></tr>
+</tbody>
+</table>
+
+<p>例として、最終編にて、「ムラサメ」装備のおぼろ丸が「十文字斬り」で眠り耐性のない敵「影」を攻撃する時の処理を見てみよう。<br>
+影はレベル9なので、何らかのバフでレベル増加が起きていない限り、乱数次第で眠り状態にできる。<br>
+先に説明した通り、<code>$00:0EC2</code>にはおぼろ丸のシナリオ別キャラデータ<span class="formula">$02</span>・右装備のアイテムデータ15の値が入っている。<br>
+つまり「ムラサメ」装備のおぼろ丸の場合、<span class="formula"><code>[$00:0EC2]</code> = $20</span>である。</p>
+
+<div class="code-container"><pre>
+$C1/DC66 LDA $7E9019[$7E:9019] ;Aに[$7E:9019]（技データ09）をロード
+$C1/DC6A STA $12    [$00:0312] ;A（技データ09）を[$00:0312]に書き込み
+$C1/DC6C LDA $7E9022[$7E:9022] ;Aに[$7E:9022]（技データ18）をロード
+$C1/DC70 STA $14    [$00:0314] ;A（技データ18）を[$00:0314]に書き込み
+;
+;（中略）
+;
+$C1/DBF7 JSR $DF27  [$C1:DF27] ;[$C1:DF27]にジャンプ
+</pre></div>
+
+<p>サブルーチンは、技の状態異常発生処理の途中から分岐する。<br>
+「十文字斬り」には技による状態異常が設定されていないため、技データ09と技データ18に入っている値は<span class="formula">$00</span>である。<br>
+そのため、<code><span class="r">$C1/DC66</span></code>～から開始になる、技の状態異常発生処理によって、技データ09と技データ18がそれぞれ<code>[$00:0312]</code>と<code>[$00:0314]</code>に書き込みされる処理が行われた後、とりあえずゼロフラグにより、「十文字斬り」の状態異常依存ステータスが「使用者依存ステータスが力」という判断だけされて先に進む。<br>
+この直後に分岐が発生する。</p>
+
+<div class="code-container"><pre>
+$C1/DB38 LDA $12    [$00:0312]   ;Aに[$00:0312]（技データ09）をロード
+$C1/DB3A BEQ $F5    [$DB31]      ;ゼロフラグが立っているとき[$DB31]分岐
+$C1/DB31 JSR $DBF5  [$C1:DBF5]   ;[$C1:DBF5]にジャンプ
+;
+$C1/DBF5 LDX $68    [$00:0368]   ;Xに[$00:0368]をロード
+$C1/DBF7 JSR $DF27  [$C1:DF27]   ;[$C1:DF27]にジャンプ
+;
+$C1/DF27 LDA $7E901F[$7E:901F]   ;Aに[$7E:901F]（技データ15）をロード
+$C1/DF2B BIT #$01                ;Aと$01で論理積（ステータスフラグのみ変更）
+$C1/DF2D BEQ $0D    [$DF3C]      ;ゼロフラグが立っているとき[$DF3C]分岐
+$C1/DF2F LDX $78    [$00:0378]   ;Xに[$00:0378]をロード
+$C1/DF31 CMP #$00                ;Aと$00を減算比較
+$C1/DF33 BCC $07    [$DF3C]      ;キャリーフラグが立っていないとき[$DF3C]分岐
+$C1/DF35 LDY $0002,x[$00:1C42]   ;Yに[$0002,x]をロード
+$C1/DF38 LDA $0002,y[$00:0EC2]   ;Aに[$00:0EC2]（おぼろ丸のシナリオ別キャラデータ$02）をロード
+$C1/DF3B RTS                     ;サブルーチン戻り
+;
+$C1/DBFA BNE $09    [$DC05]      ;ゼロフラグが立っていないとき[$DC05]分岐
+$C1/DC05 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/DC07 JSR $DC4B  [$C1:DC4B]   ;[$C1:DC4B]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/DB3A</span></code>で、改めて技データ09をロードして、ゼロフラグ判定をしている。<br>
+「十文字斬り」には状態異常効果がないのでゼロフラグが立ち、ここからは技の状態異常発生処理とは別処理になる。<br>
+つまり、「技自体に状態異常の効果がついている場合、装備による状態異常は発生しない」という分岐が、ここで行われている。</p>
+
+<p>この先は<code>[$7E:901F]</code>がロードされているが、これは技データ15である。<br>
+技データ00～24は、この処理より前に一通り呼び出されており、下のようなループ処理で<code>[$7E:9010]</code>～<code>[$7E:9028]</code>に入っている。</p>
+
+<div class="code-container"><pre>
+$C1/785C LDA $D50000,x[$D5:2C46] ;Aに[$D5:2C46]（十文字斬り　技データ15）をロード
+$C1/7860 STA $0000,y[$7E:901F]   ;Aを[$7E:901F]に書き込み
+</pre></div>
+
+<p>技データ15に入っているのは、上7ビットが反撃属性（火・水・風・土・精・善・悪）、下1ビットが技の攻撃力依存の有無である。<br>
+<code><span class="r">$C1/DF2B</span></code>で、<span class="formula">$01</span>と論理積を取っている（論理積の値は<code>A</code>には入らず、計算値の判断だけ）。つまり下1ビットの攻撃力依存の有無の値の取り出しである。<br>
+<code><span class="r">$C1/DF2D</span></code>でゼロフラグ判定をしており、攻撃力依存ありなら下1ビットの値は<span class="formula">1</span>なので、ゼロフラグが立たない。<br>
+「十文字斬り」は攻撃力依存ありのため、このまま処理が進む。</p>
+
+<p><code><span class="r">$C1/DF2F</span></code>の<code>X</code>へのロードは、おぼろ丸のステータス関係アドレスの呼び出し用の値である。</p>
+
+<p><code><span class="r">$C1/DF31</span></code>では、技データ15と<span class="formula">$00</span>を減算比較している。<br>
+キャリーフラグが立たないのは減算比較の結果が負の時である（が、技データ15から<span class="formula">$00</span>を引いて負になる場合があるのかはよくわからない）。<br>
+「十文字斬り」だとキャリーフラグが立つ。</p>
+
+<p>続けて、<code><span class="r">$C1/DF38</span></code>で<code>[$00:0EC2]</code>、おぼろ丸のシナリオ別キャラデータ<span class="formula">$02</span>を<code>A</code>にロードしている。<br>
+シナリオ別キャラデータ<span class="formula">$02</span>には、該当キャラの右装備のアイテムデータ15の値が入っている。<br>
+先に記した通り、アイテムデータ15の値は、アイテムの状態異常追加効果の値であり、「ムラサメ」装備のおぼろ丸の場合、<code>[$00:0EC2]</code>には<span class="formula">$20</span>が入っている。</p>
+
+<p><code><span class="r">$C1/DBFA</span></code>でゼロフラグ判定を行っている。つまり右装備のアイテムデータ15の値が<span class="formula">0</span>かどうかの判定で、ここでゼロフラグが立たないのは「ムラサメ」「ヨシユキ」だけである。<br>
+つまり、ここでゼロフラグが立たない場合の<code><span class="r">$C1/DC05</span></code>以降の処理が、「武器の追加効果としての状態異常発生処理」である。</p>
+
+<div class="code-container"><pre>
+$C1/DC4B LDX $78    [$00:0378]   ;Xに[$00:0378]をロード
+$C1/DC4D CMP #$00                ;Aと$00を減算比較
+$C1/DC4F BCC $10    [$DC61]      ;キャリーフラグが立っていないとき[$DC61]分岐
+$C1/DC51 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]（おぼろ丸の戦闘状態）をロード
+$C1/DC54 CMP #$40                ;Aと$40を減算比較
+$C1/DC56 BNE $05    [$DC5D]      ;ゼロフラグが立っていないとき[$DC5D]分岐
+$C1/DC5D LDA $0038,x[$00:1C08]   ;Aに[$00:1C08]（おぼろ丸のLV(現在値)）をロード
+$C1/DC60 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ややこしくなるのを避けるため、ここから先はおぼろ丸が戦闘中の味方キャラデータ1番目ということにしてアドレスなどを記す。<br>
+ここでは、おぼろ丸の状況を呼び出している。<br>
+<code>[$00:1C01]</code>は戦闘状態で、戦闘離脱なら<span class="formula">$00</span>、敵操作状態（ブリキ大王操作時など）なら<span class="formula">$40</span>、通常なら<span class="formula">$FF</span>が入る。<br>
+おぼろ丸が戦闘離脱状態でなければ<span class="formula">$FF</span>が入るので、<span class="formula">$40</span>と減算比較した場合にゼロフラグが立つことはない。<br>
+続いて、<code>[$00:1C08]</code>、つまりおぼろ丸のLV(現在値)を<code>A</code>にロードする。</p>
+
+<div class="code-container"><pre>
+$C1/DC0A BEQ $F0    [$DBFC]      ;ゼロフラグが立っているとき[$DBFC]分岐
+$C1/DC0C ASL A                   ;算術左シフト *2
+$C1/DC0D ASL A                   ;算術左シフト *2
+$C1/DC0E ASL A                   ;算術左シフト *2
+$C1/DC0F STA $21    [$00:0321]   ;A（LV(現在値)*8）を[$00:0321]に書き込み
+$C1/DC11 LDX $10    [$00:0310]   ;Xに[$00:0310]をロード
+$C1/DC13 LDA $7E9000,x[$7E:AB00] ;Aに[$7E:AB00]（敵番号1 LV(現在値)）をロード
+$C1/DC17 STA $22    [$00:0322]   ;A（敵番号1 LV(現在値)）を[$00:0322]に書き込み
+$C1/DC19 LDA #$08                ;Aに$08をロード
+$C1/DC1B STA $08    [$00:0308]   ;A（$08）を[$00:0308]に書き込み
+$C1/DC1D STZ $23    [$00:0323]   ;[$00:0323]に$00を書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/DC0A</span></code>でゼロフラグの判断をしている。つまり、この時点でデバフの効果でレベルが<span class="formula">0</span>なら、武器による状態異常は発生しない。<br>
+レベルが<span class="formula">1</span>以上の時は処理が続く。<br>
+<code><span class="r">$C1/DC0C</span></code>～の処理で、算術左シフトを3回行うので、<span class="formula">LV(現在値)×$8</span>の計算が行われたことになる。<br>
+この値は<code>[$00:0321]</code>に書き込まれる。</p>
+
+<p>ただし、もしおぼろ丸のレベルが<span class="formula">32</span>（<span class="formula">$20</span>）以上だと、ここで3桁目への繰り上がり（桁溢れ、キャリーオーバー）が起きる。<br>
+レベルが<span class="formula">$20</span>の時、<span class="formula">$20×$8 = $100</span>なので、<code>A</code>の下2桁は<span class="formula">$00</span>でキャリーフラグが立つ。<br>
+なのだが、特にキャリーフラグの処理もなく、16bitモードに移ることもなく、下2桁を<code>[$00:0321]</code>に書き込んでいる。<br>
+この値は後に状態異常継続時間にそのまま書き込まれてしまう。具体的な処理は後述する。</p>
+
+<p>続いて、敵のレベルの現在値<code>[$7E:AB00]</code>をロードし、<code>[$00:0322]</code>に書き込む。<br>
+その後の、<code>[$00:0308]</code>に<span class="formula">$08</span>を書き込み、<code>[$00:0323]</code>に<span class="formula">$00</span>を書き込むのは、この後のループ処理の回数処理及び、状態異常の値の記録用である。<br>
+この後のループ処理は、技による状態異常発生と似た処理になる。<a href="program18.html">前ページ</a>の処理方法を踏まえた上でお読みいただきたい。</p>
+
+<div class="code-container"><pre>
+$C1/DC1F LSR $20    [$00:0320]   ;[$00:0320]（武器の状態異常追加効果）を論理右シフト（/2）
+$C1/DC21 BCC $10    [$DC33]      ;キャリーフラグが立っていないとき[$DC33]分岐
+$C1/DC33 ROR $23    [$00:0323]   ;[$00:0323]をキャリーフラグを含めた9bitで右ローテート
+$C1/DC35 INX                     ;X+1
+$C1/DC36 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DC38 BNE $E5    [$DC1F]      ;ゼロフラグが立っていないとき[$DC1F]分岐
+</pre></div>
+
+<p>ここからは、「ムラサメ」による眠りの状態異常が発生するかどうか、状態異常発生の判定になる。<br>
+実質、技による状態異常発生における、石化・酔い・眠り・マヒ・毒・腕かため・足かため・首かためを下の桁から判定していくのと同じ処理を行っていることがわかる。<br>
+つまり、状態異常の値が入っている<code>[$00:0320]</code>を論理右シフトした時に、一番下の位が<span class="formula">0</span>だとキャリーフラグが立たず、<span class="formula">1</span>ならキャリーフラグが立つので該当の状態異常が記録されている、という判定である。<br>
+<code>[$00:0323]</code>の初期値<span class="formula">$00</span>は、キャリーフラグ含めて右ローテートしていくので、該当の状態異常が発生した桁だけ<span class="formula">1</span>が立った状態になる。<br>
+<code>[$00:0308]</code>の初期値<span class="formula">$08</span>は、ループ回数で、<code><span class="r">$C1/DC36</span></code>で<span class="formula">1</span>ずつ減っていく。<br>
+上の処理は最初のループなので、首かための処理である。「ムラサメ」は眠りの状態異常しか発生しないため、首かための処理で<code>[$00:0323]</code>に入る値は<span class="formula">0</span>である。<br>
+以降、足かため・腕かため・毒・マヒまでは同じ処理になるので省略する。<br>
+眠り状態の判定は以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C1/DC1F LSR $20    [$00:0320]   ;[$00:0320]（武器の状態異常追加効果）を論理右シフト（/2）
+$C1/DC21 BCC $10    [$DC33]      ;キャリーフラグが立っていないとき[$DC33]分岐
+$C1/DC23 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+$C1/6150 PHX                     ;戦闘乱数計算
+$C1/6151 PHB                     ;↓
+;（省略）
+$C1/61A3 PLX                     ;↓
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/DC26 AND #$0F                ;A（乱数）と$0Fで論理積
+$C1/DC28 CMP $22    [$00:0322]   ;Aと[$00:0322]（敵番号1 LV(現在値)）を減算比較
+$C1/DC2A BCC $07    [$DC33]      ;キャリーフラグが立っていないとき[$DC33]分岐
+$C1/DC2C LDA $21    [$00:0321]   ;Aに[$00:0321]（LV(現在値)*8）をロード
+$C1/DC2E STA $7E8F08,x[$7E:AA0D] ;Aを[$7E:AA0D]（眠り 状態異常継続時間）に書き込み
+$C1/DC32 SEC                     ;キャリーフラグON
+$C1/DC33 ROR $23    [$00:0323]   ;[$00:0323]をキャリーフラグを含めた9bitで右ローテート
+$C1/DC35 INX                     ;X+1
+$C1/DC36 DEC $08    [$00:0308]   ;[$00:0308]-1
+$C1/DC38 BNE $E5    [$DC1F]      ;ゼロフラグが立っていないとき[$DC1F]分岐
+</pre></div>
+
+<p>眠りの状態異常の判定時はキャリーフラグが立ち、戦闘乱数を生成する。サブルーチンの説明は省略する。<br>
+<code><span class="r">$C1/DC26</span></code>にて、乱数と<span class="formula">$0F</span>で論理積を取っている。<br>
+つまり、<span class="formula">$00</span>～<span class="formula">$FF</span>の乱数の下1桁だけを取り出している。<br>
+これは、乱数を<span class="formula">$10</span>で割った余りに相当し、剰余演算子の「<span class="formula">mod</span>」を使うと「<span class="formula">乱数 mod $10</span>」と表記できる。<br>
+これで乱数は<span class="formula">$0</span>～<span class="formula">$F</span>のいずれかになる。<br>
+この値と、<code>[$00:0322]</code>（敵番号1 LV(現在値)）を減算比較し、キャリーフラグが立つ場合、つまり減算の結果が<span class="formula">0</span>か正の数の時は状態異常が発生する。<br>
+つまり、敵のLV(現在値)が<span class="formula">$0</span>～<span class="formula">$F</span>の乱数以下なら、状態異常が発生する。<br>
+キャリーフラグが立たない時は状態異常が発生せず、<code>[$DC33]</code>にジャンプする。</p>
+
+<p>続いて、<code>A</code>に<code>[$00:0321]</code>をロードする。<br>
+<code>[$00:0321]</code>には先に計算した「<span class="formula">LV(現在値)*8</span>」が入っているのだが、掛け算結果に繰り上がり分を考慮していない。<br>
+だが、そのまま<code>A</code>を<code>[$7E:AA0D]</code>（眠り 状態異常継続時間）に書き込んでいる。<br>
+もしおぼろ丸のレベルが<span class="formula">31</span>（<span class="formula">$1F</span>）なら、<span class="formula">$1F×$8 = $F8</span>、状態異常継続時間として<code>[$7E:AA0D]</code>に<span class="formula">$F8</span>が書き込まれる。<br>
+だがひとつレベルを上げて<span class="formula">32</span>（<span class="formula">$20</span>）なら、先に述べた通りに<span class="formula">$20×$8 = $100</span>で、繰り上がりを考慮しない下2桁の<span class="formula">$00</span>が<code>[$7E:AA0D]</code>に書き込まれてしまう。<br>
+実質、「<span class="formula">LV(現在値)*8を$100で割った余り</span>」、剰余演算子の「<span class="formula">mod</span>」を使うと「<span class="formula">LV(現在値)*8 mod $100</span>」が状態異常継続時間扱いにされていることになる。</p>
+
+<p>技の状態異常の発生処理の時は、このように状態異常継続時間の計算でキャリーが起きる時には、状態異常継続時間に<span class="formula">$FF</span>を書き込む処理をしていたが、武器での状態異常の処理にはない、というのはどうも妙な気がする。何かしらのミスなのか、これが仕様なのかは筆者にはわからない。<br>
+とにかく、このために味方キャラのレベル（現在値）が<span class="formula">32</span>以上だと、逆に状態異常継続時間が短くなってしまう可能性がある。レベル32だと状態異常にしてもすぐ解除されてしまうことになる。<br>
+味方キャラのレベルを<span class="formula">32</span>以上にまで上げることは、最終編でも通常プレイの範囲ではあまりないだろうし、武器の状態異常をあてにする状況もさほどではないだろうから、悪影響があるかというとそんなにないかもしれないが。</p>
+
+<p>また、技の状態異常処理とは異なり、<code>[$7E:AA0D]</code>に状態異常継続時間を書き込む前に、<code>[$7E:AA0D]</code>の値を確認していない。<br>
+技の状態異常処理の時には、<br>
+「状態異常継続時間を確認し、値が1以上、つまり既に該当の状態異常で継続時間が残っている場合は該当の状態異常にする処理をスキップ」<br>
+だったのだが、武器の状態異常処理では、該当の状態異常にする処理をしてから継続時間を上書きしている。<br>
+手順が異なるのは、継続時間などの計算方法が異なるからかもしれないが、実際の理由はよくわからない。<br>
+とにかく、武器の状態異常処理では、状態異常継続時間を上書きするため、状況次第で状態異常継続時間をずっと<span class="formula">1</span>以上に保つこともできる、ということになる。</p>
+
+<p>話がやや逸れたが、状態異常継続時間をセットしたら、キャリーフラグをONにして、<code>[$00:0323]</code>をキャリーフラグを含めた9bitで右ローテートする。<br>
+これは技の状態異常の処理と同じである。<br>
+<span class="formula">%1 0000 0000</span>→<span class="formula">%0 1000 0000</span><br>
+となって、<span class="formula"><code>[$00:0323]</code> = %1000 0000</span>となる。<br>
+これで眠り状態の処理は終了で、残りの酔い・石化の処理に続く。<br>
+以下、ループ部分の解説は少し省略した。</p>
+
+<div class="code-container"><pre>
+$C1/DC1F LSR $20    [$00:0320]   ;酔い状態の処理：
+$C1/DC21 BCC $10    [$DC33]      ;
+$C1/DC33 ROR $23    [$00:0323]   ;%0 1000 0000→%0 0100 0000
+$C1/DC35 INX                     ;
+$C1/DC36 DEC $08    [$00:0308]   ;
+$C1/DC38 BNE $E5    [$DC1F]      ;
+
+$C1/DC1F LSR $20    [$00:0320]   ;酔い石化の処理：
+$C1/DC21 BCC $10    [$DC33]      ;
+$C1/DC33 ROR $23    [$00:0323]   ;%0 0100 0000→%0 0010 0000
+$C1/DC35 INX                     ;
+$C1/DC36 DEC $08    [$00:0308]   ;
+$C1/DC38 BNE $E5    [$DC1F]      ;ループ処理終了
+
+$C1/DC3A LDX $10    [$00:0310]   ;Xに[$00:0310]をロード
+$C1/DC3C LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/DC3F LDA $002A,y[$00:1A2A]   ;Aに[$00:1A2A]（敵データ10　無効状態異常）をロード
+$C1/DC42 EOR #$FF                ;Aと$FFで排他的論理和
+$C1/DC44 AND $23    [$00:0323]   ;Aと[$00:0323]で論理積
+$C1/DC46 STA $7E900C,x[$7E:AB0C] ;Aを[$7E:AB0C]に書き込み
+$C1/DC4A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>この処理も技の状態異常と同じで、敵の無効状態異常の値をロードし、<span class="formula">$FF</span>と排他的論理和を取ることで無効化できる状態異常に<span class="formula">0</span>、無効化できない状態異常に<span class="formula">1</span>が入る。<br>
+この値と、状態異常処理ループで状態異常にできるビットに<span class="formula">1</span>が入っている<code>[$00:0323]</code>と論理積を取り、<code>[$7E:AB0C]</code>に書き込む。</p>
+
+<div class="code-container"><pre>
+$C1/BD6C LDA $7E9003,x[$7E:AB03] ;Aに[$7E:AB03]をロード
+$C1/BD70 BEQ $10    [$BD82]      ;ゼロフラグが立っているとき[$BD82]分岐
+$C1/BD72 LDA $7E900C,x[$7E:AB0C] ;Aに[$7E:AB0C]をロード
+$C1/BD76 BEQ $0A    [$BD82]      ;ゼロフラグが立っているとき[$BD82]分岐
+$C1/BD78 ORA $7E8F07,x[$7E:AA07] ;Aと[$7E:AA07]（敵番号1の状態異常）で論理和
+$C1/BD7C STA $7E8F07,x[$7E:AA07] ;Aを[$7E:AA07]（敵番号1の状態異常）に書き込み
+$C1/BD80 INC $0F    [$00:030F]   ;[$00:030F]をインクリメント
+$C1/BD82 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>最後の処理は、技の状態異常と同じ<code><span class="r">$C1/BD6C</span></code>～<code><span class="r">$C1/BD82</span></code>の処理である。<br>
+<code>[$7E:AB0C]</code>に書き込んだ状態異常の値と、<code>[$7E:AA07]</code>の敵番号1の状態異常とで論理和をとって、新たな状態異常として<code>[$7E:AA07]</code>に書き込み終了となる。</p>
+
+<p>ということで、武器による状態異常には、技による状態異常とは異なる点があり、何か妙な点もあることがわかった。<br>
+まとめると以下のようになる。</p>
+
+<div class="place">武器による状態異常の発生条件：<br>
+該当するのは「ムラサメ」（眠り）、「ヨシユキ」（マヒ）のみ。
+<ol>
+	<li>使用技に状態異常の効果がない、かつ、武器の攻撃力依存の時に、乱数<span class="formula">$00</span>～<span class="formula">$FF</span>を生成して判定。</li>
+	<li>乱数を<span class="formula">$10</span>で割った余り（<span class="formula">$0</span>～<span class="formula">$F</span>、10進数<span class="formula">0</span>～<span class="formula">15</span>）と、敵のレベル（現在値）を比較し、敵のレベル（現在値）が乱数<span class="formula">0</span>～<span class="formula">15</span>以下なら、状態異常が発生する。</li>
+	<li>状態異常発生時間は、使用者の<span class="formula">レベル（現在値）×8</span>を<span class="formula">$100</span>（<span class="formula">256</span>）で割った余りになる。<br><span class="formula">LV(現在値)×8</span>の計算結果の繰り上がりを考慮していないため、レベル<span class="formula">32</span>以上で状態異常発生時間のオーバーフローが起きてしまうようである。</li>
+</ol>
+既に該当の状態異常が発生している場合でも、状態異常が起きるかどうか判定し、該当の状態異常発生時間を上書きする（加算はされない）。<br>技による状態異常は、既に該当の状態異常が発生している場合、状態異常処理を行わず状態異常発生時間が変化しないので、異なる点である。
+</div>
+
+<p>状態異常の発生条件が、敵のレベルが15以下であることから、敵も味方もレベルがさほど高くはない、通常プレイの範囲内くらいで発生させることを考えているようである。<br>
+レベル32以上での状態異常発生時間のキャリー分が考慮されていないのも同じ理由なのだろうか。<br>
+今となっては、仕様なのか何かのミスなのかわからない。<br>
+ただ、少なくともバグの類は発生しないようである。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program18.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program19.html"><span class="button">&#9654;次　副能力変動値処理</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

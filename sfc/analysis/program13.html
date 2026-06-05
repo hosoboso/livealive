@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 現代編ワタナベイベントの判定">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 現代編ワタナベイベントの判定">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 現代編ワタナベイベントの判定</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 現代編ワタナベイベントの判定</h1>
+<h2>現代編ワタナベイベントの判定の仕様</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>現代編のワタナベイベントは、グレート・エイジャが左上向きかつ、「カミツキ(青)」を高原がくらった時に低確率で発生する（高原の向きなど、高原の状態は関係ない）が、実際の確率はどの程度で、プログラム内ではどうやって計算しているのだろうか。<br>
+（ちなみにリメイク版だとワタナベイベント発生条件が異なるので、<span class="tri"><a href="../../re_gendai/index.html" target="_blank">リメイク版攻略</a></span>を参照のこと）</p>
+
+<p>調査の結果だけ先に述べると、</p>
+
+<div style="border: 1px solid gray; padding: .5em;box-shadow: 3px 3px 2px 1px rgb(10 10 10 / 0.2);"><p style="font-weight:bold;">現代編のワタナベイベントは、グレート・エイジャが左上向きの状態で、高原　日勝が「カミツキ(青)」をくらった時に10/256（約4％）の確率で発生する。</p>
+
+<p>具体的には、「カミツキ(青)」のモーションの終わる寸前にワタナベイベント判定用の乱数<span class="formula">0～255</span>を生成し、その乱数が<span class="formula">128～137</span>だったら、エイジャが左上向きかどうかを判定した後、ワタナベイベントが発生する。</p></div>
+
+<p>おそらくこれで合っているはずである。<br>
+高原の向きや位置など、高原のステータスは関係しない。エイジャも左上向き以外の条件はない。<br>
+また、条件を満たせば、一度の戦闘中に何度でも発生する。</p>
+
+<p>以下では具体的な計算方法やプログラムを紹介する。</p>
+
+<h3>概要</h3>
+
+<p>現代編のワタナベイベントは、エイジャが左上向きかつ、「カミツキ(青)」のモーションを出している間に、「続けてワタナベイベントのモーションを出すかどうか」を乱数で判定して、発生させるかどうかを決めている。<br>
+技のダメージ量やヒット数計算は、技決定後から技のモーションが入るまでに行われるのに対し、ワタナベイベント判定は技のモーション中に行われるという違いがある。おそらく、「ほいこーろー」が踊りながら次の踊りを続けるかどうか判定しているのと似たようなものなのだろう。</p>
+
+<p>技のモーションは技ごとに決まっているが、そのモーションを戦闘フィールド上のどの位置に出すか、攻撃側と攻撃される側の位置（戦闘フィールド上の座標）から毎フレーム計算している。<br>
+「カミツキ(青)」でいえば、エイジャが攻撃相手に飛びかかる技だから、「エイジャのドット絵を、どの方向にどの距離、どの速度で移動させ、どの位置に青い光のエフェクトを出すか」を、エイジャの位置と高原の位置から計算しなければならない。<br>
+方向と距離の計算なので、三角関数や、線型代数学のベクトル・行列に関係した計算になるのだろうと思うが、現代編のワタナベイベントには関係しない話なので、ここではそこまで踏み込まない。</p>
+
+<p>「カミツキ(青)」の場合は、エイジャが「カミツキ(青)」の通常モーションを終えるタイミング、つまり元から居たマスに戻る寸前くらいに、ワタナベイベントを発生させるかどうか、戦闘用乱数を使って判定を行う。<br>
+モーションの計算と同時進行なためか、サブルーチンは少々ややこしくなっている。</p>
+
+<p>なお、グレート・エイジャが左上向きかどうかは、乱数計算の後に行っている。<br>
+つまり、エイジャの向きに関係なく、「カミツキ(青)」を出した時には必ず乱数計算をしている。<br>
+乱数がワタナベイベントが発生する条件を満たしている場合のみ、その後にエイジャの向きを判定し、左上向きだった時はワタナベイベントを発生させている。</p>
+
+<h3>各種定数</h3>
+
+<p>現代編のワタナベイベント判定は、「カミツキ(青)」のモーションの計算サブルーチンに組み込まれている。つまり、定数を変えつつループ処理を繰り返す中で、「カミツキ(青)」のモーションの最後に「続けてワタナベイベントのモーションを出すかどうか」を判断している。<br>
+その定数は、今回で言えば<code>$D5:B375</code>～<code>$D5:B37C</code>に最初から入っている値になる。<br>
+バンク<code>$D5</code>には、ゲーム内の各種データ（味方・敵の各種データ類）が入っており、その中の技モーションに関するデータの一部だと思われる（未調査）。</p>
+
+<p>その他、モーション関連の未調査のメモリの値も幾つかあるが、とりあえず今回の目的は確率計算方法なので触れない。</p>
+
+<p><code>$D5:B375</code>～<code>$D5:B37C</code>の値は以下のとおりである。<br>
+「カミツキ(青)」のモーション計算に使われる定数の中の一部及び、ワタナベイベント判定用の数値が含まれている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$D5:B375</code></td><td><span class="formula">$88</span></td></tr>
+	<tr><td><code>$D5:B376</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$D5:B377</code></td><td><span class="formula">$70</span></td></tr>
+	<tr><td><code>$D5:B378</code></td><td><span class="formula">$D8</span></td></tr>
+	<tr><td><code>$D5:B379</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$D5:B37A</code></td><td><span class="formula">$FC</span></td></tr>
+	<tr><td><code>$D5:B37B</code></td><td><span class="formula">$90</span></td></tr>
+	<tr><td><code>$D5:B37C</code></td><td><span class="formula">$B3</span></td></tr>
+</tbody>
+</table>
+
+<p>もうひとつ、今回の判定でキーポイントになるのが、メモリアドレス<code>[$7E:A010]</code><code>[$7E:A011]</code>である。<br>
+<code>[$7E:A0??]</code>は、技のモーション関係の値が次々更新されていくのだが、<code>[$7E:A010]</code><code>[$7E:A011]</code>は最初にどちらにも<span class="formula">$00</span>が入って以降、エイジャの技の中で、「カミツキ(青)」のワタナベイベント判定時及びワタナベイベント中にのみ計算値が入り、ワタナベイベントの後は再び<span class="formula">$00</span>が入る、というアドレスである。<br>
+ただし、単純に乱数の値が入るのではない。</p>
+
+<h3>サブルーチン</h3>
+
+<p>「カミツキ(青)」のワタナベイベント判定は、上にも記した通りに技のモーション計算のサブルーチン中で行われる。<br>
+「カミツキ(青)」でモーションの最後にエイジャが元の位置に戻ってきたあたり、<code>$C1/A666</code>～<code>$C1/A6F7</code>で、「カミツキ(青)」モーション計算用の<code>$D5:B375</code>～の値が計算用に呼び出され、以下のように配置される。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th><th>配置先アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$D5:B375</code></td><td><span class="formula">$88</span></td><td><code>[$00:0310]</code></td></tr>
+	<tr><td><code>$D5:B376</code></td><td><span class="formula">$00</span></td><td><code>[$00:0311]</code></td></tr>
+	<tr><td><code>$D5:B377</code></td><td><span class="formula">$70</span></td><td><code>[$00:0312]</code></td></tr>
+	<tr><td><code>$D5:B378</code></td><td><span class="formula">$D8</span></td><td>-</td></tr>
+	<tr><td><code>$D5:B379</code></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><code>$D5:B37A</code></td><td><span class="formula">$FC</span></td><td>-</td></tr>
+	<tr><td><code>$D5:B37B</code></td><td><span class="formula">$90</span></td><td>-</td></tr>
+	<tr><td><code>$D5:B37C</code></td><td><span class="formula">$B3</span></td><td>-</td></tr>
+</tbody>
+</table>
+
+<p>また、ここまでの計算で、<code>$00:031C</code>～<code>$00:031F</code>に以下のように値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:031C]</code></td><td><span class="formula">$78</span></td></tr>
+	<tr><td><code>[$00:031D]</code></td><td><span class="formula">$B3</span></td></tr>
+	<tr><td><code>[$00:031E]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:031F]</code></td><td><span class="formula">$A0</span></td></tr>
+</tbody>
+</table>
+
+<p>この後に、<span class="tri"><a href="program5.html">戦闘用乱数の計算</a></span>で紹介した、<code>$C1/6150</code>～<code>$C1/61A4</code>で戦闘用乱数を2回連続で生成する。<br>
+本作の戦闘用乱数は、次の乱数の計算用に、1～4つ前の乱数が保存されており、以下アドレスに入る。</p>
+
+<ul>
+	<li><code>$00:0338</code>（乱数4）</li>
+	<li><code>$00:0339</code>（乱数3）</li>
+	<li><code>$00:033A</code>（乱数2）</li>
+	<li><code>$00:033B</code>（乱数1）</li>
+</ul>
+
+<p>よって、2回連続で乱数を生成すると、1回目に生成した乱数は<code>[$00:033A]</code>、2回目に生成した乱数は<code>[$00:033B]</code>及び、アキュムレータ<code>A</code>に入る。<br>
+以下では、最初に生成した乱数<code>[$00:033A]</code>を『乱数2』、二度目に生成した新しい方の乱数<code>[$00:033B]</code>を『乱数1』とする。</p>
+
+<h4><code>[$7E:A010]</code>と<code>[$7E:A011]</code>の計算</h4>
+
+<p>具体的なサブルーチンを紹介する。<br>
+前半部は、上で述べた<code>[$7E:A010]</code><code>[$7E:A011]</code>に入れる値を計算するサブルーチンである。<br>
+符号付8bit x 8bitの掛け算が何度か行われている。<br>
+符号付8bit x 8bitの掛け算は、<code>[$00:4202]</code>に被乗数、<code>[$00:4203]</code>に乗数をセットすると、答え（16bit）の上位バイトが<code>[$00:4217]</code>、下位バイトが<code>[$00:4216]</code>に入る。</p>
+
+<div class="code-container"><pre>
+$C1/A842 LDA $11    [$00:0311]   ;Aに[$00:0311]=$00をロード
+$C1/A844 STA $4202  [$00:4202]   ;符号付8bit x 8bit 被乗数[$00:0311]=$00
+$C1/A847 LDA $3A    [$00:033A]   ;Aに[$00:033A]=『乱数2』をロード
+$C1/A849 STA $4203  [$00:4203]   ;符号付8bit x 8bit 乗数[$00:033A]=『乱数2』
+$C1/A84C NOP                     ;乗算待ち時間
+$C1/A84D NOP                     ;乗算待ち時間
+$C1/A84E NOP                     ;乗算待ち時間
+$C1/A84F NOP                     ;乗算待ち時間
+$C1/A850 LDA $4217  [$00:4217]   ;符号付8bit x 8bitの計算結果上位バイト=$00*『乱数2』
+$C1/A853 STA $16    [$00:0316]   ;[$00:0316]=$00*『乱数2』=$00
+$C1/A855 LDA $3B    [$00:033B]   ;Aに[$00:033B]=『乱数1』をロード
+$C1/A857 STA $4203  [$00:4203]   ;符号付8bit x 8bit 乗数([$00:033B]=『乱数1』)
+$C1/A85A NOP                     ;乗算待ち時間
+$C1/A85B NOP                     ;乗算待ち時間
+$C1/A85C CLC                     ;キャリーフラグをクリア
+$C1/A85D LDA $16    [$00:0316]   ;Aに[$00:0316]=$00をロード
+$C1/A85F ADC $4216  [$00:4216]   ;$00+符号付8bit x 8bitの計算結果下位バイト=$00
+$C1/A862 STA $16    [$00:0316]   ;[$00:0316]=$00
+$C1/A864 LDA #$00                ;Aに$00をロード
+$C1/A866 ADC $4217  [$00:4217]   ;A+[$00:4217]=$00
+$C1/A869 STA $17    [$00:0317]   ;A（=$00）を[$00:0317]に書き込み
+$C1/A86B LDA $12    [$00:0312]   ;Aに[$00:0312]=$70をロード
+$C1/A86D STA $4202  [$00:4202]   ;符号付8bit x 8bit被乗数 [$00:0312]=$70
+$C1/A870 LDA $3A    [$00:033A]   ;Aに[$00:033A]=『乱数2』をロード
+$C1/A872 STA $4203  [$00:4203]   ;符号付8bit x 8bit 乗数 [$00:033A]=『乱数2』
+$C1/A875 NOP                     ;乗算待ち時間 ※$70*『乱数2』
+$C1/A876 NOP                     ;乗算待ち時間
+$C1/A877 LDA $16    [$00:0316]   ;Aに[$00:0316]=$00をロード
+$C1/A879 CLC                     ;キャリーフラグをクリア
+$C1/A87A ADC $4216  [$00:4216]   ;A($00)+「$70*『乱数2』の下位バイト」
+$C1/A87D STA $16    [$00:0316]   ;A(=$70*『乱数2』の下位バイト)を[$00:0316]に書き込み
+$C1/A87F LDA $17    [$00:0317]   ;Aに[$00:0317]=$00をロード
+$C1/A881 ADC $4217  [$00:4217]   ;A($00)+「$70*『乱数2』の上位バイト」
+$C1/A884 STA $17    [$00:0317]   ;A(=$70*『乱数2』の上位バイト)を[$00:0317]に書き込み
+$C1/A886 LDA #$00                ;Aに$00をロード
+$C1/A888 ADC #$00                ;A+$00=$00
+$C1/A88A STA $18    [$00:0318]   ;A(=$00)を[$00:0318]に書き込み
+$C1/A88C LDA $3B    [$00:033B]   ;Aに[$00:033B]=『乱数1』をロード
+$C1/A88E STA $4203  [$00:4203]   ;符号付8bit x 8bit 乗数([$00:033B]=『乱数1』)
+$C1/A891 NOP                     ;乗算待ち時間 ※[$00:4202]には[$00:0312]=$70が
+$C1/A892 NOP                     ;乗算待ち時間 ※入ったままなので、$70*『乱数1』
+$C1/A893 CLC                     ;キャリーフラグをクリア
+$C1/A894 LDA $17    [$00:0317]   ;Aに[$00:0317](=$70*『乱数2』の上位バイト)をロード
+$C1/A896 ADC $4216  [$00:4216]   ;A+「$70*『乱数1』の下位バイト」
+$C1/A899 STA $17    [$00:0317]   ;Aを[$00:0317]に書き込み
+$C1/A89B LDA $18    [$00:0318]   ;Aに[$00:0318]=$00をロード
+$C1/A89D ADC $4217  [$00:4217]   ;A(=$00)+「$70*『乱数1』の上位バイト」
+$C1/A8A0 STA $18    [$00:0318]   ;A(=「$70*『乱数1』の上位バイト」)を[$00:0318]に書き込み
+$C1/A8A2 LDA $10    [$00:0310]   ;Aに[$00:0310]=$88をロード
+$C1/A8A4 AND #$0F                ;A($88)と$0Fで論理積=$08
+$C1/A8A6 ASL A                   ;A($08)算術左シフト(*2) $08*2=$10
+$C1/A8A7 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A8A9 AND #$00FF              ;$A810と$00FFで論理積＝$0010
+$C1/A8AC ADC $1E    [$00:031E]   ;A(=$0010)+[$00:031E]=$A010
+$C1/A8AE TAX                     ;Aレジスタの値をXレジスタに転送（X=$A010）
+$C1/A8AF LDA $11    [$00:0311]   ;[$00:0311]=$00,[$00:0312]=$70をAにロード(16bit幅)=$7000
+$C1/A8B1 LSR A                   ;A(=$7000)論理右シフト(/2) $7000/2=$3800
+$C1/A8B2 STA $19    [$00:0319]   ;Aを[$00:0319][$00:0320]に書き込み　[$00:0319]=$00,[$00:0320]=$38
+$C1/A8B4 LDA $17    [$00:0317]   ;[$00:0318][$00:0317]をロード
+$C1/A8B6 SEC                     ;キャリーフラグを立てる
+$C1/A8B7 SBC $19    [$00:0319]   ;[$00:0318][$00:0317] - $3800
+$C1/A8B9 CLC                     ;キャリーフラグをクリア
+$C1/A8BA ADC $7E0000,x[$7E:A010] ;A+[$7E:A011][$7E:A010]=A+$0000
+$C1/A8BE STA $7E0000,x[$7E:A010] ;Aを[$7E:A011][$7E:A010]に書き込み
+$C1/A8C2 SEP #$20                ;MフラグON Aレジスタは8bit幅
+$C1/A8C4 LDX $1C    [$00:031C]   ;[$00:031C]=$B378
+$C1/A8C6 BRL $FDF2  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+</pre></div>
+
+<p>途中からかなり入り組んでわかりにくくなったが、途中までは16bit×16bitの乗算を行っている。<br>
+つまり、<code>[$00:0312][$00:0311]</code>を16ビット（16進数4桁）の値、『乱数2』『乱数1』を16ビットの値として扱い、<code>[$00:0312][$00:0311]</code>×『乱数2』『乱数1』を部分的に計算している。<br>
+今回は<code>[$00:0312]</code>が$70、<code>[$00:0311]</code>が$00なので、$7000×『乱数2』『乱数1』ということである。<br>
+16bit×16bitの答えは32ビット（16進数8桁）だが、その中の上4桁分が<code>[$00:0318][$00:0317]</code>に入ったことになっている。<br>
+最終的に、<code>[$7E:A010]</code>と<code>[$7E:A011]</code>に入る値は、以下のようにして決まったことになる。</p>
+
+<ul>
+	<li class="formula"><code>[$7E:A010]</code> = (「$70*『乱数2』」の結果の上位バイト部分+「$70*『乱数1』」の結果の下位バイト)の下位バイト</li>
+
+	<li class="formula"><code>[$7E:A011]</code> = 「$70*『乱数1』」の結果の上位バイト部分 - $38<br>
+	※キャリーフラグが立った状態で減算するので負の数にはならない。</li>
+</ul>
+
+<p>※16bitで考えると、<br>
+<span class="formula"><code>[$7E:A011][$7E:A010]</code> = <code>[$7E:A011][$7E:A010]</code> + (<code>[$00:0318][$00:0317]</code> - <code>[$00:0312][$00:0311]</code>/2)</span><br>
+ただし<span class="formula"><code>[$00:0318][$00:0317]</code> = <code>[$00:0311]</code>*『乱数1』の上位バイト + <code>[$00:0312]</code>*『乱数2』の上位バイト + <code>[$00:0312]</code>*『乱数1』の下位バイト</span><br>
+……というような感じか（自信はないが）。</p>
+
+<p>乱数（<span class="formula">$00</span>～<span class="formula">$FF</span>）に<span class="formula">$70</span>を掛け算した場合、結果の上位バイト部分は<span class="formula">$00</span>～<span class="formula">$6F</span>に限定され、下位バイトは下1桁が必ず<span class="formula">0</span>の<span class="formula">$00</span>, <span class="formula">$10</span>, <span class="formula">$20</span>, <span class="formula">$30</span>, <span class="formula">$40</span> ～, <span class="formula">$D0</span>, <span class="formula">$E0</span>, <span class="formula">$F0</span>になる。</p>
+
+<p>少しややこしいのが、<code>$C1/A8B7</code>の<code>SBC $19</code>の減算である。<br>
+16bitモードでアキュムレータ<code>A</code>から<code>[$00:0319]</code>を引き算しろ、ということになり、<code>[$00:0319]</code><span class="formula">=$00</span>,<code>[$00:0320]</code><span class="formula">=$38</span>なので、</p>
+
+<p class="formula"><code>A</code> - $3800</p>
+
+<p>の計算である。<br>
+また、この時点でのAは、上2桁が<code>[$00:0318]</code>の値、下2桁が<code>[$00:0317]</code>の値である。<br>
+<span class="formula">$3800</span>の下2桁は<span class="formula">00</span>なので、引き算しても、下2桁は<code>A</code>の下2桁のままである。つまり<code>[$00:0317]</code>のままである。<br>
+上2桁だけ見ると、</p>
+
+<p class="formula"><code>[$00:0318]</code> - $38</p>
+
+<p>ということになるが、<code>[$00:0318]</code>が<span class="formula">$38</span>より小さいと、答えが負の値になってしまう。<br>
+だが、引き算の前の<code>$C1/A8B6</code>でキャリーフラグが立っているため、本来2桁の値の<code>[$00:0318]</code>の上に「<span class="formula">1</span>」を付けて3桁とし、繰り下がりを考慮して計算することになる。<br>
+例えば、<code>[$00:0318]</code>が<span class="formula">$10</span>だったら、<span class="formula">$38</span>より小さいから、キャリーフラグにより、</p>
+
+<p class="formula">$110 - $38</p>
+
+<p>と、3桁目に「<span class="formula">1</span>」をつけて計算し、答えが「<span class="formula">$D8</span>」になる。</p>
+
+<p>なお、この時点の<code>[$00:0318]</code><span class="formula"> = 「$70*『乱数1』の結果の上位バイト部分」</span>である。<br>
+つまり、<code>[$00:0318]</code>に入っているのは、<span class="formula">$00</span>～<span class="formula">$6F</span>のどれかである。<br>
+<span class="formula">$00～$37</span>の時はキャリーフラグで繰り下がりが発生する引き算、<span class="formula">$38</span>以上は繰り下がりが発生しない引き算である。<br>
+結局、<code>[$7E:A011]</code>は、<span class="formula">$C8～$FF</span>、<span class="formula">$00～$38</span>のいずれかの値、ということがわかる。</p>
+
+<p><code>[$7E:A011]</code>の値は、後々でワタナベイベント発生確率に関係してくる。</p>
+
+<h4>ワタナベイベントの判定</h4>
+
+<p><code>[$7E:A010]</code>と<code>[$7E:A011]</code>の値が決まった後の続きを見ていこう。<br>
+ここからがワタナベイベントの判定である。<br>
+関係のあるサブルーチンだけ紹介していく。<br>
+計算前に、再び「カミツキ(青)」モーション計算用の<code>$D5:B375</code>～の値が計算用に呼び出され、以下のように配置される。<br>
+先に呼び出し済みの<code>$D5:B375</code>～<code>$D5:B377</code>はここまでの計算で使ってしまったため、以降では不要である。<br>
+呼び出し先の<code>[$00:0310]</code>～<code>[$00:0314]</code>に、<code>$D5:B378</code>～<code>$D5:B37C</code>を入れている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th><th>移動先アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$D5:B375</code></td><td><span class="formula">$88</span></td><td>-</td></tr>
+	<tr><td><code>$D5:B376</code></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><code>$D5:B377</code></td><td><span class="formula">$70</span></td><td>-</td></tr>
+	<tr><td><code>$D5:B378</code></td><td><span class="formula">$D8</span></td><td><code>[$00:0310]</code></td></tr>
+	<tr><td><code>$D5:B379</code></td><td><span class="formula">$00</span></td><td><code>[$00:0311]</code></td></tr>
+	<tr><td><code>$D5:B37A</code></td><td><span class="formula">$FC</span></td><td><code>[$00:0312]</code></td></tr>
+	<tr><td><code>$D5:B37B</code></td><td><span class="formula">$90</span></td><td><code>[$00:0313]</code></td></tr>
+	<tr><td><code>$D5:B37C</code></td><td><span class="formula">$B3</span></td><td><code>[$00:0314]</code></td></tr>
+</tbody>
+</table>
+
+<p>更に、以下の値も使用する。<br>
+<code>[$00:031C]</code>は値が更新されている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:031C]</code></td><td><span class="formula">$7D</span></td></tr>
+	<tr><td><code>[$00:031D]</code></td><td><span class="formula">$B3</span></td></tr>
+	<tr><td><code>[$00:031E]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:031F]</code></td><td><span class="formula">$A0</span></td></tr>
+</tbody>
+</table>
+
+<p>以下、<code>$C1/AFB0</code>から16bitモードだが、この時点の<code>A</code>には<span class="formula">$AF10</span>が入っている。</p>
+
+<div class="code-container"><pre>
+$C1/AFAB LDA $10    [$00:0310]   ;Aに[$00:0310]=$D8をロード
+$C1/AFAD AND #$0F                ;A(=$D8)と$0Fの論理積 = $08
+$C1/AFAF ASL A                   ;Aを算術左シフト　$08*2 = $10
+$C1/AFB0 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/AFB2 AND #$00FF              ;A(=$AF10)と$00FFで論理積 = $0010
+$C1/AFB5 ADC $1E    [$00:031E]   ;A(=$AF10)+$A000 = $A010
+$C1/AFB7 TAX                     ;A(=$A010)をXレジスタに転送(X=$A010)
+$C1/AFB8 SEP #$20                ;MフラグON Aレジスタは8bit幅
+$C1/AFBA LDA $7E0000,x[$7E:A010] ;Aに[$7E:A010]をロード
+$C1/AFBE AND $11    [$00:0311]   ;A(=[$7E:A010])と[$00:0311](=$00)と論理積
+$C1/AFC0 BNE $0D    [$AFCF]      ;ゼロフラグが立っていないとき[$AFCF]分岐
+$C1/AFC2 LDA $7E0001,x[$7E:A011] ;A(=[$7E:A011])をロード
+$C1/AFC6 AND $12    [$00:0312]   ;A(=[$7E:A011])と[$00:0312](=$FC)と論理積
+$C1/AFC8 BNE $05    [$AFCF]      ;ゼロフラグが立っていないとき[$AFCF]分岐
+$C1/AFCA LDX $1C    [$00:031C]   ;Xに[$00:031C](=$B37D)をロード
+$C1/AFCC BRL $F6EC  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+</pre></div>
+
+<p><code>$C1/AFAB</code>～<code>$C1/AFB8</code>は、<code>[$7E:A010]</code>と<code>[$7E:A011]</code>を呼び出すためのアドレス位置の数値（<span class="formula">$A010</span>）を計算している。<br>
+この後の<code>$C1/AFBA</code>からがワタナベイベントの判定になる。<br>
+まず、<code>$C1/AFBE</code>にて、<code>[$7E:A010]</code>と<code>[$00:0311]</code><span class="formula">=$00</span>で論理積をとり、ゼロフラグが立つかどうかを確認している。<br>
+8bitモードなので、何かの16進数2桁と<span class="formula">$00</span>で論理積ということになるが、どんな数値でも<span class="formula">$00</span>と論理積を取れば結果は<span class="formula">$00</span>である。<br>
+<code>[$00:0311]</code>に入る値は変数だから、「カミツキ(青)」モーション計算時では<span class="formula">$00</span>が入っていたというだけで、他モーションでは他の値が入り、何かしら他の分岐に使うのだろう（未確認）。<br>
+何はともあれ、ここでは必ずゼロフラグが立って、<code>$C1/AFC2</code>の処理に進む。</p>
+
+<p>ついで、<code>[$7E:A011]</code>と<code>[$00:0312]</code>(<span class="formula">=$FC</span>)と論理積をとっている。<br>
+次の判定はゼロフラグが立つかどうかである。<br>
+ここがワタナベイベント判定の分岐で、ゼロフラグが立つとそのままサブルーチンが進みワタナベイベントが発生する。<br>
+ゼロフラグが立たない場合は<code>[$AFCF]</code>へ分岐、ワタナベイベントは発生しない。</p>
+
+<p>厳密には、ここでゼロフラグが立った後、更にエイジャの向きを判定して、左上向きの時だけワタナベイベントが発生するが、とりあえず乱数関係の話を進める。</p>
+
+<p>話を戻し、<code>[$7E:A011]</code>と<span class="formula">$FC</span>の論理積の計算について考えてみよう。<br>
+論理積は、数値を2進法にしてそれぞれの位を比較し、両方とも<span class="formula">1</span>なら<span class="formula">1</span>、それ以外は<span class="formula">0</span>にする演算である。<br>
+<span class="formula">$FC</span>は2進法だと<span class="formula">%1111 1100</span>である。<br>
+<span class="formula">%1111 1100</span>と論理積で<span class="formula">0</span>になる数値は、<span class="formula">%0000 00??</span>である。<br>
+つまり、</p>
+
+<p class="formula">%0000 0000 = $00<br>
+%0000 0001 = $01<br>
+%0000 0010 = $02<br>
+%0000 0011 = $03</p>
+
+<p>この4種類しかない。</p>
+
+<p><code>[$7E:A011]</code>と$FCの論理積でゼロフラグが立つのは、<code>[$7E:A011]</code>が<span class="formula">$00, $01, $02, $03</span>の時であり、ワタナベイベントが発生する。<br>
+ということになる。</p>
+
+<p><code>[$7E:A011]</code>は、上で計算済みであるが、</p>
+
+<p class="formula"><code>[$7E:A011]</code> = 「$70*『乱数1』」の結果の上位バイト部分 - $38<br>
+※キャリーフラグが立った状態で減算するので負の数にはならない</p>
+
+<p>であり、<span class="formula">$C8～$FF</span>、<span class="formula">$00～$38</span>のいずれかの値になることが判明している。<br>
+<code>[$7E:A011]</code>が<span class="formula">$00～$03</span>の時だけワタナベイベントが発生である。<br>
+キャリーフラグを立てて繰り下がりが起きた時の値は<span class="formula">$C8～$FF</span>だから、繰り下がりが起きた時点でワタナベイベントが発生しないことがわかる。</p>
+
+<h4>乱数の値が幾つならワタナベイベントが発生する？</h4>
+
+<p>最終的に、『乱数1』しかワタナベイベント判定に関わっていなかったということがわかった。<br>
+結局、『乱数1』がどの範囲だと、ワタナベイベントが発生することになるのだろうか。<br>
+ここからは『乱数1』を「<span class="formula">R</span>」とする。</p>
+
+<p class="formula"><code>[$7E:A011]</code> = 「$70*R」の結果の上位バイト部分 - $38</p>
+
+<p>ということになるが、「<span class="formula">$70*R</span>」の結果（16進数4桁）の上位バイト部分（上2桁）は、結局、小数点位置をふたつ左に移動した、<span class="formula">「$70*R」÷$100</span>のことである、とこれまでにも紹介した通りである。<br>
+この時に小数点以下が切り捨てになる点も注意。</p>
+
+<p>よって、</p>
+
+<p class="formula"><code>[$7E:A011]</code> = $70*R/$100 - $38</p>
+
+<p>ワタナベイベントが発生するのは、</p>
+
+<p class="formula">$00 ≦ $70*R/$100 - $38 ≦ $03<br>
+ただし$70*R/$100≧$38</p>
+
+<p>ということになる。<br>
+この条件を満たす<span class="formula">R</span>は、<span class="formula">$80～$89</span>になる。<br>
+（計算する時にちょっとややこしいため、<span class="formula">$70*R/$100≧$38</span>の前提で不等式全体に<span class="formula">$38</span>を足して、<span class="formula">$38 ≦ $70*R/$100 ≦ $3B</span>と考えても良い）</p>
+
+<p>以上から、乱数<span class="formula">$00～$FF</span>（10進数<span class="formula">0～255</span>）のうち、<span class="formula">$80～$89</span>（10進数<span class="formula">128～137</span>）の時のみワタナベイベントが発生するので、確率としては<span class="formula">10/256</span>でワタナベイベント発生、ということが判明した。<br>
+<span class="formula">10/256≒0.0391</span>なので、だいたい4％である。<br>
+低すぎるというほどでもないが、高確率でもない、絶妙な確率になっている。</p>
+
+<p>仮に「カミツキ(青)」を50回くらった場合、1回以上ワタナベイベントが発生する確率は、</p>
+
+<p class="formula">1-(1-(10/256))^50 ≒ 0.864</p>
+
+<p>86％程度である。100回まで増やせば98％程度まで上がる。<br>
+50回くらえばそこそこの確率で、100回くらえばほぼ確実に一度は見られる確率になる。<br>
+とはいえ、エイジャは「カミツキ(青)」より「カミツキ(黄)」を優先して出してくること、高原が毒状態なら比較的「カミツキ(青)」が出やすいがその状態を維持することが難しいこと（「気合いため」でHP回復すると毒状態も回復する、「気合いため」のHP回復量が「カミツキ」のダメージをギリギリ相殺できる程度）、といった理由から、本気で見たい場合は倒されるのを覚悟で何戦も粘る必要がある。<br>
+それでも条件がわかっていれば、長くても1時間少々くらい踏ん張れば見られるだけ有情なイベントである。<br>
+本作の場合、レアなドロップアイテムを狙う方がよほど手間と時間がかかることは、やりこみ勢なら知っての通りであろう。</p>
+
+<p>また、条件さえ満たせば、一度の戦闘中に何度でもワタナベイベントが発生する。</p>
+
+<p>リメイク版では、エイジャが右上向きまたは左上向きで「カミツキ(青)」を出すとワタナベイベントが確実に発生、と条件が変更されて、条件を知らずに普通にプレイしているだけでも見られるケースが増えた。ただしリメイク版では、一度の戦闘にワタナベイベントが発生するのは一度だけである。</p>
+
+<h3>グレート・エイジャの向き判定</h3>
+
+<p>ここまでの話は、エイジャが左上向き前提で進めてきたような雰囲気になってしまったが、最初に記したとおり、実際にはエイジャが「カミツキ(青)」を出した時、エイジャの向きに関係なく上の乱数判定は起きている。<br>
+そして、<code>[$7E:A011]</code>が<span class="formula">$00～$03</span>の時は、向きに関係なく、上のサブルーチンの<code>$C1/AFCC</code>に到達して続きの計算を行うことになる。<br>
+つまり、向き判定は乱数での判定の後である。<br>
+どこで判定しているのかを、最後に説明する。</p>
+
+<p>まず、敵の向きはどこに記録されているかだが、1番目の敵、この戦闘で言えばエイジャの向きは<code>[$00:1B04]</code>に記録される。<br>
+入る値は、以下の4種類である。</p>
+
+<table>
+<thead>
+	<tr><th>向き</th><th>数値</th></tr>
+</thead>
+<tbody>
+	<tr><td>右下</td><td><span class="formula">$00</span></td></tr>
+	<tr><td>左下</td><td><span class="formula">$40</span></td></tr>
+	<tr><td>右上</td><td><span class="formula">$80</span></td></tr>
+	<tr><td>左上</td><td><span class="formula">$C0</span></td></tr>
+</tbody>
+</table>
+
+<p>向きの値<code>[$00:1B04]</code>は、技モーション中などに何度も読み込まれているが、「カミツキ(青)」のワタナベイベント用の判定のため（他の判定に使われているかは未確認）、別途以下のサブルーチンでも読み込まれている。</p>
+
+<div class="code-container"><pre>
+$C1/2ADD LDA $0004,y[$00:1B04]   ;X:A000 Y:1B00 Aに[$00:1B04]を読み込み
+$C1/2AE0 ROL A                   ;X:A000 Y:1B00 Aを左ローテート
+$C1/2AE1 ROL A                   ;X:A000 Y:1B00 Aを左ローテート
+$C1/2AE2 AND #$01                ;X:A000 Y:1B00 Aと$01で論理積
+$C1/2AE4 ORA $10    [$00:0310]   ;X:A000 Y:1B00 Aと[$00:0310](=$00)で論理和
+$C1/2AE6 ORA #$38                ;X:A000 Y:1B00 Aと$38で論理和
+$C1/2AE8 STA $7E001D,x[$7E:A01D] ;X:A000 Y:1B00 Aを[$7E:A01D]に書き込み
+</pre></div>
+
+<p>左ローテートというのは16進数2桁の数値を2進数8桁で見た時に、数値を1つ左に動かす処理のこと。<br>
+ただしキャリーフラグの桁溢れ分も考慮して左に動かすので、実質9桁をぐるぐると回転させるイメージである。<br>
+たとえば、左上向きの<span class="formula">$C0</span>は、2進数だと<span class="formula">%1100 0000</span>で、この時点ではキャリーフラグがないから、「<span class="formula">0 1100 0000</span>」を左に1ずつ回し、一番左のキャリー分が一番右に入るという計算になる。<br>
+つまり、「<span class="formula">0 1100 0000</span>」→「<span class="formula">1 1000 0000</span>」→「<span class="formula">1 0000 0001</span>」で、2回左ローテートした結果はキャリー分の一番上を除いた<span class="formula">%0000 0001=$01</span>となる。<br>
+そのほか、細かい計算は省くが、最終的に計算結果が<code>[$7E:A01D]</code>に収まっており、後々で<code>[$7E:A01D]</code>が向き判定に使われる。<br>
+<code>[$7E:A01D]</code>に入る値は以下の通り。</p>
+
+<table>
+<thead>
+	<tr><th>向き</th><th><code>[$7E:A01D]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>右下</td><td><span class="formula">$38</span></td></tr>
+	<tr><td>左下</td><td><span class="formula">$38</span></td></tr>
+	<tr><td>右上</td><td><span class="formula">$38</span></td></tr>
+	<tr><td>左上</td><td><span class="formula">$79</span></td></tr>
+</tbody>
+</table>
+
+<p>実は左ローテート2回の時点で、<span class="formula">$C0</span>以外は<span class="formula">$00</span>になってしまうため、上のように左上向きだけ<span class="formula">$79</span>、他の向きは<span class="formula">$38</span>となる。<br>
+もうこの時点で、<code>[$7E:A01D]</code><span class="formula">=$79</span>の時だけワタナベイベントを発生させるのだろう、とわかっただろう。<br>
+実際の判定方法は少し違うが似たようなものである。</p>
+
+<p>では、<code>[$7E:A011]</code>が<span class="formula">$00～$03</span>が判定された先のサブルーチンを見てみる。<br>
+向きに関係するところのみ掲載する。<br>
+アドレス指定が重要なので、<code>X</code>の値も併記する。</p>
+
+<div class="code-container"><pre>
+$C1/A717 LDA $D50000,x[$D5:B37F] ;X:B37F Aに[$D5:B37F](=$40)をロード
+$C1/A71B STA $12    [$00:0312]   ;X:B37F A(=$40)を[$00:0312]に書き込み
+;（中略）
+$C1/AFC2 LDA $7E0001,x[$7E:A01D] ;X:A01C Aに[$7E:A01D](=$79)をロード
+$C1/AFC6 AND $12    [$00:0312]   ;X:A01C A(=[$7E:A01D])と[$00:0312](=$40)で論理積
+$C1/AFC8 BNE $05    [$AFCF]      ;X:A01C ゼロフラグが立っていないとき[$AFCF]分岐
+</pre></div>
+
+<p><code>$C1/AFC6</code>が分岐である。<br>
+この時点で、<code>[$7E:A01D]</code>には上記の向きからの計算値（<span class="formula">$38</span>か<span class="formula">$79</span>）、<code>[$00:0312]</code>は<code>[$D5:B37F]</code>から呼び出した<span class="formula">$40</span>が入っている。<br>
+<code>[$7E:A01D]</code>と<span class="formula">$40</span>で論理積を取ると、<span class="formula">$38</span>と<span class="formula">$40</span>の論理積は<span class="formula">$00</span>、<span class="formula">$79</span>と<span class="formula">$40</span>の論理積は<span class="formula">$40</span>である。<br>
+よって、次の<code>$C1/AFC8</code>は、「左上向きの時だけゼロフラグが立たないので<code>[$AFCF]</code>へ」という条件での分岐になる。<br>
+ここで向き判定確定で、今度こそワタナベイベントが発生決定、ということである。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program25.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program15.html"><span class="button">&#9654;次　「逃げる」フラグ</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

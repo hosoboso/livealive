@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 功夫編終盤">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 功夫編終盤">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 功夫編終盤</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+.num{
+font-family: 'STIXTwoMath', "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo UI", "Meiryo", "Helvetica Neue", arial, sans-serif;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 功夫編終盤</h1>
+<h2>功夫編終盤</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここでは、功夫編最終盤における、</p>
+
+<ul>
+	<li>シナリオ別キャラデータにおいて、功夫編主人公が心山拳老師→弟子のデータに切り替わるタイミングと処理</li>
+	<li>ラストバトルにおいて一度だけ使える「旋牙連山拳」の処理</li>
+</ul>
+
+<p>について説明する。</p>
+
+<h3>シナリオ別キャラデータ</h3>
+
+<p>シナリオ別キャラデータは、<code>$00:0D00</code>～<code>$00:0FBF</code>に入る、各シナリオのキャラ用データである。<br>
+各シナリオの主人公8キャラ＋各シナリオの仲間キャラ最大3キャラ、合計11キャラのデータを保存している。<br>
+仲間キャラについては、3キャラ分の領域しかないので、各シナリオ内でのみ保存される。</p>
+
+<p><code>$00:0DC0</code>～<code>$00:0DFF</code>が功夫編主人公のデータ領域になるのだが、功夫編だと心山拳老師、最終編だと心山拳師範、つまり功夫編で伝承者に選んだ弟子のデータになる。<br>
+功夫編終盤からクリアまでのどこかのタイミングで、<code>$00:0DC0</code>～<code>$00:0DFF</code>に入っていた心山拳老師のデータが、弟子のデータに上書きされているはずである。<br>
+弟子3キャラは、功夫編において仲間キャラの扱いなので、シナリオ別キャラデータだと、</p>
+
+<table>
+<thead>
+	<tr><th>ID</th><th>アドレス</th><th>キャラ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$08</span></td><td><code>$00:0F00</code>～<code>$00:0F3F</code></td><td>ユン</td></tr>
+	<tr><td><span class="formula">$09</span></td><td><code>$00:0F40</code>～<code>$00:0F7F</code></td><td>レイ</td></tr>
+	<tr><td><span class="formula">$0A</span></td><td><code>$00:0F80</code>～<code>$00:0FBF</code></td><td>サモ</td></tr>
+</tbody>
+</table>
+
+<p>以上のようにデータが入っているが、これらのデータが<code>$00:0DC0</code>～<code>$00:0DFF</code>に上書きされる処理になるはずだ。</p>
+
+<p>そのタイミングは、実は功夫編ラストバトル前である。<br>
+功夫編ラストバトル前の会話で、山頂にて老師が弟子に「旋牙連山拳」を見せるシーンの回想が入るが、この回想が終わる暗転のタイミングで<code>$00:0DC0</code>～<code>$00:0DFF</code>の領域が弟子のデータに上書きされ、そのままラストバトルに突入する。</p>
+
+<h4>メモリアドレス</h4>
+
+<p>シナリオ別キャラデータ以外の重要なアドレスは以下のとおり。<br>
+<code>$00:0A11</code>～<code>$00:0A13</code>は、各シナリオの仲間キャラのシナリオ別キャラデータIDが入っている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:0A11</code></td><td>2人目のシナリオ別キャラデータID</td></tr>
+	<tr><td><code>$00:0A12</code></td><td>3人目のシナリオ別キャラデータID</td></tr>
+	<tr><td><code>$00:0A13</code></td><td>4人目のシナリオ別キャラデータID</td></tr>
+</tbody>
+</table>
+
+<p>つまり、功夫編ラストバトル前は、<code>$00:0A11</code>に伝承者になる弟子のキャラIDが入っている。</p>
+
+<table>
+<thead>
+	<tr><th>弟子</th><th>キャラID</th></tr>
+</thead>
+<tbody>
+	<tr><td>ユン</td><td><span class="formula">$08</span></td></tr>
+	<tr><td>レイ</td><td><span class="formula">$09</span></td></tr>
+	<tr><td>サモ</td><td><span class="formula">$0A</span></td></tr>
+</tbody>
+</table>
+
+<p>また、<code>$00:0A15</code>は、心山拳老師＆師範が誰なのかの値が入り、初期値（功夫編開始時）は<span class="formula">$00</span>で、心山拳老師に該当する。</p>
+
+<table>
+<thead>
+	<tr><th><code>$00:0A15</code></th><th>キャラ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>心山拳老師</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>ユン</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>レイ</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>サモ</td></tr>
+</tbody>
+</table>
+
+<h4>サブルーチン</h4>
+
+<p>回想終了のタイミングでデータが上書きされる処理は以下のようになっている。</p>
+
+<div class="code-container"><pre>
+$C0/24D3 LDA $0A11  [$00:0A11]   ;Aに[$00:0A11]をロード
+$C0/24D6 SEC                     ;キャリーフラグON
+$C0/24D7 SBC #$07                ;A - $07
+$C0/24D9 STA $0A15  [$00:0A15]   ;Aを[$00:0A15]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C0/24D3</span></code>～<code><span class="r">$C0/24D9</span></code>でやっていることは、『「<span class="formula"><code>[$00:0A11]</code> - $07</span>」を<code>[$00:0A15]</code>に書き込む』である。<br>
+<code>[$00:0A11]</code>には伝承者になる弟子のキャラIDが入っているから、<code>[$00:0A15]</code>に書き込まれる<span class="formula"><code>[$00:0A11]</code> - $07</span>の解は以下の通り。</p>
+
+<table>
+<thead>
+	<tr><th>弟子</th><th>キャラID</th><th><code>[$00:0A11]</code> - <span class="formula">$07</span></th></tr>
+</thead>
+<tbody>
+	<tr><td>ユン</td><td><span class="formula">$08</span></td><td><span class="formula">$01</span></td></tr>
+	<tr><td>レイ</td><td><span class="formula">$09</span></td><td><span class="formula">$02</span></td></tr>
+	<tr><td>サモ</td><td><span class="formula">$0A</span></td><td><span class="formula">$03</span></td></tr>
+</tbody>
+</table>
+
+<p>つまりここで、</p>
+
+<table>
+<thead>
+	<tr><th><code>$00:0A15</code></th><th>キャラ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>心山拳老師</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>ユン</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>レイ</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>サモ</td></tr>
+</tbody>
+</table>
+
+<p><code>$00:0A15</code>に、新たな値が計算されて書き込まれたことになる。<br>
+実質ここで功夫編主人公が交代になったとみなすこともできる。</p>
+
+<p>続きはシナリオ別キャラデータの処理である。<br>
+上の処理で、<code>A</code>には弟子に対応した<span class="formula">$01</span>～<span class="formula">$03</span>の値のいずれかが入っている。</p>
+
+<div class="code-container"><pre>
+$C0/24DC TAX                     ;Aの値をXレジスタに転送
+$C0/24DD LDA $01B0,x[$00:01B2]   ;Aに[$00:01B0+x]をロード x=1～3
+$C0/24E0 STA $01B0  [$00:01B0]   ;Aを[$00:01B0]に書き込み
+$C0/24E3 PHY                     ;Yをスタックへプッシュ
+$C0/24E4 LDA $0A15  [$00:0A15]   ;Aに[$00:0A15]($01～$03)をロード
+$C0/24E7 DEC A                   ;Aをデクリメント -1
+$C0/24E8 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/24EA AND #$00FF              ;Aと$00FFで論理積
+$C0/24ED ASL A                   ;Aを算術左シフト *2
+$C0/24EE ASL A                   ;Aを算術左シフト *2
+$C0/24EF ASL A                   ;Aを算術左シフト *2
+$C0/24F0 ASL A                   ;Aを算術左シフト *2
+$C0/24F1 ASL A                   ;Aを算術左シフト *2
+$C0/24F2 ASL A                   ;Aを算術左シフト *2
+$C0/24F3 CLC                     ;キャリーフラグクリア
+$C0/24F4 ADC #$0F00              ;A + $0F00
+$C0/24F7 TAX                     ;Aの値をXレジスタに転送
+$C0/24F8 LDY #$0DC0              ;Yに$0DC0をロード
+$C0/24FB LDA #$0033              ;Aに$0033をロード
+</pre></div>
+
+<p>この先で、シナリオ別キャラデータを丸ごと転送するため、その前処理が上のサブルーチンで行われている。<br>
+弟子が誰なのかによって、元となるシナリオ別キャラデータのアドレスが変わるため、アドレスを計算している。<br>
+処理を見ると、<span class="formula">(<code>[$00:0A15]</code>-1)*40 + $0F00</span>が<code>X</code>レジスタに転送されている。<br>
+<span class="formula">(<code>[$00:0A15]</code>-1)*40 + $0F00</span>の計算値（<code>X</code>に入った値）は以下の通り。</p>
+
+<table>
+<thead>
+	<tr><th><code>$00:0A15</code></th><th>キャラ</th><th><code>X</code></th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$01</span></td><td>ユン</td><td>$0F00</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>レイ</td><td>$0F40</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>サモ</td><td>$0F80</td></tr>
+</tbody>
+</table>
+
+<p>つまり、シナリオ別キャラデータの開始アドレスの値そのままである。例えばユンなら、上にバンク<span class="formula">$00</span>をつければ<code>$00:0F00</code>になる。<br>
+これで、転送元になる弟子のシナリオ別キャラデータのアドレスが計算できた。<br>
+転送先は固定（<code>$00:0DC0</code>～）だから、計算の必要はない。<br>
+続きはニーモニック<code>MVN</code>による転送処理である。</p>
+
+<div class="code-container"><pre>
+;MVN データ転送
+$C0/24FE MVN 00 00     ;A:0033 X:0FX0 Y:0DC0 データ転送開始
+$C0/24FE MVN 00 00     ;A:0032 X:0FX1 Y:0DC1 A:転送したいデータサイズ-1=$0033
+$C0/24FE MVN 00 00     ;A:0031 X:0FX2 Y:0DC2 X:コピー元アドレス=$0FX0（弟子により変更）
+$C0/24FE MVN 00 00     ;A:0030 X:0FX3 Y:0DC3 Y:コピー先アドレス=$0DC0
+$C0/24FE MVN 00 00     ;A:002F X:0FX4 Y:0DC4 オペランド:コピー元バンク=$00 コピー先バンク=$00
+$C0/24FE MVN 00 00     ;A:002E X:0FX5 Y:0DC5 コピー元 $00:0FX0～$00:0FX3
+$C0/24FE MVN 00 00     ;A:002D X:0FX6 Y:0DC6 コピー先 $00:0DC0～$00:0DF3
+$C0/24FE MVN 00 00     ;A:002C X:0FX7 Y:0DC7 
+;(中略)
+$C0/24FE MVN 00 00     ;A:0001 X:0FX2 Y:0DF2 
+$C0/24FE MVN 00 00     ;A:0000 X:0FX3 Y:0DF3 データ転送ここまで
+</pre></div>
+
+<p><code>MVN</code>は、あるアドレスの範囲の値を他のアドレスにまとめて転送（コピー）するニーモニックである。<br>
+以下のように各レジスタに値を設定する。オペランドは<code>MVN</code>の後に指定される数値のこと。</p>
+
+<table>
+<thead>
+	<tr><th>レジスタ</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>A</code></td><td>転送したいデータサイズ-1</td></tr>
+	<tr><td><code>X</code></td><td>コピー元アドレス</td></tr>
+	<tr><td><code>Y</code></td><td>コピー先アドレス</td></tr>
+	<tr><td>オペランド</td><td>コピー元バンク, コピー先バンク</td></tr>
+</tbody>
+</table>
+
+<p><code>MVN</code>の前に、<code>A</code>に<span class="formula">$0033</span>、<code>Y</code>に<span class="formula">$0DC0</span>が固定値として入っている。<br>
+オペランドは<code>00,00</code>なので、転送元も転送先もバンク<span class="formula">$00</span>である。<br>
+弟子により異なるのは<code>X</code>、つまりコピー元アドレスで、それらは先に<code><span class="r">$C0/24DC</span></code>～<code><span class="r">$C0/24FB</span></code>にて計算した通り。<br>
+上の処理から、弟子のコピー元アドレス範囲が以下のようになっていることがわかる。</p>
+
+<table>
+<thead>
+	<tr><th>キャラ</th><th>コピー元アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td>ユン</td><td><code>$00:0F00</code>～<code>$00:0F33</code></td></tr>
+	<tr><td>レイ</td><td><code>$00:0F40</code>～<code>$00:0F73</code></td></tr>
+	<tr><td>サモ</td><td><code>$00:0F80</code>～<code>$00:0FB3</code></td></tr>
+</tbody>
+</table>
+
+<p>例えばユンなら、本来、シナリオ別キャラデータは<code>$00:0F00</code>～<code>$00:0F3F</code>である。<br>
+だが、転送は<code>$00:0F33</code>までしか指定されていない。<br>
+コピー先も、<code>$00:0DC0</code>～<code>$00:0DF3</code>で、<code>$00:0DFF</code>ではない。<br>
+どうして最後の12バイト（<code>$00:0DF4</code>～<code>$00:0DFF</code>）は転送しないのだろうか？</p>
+
+<p>シナリオ別キャラデータの最後の12バイトだが、以下のように値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$34</span></td><td>名前1文字目</td></tr>
+	<tr><td><span class="formula">$35</span></td><td>名前2文字目</td></tr>
+	<tr><td><span class="formula">$36</span></td><td>名前3文字目</td></tr>
+	<tr><td><span class="formula">$37</span></td><td>名前4文字目</td></tr>
+	<tr><td><span class="formula">$38</span></td><td>名前5文字目</td></tr>
+	<tr><td><span class="formula">$39</span></td><td>名前6文字目</td></tr>
+	<tr><td><span class="formula">$3A</span></td><td>名前7文字目</td></tr>
+	<tr><td><span class="formula">$3B</span></td><td>名前8文字目</td></tr>
+	<tr><td><span class="formula">$3C</span></td><td>名前9文字目</td></tr>
+	<tr><td><span class="formula">$3D</span></td><td>名前10文字目</td></tr>
+	<tr><td><span class="formula">$3E</span></td><td>名前11文字目</td></tr>
+	<tr><td><span class="formula">$3F</span></td><td>名前12文字目</td></tr>
+</tbody>
+</table>
+
+<p>この通り、キャラクター名が入っている。<br>
+功夫編だと拳法の名前であるが、転送前は各キャラ、どのような値（名前）が入っていたのか。<br>
+拳法名がデフォルトの「心山」だった場合は以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>キャラ</th><th>アドレス</th><th>16進数</th><th>デコード</th></tr>
+</thead>
+<tbody>
+	<tr><td>老師</td><td><code>$00:0DF4</code>～<code>$00:0DFF</code></td><td><span class="formula">1E 72 1E 00 1D B2 00 00 00 00 00 00</span></td><td>心山拳<span class="formula">(00)(00)(00)(00)(00)(00)</span></td></tr>
+	<tr><td>ユン</td><td><code>$00:0F34</code>～<code>$00:0F3F</code></td><td><span class="formula">85 8D 3C 9D 90 63 00 00 00 00 00 00</span></td><td>ユン・ジョウ<span class="formula">(00)(00)(00)(00)(00)(00)</span></td></tr>
+	<tr><td>レイ</td><td><code>$00:0F74</code>～<code>$00:0F7F</code></td><td><span class="formula">8A 62 3C 68 63 9B 00 00 00 00 00 00</span></td><td>レイ・クウゴ<span class="formula">(00)(00)(00)(00)(00)(00)</span></td></tr>
+	<tr><td>サモ</td><td><code>$00:0FB4</code>～<code>$00:0FBF</code></td><td><span class="formula">6B 83 3C 7A 91 66 00 00 00 00 00 00</span></td><td>サモ・ハッカ<span class="formula">(00)(00)(00)(00)(00)(00)</span></td></tr>
+</tbody>
+</table>
+
+<p>つまり、名前だけは弟子のデータからコピーせず、それ以外、戦闘関係のステータスなどだけシナリオ別キャラデータからコピーして、ラストバトルに突入するということである。<br>
+そしてこのまま、功夫編をクリアして最終編に入っても、名前部分だけは変わらない。<br>
+というのは、功夫編主人公は、功夫編だと名前が「心山拳老師」、最終編だと「心山拳師範」である。<br>
+<code>$00:0DF4</code>～<code>$00:0DFF</code>に入っている名前データ＋「老師」または「師範」がキャラ名になるため、以上のコピーだけで充分なのである。</p>
+
+<p>逆に名前まで上書きしてしまうと、プレイヤーが付けた拳法の名前が消えてしまうので、名前の上書きまで行わないという意味でもある。<br>
+ユン・レイ・サモのキャラ名自体はデフォルトネームで変更不可であり、最終編ではセリフなどで使われるのみなのでコピーする必要はない。</p>
+
+<p>ただ、功夫編ラストバトルでは、キャラ名は弟子のフルネームのままである。<br>
+そのあたりの処理は後で説明する。</p>
+
+<div class="code-container"><pre>
+$C0/2501 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2503 PLY                     ;Yレジスタにスタックからプル
+$C0/2504 BRA $2D    [$2533]      ;フラグにかかわりなく常に分岐[$2533]
+$C0/2533 DEC $0A14  [$00:0A14]   ;[$00:0A14]をデクリメント -1
+$C0/2536 LDA $0A14  [$00:0A14]   ;Aに[$00:0A14]をロード
+$C0/2539 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/253B BNE $08    [$2545]      ;ゼロフラグが立っていないとき[$2545]分岐
+$C0/2545 PLB                     ;DBレジスタに値をプル
+$C0/2546 JSR $4104  [$C0:4104]   ;[$C0:4104]へジャンプ
+</pre></div>
+
+<p>転送が終わると、<code>[$00:0A14]</code>をデクリメントして処理が一通り終わる。<br>
+<code>[$00:0A14]</code>はパーティ内の仲間キャラの数である（<span class="formula">パーティ人数-1</span>でもある）。<br>
+寸前までは老師＋弟子の2人パーティで、<code>[$00:0A14]</code>には<span class="formula">$01</span>が入っていたが、ここでデクリメント(<span class="formula">-1</span>)されて<span class="formula">$00</span>となり、主人公1人パーティという扱いになる。</p>
+
+<h3>功夫編ラストバトル</h3>
+
+<p>功夫編ラストバトルにおける、この戦闘専用の処理を紹介する。<br>
+まず戦闘開始時の処理について。</p>
+
+<div class="code-container"><pre>
+$C1/1ADD LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/1AE0 CMP #$F4                ;Aと$F4を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE2 BNE $05    [$1AE9]      ;ゼロフラグが立っていないとき[$1AE9]分岐
+$C1/1AE4 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00](シナリオID$03 = 功夫編)をロード
+$C1/1AE7 CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE9 RTS                     ;サブルーチン戻り
+;
+$C1/1AED BNE $26    [$1B15]      ;ゼロフラグが立っていないとき[$1B15]分岐
+$C1/1AEF LDA #$01                ;Aに$01をロード
+$C1/1AF1 STA $0A14  [$00:0A14]   ;Aを[$00:0A14]($01)に書き込み
+$C1/1AF4 LDA $0A15  [$00:0A15]   ;Aに[$00:0A15](弟子の値$01～$03)をロード
+$C1/1AF7 CLC                     ;キャリーフラグクリア
+$C1/1AF8 ADC #$07                ;A + $07
+$C1/1AFA STA $0A11  [$00:0A11]   ;Aを[$00:0A11](キャラID$08～$0A)に書き込み
+$C1/1AFD LDX #$0DC0              ;Xに$0DC0をロード
+$C1/1B00 JSR $1B16  [$C1:1B16]   ;[$C1:1B16]へジャンプ
+;
+;シナリオ別キャラデータ 功夫編主人公
+$C1/1B16 LDA $000E,x[$00:0DCE]   ;Aに[$00:0DCE](習得技（上位バイト）)をロード
+$C1/1B19 STA $001F,x[$00:0DDF]   ;Aを[$00:0DDF]に書き込み
+$C1/1B1C ORA #$80                ;Aと$80で論理和
+$C1/1B1E STA $000E,x[$00:0DCE]   ;Aを[$00:0DCE]に書き込み
+$C1/1B21 RTS                     ;サブルーチン戻り
+;
+$C1/1B03 LDX #$0F00              ;Xに$0F00をロード
+$C1/1B06 JSR $1B16  [$C1:1B16]   ;[$C1:1B16]へジャンプ
+;
+;シナリオ別キャラデータ 仲間1人目（ユン・ジョウ）
+$C1/1B16 LDA $000E,x[$00:0F0E]   ;Aに[$00:0F0E]をロード
+$C1/1B19 STA $001F,x[$00:0F1F]   ;Aを[$00:0F1F]に書き込み
+$C1/1B1C ORA #$80                ;Aと$80で論理和
+$C1/1B1E STA $000E,x[$00:0F0E]   ;Aを[$00:0F0E]に書き込み
+$C1/1B21 RTS                     ;サブルーチン戻り
+;
+$C1/1B09 LDX #$0F40              ;Xに$0F40をロード
+$C1/1B0C JSR $1B16  [$C1:1B16]   ;[$C1:1B16]へジャンプ
+;
+;シナリオ別キャラデータ 仲間2人目（レイ・クウゴ）
+$C1/1B16 LDA $000E,x[$00:0F4E]   ;Aに[$00:0F4E]をロード
+$C1/1B19 STA $001F,x[$00:0F5F]   ;Aを[$00:0F5F]に書き込み
+$C1/1B1C ORA #$80                ;Aと$80で論理和
+$C1/1B1E STA $000E,x[$00:0F4E]   ;Aを[$00:0F4E]に書き込み
+$C1/1B21 RTS                     ;サブルーチン戻り
+;
+$C1/1B0F LDX #$0F80              ;Xに$0F80をロード
+$C1/1B12 JSR $1B16  [$C1:1B16]   ;[$C1:1B16]へジャンプ
+;
+;シナリオ別キャラデータ 仲間3人目（サモ・ハッカ）
+$C1/1B16 LDA $000E,x[$00:0F8E]   ;Aに[$00:0F8E]をロード
+$C1/1B19 STA $001F,x[$00:0F9F]   ;Aを[$00:0F9F]に書き込み
+$C1/1B1C ORA #$80                ;Aと$80で論理和
+$C1/1B1E STA $000E,x[$00:0F8E]   ;Aを[$00:0F8E]に書き込み
+$C1/1B21 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/1ADD</span></code>～<code><span class="r">$C1/1AE9</span></code>～<code><span class="r">$C1/1AED</span></code>が功夫編分岐にあたる。<br>
+最初に<code>[$00:0040]</code>の値が<span class="formula">$F4</span>かを判定しているが、これは（おそらく）功夫編ラストバトル固有の数値である。詳細未調査。<br>
+<code>[$00:0A00]</code>に入っているのはシナリオIDで、<code><span class="r">$C1/1AE7</span></code>で<span class="formula">$03</span>と減算比較しているが、ここでゼロフラグが立つのはシナリオIDが<span class="formula">$03</span>、つまり功夫編のみである。<br>
+よって<code><span class="r">$C1/1AED</span></code>のゼロフラグ分岐では、そのまま次の<code><span class="r">$C1/1AEF</span></code>に処理が進む。<br>
+<code>[$00:0040]</code>の値と<code>[$00:0A00]</code>のシナリオIDで、功夫編ラストバトルかどうかを判定している。</p>
+
+<p><code><span class="r">$C1/1AF1</span></code>の処理だが、<code>[$00:0A14]</code>は直前のシナリオ別キャラデータの処理の時に一度<span class="formula">$00</span>になったにもかかわらず、ここでもう一度<span class="formula">$01</span>が書き込まれている。つまり仲間キャラが1人いる戦闘という扱いになっている。<br>
+<code><span class="r">$C1/1AF4</span></code>～は<code>[$00:0A15]</code>に書き込まれた弟子の値（<span class="formula">$01</span> = ユン、<span class="formula">$02</span> = レイ、<span class="formula">$03</span> = サモ）に<span class="formula">$07</span>を足すことで、味方キャラ2人目のシナリオ別キャラデータIDを再度<code>[$00:0A11]</code>に書き込む処理である。</p>
+
+<p><code><span class="r">$C1/1B16</span></code>～が「旋牙連山拳」の処理である。<br>
+<code>[$00:0DCE]</code>は、前に弟子の名前以外のデータをコピーした、功夫編主人公のシナリオ別キャラデータ<code>$00:0DC0</code>～<code>$00:0DF3</code>における、習得技2バイトのデータの中で、上位1バイト部分にあたる。<br>
+つまり、習得可能な技の中で、後半にあたる8種類、技LV08～技LV16の習得状況にあたり、2進数8ビットで表した時、下の位から順に技を習得していれば<span class="formula">%1</span>、そうでなければ<span class="formula">%0</span>が入っている。<br>
+「旋牙連山拳」は技LV16だから、一番上の桁に<span class="formula">1</span>が入っていれば習得している扱いである。つまり、<span class="formula">%1000 0000</span>(=<span class="formula">$80</span>)である。<br>
+<code>[$00:0DCE]</code>の値を一度<code>[$00:0DDF]</code>に書き込んでから、<span class="formula">$80</span>と論理和を取っているから、<span class="formula">%1000 0000</span>を加算したことになる。<br>
+<code><span class="r">$C1/1B1E</span></code>で、<code>[$00:0DCE]</code>に上書きしたので、この処理で、弟子は「旋牙連山拳」を覚えたことになる。</p>
+
+<p>更に、<code>X</code>の値を変更して<code><span class="r">$C1/1B16</span></code>～<code><span class="r">$C1/1B21</span></code>の処理を行っている。<br>
+上の通り、シナリオ別キャラデータの仲間3キャラ分のアドレスに繰り返して処理している。<br>
+離脱した他2人の弟子分もまとめて、「旋牙連山拳」を習得技に書き込んでいるのである。<br>
+伝承者の弟子のデータだけ処理すれば良いはずだが、ここでは3キャラ分の分岐はつくらずにまとめて処理していることがわかる。</p>
+
+<p>これが、功夫編ラストバトルでのみ、弟子が「旋牙連山拳」を使える仕組みである。<br>
+ここまでの処理で、功夫編の主人公・仲間3キャラ（弟子3人）すべてが「旋牙連山拳」を習得した扱いとなる。</p>
+
+<p>この後だが、「仲間キャラが1人いる戦闘＝味方キャラ2人目がいる戦闘」になっているため、弟子のデータは仲間1人目としてステータスなどがコピーされていくことになる。<br>
+実際には味方キャラは弟子1人のみなのだが、味方キャラ1人目は誰なのか？</p>
+
+<p>戦闘開始時、味方キャラのデータは、1人目から順に、<code>$00:1C00</code>～, <code>$00:1C40</code>～, <code>$00:1C80</code>～, <code>$00:1CC0</code>～に入る。<br>
+該当キャラが居ない、パーティメンバーが4人以下の場合でも、「該当キャラはいない」という処理のために値を入れていく。</p>
+
+<div class="code-container"><pre>
+$C1/EE56 LDA $0000,y[$00:0DC0]   ;Aに[$00:0DC0]($09, $0A, $0B)をロード
+$C1/EE59 STA $1C00  [$00:1C00]   ;Aを[$00:1C00]に書き込み
+$C1/EE5C STY $1C02  [$00:1C02]   ;Yを[$00:1C02]に書き込み
+$C1/EE5F LDA #$FF                ;Aに$FFをロード
+$C1/EE61 STA $1C01  [$00:1C01]   ;Aを[$00:1C01]に書き込み
+</pre></div>
+
+<p>まずは味方1人目、プレイ中のシナリオの主人公IDを、シナリオ別キャラデータから取得する。<br>
+功夫編であれば、<code>[$00:0DC0]</code>に功夫編主人公のIDが入っているが、功夫編ラストバトルの時点では、功夫編シナリオ別キャラデータに、弟子のデータが上書き済みだから、ここで呼び出される<code>[$00:0DC0]</code>の中身は老師のID<span class="formula">$08</span>ではなく、弟子のID<span class="formula">$09</span>, <span class="formula">$0A</span>, <span class="formula">$0B</span>のいずれかである。<br>
+よって、「味方キャラ1人目は弟子」である。<br>
+だが、功夫編シナリオ別キャラデータに、弟子の名前はコピーされていないため、厳密には、<br>
+「味方キャラ1人目は心山拳老師という名前で、ステータスは弟子」<br>
+というキャラのはずだ。<br>
+なお、<code>[$00:1C01]</code>は該当キャラの戦闘状態で、<span class="formula">$FF</span>は通常状態を意味する。<br>
+このままだと、<br>
+「味方キャラ1人目は心山拳老師という名前で、ステータスは弟子」<br>
+が、戦闘フィールドに登場することになってしまうが、後できちんと処理が入る。</p>
+
+<div class="code-container"><pre>
+$C1/EE8E STY $1CC2  [$00:1CC2]   ;Yを[$00:1CC2]に書き込み
+$C1/EE91 LDA $0A14  [$00:0A14]   ;Aに[$00:0A14](仲間の人数$01)をロード
+$C1/EE94 BEQ $32    [$EEC8]      ;ゼロフラグが立っているとき[$EEC8]分岐
+$C1/EE96 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/EE98 BEQ $20    [$EEBA]      ;ゼロフラグが立っているとき[$EEBA]分岐
+$C1/EEBA LDA $0A11  [$00:0A11]   ;Aに[$00:0A11](2人目のシナリオ別キャラデータID)をロード
+$C1/EEBD JSR $EC7A  [$C1:EC7A]   ;[$C1:EC7A]へジャンプ
+
+$C1/EC7A CMP #$0A                ;Aと$0Aを減算比較（ステータスレジスタ変更のみ）
+$C1/EC7C BEQ $0E    [$EC8C]      ;ゼロフラグが立っているとき[$EC8C]分岐(サモ)
+$C1/EC7E CMP #$09                ;Aと$09を減算比較（ステータスレジスタ変更のみ）
+$C1/EC80 BEQ $05    [$EC87]      ;ゼロフラグが立っているとき[$EC87]分岐(レイ)
+$C1/EC82 LDA $D60001,x[$D6:513C] ;(ユン)Aに[$D6:513C]をロード
+$C1/EC86 RTS                     ;サブルーチン戻り
+$C1/EC87 LDA $D60002,x[$D6:513D] ;(レイ)Aに[$D6:513D]をロード
+$C1/EC8B RTS                     ;サブルーチン戻り
+$C1/EC8C LDA $D60003,x[$D6:513E] ;(サモ)Aに[$D60003,x]をロード
+$C1/EC90 RTS                     ;サブルーチン戻り
+
+$C1/EEC0 STA $1C40  [$00:1C40]   ;Aを[$00:1C40]に書き込み
+$C1/EEC3 LDA #$FF                ;Aに$FFをロード
+$C1/EEC5 STA $1C41  [$00:1C41]   ;Aを[$00:1C41]に書き込み
+$C1/EEC8 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>この<code><span class="r">$C1/EE8E</span></code>～の処理は、<span class="tri"><a href="program24.html">味方との戦闘</a></span>でも紹介したことがある、シナリオ別キャラデータIDから味方キャラIDを呼び出す処理である。<br>
+<code><span class="r">$C1/EE91</span></code>で、仲間の人数から、<code>[$00:0A11]</code>(2人目のシナリオ別キャラデータID)をロードする。<br>
+つまり弟子に対応した<span class="formula">$08</span>～<span class="formula">$0A</span>の値の呼び出しである。<br>
+<code><span class="r">$C1/EC7A</span></code>～は、味方パーティIDリスト（<code>$D6:512F</code>～<code>$D6:514F</code>）から味方キャラIDを呼び出す処理である。</p>
+
+<table>
+<thead>
+	<tr><th>弟子</th><th>キャラID</th><th>ロード先アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td>ユン <span class="formula">$08</span></td><td><code>[$D6:513C]</code></td><td><span class="formula">$09</span></td></tr>
+	<tr><td>レイ <span class="formula">$09</span></td><td><code>[$D6:513D]</code></td><td><span class="formula">$0A</span></td></tr>
+	<tr><td>サモ <span class="formula">$0A</span></td><td><code>[$D6:513E]</code></td><td><span class="formula">$0B</span></td></tr>
+</tbody>
+</table>
+
+<p>こうして呼び出された値が、味方キャラ2人目の味方キャラIDとして、<code><span class="r">$C1/EEC0</span></code>で<code>[$00:1C40]</code>に書き込まれる。<br>
+戦闘状態<code>[$00:1C41]</code>には<span class="formula">$FF</span>が書き込まれる。</p>
+
+<p>ということで、ここまでだと、</p>
+
+<ul>
+	<li>味方キャラ1人目は心山拳老師という名前で、ステータスは弟子</li>
+	<li>味方キャラ2人目は弟子（名前はユン・レイ・サモのまま）</li>
+</ul>
+
+<p>という、なんともおかしな状態になっている。<br>
+だが、この後に、先程と同じ、シナリオ分岐処理<code><span class="r">$C1/1ADD</span></code>～<code><span class="r">$C1/1AE9</span></code>が入る。</p>
+
+<div class="code-container"><pre>
+$C1/1ADD LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/1AE0 CMP #$F4                ;Aと$F4を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE2 BNE $05    [$1AE9]      ;ゼロフラグが立っていないとき[$1AE9]分岐
+$C1/1AE4 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード
+$C1/1AE7 CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE9 RTS                     ;サブルーチン戻り
+
+$C1/1AC6 BNE $0D    [$1AD5]      ;ゼロフラグが立っていないとき[$1AD5]分岐
+$C1/1AC8 LDA $1C41  [$00:1C41]   ;Aに[$00:1C41]をロード
+$C1/1ACB CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/1ACD BNE $06    [$1AD5]      ;ゼロフラグが立っていないとき[$1AD5]分岐
+$C1/1ACF STZ $1C01  [$00:1C01]   ;[$00:1C01]に$00を書き込み
+$C1/1AD2 JSR $C489  [$C1:C489]   ;[$C1:C489]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/1AC8</span></code>～が功夫編ラストバトル専用処理ということになるが、<code>[$00:1C41]</code>（味方2人目の戦闘状態）が<span class="formula">$FF</span>（通常状態）なら、<code>[$00:1C01]</code>（味方1人目の戦闘状態）に<span class="formula">$00</span>を書き込む。<br>
+戦闘状態<span class="formula">$00</span>は、戦闘離脱状態にあたるので、味方キャラ1人目は戦闘開始時点で戦闘離脱状態、つまり戦闘フィールドにいないことになる。<br>
+これで、味方キャラは、味方キャラ2人目にあたる弟子のみという状態になる。<br>
+表示する名前の都合で、味方キャラ2人目として弟子を戦闘に参加させる処理が行われたのだろう。</p>
+
+<h4>「旋牙連山拳」使用後処理</h4>
+
+<p>先の処理で、弟子は「旋牙連山拳」を習得している扱いになっている。<br>
+では、一度「旋牙連山拳」を使うとその後は使用不可になる処理はどうなっているのか。</p>
+
+<p>ここまでの処理で、弟子は味方2人目という扱いになっていることがわかった。<br>
+つまり、戦闘中の味方キャラデータ<code>$00:1C40</code>～に値が入り、技関連の値は<code>$7E:E940</code>～<code>$7E:E97F</code>に入ることになる。</p>
+
+<p>以下は、「旋牙連山拳」を使った直後の処理になる。<br>
+ひとつ前に使った技として、味方2人目の戦闘中データ<code>[$00:1C54]</code>に、「旋牙連山拳」の技ID<span class="formula">$94</span>が書き込まれる。<br>
+実際に書き込む処理については省略するが、その後、以下のような処理で、<code>[$00:1C54]</code>の値は<code>[$00:036A]</code>にコピーされる。</p>
+
+<div class="code-container"><pre>
+$C1/D1A2 LDX $78    [$00:0378]   ;Xに[$00:0378]をロード
+$C1/D1A4 LDY $0002,x[$00:1C42]   ;Yに[$00:1C42]をロード
+$C1/D1A7 LDA $0014,x[$00:1C54]   ;Aに[$00:1C54]をロード
+$C1/D1AA STA $6A    [$00:036A]   ;Aを[$00:036A]に書き込み
+$C1/D1AC JSR $3D7A  [$C1:3D7A]   ;[$C1:3D7A]へジャンプ
+</pre></div>
+
+<p>この後、上でもおなじみの、功夫編ラストバトル判定処理の<code><span class="r">$C1/1ADD</span></code>～<code><span class="r">$C1/1AE9</span></code>が入る。</p>
+
+<div class="code-container"><pre>
+$C1/1ADD LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/1AE0 CMP #$F4                ;Aと$F4を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE2 BNE $05    [$1AE9]      ;ゼロフラグが立っていないとき[$1AE9]分岐
+$C1/1AE4 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード
+$C1/1AE7 CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>功夫編ラストバトルだと判定されると、以下のループ処理が入る。</p>
+
+<div class="code-container"><pre>
+$C1/1BBE BNE $21    [$1BE1]      ;ゼロフラグが立っていないとき[$1BE1]分岐
+$C1/1BC0 LDA $6A    [$00:036A]   ;Aに[$00:036A]をロード
+$C1/1BC2 CMP #$94                ;Aと$94を減算比較（ステータスレジスタ変更のみ）
+$C1/1BC4 BNE $1B    [$1BE1]      ;ゼロフラグが立っていないとき[$1BE1]分岐
+$C1/1BC6 LDX $78    [$00:0378]   ;Xに[$00:0378]をロード
+$C1/1BC8 LDA #$10                ;Aに$10をロード
+$C1/1BCA STA $08    [$00:0308]   ;A($10)を[$00:0308]に書き込み
+;
+;ループ処理開始　最大$10回ループ
+$C1/1BCC LDA $7ECD00,x           ;Aに[$7E:E940+n]をロード
+$C1/1BD0 CMP #$94                ;Aと$94(旋牙連山拳の技ID)を減算比較（ステータスレジスタ変更のみ）
+$C1/1BD2 BNE $08    [$1BDC]      ;ゼロフラグが立っていないとき[$1BDC]分岐
+;ゼロフラグON
+$C1/1BD4 LDA #$00                ;Aに$00をロード
+$C1/1BD6 STA $7ECD00,x           ;Aを[$7E:E940+n]に書き込み
+$C1/1BDA BRA $05    [$1BE1]      ;フラグにかかわりなく常に分岐[$1BE1]
+;ゼロフラグOFF
+$C1/1BDC INX                     ;Xをインクリメント +1
+$C1/1BDD DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/1BDF BNE $EB    [$1BCC]      ;ゼロフラグが立っていないとき[$1BCC]分岐
+;ループ処理ここまで
+$C1/1BE1 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ループ前に、ひとつ前に使った技の技IDが入っている<code>[$00:036A]</code>と<span class="formula">$94</span>を減算比較し、ゼロフラグ判定をしている。<br>
+つまり、ひとつ前に使った技の技IDが<span class="formula">$94</span>(旋牙連山拳の技ID)かどうかの判定である。<br>
+「旋牙連山拳」を使った直後だと、<code><span class="r">$C1/1BCC</span></code>～からのループ処理を行う。</p>
+
+<p>味方2人目の習得技関連の値が入る<code>$7E:E940</code>～<code>$7E:E97F</code>の中で、<code>$7E:E940</code>～<code>$7E:E94F</code>は技IDにあたるのだが、<code><span class="r">$C1/1BCC</span></code>～<code><span class="r">$C1/1BDF</span></code>のループ処理では、<code>$7E:E940</code>～<code>$7E:E94F</code>に、<span class="formula">$94</span>(旋牙連山拳の技ID)が入っていないかを確認している。<br>
+<code>$7E:E940</code>～<code>$7E:E94F</code>は、レベル順に技IDが入っていくのだが、功夫編のようにラーニングで技習得がレベル順でない場合は詰めて記録されるため、「旋牙連山拳」の技IDが<code>$7E:E940</code>～<code>$7E:E94F</code>のどこに入っているか、判定する必要がある。<br>
+「旋牙連山拳」の技IDが入っているアドレスがあると、<code><span class="r">$C1/1BD2</span></code>でゼロフラグが立ち、<span class="formula">$00</span>を該当のアドレスに上書きする。<br>
+こうして「旋牙連山拳」が技一覧から削除されるのである。</p>
+
+<p><code><span class="r">$C1/1BBE</span></code>～<code><span class="r">$C1/1BCA</span></code>で、ひとつ前に使った技が「旋牙連山拳」の場合にループ処理に入ることになっているから、<code><span class="r">$C1/1BCC</span></code>～<code><span class="r">$C1/1BDF</span></code>のループ処理は、どこかで必ず<code><span class="r">$C1/1BD2</span></code>にてゼロフラグが経ってループを抜けるはずである。</p>
+
+<p>戦闘中における処理はここまでである。<br>
+シナリオ別キャラデータの技習得状況の4キャラ分のアドレス<code>[$00:0DCE]</code><code>[$00:0F0E]</code><code>[$00:0F4E]</code><code>[$00:0F8E]</code>には、「旋牙連山拳」が習得済みと記録されたままだが、これらから「旋牙連山拳」の削除処理が行われるのはラストバトルに勝利したタイミングである。<br>
+すっかりおなじみの<code><span class="r">$C1/1ADD</span></code>～<code><span class="r">$C1/1AE9</span></code>の功夫編ラストバトル判定後に処理が入る。</p>
+
+<div class="code-container"><pre>
+$C1/1ADD LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/1AE0 CMP #$F4                ;Aと$F4を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE2 BNE $05    [$1AE9]      ;ゼロフラグが立っていないとき[$1AE9]分岐
+$C1/1AE4 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード
+$C1/1AE7 CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C1/1AE9 RTS                     ;サブルーチン戻り
+
+$C1/1B7C BNE $1B    [$1B99]      ;ゼロフラグが立っていないとき[$1B99]分岐
+$C1/1B7E STZ $0A14  [$00:0A14]   ;[$00:0A14]に$00を書き込み
+$C1/1B81 LDX #$0DC0              ;Xに$0DC0をロード
+$C1/1B84 JSR $1B9A  [$C1:1B9A]   ;[$C1:1B9A]へジャンプ
+
+$C1/1B9A LDA $001F,x[$00:0DDF]   ;Aに[$00:0DDF]をロード
+$C1/1B9D STA $000E,x[$00:0DCE]   ;Aを[$00:0DCE]に書き込み
+$C1/1BA0 RTS                     ;サブルーチン戻り
+
+$C1/1B87 LDX #$0F00              ;Xに$0F00をロード
+$C1/1B8A JSR $1B9A  [$C1:1B9A]   ;[$C1:1B9A]へジャンプ
+
+$C1/1B9A LDA $001F,x[$00:0F1F]   ;Aに[$00:0F1F]をロード
+$C1/1B9D STA $000E,x[$00:0F0E]   ;Aを[$00:0F0E]に書き込み
+$C1/1BA0 RTS                     ;サブルーチン戻り
+
+$C1/1B8D LDX #$0F40              ;Xに$0F40をロード
+$C1/1B90 JSR $1B9A  [$C1:1B9A]   ;[$C1:1B9A]へジャンプ
+
+$C1/1B9A LDA $001F,x[$00:0F5F]   ;Aに[$00:0F5F]をロード
+$C1/1B9D STA $000E,x[$00:0F4E]   ;Aを[$00:0F4E]に書き込み
+$C1/1BA0 RTS                     ;サブルーチン戻り
+
+$C1/1B93 LDX #$0F80              ;Xに$0F80をロード
+$C1/1B96 JSR $1B9A  [$C1:1B9A]   ;[$C1:1B9A]へジャンプ
+
+$C1/1B9A LDA $001F,x[$00:0F9F]   ;Aに[$00:0F9F]をロード
+$C1/1B9D STA $000E,x[$00:0F8E]   ;Aを[$00:0F8E]に書き込み
+$C1/1BA0 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>「旋牙連山拳」習得処理の前に、習得前のデータを<code>[$00:0DDF]</code><code>[$00:0F1F]</code><code>[$00:0F5F]</code><code>[$00:0F9F]</code>にコピーしていたから、</p>
+
+<ul>
+	<li><code>[$00:0DDF]</code>→<code>[$00:0DCE]</code>（功夫編主人公）</li>
+	<li><code>[$00:0F1F]</code>→<code>[$00:0F0E]</code>（仲間キャラ1人目）</li>
+	<li><code>[$00:0F5F]</code>→<code>[$00:0F4E]</code>（仲間キャラ2人目）</li>
+	<li><code>[$00:0F9F]</code>→<code>[$00:0F8E]</code>（仲間キャラ3人目）</li>
+</ul>
+
+<p>と、習得状況を書き戻したことになる。<br>
+これで、シナリオ別キャラデータの技習得状況から、「旋牙連山拳」が削除された。<br>
+もっとも、この戦闘がラストバトルだから、削除するのは功夫編主人公用のアドレス<code>[$00:0DCE]</code>だけでも問題はないはずであるが、このあたりはサブルーチンの再利用であろうし、諸々のエラーを防ぐために行われているのかもしれない。</p>
+
+<p>以上が、功夫編ラストバトル関連の処理となる。<br>
+シナリオ別キャラデータのコピーがラストバトル前に行われているというのは少々意外だったが、老師の離脱タイミングで行っておこうという意味合いなのだろうか。</p>
+
+<p>今回の処理で書き込まれた、功夫編・最終編のみ心山拳老師＆師範が誰なのかの値<code>$00:0A15</code>は最終編にそのまま引き継ぎになり、最終編でも心山拳師範が誰なのかの分岐で使われることになる。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program28.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program30.html"><span class="button">&#9654;次　ＳＦ編・主人公データ切り替え</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

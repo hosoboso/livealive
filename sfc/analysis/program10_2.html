@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; レベルアップ処理 &gt; ステータス上昇値">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; レベルアップ処理 &gt; ステータス上昇値">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; レベルアップ処理 &gt; ステータス上昇値</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program10.html">レベルアップ処理</a> &gt; レベルアップ時のステータス上昇値</h1>
+<h2>レベルアップ時のステータス上昇値</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>味方キャラがレベルアップすると、HP・力・速・体・知が、キャラに設定された値だけ上昇する（上限は、HPが<span class="formula">999</span>、力・速・体・知が<span class="formula">99</span>）。<br>
+ただし、上昇値にブレ幅がある場合が多い。<br>
+例えば、おぼろ丸であれば、</p>
+
+<ul>
+	<li>HP：<span class="formula">18～26</span>の間でランダム</li>
+	<li>力：<span class="formula">2</span>で固定</li>
+	<li>速：<span class="formula">3～5</span>の間でランダム</li>
+	<li>体：<span class="formula">0～3</span>の間でランダム</li>
+	<li>知：<span class="formula">3～6</span>の間でランダム</li>
+</ul>
+
+<p>である。<br>
+上昇値に幅がある場合は、実際の上昇値が乱数で決められているはずだが、プログラム上ではどのように計算されているのだろうか。</p>
+
+<p>まず、そもそも上のステータス上昇値がどこに記録されているのかから説明する。</p>
+
+<h3>ステータス上昇値</h3>
+
+<p>味方キャラデータには、レベルアップ時のHP・力・速・体・知上昇値を計算するための値が収納されている。<br>
+該当するのは、味方キャラデータ21～24と27である。各1バイトのデータが格納されている。<br>
+ゲーム内でレベルアップしないキャラにも設定されている。</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>21</td><td>レベルアップ時　力上昇値</td></tr>
+	<tr><td>22</td><td>レベルアップ時　速上昇値</td></tr>
+	<tr><td>23</td><td>レベルアップ時　体上昇値</td></tr>
+	<tr><td>24</td><td>レベルアップ時　知上昇値</td></tr>
+	<tr><td>27</td><td>レベルアップ時　HP上昇値</td></tr>
+</tbody>
+</table>
+
+<p>計算方法は力・速・体・知とHPとで異なる。<br>
+特にHP上昇値については少々ややこしい。</p>
+
+<h4>HP上昇値</h4>
+
+<p>味方キャラデータ27の値を使って計算する。<br>
+上2ビットに計算方法パターン、下6ビットに計算用の数値が入っている。<br>
+便宜上、下の表では味方キャラデータ27の下6ビットの値を、「計算値」とする。<br>
+<span style="font-style: italic;" class="formula">x</span>, <span style="font-style: italic;" class="formula">y</span> は計算に使うための変数。<br>
+<span style="font-style: italic;" class="formula">x</span> が基礎値、<span style="font-style: italic;" class="formula">y</span> が加算値のようなもので、基礎値に加算値を加えて上昇値とするのだが、加算値には乱数でブレを生じさせる仕組みである。</p>
+
+<table>
+<thead>
+	<tr><th>上2ビット</th><th>基礎値<span style="font-style: italic;" class="formula">x</span></th><th>加算値<span style="font-style: italic;" class="formula">y</span></th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td><span class="formula">計算値</span></td><td><span class="formula">計算値/2</span></td></tr>
+	<tr><td><span class="formula">%01</span></td><td><span class="formula">計算値</span></td><td><span class="formula">計算値</span></td></tr>
+	<tr><td><span class="formula">%10</span></td><td><span class="formula">計算値/2</span></td><td><span class="formula">計算値</span></td></tr>
+	<tr><td><span class="formula">%11</span></td><td><span class="formula">0</span></td><td><span class="formula">計算値</span></td></tr>
+</tbody>
+</table>
+
+<p>HP上昇の下限値は、</p>
+
+<p><span class="formula">下限値 = <span style="font-style: italic;">x</span></span></p>
+
+<p>HP上昇の上限値は、</p>
+
+<p><span class="formula">上限値 = <span style="font-style: italic;">x</span> + trunc(<span style="font-style: italic;">y</span> * $FF/$100)</span></p>
+
+<p>このように計算される。<br>
+上限値の<span class="formula">$FF/$100</span>の部分だが、ゲームでは乱数で決まる部分で、最大が<span class="formula">$FF/$100</span>である。<br>
+<span style="font-style: italic;" class="formula">y</span>の値が0でなければ、「<span class="formula"><span style="font-style: italic;">y</span> * $FF/$100</span>」の計算値は「<span class="formula"><span style="font-style: italic;">y</span> - 1</span>」に等しい。<br>
+よって、</p>
+
+<p><span class="formula">上限値 = <span style="font-style: italic;">x</span> + max(<span style="font-style: italic;">y</span> - 1, 0)</span></p>
+
+<p>これでも構わない。</p>
+
+<p>例：アキラの場合<br>
+<span class="formula">味方キャラデータ27 = $94</span><br>
+<span class="formula">下6ビット = $14</span><br>
+<span class="formula">上2ビット = $80(上2ビット10)</span></p>
+
+<p><span class="formula">下限値 = 下6ビット/2</span><br>
+<span class="formula"> = $14/2</span><br>
+<span class="formula"> = $0A（10進数10）</span></p>
+
+<p><span class="formula">上限値 = 下6ビット/2 + max(下6ビット-1, 0)</span><br>
+<span class="formula"> = $14/2 + max($14-1, 0)</span><br>
+<span class="formula"> = $0A + $13</span><br>
+<span class="formula"> = $1D（10進数29）</span></p>
+
+<p>HP上昇値は、<span class="formula">10～29</span>ということになる。</p>
+
+<p>例：サモの場合<br>
+<span class="formula">味方キャラデータ27 = $FC</span><br>
+<span class="formula">下6ビット = $3C</span><br>
+<span class="formula">上2ビット = $C0(上2ビット11)</span></p>
+
+<p><span class="formula">下限値 = 0</span></p>
+
+<p><span class="formula">上限値 = 0 + max(下6ビット-1, 0)</span><br>
+<span class="formula"> = $3C - $1</span><br>
+<span class="formula"> = $3B（10進数59）</span></p>
+
+<p>HP上昇値は、<span class="formula">0～59</span>ということになる。</p>
+
+<h4>力・速・体・知上昇値</h4>
+
+<p>計算方法は4種とも共通。<br>
+味方キャラデータ21～24の値を使って計算する。<br>
+上4ビットに基礎値、下4ビットに加算値が入っている。<br>
+よって、HP上昇の下限値は、</p>
+
+<p><span class="formula">下限値 = 基礎値 = (データ21～24) &amp; $F0 / $10</span></p>
+
+<p>HP上昇の上限値は、</p>
+
+<p><span class="formula">上限値 = 基礎値 + (データ21～24)4 &amp; $0F * $FF/$100</span><br>
+<span class="formula"> = 基礎値 + max((データ21～24) &amp; $0F - 1, 0)</span></p>
+
+<p>このように計算される。</p>
+
+<p>例：高原　日勝の場合</p>
+
+<p>味方キャラデータ21～24に<span class="formula">$52</span>, <span class="formula">$42</span>, <span class="formula">$11</span>, <span class="formula">$01</span>と値が入っているので、</p>
+
+<table>
+<thead>
+	<tr><th>能力</th><th>下限値</th><th>上限値</th></tr>
+</thead>
+<tbody>
+	<tr><td>力</td><td><span class="formula">$52 &amp; $F0 / $10 = $5</span></td><td><span class="formula">max($5 + $52 &amp; $0F -1, 0) = $6</span></td></tr>
+	<tr><td>速</td><td><span class="formula">$42 &amp; $F0 / $10 = $4</span></td><td><span class="formula">max($4 + $42 &amp; $0F -1, 0) = $5</span></td></tr>
+	<tr><td>体</td><td><span class="formula">$11 &amp; $F0 / $10 = $1</span></td><td><span class="formula">max($1 + $11 &amp; $0F -1, 0) = $1</span></td></tr>
+	<tr><td>知</td><td><span class="formula">$01 &amp; $F0 / $10 = $0</span></td><td><span class="formula">max($0 + $01 &amp; $0F -1, 0) = $0</span></td></tr>
+</tbody>
+</table>
+
+<p>力上昇値は<span class="formula">5～6</span>、速上昇値は<span class="formula">4～5</span>、体上昇値は<span class="formula">1</span>、知上昇値は<span class="formula">0</span>となる。</p>
+
+<p>以上が、味方キャラデータからステータス上昇値を計算する方法になる。<br>
+上でも説明したが、実際の上昇値は乱数によりブレが生じる。<br>
+HP・力・速・体・知全て、<span class="formula">基礎値 + 加算値*$FF/$100</span>という計算になるのだが、実際には<span class="formula">乱数$00～$FF/$100</span>を加算値に掛け算するので、加算値は<span class="formula">0～上限</span>まで均等な確率でいずれかになる。<br>
+例えばアキラのHPは上で計算した通り、HP上昇値が<span class="formula">10～29</span>の19通りから選ばれるが、どの値もほぼ均等の<span class="formula">1/19</span>で選ばれることになる。</p>
+
+<h3>サブルーチン</h3>
+
+<p>では、実際の処理を見てみよう。<br>
+<a href="program10.html">前ページ</a>の経験値計算の処理の後に、レベルアップする場合はレベルアップ時のモーションなどが入るが、以下のステータス上昇値の計算は、そのモーション直後に行われるようだ。</p>
+
+<p>レベルアップ時、ステータス上昇値の計算は、HP・力・速・体・知の順に行われる。<br>
+計算の際には、上で紹介した、味方キャラデータ21～24と27、そして計算した値をキャラの新たなステータスとするため、シナリオ別キャラデータのアドレスが使われることになる。</p>
+
+<h4>HP上昇値の処理</h4>
+
+<br>
+
+<div class="code-container"><pre>
+$C1/2459 LDA $D5001B,x           ;Aに[$D5001B,x]（味方キャラデータ27・HP上昇値）をロード
+$C1/245D JSR $1A09  [$C1:1A09]   ;[$C1:1A09]へジャンプ
+;
+$C1/1A09 STA $10    [$00:0310]   ;A（味方キャラデータ27）を[$00:0310]に書き込み
+$C1/1A0B AND #$3F                ;A（味方キャラデータ27）と$3Fで論理積（下6ビット取り出し）
+$C1/1A0D STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/1A0F LDA $10    [$00:0310]   ;Aに[$00:0310]（味方キャラデータ27）をロード
+$C1/1A11 AND #$C0                ;[$00:0310]（味方キャラデータ27）と$C0で論理積（上2ビット取り出し）
+$C1/1A13 BEQ $12    [$1A27]      ;ゼロフラグが立っているとき[$1A27]分岐 ※上2ビットが00
+$C1/1A15 CMP #$40                ;Aと$40($0100 0000)を減算比較
+$C1/1A17 BEQ $17    [$1A30]      ;ゼロフラグが立っているとき[$1A30]分岐 ※上2ビットが01
+$C1/1A19 CMP #$80                ;Aと$80($1000 0000)を減算比較
+$C1/1A1B BEQ $1B    [$1A38]      ;ゼロフラグが立っているとき[$1A38]分岐 ※上2ビットが10
+$C1/1A1D LDA $20    [$00:0320]   ;Aに[$00:0320]（下6ビット）をロード ※上2ビットが11
+$C1/1A1F STZ $21    [$00:0321]   ;[$00:0321] = 0
+$C1/1A21 STA $22    [$00:0322]   ;[$00:0322] = 下6ビット
+$C1/1A23 STA $23    [$00:0323]   ;[$00:0323] = 下6ビット
+$C1/1A25 BRA $1A    [$1A41]      ;フラグにかかわりなく常に分岐[$1A41]
+$C1/1A27 LDA $20    [$00:0320]   ;※上2ビットが00のジャンプ先 Aに[$00:0320]（下6ビット）をロード
+$C1/1A29 STA $21    [$00:0321]   ;[$00:0321] = 下6ビット
+$C1/1A2B LSR A                   ;論理右シフト /2
+$C1/1A2C STA $22    [$00:0322]   ;[$00:0322] = 下6ビット/2
+$C1/1A2E BRA $0F    [$1A3F]      ;フラグにかかわりなく常に分岐[$1A3F]
+$C1/1A30 LDA $20    [$00:0320]   ;※上2ビットが01のジャンプ先 Aに[$00:0320]（下6ビット）をロード
+$C1/1A32 STA $21    [$00:0321]   ;[$00:0321] = 下6ビット
+$C1/1A34 STA $22    [$00:0322]   ;[$00:0322] = 下6ビット
+$C1/1A36 BRA $07    [$1A3F]      ;フラグにかかわりなく常に分岐[$1A3F]
+$C1/1A38 LDA $20    [$00:0320]   ;※上2ビットが10のジャンプ先 Aに[$00:0320]（下6ビット）をロード
+$C1/1A3A STA $22    [$00:0322]   ;[$00:0322] =下6ビット
+$C1/1A3C LSR A                   ;論理右シフト /2
+$C1/1A3D STA $21    [$00:0321]   ;[$00:0321] = 下6ビット/2
+$C1/1A3F STZ $23    [$00:0323]   ;[$00:0323] = 0
+$C1/1A41 JSR $6150  [$C1:6150]   ;[$C1:6150]へ
+</pre></div>
+
+<p><code><span class="r">$C1/2459</span></code>でまず、<code>[$D5001B,x]</code>（味方キャラデータ27・HP上昇値）をロードしている。<code>X</code>の値はここまでに、該当キャラのアドレスを呼び出すために計算されているがここでは省く。<br>
+その後は、先に述べた通り、味方キャラデータ27の上2ビットによる分岐を行っている。<br>
+以下、味方キャラデータ27の下6ビットの値は単に「下6ビット」と省略する。<br>
+長くなるので細かい説明は省くが、共通して<code>[$00:0320]</code>に下6ビットが入り、分岐により、アドレス<code>[$00:0321]</code>～<code>[$00:0323]</code>に以下のように値が入っていく。</p>
+
+<table>
+<thead>
+	<tr><th>上2ビット</th><th><code>[$00:0321]</code></th><th><code>[$00:0322]</code></th><th><code>[$00:0323]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">00</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">下6ビット/2</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td><span class="formula">01</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td><span class="formula">10</span></td><td><span class="formula">下6ビット/2</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td><span class="formula">11</span></td><td><span class="formula">0</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">下6ビット</span></td></tr>
+</tbody>
+</table>
+
+<p>後の処理でわかるのだが、実は<code>[$00:0323]</code>の値は、HP上昇値計算には関係がない。</p>
+
+<p>最後に<code>[$C1:6150]</code>にジャンプしているが、これは戦闘用乱数の計算を行うサブルーチンである。</p>
+
+<div class="code-container"><pre>
+$C1/6150 PHX                     ;戦闘乱数計算
+$C1/6151 PHB                     ;↓
+$C1/6152 LDA #$00                ;↓
+$C1/6154 PHA                     ;↓
+$C1/6155 PLB                     ;↓
+$C1/6156 LDA $38    [$00:0338]   ;↓
+$C1/6158 ORA $39    [$00:0339]   ;↓
+$C1/615A ORA $3A    [$00:033A]   ;↓
+$C1/615C ORA $3B    [$00:033B]   ;↓
+$C1/615E BNE $24    [$6184]      ;↓
+$C1/6184 LDX $38    [$00:0338]   ;↓
+$C1/6186 STX $4204  [$00:4204]   ;↓
+$C1/6189 LDA #$0D                ;↓
+$C1/618B STA $4206  [$00:4206]   ;↓
+$C1/618E JSR $46C8  [$C1:46C8]   ;↓
+;
+$C1/46C8 NOP                     ;↓
+$C1/46C9 RTS                     ;↓
+;
+$C1/6191 LDA $39    [$00:0339]   ;↓
+$C1/6193 STA $38    [$00:0338]   ;↓
+$C1/6195 LDA $3A    [$00:033A]   ;↓
+$C1/6197 STA $39    [$00:0339]   ;↓
+$C1/6199 LDA $3B    [$00:033B]   ;↓
+$C1/619B STA $3A    [$00:033A]   ;↓
+$C1/619D LDA $4214  [$00:4214]   ;↓
+$C1/61A0 STA $3B    [$00:033B]   ;↓
+$C1/61A2 PLB                     ;↓
+$C1/61A3 PLX                     ;↓
+$C1/61A4 RTS                     ;乱数（1）がAと[$00:033B]に入る
+;
+$C1/1A44 STA $4202  [$00:4202]   ;符号付8bit x 8bit　被乗数 = 乱数（1）
+$C1/1A47 LDA $23    [$00:0323]   ;Aに[$00:0323]をロード
+$C1/1A49 STA $4203  [$00:4203]   ;符号付8bit x 8bit　乗数 = [$00:0323]
+$C1/1A4C JSR $6150  [$C1:6150]   ;[$C1:6150]へ
+</pre></div>
+
+<p>戦闘用乱数計算サブルーチンの説明は省略する。<br>
+上に乱数（1）と書いたが、この後にもう一度乱数計算があるので、区別するため（1）を付けた。<br>
+計算された乱数（1）は、<code><span class="r">$C1/1A44</span></code>で<code>[$00:4202]</code>に書き込まれているが、これは符号付8bit x 8bitの乗算を行うため。<br>
+符号付8bit x 8bitは、<code>[$00:4202]</code>に被乗数、<code>[$00:4203]</code>に乗数を入れると、<code>[$00:4216]</code>に乗算結果の下1バイト、<code>[$00:4217]</code>に乗算結果の上1バイトの合計2バイトが出力される。<br>
+上では、乱数（1）×<code>[$00:0323]</code>を行おうとしていることがわかる。<br>
+この後もう一度、戦闘用乱数計算の<code>[$C1:6150]</code>へジャンプする。</p>
+
+<div class="code-container"><pre>
+$C1/6150 PHX                     ;戦闘乱数計算
+$C1/6151 PHB                     ;↓
+$C1/6152 LDA #$00                ;↓
+$C1/6154 PHA                     ;↓
+$C1/6155 PLB                     ;↓
+$C1/6156 LDA $38    [$00:0338]   ;↓
+$C1/6158 ORA $39    [$00:0339]   ;↓
+$C1/615A ORA $3A    [$00:033A]   ;↓
+$C1/615C ORA $3B    [$00:033B]   ;↓
+$C1/615E BNE $24    [$6184]      ;↓
+$C1/6184 LDX $38    [$00:0338]   ;↓
+$C1/6186 STX $4204  [$00:4204]   ;↓
+$C1/6189 LDA #$0D                ;↓
+$C1/618B STA $4206  [$00:4206]   ;↓
+$C1/618E JSR $46C8  [$C1:46C8]   ;↓
+;
+$C1/46C8 NOP                     ;↓
+$C1/46C9 RTS                     ;↓
+;
+$C1/6191 LDA $39    [$00:0339]   ;↓
+$C1/6193 STA $38    [$00:0338]   ;↓
+$C1/6195 LDA $3A    [$00:033A]   ;↓
+$C1/6197 STA $39    [$00:0339]   ;↓
+$C1/6199 LDA $3B    [$00:033B]   ;↓
+$C1/619B STA $3A    [$00:033A]   ;↓
+$C1/619D LDA $4214  [$00:4214]   ;符号付16bit / 8bitの商（下位バイト）
+$C1/61A0 STA $3B    [$00:033B]   ;↓※$4216-$4217には余りが入る
+$C1/61A2 PLB                     ;↓
+$C1/61A3 PLX                     ;↓
+$C1/61A4 RTS                     ;乱数（2）がAと[$00:033B]に入る
+;
+$C1/1A4F LDA $4217  [$00:4217]   ;Aに符号付16bit / 8bitの商（上位バイト）をロード = 00
+$C1/1A52 STA $24    [$00:0324]   ;A = $00を[$00:0324]に書き込み
+</pre></div>
+
+<p>これが続きの処理で、乱数（2）を算出している。<br>
+乱数（2）の算出前に、乱数（1）×<code>[$00:0323]</code>の計算をするために値を<code>[$00:4202]</code><code>[$00:4203]</code>にセットしたのだが、上を見ると何かおかしい。</p>
+
+<p>戦闘乱数の計算では、途中で符号付16bit / 8bitの割り算を行う。<br>
+符号付16bit / 8bitでは、<code>[$00:4204]</code>～<code>[$00:4205]</code>に被除数、<code>[$00:4206]</code>に除数をセットすると、<code>[$00:4214]</code>～<code>[$00:4215]</code>に商（2バイト）、<code>[$00:4216]</code>～<code>[$00:4217]</code>に余り（2バイト）が入る。<br>
+ところが、<code>[$00:4216]</code>～<code>[$00:4217]</code>は、符号付8bit x 8bitの乗算結果の2バイトが入るアドレスでもある。<br>
+乱数計算の符号付16bit / 8bitの方が後に行われたから、符号付8bit x 8bitの結果は上書きされてなくなってしまった。<br>
+結果、乱数（2）計算後の、<code>[$00:4217]</code>の中には、戦闘乱数算出中の符号付16bit / 8bitの結果の余り（上1バイト）が入っている。<br>
+符号付16bit / 8bitを計算したら、余りは除数（8bit）より小さくなるはずであるから、余り（上1バイト）に入る値は必ず<span class="formula">$00</span>なのである。<br>
+つまり、<code><span class="r">$C1/1A4F</span></code>で<code>A</code>に読み込まれる<code>[$00:4217]</code>の値は、必ず<span class="formula">$00</span>である。</p>
+
+<p>この後の処理を見てもわかるが、最初に行おうとした「乱数（1）×<code>[$00:0323]</code>」の結果は、この後全く登場しない（答えが上書きされて消えたので当然なのだが）。<br>
+いったい何の意味があったのかわからない処理になってしまったが、意図したものかどうなのかもよくわからない。<br>
+とにかく、続きを見てみよう。</p>
+
+<div class="code-container"><pre>
+$C1/1A54 LDA $3B    [$00:033B]   ;Aに[$00:033B]（乱数（2））をロード
+$C1/1A56 STA $4202  [$00:4202]   ;符号付8bit x 8bit　被乗数
+$C1/1A59 LDA $22    [$00:0322]   ;Aに[$00:0322]をロード
+$C1/1A5B STA $4203  [$00:4203]   ;符号付8bit x 8bit　乗数
+$C1/1A5E LDA $24    [$00:0324]   ;Aに[$00:0324]をロード
+$C1/1A60 CLC                     ;キャリーフラグクリア
+$C1/1A61 NOP                     ;計算待機　乱数（2）×[$00:0322]
+$C1/1A62 NOP                     ;計算待機
+$C1/1A63 ADC $4217  [$00:4217]   ;Aに乗算結果上1バイト（乱数（2）×[$00:0322]/$100）を加算
+$C1/1A66 ADC $21    [$00:0321]   ;Aに[$00:0321]を加算
+$C1/1A68 STA $24    [$00:0324]   ;Aを[$00:0324]に書き込み
+$C1/1A6A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/1A54</span></code>から、再び符号付8bit x 8bitの計算が行われる。<br>
+<code>[$00:4202]</code>に乱数（2）、<code>[$00:4203]</code>に<code>[$00:0322]</code>が入るので、乱数（2）×<code>[$00:0322]</code>の計算である。<br>
+計算待ちの間に、Aに<code>[$00:0324]</code>をロードしているが、先ほど述べた通り、この時点の<code>[$00:0324]</code>には必ず<span class="formula">$00</span>が入っている。よって<code>A</code>に<span class="formula">$00</span>が書き込まれる。<br>
+<code><span class="r">$C1/1A63</span></code>では、<code>A</code>に<code>[$00:4217]</code>が加算されている。<code>[$00:4217]</code>は乗算結果の上1バイトであり、乗算結果を<span class="formula">÷$100</span>した値（小数点を2つ左にずらした値）に等しい。<br>
+よって、</p>
+
+<p><span class="formula"><code>A</code> = $00 + 乱数（2）×<code>[$00:0322]</code>/$100</span></p>
+
+<p>である。<br>
+<code><span class="r">$C1/1A66</span></code>で、更に<code>[$00:0321]</code>も加算しているので、</p>
+
+<p><span class="formula"><code>A</code> = 乱数（2）×<code>[$00:0322]</code>/$100 + <code>[$00:0321]</code></span></p>
+
+<p>となった。<br>
+この値が<code>[$00:0324]</code>に書き込まれたので、</p>
+
+<p><span class="formula"><code>[$00:0324]</code> = 乱数（2）×<code>[$00:0322]</code>/$100 + <code>[$00:0321]</code></span></p>
+
+<p>である。<br>
+この値が結局、レベルアップによるHP上昇値になる。</p>
+
+<div class="code-container"><pre>
+$C1/2460 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/2462 STZ $11    [$00:0311]   ;[$00:0311] = $00
+$C1/2464 REP #$21                ;Aレジスタは16bit幅, キャリーフラグクリア
+$C1/2466 LDA $000A,y             ;Aに[$000A,y+1][$000A,y]をロード（シナリオ別キャラデータの最大HP、2バイト分）
+$C1/2469 ADC $10    [$00:0310]   ;A + [$00:0311][$00:0310]（HP上昇値）
+$C1/246B CMP #$03E7              ;Aと$03E7(10進数999)を減算比較
+$C1/246E BCC $03    [$2473]      ;キャリーフラグが立っていないとき[$2473]分岐
+$C1/2470 LDA #$03E7              ;（キャリーフラグON）Aに$03E7をロード
+$C1/2473 STA $000A,y             ;Aを[$000A,y+1][$000A,y]に書き込み
+$C1/2476 STA $0008,y             ;Aを[$0008,y+1][$0008,y]（シナリオ別キャラデータの現在HP、2バイト分）に書き込み
+</pre></div>
+
+<p><code>[$00:0324]</code>の計算結果は、<code>[$00:0310]</code>にも書き込まれる。<br>
+<code>[$00:0311]</code>に<span class="formula">$00</span>が書き込まれた後、16bitモードに変更。<br>
+<code><span class="r">$C1/2466</span></code>で、<code>[$000A,y]</code>をロードしているが、16bitモードだから、一緒にひとつ後のアドレス<code>[$000A,y+1]</code>を上1バイトにロードしている。<br>
+このふたつのアドレスは、該当キャラのシナリオ別キャラデータの最大HP（2バイト分）になる。HPは最大値が<span class="formula">999</span>であるため、記録に2バイト分の領域が必要である。<br>
+<code><span class="r">$C1/2469</span></code>で、最大HPに<code>[$00:0310]</code>を加算しているが、ここも16bitモードだから、<code>[$00:0311]</code><code>[$00:0310]</code>の2バイト分を加算している。<br>
+ただし<code>[$00:0311]</code>には<span class="formula">$00</span>を入れたばかりなので、実際に入るのは下1バイトに<code>[$00:0310]</code>の値である。これで、レベルアップ前の最大HPに、レベルアップ分のHP上昇値を加算したことになる。<br>
+<code><span class="r">$C1/246B</span></code>で、新しい最大HPと<span class="formula">$03E7</span>(10進数<span class="formula">999</span>)を減算比較しているが、レベルアップ後の最大HPが<span class="formula">999</span>を越えていないかどうかを判定していることになる。<br>
+ここでキャリーフラグが立つのは、減算の結果が<span class="formula">0</span>か正の数の時、つまり<span class="formula">999</span>以上の時である。<br>
+その場合は<code><span class="r">$C1/2470</span></code>に進み、<code>A</code>に<span class="formula">$03E7</span>をロードする。つまり<code>A</code>の値に<span class="formula">$03E7</span>(10進数<span class="formula">999</span>)を上書きして、最大HPを上限の<span class="formula">999</span>に変更している。<br>
+キャリーフラグが立たない場合は<span class="formula">999</span>未満なので、そのままの値が、<code><span class="r">$C1/2473</span></code>で<code>[$000A,y+1]</code><code>[$000A,y]</code>（シナリオ別キャラデータの最大HP）に書き込まれる。<br>
+また、同じ値が、<code>[$0008,y+1]</code><code>[$0008,y]</code>にも書き込まれているが、これはシナリオ別キャラデータにある現在HPのアドレスになる。<br>
+本作は戦闘終了時にHPが全回復するが、その処理をここで行ったことになる。</p>
+
+<p>以上で、レベルアップ時のHP上昇値の計算・処理が終了した。<br>
+乱数計算を2回行っているのに1回目が結局使われずに終わったのだが、何かのミスか、開発中に何かの事情でこうなったのかは今となってはわからない。<br>
+このページの最後に考察を付けてあるので、気になったら読んでいただきたい。</p>
+
+<h4>力・速・体・知上昇値の処理</h4>
+
+<p>HPの計算後は、力・速・体・知の処理に移る。<br>
+こちらはHPの処理よりシンプルである。<br>
+また、サブルーチンは共通であり、力・速・体・知がループ処理される。</p>
+
+<div class="code-container"><pre>
+$C1/248B LDA $D50015,x           ;Aに[$D50015,x]（レベルアップ時　該当ステータス上昇値）をロード
+$C1/248F AND #$F0                ;Aと$F0で論理積（上4ビット取り出し）
+$C1/2491 LSR A                   ;論理右シフト /2
+$C1/2492 LSR A                   ;論理右シフト /2
+$C1/2493 LSR A                   ;論理右シフト /2
+$C1/2494 LSR A                   ;論理右シフト /2（上4ビットが下4ビットまで移動）
+$C1/2495 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/2497 LDA $D50015,x           ;Aに[$D5:03D2]（レベルアップ時　該当ステータス上昇値）をロード
+$C1/249B AND #$0F                ;Aと$0Fで論理積（下4ビット取り出し）
+$C1/249D STA $21    [$00:0321]   ;Aを[$00:0321]に書き込み
+$C1/249F JSR $2554  [$C1:2554]   ;[$C1:2554]へジャンプ
+;
+$C1/2554 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+$C1/6150 PHX                     ;戦闘乱数計算
+$C1/6151 PHB                     ;↓
+$C1/6152 LDA #$00                ;↓
+$C1/6154 PHA                     ;↓
+$C1/6155 PLB                     ;↓
+$C1/6156 LDA $38    [$00:0338]   ;↓
+$C1/6158 ORA $39    [$00:0339]   ;↓
+$C1/615A ORA $3A    [$00:033A]   ;↓
+$C1/615C ORA $3B    [$00:033B]   ;↓
+$C1/615E BNE $24    [$6184]      ;↓
+$C1/6184 LDX $38    [$00:0338]   ;↓
+$C1/6186 STX $4204  [$00:4204]   ;↓
+$C1/6189 LDA #$0D                ;↓
+$C1/618B STA $4206  [$00:4206]   ;↓
+$C1/618E JSR $46C8  [$C1:46C8]   ;↓
+;
+$C1/46C8 NOP                     ;↓
+$C1/46C9 RTS                     ;↓
+;
+$C1/6191 LDA $39    [$00:0339]   ;↓
+$C1/6193 STA $38    [$00:0338]   ;↓
+$C1/6195 LDA $3A    [$00:033A]   ;↓
+$C1/6197 STA $39    [$00:0339]   ;↓
+$C1/6199 LDA $3B    [$00:033B]   ;↓
+$C1/619B STA $3A    [$00:033A]   ;↓
+$C1/619D LDA $4214  [$00:4214]   ;↓
+$C1/61A0 STA $3B    [$00:033B]   ;↓
+$C1/61A2 PLB                     ;↓
+$C1/61A3 PLX                     ;↓
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/2557 STA $211B  [$00:211B]   ;符号付16bit x 8bit　被乗数の下位バイト（乱数）
+$C1/255A LDA #$00                ;Aに$00をロード
+$C1/255C STA $211B  [$00:211B]   ;符号付16bit x 8bit　被乗数の上位バイト（$00）
+$C1/255F LDA $21    [$00:0321]   ;Aに[$00:0321]（下4ビット）をロード
+$C1/2561 STA $211C  [$00:211C]   ;符号付16bit x 8bit　乗数
+$C1/2564 STA $211C  [$00:211C]   ;符号付16bit x 8bit　乗数
+$C1/2567 LDA $2135  [$00:2135]   ;Aに乗算結果(24bit)の中位バイトをロード（乱数*下4ビット/$100）
+$C1/256A CLC                     ;キャリーフラグクリア
+$C1/256B ADC $20    [$00:0320]   ;A + [$00:0320]（上4ビット）
+$C1/256D RTS                     ;サブルーチン戻り
+;
+$C1/24A2 ADC $0011,y[$00:0E91]   ;A + [$0011,y](シナリオ別キャラデータ 該当ステータス)
+$C1/24A5 CMP #$63                ;Aと$63（10進数99）を減算比較）
+$C1/24A7 BCC $02    [$24AB]      ;キャリーフラグが立っていないとき[$24AB]分岐
+$C1/24A9 LDA #$63                ;（キャリーフラグON）Aに$63をロード
+$C1/24AB STA $0011,y[$00:0E91]   ;Aを[$0011,y](シナリオ別キャラデータ 該当ステータス)に書き込み
+$C1/24AE LDA $0012,y[$00:0E92]   ;Aに[$0012,y](シナリオ別キャラデータ 該当ステータス（装備上昇分）)をロード
+</pre></div>
+
+<p>順に見ていく。</p>
+
+<div class="code-container"><pre>
+$C1/248B LDA $D50015,x           ;Aに[$D50015,x]（レベルアップ時　該当ステータス上昇値）をロード
+$C1/248F AND #$F0                ;Aと$F0で論理積（上4ビット取り出し）
+$C1/2491 LSR A                   ;論理右シフト /2
+$C1/2492 LSR A                   ;論理右シフト /2
+$C1/2493 LSR A                   ;論理右シフト /2
+$C1/2494 LSR A                   ;論理右シフト /2（上4ビットが下4ビットまで移動）
+$C1/2495 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
+$C1/2497 LDA $D50015,x           ;Aに[$D50015,x]（レベルアップ時　該当ステータス上昇値）をロード
+$C1/249B AND #$0F                ;Aと$0Fで論理積（下4ビット取り出し）
+$C1/249D STA $21    [$00:0321]   ;Aを[$00:0321]に書き込み
+$C1/249F JSR $2554  [$C1:2554]   ;[$C1:2554]へジャンプ
+;
+$C1/2554 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/248B</span></code>で、判定するステータス上昇値を味方キャラデータからロードする。<br>
+この値と<span class="formula">$F0</span>とで論理積をとっている。つまり上4ビットの値を取り出しているが、この時点では16進数の2桁目に値がある。<br>
+<code><span class="r">$C1/2491</span></code>～<code><span class="r">$C1/2494</span></code>で論理右シフトを4回繰り返している。つまり<span class="formula">÷$10</span>であり、16進数の2桁目から1桁目に値が移動した。<br>
+この値を<code>[$00:0320]</code>に書き込んでいるので、<code>[$00:0320]</code> = 該当ステータス上昇値の上4ビットの値である。<br>
+<code><span class="r">$C1/2497</span></code>からは、判定するステータス上昇値と<span class="formula">$0F</span>で論理積を取っているので、今度は下4ビットの取り出しである。<br>
+この値は<code><span class="r">$C1/249D</span></code>で、<code>[$00:0321]</code>に書き込まれている。<br>
+ここまで行った後、戦闘乱数計算のサブルーチンにジャンプしている。<br>
+戦闘乱数計算のサブルーチンの説明は省略する。</p>
+
+<div class="code-container"><pre>
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/2557 STA $211B  [$00:211B]   ;符号付16bit x 8bit　被乗数の下位バイト（乱数）
+$C1/255A LDA #$00                ;Aに$00をロード
+$C1/255C STA $211B  [$00:211B]   ;符号付16bit x 8bit　被乗数の上位バイト（$00）
+$C1/255F LDA $21    [$00:0321]   ;Aに[$00:0321]（下4ビット）をロード
+$C1/2561 STA $211C  [$00:211C]   ;符号付16bit x 8bit　乗数
+$C1/2564 STA $211C  [$00:211C]   ;符号付16bit x 8bit　乗数
+$C1/2567 LDA $2135  [$00:2135]   ;Aに乗算結果(24bit)の中位バイトをロード（乱数*下4ビット/$100）
+$C1/256A CLC                     ;キャリーフラグクリア
+$C1/256B ADC $20    [$00:0320]   ;A + [$00:0320]（上4ビット）
+$C1/256D RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>戦闘乱数計算後、符号付16bit x 8bitの計算を行っている。<br>
+<code>[$00:211B]</code>に2回連続で被乗数の下位バイト・上位バイトを書き込み、<code>[$00:211C]</code>に乗数をセットすると、<code>[$00:2134]</code><code>[$00:2135]</code><code>[$00:2136]</code>に、24ビット分の乗算の結果が入る（順に、乗算結果の下位1バイト・中位1バイト・上位1バイト）。<br>
+よって、<span class="formula">$00??</span>（<span class="formula">??</span>は乱数）×<code>[$00:0321]</code>（下4ビット）の掛け算を行っており、<code><span class="r">$C1/2567</span></code>では乗算結果の中位バイト<code>[$00:2135]</code>を<code>A</code>にロードしている。<br>
+要するに、乗算結果の3・4桁目にあたり、<span class="formula">乗算結果/$100</span>と同値である。<br>
+<code><span class="r">$C1/256B</span></code>では、乗算結果/$100と<code>[$00:0320]</code>（上4ビット）を加算している。<br>
+これがレベルアップによる該当ステータスの上昇値になる。</p>
+
+<div class="code-container"><pre>
+$C1/24A2 ADC $0011,y             ;A + [$0011,y](シナリオ別キャラデータ 該当ステータス)
+$C1/24A5 CMP #$63                ;Aと$63（10進数99）を減算比較
+$C1/24A7 BCC $02    [$24AB]      ;キャリーフラグが立っていないとき[$24AB]分岐
+$C1/24A9 LDA #$63                ;（キャリーフラグON）Aに$63をロード
+$C1/24AB STA $0011,y             ;Aを[$0011,y](シナリオ別キャラデータ 該当ステータス)に書き込み
+$C1/24AE LDA $0012,y             ;Aに[$0012,y](シナリオ別キャラデータ 該当ステータス（装備上昇分）)をロード
+$C1/24B1 BMI $0A    [$24BD]      ;ネガティブフラグが立っているとき[$24BD]分岐
+$C1/24B3 CLC                     ;キャリーフラグクリア
+$C1/24B4 ADC $0011,y[$00:0E94]   ;A + [$0011,y](シナリオ別キャラデータ 該当ステータス)
+$C1/24B7 BCC $0C    [$24C5]      ;キャリーフラグが立っていないとき[$24C5]分岐
+$C1/24B9 LDA #$FF                ;（$C1/24B7・キャリーフラグON処理)Aに$FFをロード
+$C1/24BB BRA $08    [$24C5]      ;フラグにかかわりなく常に分岐[$24C5]
+$C1/24BD CLC                     ;($C1/24B1・ネガティブフラグON処理)キャリーフラグクリア
+$C1/24BE ADC $0011,y[$00:0E51]   ;↓A + [$0011,y](シナリオ別キャラデータ 該当ステータス)
+$C1/24C1 BCS $02    [$24C5]      ;↓キャリーフラグが立っているとき[$24C5]分岐
+$C1/24C3 LDA #$00                ;↓Aに$00をロード
+$C1/24C5 STA $0010,y[$00:0E93]   ;Aを[$0010,y](シナリオ別キャラデータ 該当ステータス（ステータス+装備上昇分）)に書き込み
+</pre></div>
+
+<p><code><span class="r">$C1/24A2</span></code>で、算出したステータスの上昇値に、<code>[$0011,y]</code>(シナリオ別キャラデータ 該当ステータス)を加算している。<br>
+元のステータスに、レベルアップ分のステータスを加算したことになる。<br>
+<code><span class="r">$C1/24A5</span></code>では、元のステータス + レベルアップ分のステータスを、<span class="formula">$63</span>（10進数<span class="formula">99</span>）と減算比較している。<br>
+ステータスの最大値は<span class="formula">99</span>だから、<span class="formula">99</span>を越えていないかどうかの判定である。<br>
+キャリーフラグが立つ場合は<span class="formula">99</span>以上なので、<code><span class="r">$C1/24A9</span></code>で、<code>A</code>に<span class="formula">$63</span>を書き込む。<br>
+キャリーフラグが立たない場合は<span class="formula">99</span>未満だから、そのままの値が<code>[$0011,y]</code>に書き込まれ、新たな「シナリオ別キャラデータ・該当ステータス」になる。</p>
+
+<p><code><span class="r">$C1/24AE</span></code>で、<code>[$0012,y]</code>をロードしているが、これは「該当ステータス（装備上昇分）」のアドレスである。<br>
+要するに該当ステータスの、装備補正分の値である。装備補正なので、正の値の時と負の値の時がある。<br>
+<code><span class="r">$C1/24B1</span></code>でネガティブフラグを確認しているが、ネガティブフラグは、16進数を符号付き8ビット整数として見た時（上1ビットが正負の符号、下7ビットが数値）、上1ビットに1が立っていて、負の数を意味している時に立つフラグである。<br>
+※符号付き8ビット整数の説明は、<span class="tri"><a href="index.html#nega">2進法・16進法 &gt; 正負表現</a></span>の項目も参照のこと。<br>
+つまり、ネガティブフラグが立つなら、装備補正が負の値の時である。</p>
+
+<p>少しややこしいので、ここではまず、ネガティブフラグが立たない、つまり装備補正が正の値の処理を見てみよう。<br>
+その場合は、<code><span class="r">$C1/24B3</span></code>に進む。<br>
+キャリーフラグクリア後に、レベルアップで上昇した、新たなステータスの値と、装備上昇分を加算する。<br>
+キャラの素のステータス+装備補正を計算したことになるが、<code><span class="r">$C1/24B7</span></code>でキャリーフラグが立っているかどうかを判定している。<br>
+加算でキャリーフラグが立つのは<span class="formula">$100</span>（10進数<span class="formula">256</span>）以上の値になった時である。<br>
+キャリーフラグが立つ場合は<code><span class="r">$C1/24B9</span></code>に進むが、<code>A</code>に<span class="formula">$FF</span>を書き込んでいるので、加算結果が<span class="formula">$100</span>以上の時は<span class="formula">$FF</span>に上書きする、という処理である。その後は<code>[$24C5]</code>にジャンプする。<br>
+キャリーフラグが立たない場合、加算の結果が<span class="formula">$100</span>（10進数<span class="formula">256</span>）未満だから、そのまま<code>[$24C5]</code>にジャンプ。<br>
+<code><span class="r">$C1/24C5</span></code>で、加算の結果が<span class="formula">$100</span>（10進数<span class="formula">256</span>）未満の時は加算結果を、$100以上なら<span class="formula">$FF</span>が<code>[$0010,y]</code>に書き込んでいる。<br>
+<code>[$0010,y]</code>は、「シナリオ別キャラデータ・該当ステータス（ステータス+装備上昇分）」である。<br>
+これで、レベルアップにより、「ステータス」「ステータス+装備上昇分」の値が更新されたことになる。</p>
+
+<p>では、少し巻き戻って、<code><span class="r">$C1/24B1</span></code>でネガティブフラグが立っている場合の処理を見てみよう。<br>
+ネガティブフラグが立つ、つまり装備補正が負の値の時は、<code><span class="r">$C1/24BD</span></code>にジャンプする。<br>
+キャリーフラグクリア後に<span class="formula"><code>A</code> + <code>[$0011,y]</code></span>を計算しているので、こちらでも結局「新たなステータス+装備補正」である。<br>
+次の処理が異なり、計算結果でキャリーフラグが立っているとき<code>[$24C5]</code>分岐、キャリーフラグが立たないときは<code><span class="r">$C1/24C3</span></code>に進む。<br>
+ここでは「負の装備補正 + キャラのステータス」を行っているが、キャリーフラグはどういう場合に立つだろうか。</p>
+
+<p>例えば、装備補正で該当ステータスが<span class="formula">-5</span>されている場合、<span class="formula">-5</span>は10進数表記になるが、符号付き8ビット整数だと<span class="formula">$FB</span>である。<br>
+キャラのステータスが<span class="formula">$20</span>（10進数<span class="formula">32</span>）だったとしたら、ここでの加算は、<br>
+<span class="formula">$FB + $20 = $11B</span><br>
+キャリーフラグが立つが、答えの下2桁の「<span class="formula">$1B</span>」は10進数<span class="formula">27</span>である。<br>
+実は<span class="formula">32-5</span>の計算結果と全く同一なのである。<br>
+以上から、「<span class="formula">負の装備補正 + キャラのステータス</span>」の計算の結果、キャリーフラグが立ち、下2桁をそのまま「<span class="formula">ステータス + 装備上昇分</span>」として良いことがわかる。</p>
+
+<p>逆にキャリーフラグが立たないのは、上の計算結果が負の時である。<br>
+キャラのステータスが<span class="formula">$02</span>（10進数<span class="formula">2</span>）だったとしたら、ここでの加算は、<br>
+<span class="formula">$FB + $02 = $FD</span><br>
+繰り上がりが生じないため、キャリーフラグが立たない。<br>
+また、<span class="formula">$FD</span>は符号付き8ビット整数だと<span class="formula">-2</span>である。<br>
+本作はステータスを装備補正して負の値になる場合は0とするのだが、<code><span class="r">$C1/24C3</span></code>がまさにその処理で、キャリーフラグが立たないなら<code>A</code>に<span class="formula">$00</span>をロードしている。<br>
+以上で算出された<code>A</code>を<code>[$0010,y]</code>に書き込み「新たなステータス+装備補正」としている。</p>
+
+<p>これでレベルアップによる「ステータス」「ステータス+装備上昇分」の処理終了となる。<br>
+ここまででステータス1種類分の処理になるので、実際には力・速・体・知の4回分処理をして、全てのステータスの計算処理終了になる。</p>
+
+<p>以上から、レベルアップ時のステータス上昇値は、味方キャラデータ21～24（レベルアップ時の力・速・体・知ステータス上昇値）を使い、以下のように計算していることがわかった。</p>
+
+<p><span class="formula">ステータス上昇値 = 味方キャラデータ21～24の上4ビット（基礎値） + 味方キャラデータ21～24の下4ビット（変動値）×$00～$FFの乱数/$100</span><br>
+<span class="formula"> = 基礎値 + 変動値×(0～255の乱数/256)</span></p>
+
+<p>上昇値は乱数により、「<span class="formula">変動値-1（ただし変動値が0なら0のまま）</span>」の幅から当確率で選ばれることになる。<br>
+高原の「力」なら、</p>
+
+<p><span class="formula">基礎値(5) + 変動値(2)×(0～255の乱数/256)</span></p>
+
+<p>になるが、乱数最大値が<span class="formula">255</span>だから、小数点以下切り捨ての計算を考えると、「<span class="formula">変動値(2)×(0～255の乱数/256)</span>」の部分の最大値が<span class="formula">1</span>となる。<br>
+よって力上昇値は<span class="formula">5</span>か<span class="formula">6</span>のどちらかになる。<br>
+「知」だと基礎値も変動値も<span class="formula">0</span>であり、<span class="formula">変動値×(0～255の乱数/256)</span>は<span class="formula">0</span>のままである。</p>
+
+<p><a href="program10_3.html">次ページ</a>では、レベルアップ時のステータス上昇処理の後に行われる、技習得処理について解説しているので、興味があれば読み進めていただきたい。</p>
+
+<hr>
+
+<p>ここまででレベルアップ時のステータス上昇値の説明は終わったのだが、最後に、HP上昇値のサブルーチンにおいて、乱数計算を2回行ったのに、1回目がなかったことにされてしまった件について、ちょっとだけ考察をしておく。</p>
+
+<p>1回目の乱数計算前、味方キャラデータ27の上2ビットの値により分岐が起きて、メモリアドレスに以下のように値が入った。</p>
+
+<table>
+<thead>
+	<tr><th>上2ビット</th><th><code>[$00:0321]</code></th><th><code>[$00:0322]</code></th><th><code>[$00:0323]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">00</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">下6ビット/2</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td><span class="formula">01</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td><span class="formula">10</span></td><td><span class="formula">下6ビット/2</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td><span class="formula">11</span></td><td><span class="formula">0</span></td><td><span class="formula">下6ビット</span></td><td><span class="formula">下6ビット</span></td></tr>
+</tbody>
+</table>
+
+<p>そして、1回目の乱数計算後、<span class="formula">乱数（1）×<code>[$00:0323]</code></span>の乗算のセットだけは行われている。<br>
+この直後に乱数（2）の計算が行われ、</p>
+
+<div class="code-container"><pre>
+$C1/1A4F LDA $4217  [$00:4217]   ;Aに符号付16bit / 8bitの商（上位バイト）をロード = $00
+$C1/1A52 STA $24    [$00:0324]   ;A = $00を[$00:0324]に書き込み
+</pre></div>
+
+<p>という処理に続くのだが、もし乱数（2）の計算が行われていなければ、<code>[$00:4217]</code>に、乱数（1）×<code>[$00:0323]</code>の乗算結果の上1バイトが入っていたはずだ。<br>
+ところが乱数（2）の計算を挟んだために、<code>[$00:4217]</code>には乱数計算の途中の符号付16bit / 8bitの商（上位バイト）が入ってしまったのである。<br>
+乱数（2）計算の前に、乱数（1）×<code>[$00:0323]</code>の乗算結果が入った状態の<code>[$00:4217]</code>の値をどこかのメモリに書き込んでおけば、上書きされても問題はなかったのだが、そういった処理も見られない。</p>
+
+<p>もし、実際には、<code>[$00:0324]</code>に<span class="formula">乱数（1）×<code>[$00:0323]</code></span>の乗算結果の上1バイト<span class="formula"> = 乱数（1）×<code>[$00:0323]</code>/$100</span>を入れるつもりだったとしたら、この後はどうなるだろうか？<br>
+詳細は省略するが、</p>
+
+<p><span class="formula">レベルアップによるHP上昇値 = 乱数（1）×<code>[$00:0323]</code>/$100 + 乱数（2）×<code>[$00:0322]</code>/$100 + <code>[$00:0321]</code></span></p>
+
+<p>このように計算されることになる。<br>
+<code>[$00:0323]</code>には、味方キャラデータ27の上2ビットの値が<span class="formula">%11</span>の時だけ、下6ビットの値が入り、それ以外は<span class="formula">00</span>が入っている。<br>
+よって、影響があるのは、味方キャラデータ27の上2ビットの値が<span class="formula">%11</span>の時だけになる。</p>
+
+<p>先に、例としてサモのHP上昇値について計算してみたが、サモは味方キャラデータ27が<span class="formula">$FC</span>で、下6ビット<span class="formula">$3C</span>、上2ビット<span class="formula">$C0</span>(上2ビット<span class="formula">11</span>)である。<br>
+<span class="formula">レベルアップによるHP上昇値 = 乱数（1）×<code>[$00:0323]</code>/$100 + 乱数（2）×<code>[$00:0322]</code>/$100 + <code>[$00:0321]</code></span><br>
+だったら、どう変わるだろうか。<br>
+乱数が最大値の時、HP上昇値の上限値になるから、</p>
+
+<p><span class="formula">レベルアップによるHP上昇値 = <code>[$00:0323]</code>*$FF/$100 + <code>[$00:0322]</code>*$FF/$100 + <code>[$00:0321]</code></span><br>
+<span class="formula"> = 下6ビット*$FF/$100 + 下6ビット*$FF/$100 + 0</span><br>
+<span class="formula"> = 下6ビット*2 - 2</span><br>
+<span class="formula"> = $3C*2 - 2</span><br>
+<span class="formula"> = $76（10進数118）</span></p>
+
+<p>レベルが1上がるだけで、HPが最大<span class="formula">+118</span>される可能性がある、ということだ。<br>
+下限は<span class="formula">0</span>のままだから、HP上昇値の幅が<span class="formula">0～118</span>と、とんでもないブレ幅になる。<br>
+最大HPが<span class="formula">999</span>の本作において、最大値はさすがに大きすぎる。<br>
+平均値の<span class="formula">59</span>でもかなり大きめである。</p>
+
+<p>実際には「<span class="formula">乱数（1）×<code>[$00:0323]</code>/$100</span>」部分が無効化されて、サモのHP上昇値は<span class="formula">0～59</span>と算出される。<br>
+意図的に変更したのか、何かしらのミスだったのか、よくわからないが、さすがにHP上昇値が<span class="formula">0～118</span>はピーキーにも程があるので、無効化されて正解だったのだろう。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program10.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program10_3.html"><span class="button">&#9654;次　技習得処理</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

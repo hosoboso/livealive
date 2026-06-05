@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 副能力変動値</h1>
+<h2>副能力変動値</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>装備品の中には、複数の箇所に装備可能だが、装備位置を変えるとステータス変動値が変わるものがある。<br>
+例えば「ガツングローブ」は、右と左、どちらにも装備可能であるが、左だと防御<span class="formula">+5</span>, 力<span class="formula">+16</span>の効果なのに、右だと力<span class="formula">+8</span>になる。</p>
+
+<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様のアイテムデータページによれば、アイテム（装備品）には「主装備位置」「性能」「主能力変動」「副能力変動」といった、ステータス変動に関わる設定がある。</p>
+
+<blockquote>性能値は右の場合攻撃力・頭左体足の場合防御力・装飾は意味なし？<br>
+複数個所に装備可能な場合、主装備位置が自由となっている場合は、どこに装備しても同じ性能が得られます。<br>
+主装備位置が指定されている場合、主装備位置以外では副能力変動の値が使われます。また、性能値は0となります。回避属性も得られないようです。</blockquote>
+
+<p>「ガツングローブ」だと、主装備位置が「左」であり、左に装備した時だけ、「性能」の値の<span class="formula">+5</span>が防御の値に加わり、「主能力変動」の力<span class="formula">+16</span>も得られる。<br>
+だが、「右」は装備可能ではあるが主装備位置ではないため、「性能」の値は反映されず、「副能力変動」の力<span class="formula">+8</span>だけが得られるようになっている。<br>
+「副能力変動」の値は「主能力変動」の1/2（小数点以下切り捨て）であることが多いのだが、例外もある。</p>
+
+<p>例えば「グラブ」は、主装備位置が「右」で、左装備も可能。<br>
+右に装備すると、「性能」の値の<span class="formula">+4</span>が武器の攻撃力になる。「主能力変動」の値は設定されていない。<br>
+なのだが、左に装備すると、「副能力変動」の速<span class="formula">-5</span>が働くのである。<br>
+「主能力変動」には何も設定されていないのに、「副能力変動」の値があったり、「副能力変動」が「主能力変動」の1/2（小数点以下切り捨て）でない場合などもある。<br>
+これらの「副能力変動」の数値は、どこで決まっているのだろうか？</p>
+
+<p>まず、アイテムデータを確認してみよう。<br>
+アイテムデータは、1アイテムにつき00～15の16バイト分のデータが格納されている。</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>00</td><td>上4ビット：1～7は主装備位置、8以上なら罠アイテム/下4ビット：装備品なら装備種類、装備品以外ならアイテム種別</td></tr>
+	<tr><td>01</td><td>上6ビット：装備部位/下1ビット：材料アイテム</td></tr>
+	<tr><td>02</td><td>無効状態異常（8ビット）</td></tr>
+	<tr><td>03</td><td>上4ビット：装備タイプ/下4ビット：フィールド吸収</td></tr>
+	<tr><td>04</td><td>回避属性1（8ビット）</td></tr>
+	<tr><td>05</td><td>回避属性2（8ビット）</td></tr>
+	<tr><td>06</td><td>力　主能力変動値（符号付き8ビット整数値、一番上のビットが正負、下7ビットが数値になる。以下09まで同じ）</td></tr>
+	<tr><td>07</td><td>速　主能力変動値</td></tr>
+	<tr><td>08</td><td>体　主能力変動値</td></tr>
+	<tr><td>09</td><td>知　主能力変動値</td></tr>
+	<tr><td>10</td><td>使用時に技が発動する場合、味方技IDの値</td></tr>
+	<tr><td>11</td><td>副能力変動値計算用の値</td></tr>
+	<tr><td>12</td><td>メカがアクセサリ装備で技追加（<span class="formula">$08～$0F</span>）</td></tr>
+	<tr><td>13</td><td>上4ビット：戦闘開始時行動異常を起こす敵種族/下4ビット：戦闘開始時行動異常</td></tr>
+	<tr><td>14</td><td>下6ビット：攻撃または防御の値</td></tr>
+	<tr><td>15</td><td>状態異常追加効果（8ビット）</td></tr>
+</tbody>
+</table>
+
+<p>「主能力変動」の値は、アイテムデータ06～09に入っている。<br>
+「性能」の値は、アイテムデータ14の下6ビットに入っている。<br>
+だが、「副能力変動」の値はない。<br>
+その代わりに、アイテムデータ11に、副能力変動値計算用の値が入っている。<br>
+この値を使って「副能力変動」が計算されている。<br>
+アイテムデータ11に格納されているのは、上2ビットが「変動する能力値」、下6ビットが「マイナスする値」なのだが、16進数の正負の表現方法と、10進数の正負の表現方法がまったく異なっているため、単純に足し引きしただけでは変動値が算出されず、少し面倒に見える計算を行っている。</p>
+
+<p>サブルーチンの説明は<a href="program19_2.html">次ページ</a>にして、計算方法を先に記す。<br>
+「副能力変動」の計算方法は、以下のようになっている。<br>
+主能力変動値を符号付き8ビット整数値（2進数にして一番上の値が1なら負の値であり、下7ビット分が整数値）として計算することに注意。</p>
+
+<div style="border: 1px solid gray; padding: .1em;"><p>まず、「副能力用計算値」を以下のように計算する。</p>
+
+<ul>
+	<li>主能力変動値が正の値（<span class="formula">$00～$79</span>）の場合は、<br>
+	<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span></li>
+
+	<li>主能力変動値が負の値（<span class="formula">$80～$FF</span>）の場合は、頭に<span class="formula">$FF</span>をつけて符号付き16ビット整数値として扱い、<br>
+	<span class="formula">副能力用計算値 = trunc($FF(主能力変動値)/2) &amp; $00FF</span><br>
+	例：主能力変動値が<span class="formula">$F5</span>（10進数<span class="formula">-11</span>）なら、<span class="formula">trunc($FFF5/2) = $7FFA</span>、下1バイト<span class="formula">$FA</span>（10進数<span class="formula">-6</span>）が副能力変動値。</li>
+</ul>
+
+<p>次に、アイテムデータ11（副能力変動値計算用の値）に<span class="formula">$00</span>が入っているかどうかで分岐する。</p>
+
+<ul>
+	<li>アイテムデータ11（副能力変動値計算用の値）に<span class="formula">$00</span>が入っている場合、<br>
+	<span class="formula">副能力変動値 = 副能力用計算値</span></li>
+
+	<li>アイテムデータ11に<span class="formula">$00</span>以外の値が入っている場合は、まずアイテムデータ11から必要な値を算出する。
+
+<ul>
+	<li>アイテムデータ11の上2ビット：<br>変動する能力値の値。以下に対応。</li>
+
+<table>
+<thead>
+	<tr><th>上2ビット</th><th>能力値</th></tr>
+</thead>
+<tbody>
+	<tr><td>00</td><td>力</td></tr>
+	<tr><td>01</td><td>速</td></tr>
+	<tr><td>10</td><td>体</td></tr>
+	<tr><td>11</td><td>知</td></tr>
+</tbody>
+</table>
+
+	<li>アイテムデータ11の下6ビット：<br>変動値を以下のように計算する。<br>副能力用計算値は上で算出した値。<br>
+	<span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
+	計算結果が<span class="formula">$100</span>以上の時は下1バイト分が変動値になる（※符号付き8ビット整数）。</li>
+</ul>
+以上から副能力変動するステータス＆副能力変動値が算出される。
+</li>
+</ul></div>
+
+<p>とてもややこしそうだが、ステータス変動がマイナスの時に符号付き8ビット整数値を使っていることと、アイテムデータ11に<span class="formula">$00</span>以外が入っているかどうかの分岐があるため、ややこしく見えているようなものである。<br>
+アイテムデータ11の例外を考えない場合、基本的に、副能力変動値は主能力変動値の<span class="formula">1/2</span>（小数点以下切り捨て）である。<br>
+要するに、副能力変動値は主能力変動値の絶対値の半分しか変動しないようにする意図での計算である。<span class="formula">+10</span>なら半分の<span class="formula">+5</span>にしたい、<span class="formula">-10</span>なら半分の<span class="formula">-5</span>にしたい、ということである。</p>
+
+<p>ただ、主能力変動値がマイナスの値の時の計算がややこしい。<br>
+例えば主能力変動値が10進数で<span class="formula">-10</span>の時、16進数（符号付き8ビット）だと<span class="formula">$F6</span>である。<br>
+<span class="formula">$F6</span>を単純に<span class="formula">1/2</span>すると、<span class="formula">$7B</span>である。<br>
+符号付き8ビット整数値とみなすと、10進数<span class="formula">+123</span>という扱いになってしまう。<br>
+符号付き8ビット整数は、上1ビットに正負、下7ビットに数値（絶対値）が入っているが、上1ビットはそのままで、下7ビット部分だけを<span class="formula">1/2</span>したい、という場合、単純に<span class="formula">÷2</span>だけでは上1ビットも巻き込んで計算してしまうため、うまくいかないのである。</p>
+
+<p>そこでどうするかというと、上の計算方法のように、<span class="formula">$F6</span>の上に<span class="formula">FF</span>をつけて、符号付き16ビット整数の<span class="formula">$FFF6</span>としてから<span class="formula">1/2</span>する。<br>
+（プログラム上の処理は後で紹介するが、<span class="formula">$FF00</span>との論理和を取っている）<br>
+こうすると、<span class="formula">trunc($FFF6/2) = $7FFB</span>、下の2桁のみ取り出し符号付き8ビット整数値<span class="formula">$FB</span>とすれば、10進数<span class="formula">-5</span>になる。<br>
+ということで、符号付き8ビット整数値だからややこしくなっているが、絶対値を半分にすることができている。</p>
+
+<p>ただし、余りが出る時の切り捨てには注意。<br>
+主能力変動値が<span class="formula">$F5</span>（10進数<span class="formula">-11</span>）の時は、<br>
+<span class="formula">trunc($FFF5/2) = $7FFA</span><br>
+なので、<span class="formula">$FA</span>（10進数<span class="formula">-6</span>）が副能力変動値になる。<br>
+10進数の計算<span class="formula">trunc(-11/2) = -5</span>とは異なる値が返ってくるので、計算自体はあくまでも符号付き8ビット整数値で行う必要がある。</p>
+
+<p>アイテムデータ11に<span class="formula">$00</span>が入っている場合は、以上で計算終了で、副能力変動値が算出できた。<br>
+アイテムデータ11に<span class="formula">$00</span>以外の値が入っている場合は、副能力変動値は主能力変動値の半減だけではなく、別に計算をしなければならない、という意味になる。<br>
+アイテムデータ11の上2ビットと下6ビットに分けて、上2ビットから変動する能力値がどれなのかを判断する。<br>
+下6ビットの値だが、上の計算式はややこしく見えるものの、実際には、「<span class="formula">副能力変動値 = 主能力変動値/2 - 下6ビットの値</span>」である。ただしこちらも、符号付き8ビット整数値なのでややこしい計算式になっているだけである。</p>
+
+<p>実際の例を示す。</p>
+
+<p>「野性バッグ」は右と左に装備可能で、主装備位置は右である。<br>
+主能力変動値は力<span class="formula">$14</span>(10進数<span class="formula">20</span>)、知<span class="formula">$08</span>(10進数<span class="formula">8</span>)。他の値は<span class="formula">0</span>である。<br>
+アイテムデータ11は<span class="formula">$14</span>である。<br>
+このため、左に装備した場合は、副能力変動値でステータスが変動することになる。<br>
+左装備時の変動値を計算してみよう。</p>
+
+<p>まず、アイテムデータ11（<span class="formula">$14</span>）の上2ビットと下6ビットを取り出してみる。</p>
+
+<p><span class="formula">$14 = %0001 0100</span><br>
+アイテムデータ11の上2ビット：<span class="formula">$00</span><br>
+アイテムデータ11の下6ビット：<span class="formula">%0001 0100 = $14</span></p>
+
+<p>上2ビットの値は変動する能力値を示しており、<span class="formula">$00</span>だと「力」である。</p>
+
+<table>
+<thead>
+	<tr><th>上2ビット</th><th>能力値</th></tr>
+</thead>
+<tbody>
+	<tr><td>00</td><td>力</td></tr>
+	<tr><td>01</td><td>速</td></tr>
+	<tr><td>10</td><td>体</td></tr>
+	<tr><td>11</td><td>知</td></tr>
+</tbody>
+</table>
+
+<p>「力」だけ、アイテムデータ11の下6ビットの値も使って変動値を計算しなければならない。<br>
+逆にいえば、他の「速」「体」「知」の計算は、アイテムデータ11の値に影響されず、単純に主能力変動値を<span class="formula">1/2</span>すれば良いということである。<br>
+アイテムデータ11が影響するのは、1種類のアイテムにつき1つのステータスのみということがわかる。</p>
+
+<p>次に、<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span>を計算する。<br>
+「野性バッグ」の主能力変動値の中に負の値はないので、この計算式で計算して構わない。<br>
+「速」「体」「知」は、この計算結果がそのまま、副能力変動値になる。</p>
+
+<p>速：<br>
+<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
+<span class="formula"> = trunc($00/2)</span><br>
+<span class="formula"> = $00</span></p>
+
+<p>体：<br>
+<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
+<span class="formula"> = trunc($00/2)</span><br>
+<span class="formula"> = $00</span></p>
+
+<p>知：<br>
+<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
+<span class="formula"> = trunc($08/2)</span><br>
+<span class="formula"> = $04</span></p>
+
+<p>「速」「体」は元の変動値がゼロなのでそのまま<span class="formula">0</span>が副能力変動値だが、「知」は元の変動値が<span class="formula">$08</span>なので、半分の<span class="formula">$04</span>が副能力変動値ということになる。<br>
+では、「力」について計算してみる。</p>
+
+<p>力：<br>
+<span class="formula">副能力用計算値 = trunc($14/2)</span><br>
+<span class="formula"> = $0A</span></p>
+
+<p><span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
+<span class="formula"> = ($0A + ($14 XOR $FF + $01)) &amp; $FF</span><br>
+<span class="formula"> = ($0A + $EC) &amp; $FF</span><br>
+<span class="formula"> = $F6</span></p>
+
+<p>「野性バッグ」の「力」の副能力変動値は「<span class="formula">$F6</span>」と計算された。<br>
+<span class="formula">$100-$F6 = $0A</span>、10進数<span class="formula">10</span>なので、「野性バッグ」の「力」の副能力変動値は10進数で<span class="formula">-10</span>となる。</p>
+
+<p>これで計算は終わりなのだが、以上を10進数でもう一度見てみよう。<br>
+アイテムデータ11の下6ビットは、<span class="formula">%0001 0100 = $14</span>だったから、10進数だと「<span class="formula">20</span>」である。<br>
+そして、副能力用計算値を10進数で計算すると、</p>
+
+<p><span class="formula">副能力用計算値 = trunc(20/2)</span><br>
+<span class="formula"> = 10</span></p>
+
+<p>この値から、アイテムデータ11の下6ビットを10進数で引き算すれば、それが「野性バッグ」の「力」の副能力変動値なのである。<br>
+つまり、</p>
+
+<p><span class="formula">10 - 20 = -10</span></p>
+
+<p>これで計算終了である。<br>
+先に記した通り、主能力変動値が負の値の時は、<span class="formula">trunc</span>での小数点以下切り捨ての方法が16進数と10進数で変わるので気をつけなければならないが、それを除けば、10進数で見た方がわかりやすい。</p>
+
+<p>もうひとつの例として、主能力変動値が負の値の「ワタナベのパンツ」の計算方法を見てみよう。<br>
+「ワタナベのパンツ」は、頭と体に装備可能で、主装備位置は体である。<br>
+主能力変動値は知<span class="formula">$E7</span>。他の値は<span class="formula">0</span>である。<br>
+<span class="formula">$E7</span>は符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-25</span>」である。<br>
+アイテムデータ11は<span class="formula">$E0</span>である。<br>
+このため、頭に装備した場合は、副能力変動値でステータスが変動することになる。</p>
+
+<p>まず、アイテムデータ11（<span class="formula">$E0</span>）の上2ビットと下6ビットを取り出してみる。</p>
+
+<p><span class="formula">$E0 = %1110 0000</span><br>
+アイテムデータ11の上2ビット：<span class="formula">$11</span><br>
+アイテムデータ11の下6ビット：<span class="formula">%0010 0000 = $20</span></p>
+
+<p>上2ビットから、変動する能力値は「知」である。<br>
+下6ビットは<span class="formula">$20</span>、10進数だと「<span class="formula">32</span>」である。</p>
+
+<p>以下、「知」の副能力変動値だけ計算する。</p>
+
+<p><span class="formula">副能力用計算値 = trunc($FFE7/2) &amp; $00FF</span><br>
+<span class="formula"> = $F3</span></p>
+
+<p><span class="formula">主能力変動値/2</span>の計算になるが、答えは<span class="formula">$F3</span>、符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-13</span>」である。<br>
+主能力変動値<span class="formula">$E7</span>は10進数の「<span class="formula">-25</span>」だが、<span class="formula">trunc(-25/2)</span>を計算すると、「<span class="formula">-12</span>」になってしまう。<br>
+このズレが生じてしまうため、符号付き8ビット整数値で計算を行っていかなければならない。</p>
+
+<p><span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
+<span class="formula"> = ($F3 + ($20 XOR $FF + $01)) &amp; $FF</span><br>
+<span class="formula"> = ($F3 + ($DF + $01)) &amp; $FF</span><br>
+<span class="formula"> = ($F3 + $E0) &amp; $FF</span><br>
+<span class="formula"> = $1D3 &amp; $FF</span><br>
+<span class="formula"> = $D3</span></p>
+
+<p><span class="formula">$D3</span>を符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-45</span>」である。<br>
+よって、「ワタナベのパンツ」の「知」の副能力変動値は<span class="formula">-45</span>である。<br>
+下6ビットは10進数「<span class="formula">32</span>」だったので、主能力変動値/2の「<span class="formula">-13</span>」から<span class="formula">32</span>を引いた、</p>
+
+<p><span class="formula">-13-32 = -45</span></p>
+
+<p>こちらの方が計算としては手っ取り早い。</p>
+
+<p>以上のようにして、副能力変動値が計算されている。<br>
+アイテムデータ11に格納されている値自体は、上2ビットが「変動する能力値」、下6ビットが「マイナスする値」とシンプルなのだが、16進数のため計算方法がくどくなっているように見えてしまう。</p>
+
+<p>では、このなかなか面倒な計算が、プログラムでは実際にどういう風に処理されているのか、<a href="program19_2.html">次ページ</a>で解説する。</p>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program18_2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program19_2.html"><span class="button">&#9654;次　副能力変動値処理</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

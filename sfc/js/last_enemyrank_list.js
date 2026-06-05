@@ -193,7 +193,7 @@ d.getElementById("rankcal").addEventListener("click", () => {
 		// 心・本能・力・鍵のダンジョン
 		+ `<h5>心・本能・鍵のダンジョン</h5><p>${tex[2]}${rank[1]}, ${rank[1] + 1}, ${rank[1] + 2}, ${rank[1] + 3}${tablelist[1]}</tbody></table></p>※鍵のダンジョンのみ「影×1」も出現する</p>`
 		// 力のダンジョン
-		+ `<h5>力のダンジョン</h5><p>${tex[2]}${rank[3]}, ${rank[3] + 1}, ${rank[3] + 2}, ${rank[3] + 3}</p>${tablelist[3]}</tbody></table><p>※入り口エリアまで戻ってから再度奥に進む時はランク${rank[2]}, ${rank[2] + 1}, ${rank[2] + 2}, ${rank[2] + 3}<br>（下の魔王山エンカウントテーブルと同一）</p>`
+		+ `<h5>力のダンジョン</h5><p>${tex[2]}${rank[3]}, ${rank[3] + 1}, ${rank[3] + 2}, ${rank[3] + 3}</p>${tablelist[3]}</tbody></table><p>※1フロア目に入口から入った時のみ。それ以外はランク${rank[2]}, ${rank[2] + 1}, ${rank[2] + 2}, ${rank[2] + 3}<br>（下の魔王山エンカウントテーブルと同一）</p>`
 		// 魔王山
 		+ `<h5>魔王山</h5><p>${tex[2]}${rank[2]}, ${rank[2] + 1}, ${rank[2] + 2}, ${rank[2] + 3}</p>${tablelist[2]}</tbody></table>`;
 	}
