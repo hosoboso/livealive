@@ -357,12 +357,20 @@ const checklist = document.getElementById('checklist');
 // テーブルを挿入する対象の要素を取得
 const tableContainer = document.getElementById('charadata_table');
 
+// 未使用アイテムID
+const unusedItemIDList = [
+	174+1,177+1,180+1,181+1,184+1,220+1,221+1,245+1,
+];
+
 // テーブルを描画する処理を関数にまとめる
 function updateTable() {
 		// ラジオボタンの状態を取得
 		const radios = document.querySelectorAll('input[name="ilist"]');
 		const checkedRadio = Array.from(radios).findIndex(radio => radio.checked);
-
+		
+		// 未使用アイテムチェックボックスの状態を取得（チェック入っていたら未使用アイテム除外）
+		const unusedItemCheck = document.getElementById('unused').checked;
+		
 		// 多次元配列を作成
 		const resultMatrix = [];
 		const checkboxes = checklist.querySelectorAll('input[type="checkbox"]');
@@ -407,8 +415,13 @@ function updateTable() {
 		((checkedRadio==8) && (((itemData[i-1][0] & 0x0F) == 2)||((itemData[i-1][0] & 0x0F) == 3)))||	//回復
 		((checkedRadio==9) && (((itemData[i-1][0] & 0x0F) == 4)||((itemData[i-1][0] & 0x0F) == 5)));	//攻撃
 
+		//未使用アイテムを含めるかどうか
+		let unusedItemIDChecker = 
+		(unusedItemCheck && !unusedItemIDList.includes(i)) || 	//未使用アイテム除外 かつ unusedItemIDListに含まれる
+		(!unusedItemCheck); 	//未使用アイテム除外なし（全てのアイテムを表示）
+
 		//ラジオボタンでテーブル列を作るか1行ずつ判定
-		if (scenarioIDChecker) {
+		if (scenarioIDChecker && unusedItemIDChecker) {
 		
 				tableHtml += '<tr>';
 				resultMatrix.forEach(columnData => {
@@ -439,6 +452,13 @@ checklist.addEventListener('change', (event) => {
 				updateTable();
 		}
 });
+
+document.getElementById('unused').addEventListener('change', (event) => {
+		if (event.target.type === 'checkbox') {
+				updateTable();
+		}
+});
+
 
 // 変更時実行：ラジオボタンの状態が変わるたびに実行
 document.getElementById('itemlist').addEventListener('change', (event) => {
