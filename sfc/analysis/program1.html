@@ -9,15 +9,15 @@
 <meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ボタン判定">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://livealivem.stars.ne.jp/sfc/">
-<meta property="og:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
 <meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="Summary">
 <meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ボタン判定">
 <meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
-<meta name="twitter:image" content="https://livealivem.stars.ne.jp/sfc/img/social.png" />
-<meta name="twitter:url" content="https://livealivem.stars.ne.jp/sfc/">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
 <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
 <link rel="icon alternate" href="../img/social.png" type="image/png">
 <title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ボタン判定</title>
@@ -120,6 +120,8 @@ table {
 		<li><a href="program34.html">ステータス変動</a></li>
 		<li><a href="program36.html">回復技</a></li>
 		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">戦闘・その他</button>
@@ -225,6 +227,37 @@ table {
 上の通りに<code>$00:4218</code>の下1桁にはボタンに対応した数値がない。<br>
 よって、ボタンの状態は、<code>$00:4219</code>・<code>$00:4218</code>の2バイト（16進数4桁）の中で上3桁で表されるということがわかる。</p>
 
+
+<h4><code>$00:4200</code>について</h4>
+
+<p><a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/interrupt/ioreg.md" target="_blank">割り込み関連のレジスタ/snes-docs-ja</a></p>
+
+<p><code>[$00:4200]</code>が割り込み有効化レジスタである、と上で説明した通りだが、8ビットの値の一番下のビットに1を入れると自動ジョイパッド読み取り機能をONにする以外にも機能がある。<br>
+コントローラのボタン判定とは直接関係ないが、処理として重要なので、合わせて説明しておく。</p>
+
+<p><code>[$00:4200]</code>の下のビットから順に0～7と番号をふると、以下のように対応している。</p>
+
+<table>
+<thead>
+	<tr><th>bit</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>0</td><td>自動Joypad読み出し有効化フラグ (0=無効, 1=有効)</td></tr>
+	<tr><td>1～3</td><td>使用しない</td></tr>
+	<tr><td>4～5</td><td>IRQフラグ（2bit）</td></tr>
+	<tr><td>6</td><td>使用しない</td></tr>
+	<tr><td>7</td><td>VBlank NMI 有効化フラグ (0=無効, 1=有効)</td></tr>
+</tbody>
+</table>
+
+<p>IRQとNMIはどちらも処理の途中に割り込むための命令である。<br>
+IRQはとりあえず横に置いておくとして、7bit目、つまり一番上のビットの「VBlank NMI 有効化フラグ」が重要である。<br>
+VBlankとは、スーパーファミコンの画面1枚分を描画する処理の間の空白時間（Blank）のことである。1フレームに1回入る。<br>
+1枚分のグラフィック描画中に、グラフィック用メモリ（VRAM）に別のデータを転送すると画面描画がおかしくなるので、VBlank中に次の画像のデータをVRAMに送る。<br>
+VBlankのタイミングが来た時に、次のグラフィックの処理に移行するため、NMIという命令で現在の処理を一時中断するかどうかを、「VBlank NMI 有効化フラグ」で決めている。<br>
+本作のサブルーチンを見てみると、<code>[$00:4200]</code>で自動Joypad読み出し有効化フラグをONにする時、だいたい<code>[$00:4200]</code>に<span class="formula">$01</span>か<span class="formula">$81</span>を書き込むのだが、<span class="formula">$01</span>ならNMI割り込み無効、<span class="formula">$81</span>ならNMI割り込み有効ということである。<br>
+1フレーム後に、現在とは別のグラフィックを描画するなら<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込み、NMI割り込みを有効化する必要がある。</p>
+
 <h3>アドレス</h3>
 
 <p>ボタンの出力先は上の通り<code>$00:4218</code>～<code>$00:4219</code>なのだが、この値は他アドレスにもコピーされて各種判定に使われる。</p>
@@ -304,6 +337,35 @@ LDX $4218  [$00:4218]   ;Xに[$00:4219][$00:4218]をロード
 
 <p>フィールドにいる時のボタン判定用サブルーチンは以下の通り。<br>
 フィールド上でも、メニュー画面を開いている時とは別になる。</p>
+
+<div class="code-container"><pre>
+$C0/1051 LDA #$02                ;Aに$02をロード
+$C0/1053 STA $0104  [$00:0104]   ;Aを[$00:0104]に書き込み
+$C0/1056 LDA #$5C                ;Aに$5Cをロード
+$C0/1058 STA $F8    [$00:00F8]   ;Aを[$00:00F8]に書き込み
+$C0/105A LDX #$01D1              ;Xに$01D1をロード
+$C0/105D STX $F9    [$00:00F9]   ;Xを[$00:00F9]に書き込み
+$C0/105F LDA #$C0                ;Aに$C0をロード
+$C0/1061 STA $FB    [$00:00FB]   ;Aを[$00:00FB]に書き込み
+$C0/1063 LDA #$81                ;Aに$81をロード
+$C0/1065 STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C0/1068 PLB                     ;DBレジスタに値をプル
+$C0/1069 RTS                     ;サブルーチン戻り
+</pre></div>
+<br>
+<div class="code-container"><pre>
+$C0/106A PHB                     ;DBレジスタをスタックにプッシュ
+$C0/106B LDA #$00                ;Aに$00をロード
+$C0/106D PHA                     ;Aをスタックにプッシュ
+$C0/106E PLB                     ;DBレジスタに値をプル
+$C0/106F LDA #$01                ;Aに$01をロード
+$C0/1071 STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C0/1074 JSR $09F2  [$C0:09F2]   ;[$C0:09F2]へジャンプ
+</pre></div>
+
+<p><code>[$00:4200]</code>に<span class="formula">$81</span>または<span class="formula">$01</span>に書き込んで自動ジョイパッド読み取り機能をONにするサブルーチンは上の通り。<br>
+先に説明した通り、VBlankのタイミングで割り込みのNMIを入れるかどうか（現在の処理を中断しグラフィックの処理に移行するかどうか）でサブルーチンを変えるようにしている。<br>
+つまり、1フレーム後に、現在とは別のグラフィックを描画するなら<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込み、NMI割り込みを有効化する必要がある。</p>
 
 <div class="code-container"><pre>
 $C0/B83E LDA #$01                ;Aに$01をロード
@@ -390,10 +452,42 @@ $C0/0926 LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
 $C0/0928 STA $020A  [$00:020A]   ;Aを[$00:020A]に書き込み
 </pre></div>
 
-
 <h4>戦闘</h4>
 
-<p>戦闘中のボタン判定用サブルーチンは以下の通り。</p>
+<p>戦闘中のボタン判定用サブルーチンは以下の通り。<br>
+戦闘開始時、<code>$C1:0000</code>～から処理が開始になるのだが、その中に以下の処理がある。</p>
+
+<div class="code-container"><pre>
+$C1/006E SEI                     ;インタラプトフラグON 割り込み不許可
+$C1/006F LDA #$8F                ;Aに$8Fをロード
+$C1/0071 STA $2100  [$00:2100]   ;Aを[$00:2100]に書き込み
+$C1/0074 LDA #$01                ;Aに$01をロード
+$C1/0076 STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C1/0079 JSR $F4A9  [$C1:F4A9]   ;[$C1:F4A9]へジャンプ
+</pre></div>
+
+<p>戦闘開始時は、ここで<code>[$00:4200]</code>に<span class="formula">$01</span>がロードされて、自動ジョイパッド読み取り機能がONになる。<br>
+<code>[$00:2100]</code>はディスプレイ制御レジスタで、<span class="formula">$8F = %1000 1111</span>を書き込んでいるが、下4ビットが明るさ制御。<br>
+ただし一番上のビットに<span class="formula">1</span>を書き込むとForced blankフラグがONとなり画面が真っ暗になる仕様である。つまり戦闘突入時の暗転である。<br>
+<span class="formula">$01</span>を書き込むのでNMI割り込みは入らない。</p>
+
+<div class="code-container"><pre>
+$C1/0136 LDA $92    [$00:0392]   ;Aに[$00:0392]をロード
+$C1/0138 STA $2100  [$00:2100]   ;Aを[$00:2100]に書き込み
+$C1/013B LDA #$81                ;Aに$81をロード
+$C1/013D STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C1/0140 JSR $0327  [$C1:0327]   ;[$C1:0327]へジャンプ
+</pre></div>
+<br>
+<div class="code-container"><pre>
+$C1/835E LDA #$0F                ;Aに$0Fをロード
+$C1/8360 STA $2100  [$00:2100]   ;Aを[$00:2100]に書き込み
+$C1/8363 LDA #$81                ;Aに$81をロード
+$C1/8365 STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C1/8368 JSR $6121  [$C1:6121]   ;[$C1:6121]へジャンプ
+</pre></div>
+
+<p>上は戦闘中に<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込む場合の処理。</p>
 
 <div class="code-container"><pre>
 ;ボタン判定ループ処理
@@ -433,6 +527,11 @@ $C1/8B1D RTS                     ;サブルーチン戻り
 <p>メニュー画面でのボタン判定用サブルーチンは以下の通り。</p>
 
 <div class="code-container"><pre>
+$C2/4FE8 LDA $79    [$00:0579]   ;Aに[$00:0579]をロード
+$C2/4FEA STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C2/4FED STZ $76    [$00:0576]   ;[$00:0576]に$00を書き込み
+$C2/4FEF JSR $5178  [$C2:5178]   ;[$C2:5178]へジャンプ
+
 $C2/5178 PHP                     ;ステータスレジスタをスタックへプッシュ
 $C2/5179 SEP #$20                ;MフラグON　Aレジスタは8bit幅
 ;ボタン判定ループ処理
@@ -446,6 +545,7 @@ $C2/5189 STA $7D    [$00:057D]   ;Aを[$00:057E][$00:057D]に書き込み
 </pre></div>
 
 <p>判定方法はフィールドや戦闘時と同様である。<br>
+<code>[$00:4200]</code>に<code>[$00:0579]</code>を書き込むことで自動ジョイパッド読み取り機能をONにしているが、<code>[$00:0579]</code>は<span class="formula">$81</span>か<span class="formula">$01</span>である（筆者が確認した限りでは）。NMI割り込みが入るかどうかで<code>[$00:0579]</code>の値を書き換えているようだ。<br>
 <code>[$00:4219]</code><code>[$00:4218]</code>は<code>[$00:057E]</code><code>[$00:057D]</code>に書き込まれる。<br>
 ただし、メニュー画面の方ではコントローラ2判定はないようだ。</p>
 
@@ -703,6 +803,8 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 		<li><a href="program35.html">セーブ</a></li>
 		<li><a href="program36.html">回復技</a></li>
 		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
 	</ul>
 </div>
 </div>

@@ -283,7 +283,7 @@ function ePartyEnemysTEXTFunc() {
 			if (((enemyData[tempID][15] & 0x0F) == 0)) {
 				enTypeRandom="敵の初期配置はランダム";
 			}
-			temp += (enType + enemyData_ID[tempID][0] + "：" + tempText + ",<br>");
+			temp += (enType + enemyData_ID[tempID][0] + "：" + tempText + "<br>");
 		}
 		enemyIDArray[k] = temp + enTypeRandom;
 	}

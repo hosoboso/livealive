@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 向き補正(1)</head>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 向き補正(1)">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; 向き補正(1)</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 向き補正(1)</h1>
+<h2>向き補正(1)</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>戦闘時には、向きによる補正がかかる。<br>
+具体的には、攻撃時のレベルに関係する一部計算式に向きの補正がかかる。<br>
+ダメージ計算には自レベルと敵レベルが関わるし、命中判定も攻撃をくらう側のレベルの値が判定に必要である。</p>
+
+<p>向きについては<a href="../battle02.html">戦闘関係の解説 &gt; 向き</a>で説明しているが、■が右下向きなら、周囲のマスとの位置関係は以下のようになる。<br>
+「正」が正面、「側」が側面、「背」が背面である。</p>
+
+<div class="mono">
+<span style="background-color:#f0b4b4;">背背背</span><span style="background-color:#edebb2;">側側</span><br>
+<span style="background-color:#f0b4b4;">背背背</span><span style="background-color:#edebb2;">側側</span><br>
+<span style="background-color:#f0b4b4;">背背</span><span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">■</span><span style="background-color:#b2deed;">正正</span><br>
+<span style="background-color:#edebb2;">側側</span><span style="background-color:#b2deed;">正正正</span><br>
+<span style="background-color:#edebb2;">側側</span><span style="background-color:#b2deed;">正正正</span>
+</div>
+
+<p>複数マスにまたがる敵などは以下のようになり、●が味方とすると、●が敵を攻撃したら敵を正面から攻撃したことになる。</p>
+
+<div class="mono">
+<span style="background-color:#f0b4b4;">背背背背</span><span style="background-color:#edebb2;">側側</span><br>
+<span style="background-color:#f0b4b4;">背背背背</span><span style="background-color:#edebb2;">側側</span><br>
+<span style="background-color:#f0b4b4;">背背</span><span style="background-color:#ddd;">■■</span><span style="background-color:#b2deed;">正正</span><br>
+<span style="background-color:#f0b4b4;">背背</span><span style="background-color:#ddd;">■</span><span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">■</span><span style="background-color:#b2deed;">正正</span><br>
+<span style="background-color:#edebb2;">側側</span><span style="background-color:#b2deed;">正正正</span>●<br>
+<span style="background-color:#edebb2;">側側</span><span style="background-color:#b2deed;">正正正正</span>
+</div>
+<p>「側」のマスから攻撃すれば側面からの攻撃、「背」のマスから攻撃すれば背面からの攻撃である。<br>
+この場合、敵はそれぞれ、自身のレベルから側面補正または背面補正を引いた値でダメージ量などを計算することになる。</p>
+
+<p>複数マスにまたがる敵からの攻撃については少しややこしくなるので、次ページから詳しく説明している。</p>
+
+<h3>メモリアドレス</h3>
+
+<p>向き補正に関するメモリアドレスは以下の通り。</p>
+
+<h4>向き補正</h4>
+
+<h5>味方キャラ</h5>
+
+<p>味方キャラデータ29の、</p>
+
+<ul>
+	<li>上4ビット：背後補正</li>
+	<li>下4ビット：側面補正</li>
+</ul>
+
+<p>また、シナリオ別キャラデータの、</p>
+<ul>
+	<li><span class="formula">+$1C</span>：側面補正</li>
+	<li><span class="formula">+1D</span>：背面補正</li>
+</ul>
+<p>である。</p>
+
+<h5>敵キャラ</h5>
+<p>敵キャラデータ29の、</p>
+
+<ul>
+	<li>上4ビット：背後補正</li>
+	<li>下4ビット：側面補正</li>
+</ul>
+
+<h4>戦闘中のキャラの向き</h4>
+
+<h5>味方キャラ</h5>
+
+<table>
+<thead>
+	<tr><th>味方キャラ番号</th><th>アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td>1</td><td><code>$00:1C1D</code></td></tr>
+	<tr><td>2</td><td><code>$00:1C5D</code></td></tr>
+	<tr><td>3</td><td><code>$00:1C9D</code></td></tr>
+	<tr><td>4</td><td><code>$00:1CDD</code></td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>向き</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>右下</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>左下</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>右上</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>左上</td></tr>
+</tbody>
+</table>
+
+<h5>敵キャラ</h5>
+
+<p>敵番号nの敵の向きは<code>$00:1Bn4</code>に入る。</p>
+
+<table>
+<thead>
+	<tr><th>数値</th><th>向き</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>右下</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>左下</td></tr>
+	<tr><td><span class="formula">$80</span></td><td>右上</td></tr>
+	<tr><td><span class="formula">$C0</span></td><td>左上</td></tr>
+</tbody>
+</table>
+
+
+<h3>サブルーチン</h3>
+
+<p>以下、味方が敵を攻撃する場合と、敵が味方を攻撃する場合の2パターンに分けて解説する。</p>
+
+<h4>味方が敵を攻撃する場合</h4>
+
+<p>先に結論を言うと、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:ABn0</code></td><td>敵番号nの現在のレベル</td></tr>
+	<tr><td><code>$7E:ABnB</code></td><td>敵番号nの向き補正 (正面:<span class="formula">$00</span>, 側面:<span class="formula">$01</span>, 背面:<span class="formula">$80</span>)</td></tr>
+	<tr><td><code>$7E:ABnA</code></td><td>敵番号nの向き補正込みのレベル</td></tr>
+</tbody>
+</table>
+
+<p>というように値が入り、後の計算に使われるようになっている。<br>
+敵は<span class="formula">0～E</span>まで最大で15体だから、向き補正込みのレベルの値は、<code>$7E:AB0A</code>, <code>$7E:AB1A</code>, <code>$7E:AB2A</code>, ……, <code>$7E:ABEA</code>に入ることになる。<br>
+この値は該当の敵を攻撃する度に更新されていくことになる。</p>
+
+<p>まず、1×1マスサイズの味方キャラが敵を攻撃する場合について説明する。<br>
+今回はレベル6のアキラがレベル7のクルセイダーＲＳを「ローキック」で攻撃する場合を例として説明する。<br>
+クルセイダーＲＳの側面補正は<span class="formula">8</span>、背面補正は<span class="formula">12</span>とかなり大きめ。<br>
+この戦闘ではクルセイダーＲＳは敵番号<span class="formula">E</span>。</p>
+
+<p>まず、クルセイダーＲＳ右下向き、アキラ左上向きで、下配置のようにクルセイダーの正面から攻撃する。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□<span style="background-color:#ddd;">ク</span>□□□<br>
+□□□<span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">ク</span>□□□<br>
+□□□□ア□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>座標は左上を原点とし、右方向をX軸、下方向をY軸として表す。<br>
+つまり、X座標は左から<span class="formula">0～6</span>、Y座標は上から<span class="formula">0～6</span>とカウントする。<br>
+アキラの位置は<span class="formula">(4,3)</span>になる。<br>
+複数マスにまたがる敵は左上マス位置を座標としているので、クルセイダーＲＳの座標は上側マスにあたる<span class="formula">(3,1)</span>である。</p>
+
+<div class="code-container"><pre>
+$C1/E061 LDX $78    [$00:0378]   ;Xに[$00:0378]をロード
+$C1/E063 LDA $79    [$00:0379]   ;Aに[$00:0379]をロード
+$C1/E065 CMP #$1C                ;Aと$1Cを減算比較（ステータスレジスタ変更のみ）
+$C1/E067 BEQ $02    [$E06B]      ;ゼロフラグが立っているとき[$E06B]分岐
+$C1/E06B LDA $0018,x[$00:1C18]   ;Aに[$00:1C18](アキラ キャラ位置のマス目のX座標)をロード
+$C1/E06E STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/E070 LDA $0019,x[$00:1C19]   ;Aに[$00:1C19](アキラ キャラ位置のマス目のY座標)をロード
+$C1/E073 STA $13    [$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/E075 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>敵を攻撃する時の向き補正は、敵の向き・座標と味方の座標で決まる。<br>
+まず上のサブルーチンで、攻撃する味方キャラ、今回はアキラの現在の位置のマス目の座標を読み込む。<br>
+今回はアキラのマス目の座標が<span class="formula">(4,3)</span>であり、それぞれ<code>[$00:1C18]</code>と<code>[$00:1C19]</code>に入っているのだが、これをそれぞれ<code>[$00:0312]</code>と<code>[$00:0313]</code>にコピーする。</p>
+
+<div class="code-container"><pre>
+$C1/E0B6 BEQ $FB    [$E0B3]      ;ゼロフラグが立っているとき[$E0B3]分岐
+;（中略）
+$C1/E0D0 LDA $7E9000,x[$7E:ABE0] ;Aに[$7E:ABE0](敵LV(現在値))をロード
+$C1/E0D4 STA $10    [$00:0310]   ;A(敵LV(現在値))を[$00:0310]に書き込み
+;（中略）
+$C1/E0F4 JSR $E127  [$C1:E127]   ;[$C1:E127]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/E0B6</span></code>～<code><span class="r">$C1/E0F4</span></code>は主に回避属性周りの処理だが、<code><span class="r">$C1/E0D0</span></code>～<code><span class="r">$C1/E0D4</span></code>で敵LV(現在値)が<code>[$00:0310]</code>にコピーされる。<br>
+この敵LV(現在値)は、バフ・デバフなどで増減されている場合はその値が入っている。<br>
+クルセイダーＲＳのレベルは7なので、バフ・デバフが適用されていない限り、<code>[$00:0310]</code>に<span class="formula">$07</span>が書き込まれる。</p>
+
+<p>この先が位置と向きの判定になるのだが、分岐が多く少々ややこしいので、ひとまず敵が右下向きかつ正面からの攻撃という前提で処理を追ってみよう。</p>
+
+<div class="code-container"><pre>
+$C1/E127 LDY $0002,x[$00:1BE2]   ;Yに[$00:1BE2]をロード
+$C1/E12A LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E12D BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/E12F BEQ $0E    [$E13F]      ;ゼロフラグが立っているとき[$E13F]分岐
+;ゼロフラグON 向きが$80(右上)か$C0(左上)以外
+$C1/E13F LDA $13    [$00:0313]   ;Aに[$00:0313](アキラ マス目のY座標)をロード
+$C1/E141 CMP $000B,x[$00:1BEB]   ;Aと[$00:1BEB](敵位置のマス目のY座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/E144 BCC $21    [$E167]      ;キャリーフラグが立っていないとき[$E167]分岐
+$C1/E146 BRA $00    [$E148]      ;フラグにかかわりなく常に分岐[$E148]
+$C1/E148 LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E14B BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/E14D BEQ $0E    [$E15D]      ;ゼロフラグが立っているとき[$E15D]分岐
+;ゼロフラグON 向きが$40(左下)以外＝右下向き確定
+$C1/E15D LDA $12    [$00:0312]   ;Aに[$00:0312](アキラ マス目のX座標)をロード
+$C1/E15F CMP $000A,x[$00:1BEA]   ;Aと[$00:1BEA](敵位置のマス目のX座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/E162 BCC $03    [$E167]      ;キャリーフラグが立っていないとき[$E167]分岐
+$C1/E164 LDA #$00                ;Aに$00をロード
+$C1/E166 RTS                     ;サブルーチン戻り
+;
+$C1/E0F7 STA $7E900B,x[$7E:ABEB] ;A($00)を[$7E:ABEB]に書き込み
+$C1/E0FB BEQ $21    [$E11E]      ;ゼロフラグが立っているとき[$E11E]分岐
+$C1/E11E LDA $10    [$00:0310]   ;Aに[$00:0310](敵LV(現在値))をロード
+$C1/E120 STA $7E900A,x[$7E:ABEA] ;A(敵LV(現在値))を[$7E:ABEA]に書き込み
+$C1/E124 BRA $8D    [$E0B3]      ;フラグにかかわりなく常に分岐[$E0B3]
+$C1/E0B3 JSR $E1A9  [$C1:E1A9]   ;[$C1:E1A9]へジャンプ
+</pre></div>
+
+<p>敵番号nの敵の向きは<code>[$00:1Bn4]</code>に入り、今回は敵番号Eなので、<code><span class="r">$C1/E12A</span></code>で<code>[$00:1BE4]</code>をロードするが、敵の向きは右下向きなので<code>[$00:1BE4]</code>には<span class="formula">$00</span>が入っている。<br>
+まず、<code><span class="r">$C1/E12D</span></code>で<span class="formula">$80</span>で論理積をとりゼロフラグ判定をしている。<br>
+右上向き(<span class="formula">$80</span>)または左上向き(<span class="formula">$C0</span>)なら、<span class="formula">$80</span>と論理積を取ると<span class="formula">$80</span>になるからゼロフラグは立たない。<br>
+右下向き(<span class="formula">$00</span>)または左下向き(<span class="formula">$40</span>)なら、<span class="formula">$80</span>と論理積を取ると<span class="formula">$00</span>になるからゼロフラグが立つ。<br>
+ゼロフラグが立たない時は右上向きか左上向き、ゼロフラグが立つ時は右下向きか左下向きということになり、敵の向きが右下向きならゼロフラグが立ち<code><span class="r">$C1/E13F</span></code>へ進む。</p>
+
+<p><code><span class="r">$C1/E13F</span></code>で、先程の味方キャラのマス目のY座標をロードし、<code>[$00:1BEB]</code>(敵位置のマス目のY座標)と減算比較する。<br>
+アキラの座標は<span class="formula">(4,3)</span>、クルセイダーＲＳの座標は<span class="formula">(3,1)</span>。<br>
+よって<span class="formula">3 - 1 = 2</span>で正の数となり、減算で繰り下がりが発生しないことから、キャリーフラグが立つ。<br>
+キャリーフラグが立つのは減算で<span class="formula">0</span>以上の時だから、「クルセイダーＲＳはY軸でアキラと同じまたはアキラより上にいる」という時にキャリーフラグが立つことになる。<br>
+この時は<code><span class="r">$C1/E146</span></code>に進む。</p>
+
+<p><code><span class="r">$C1/E148</span></code>からは、敵の向きが左下向き（<span class="formula">$40</span>）かどうかのゼロフラグ判定である。<br>
+ゼロフラグが立つ時は右下向きで確定ということになり<code><span class="r">$C1/E15D</span></code>へ進む。</p>
+
+<p><code><span class="r">$C1/E15D</span></code>からは、アキラのX座標から敵のX座標を減算比較し、キャリーフラグ分岐を行っている。<br>
+<span class="formula">4 - 3 = 1</span>で正の数となり、減算で繰り下がりが発生しないことから、キャリーフラグが立つ。<br>
+よってそのまま処理が進み、<code>A</code>に<span class="formula">$00</span>をロードして、<code><span class="r">$C1/E166</span></code>でサブルーチンが終了する。</p>
+
+<p><code><span class="r">$C1/E0F7</span></code>以降を見てみると、<code>A</code>の値は<code>[$7E:ABEB]</code>に書き込まれ、ゼロフラグが立っているので<code><span class="r">$C1/E11E</span></code>に飛び、<code>[$00:0310]</code>(敵LV(現在値))がそのまま<code>[$7E:ABEA]</code>（向き補正ありのレベル）に書き込まれている。<br>
+<code>[$7E:ABEB]</code>に書き込まれる値で、向き補正が決まっているのである。<br>
+<code><span class="r">$C1/E166</span></code>までの処理で、<code>[$7E:ABEB]</code>に<span class="formula">$00</span>が書き込まれる時は、向き補正なし、つまり正面からの攻撃と判断されている。<br>
+では、少し振り返って、どういう判断がされたか見てみる。</p>
+
+<p><code><span class="r">$C1/E15D</span></code>に進んだ時点で、クルセイダーＲＳが右下向きなのは確定である。<br>
+更に、クルセイダーＲＳとアキラの位置関係だが、座標の減算比較から、</p>
+
+<ul>
+	<li>クルセイダーＲＳはY軸でアキラと同じまたはアキラより上にいる</li>
+	<li>クルセイダーＲＳはX軸でアキラと同じまたはアキラより左にいる</li>
+</ul>
+
+<p>という判定がされている。<br>
+クルセイダーＲＳの座標は上のマスの扱いだから、クルセイダーＲＳを基準とすると、アキラはクルセイダーＲＳより右側かつ下側にいる、ということになる。</p>
+<div class="mono">
+□□□□□□□<br>
+□□□<span style="background-color:#ddd;">ク</span>■■■<br>
+□□□<span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">ク</span>■■■<br>
+□□□■■■■<br>
+□□□■■■■<br>
+□□□■■■■<br>
+□□□■■■■<br>
+</div>
+
+<p>上の■のどこかにアキラがいる、ということであり、これを「正面向き」と判定して、向きによるレベル補正がされないのである。</p>
+
+<p>もしこれが横幅もある大型の敵の場合でも、左上マスが敵座標の基準だから、</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□<span style="background-color:#ddd;">敵敵</span>■■■<br>
+□□<span style="background-color:#ddd;">敵</span><span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">敵</span>■■■<br>
+□□■■■■■<br>
+□□■■■■■<br>
+□□■■■■■<br>
+□□■■■■■<br>
+</div>
+
+<p>正面の位置は上のように判定されることになる。</p>
+
+<p>では、側面だとどうなるか。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□<span style="background-color:#ddd;">ク</span>□□□<br>
+□□□<span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">ク</span>□□□<br>
+□□ア□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>クルセイダーＲＳは右下向きのまま、アキラは左下から攻撃する。側面からの攻撃である。<br>
+今回は、アキラの位置は<span class="formula">(2,3)</span>になる。<br>
+クルセイダーＲＳの座標は<span class="formula">(3,1)</span>のまま。</p>
+
+<div class="code-container"><pre>
+$C1/E127 LDY $0002,x[$00:1BE2]   ;Yに[$00:1BE2]をロード
+$C1/E12A LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E12D BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/E12F BEQ $0E    [$E13F]      ;ゼロフラグが立っているとき[$E13F]分岐
+;ゼロフラグON 向きが$80(右上)か$C0(左上)以外
+$C1/E13F LDA $13    [$00:0313]   ;Aに[$00:0313](アキラ マス目のY座標)をロード
+$C1/E141 CMP $000B,x[$00:1BEB]   ;Aと[$00:1BEB](敵位置のマス目のY座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/E144 BCC $21    [$E167]      ;キャリーフラグが立っていないとき[$E167]分岐
+$C1/E146 BRA $00    [$E148]      ;フラグにかかわりなく常に分岐[$E148]
+$C1/E148 LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E14B BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/E14D BEQ $0E    [$E15D]      ;ゼロフラグが立っているとき[$E15D]分岐
+;ゼロフラグON 向きが$40(左下)以外＝右下向き確定
+$C1/E15D LDA $12    [$00:0312]   ;Aに[$00:0312](アキラ マス目のX座標)をロード
+$C1/E15F CMP $000A,x[$00:1BEA]   ;Aと[$00:1BEA](敵位置のマス目のX座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/E162 BCC $03    [$E167]      ;キャリーフラグが立っていないとき[$E167]分岐
+;[$00:0312]-[$00:1BEA]=2-3で負の値、キャリーOFF
+$C1/E167 LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E16A BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/E16C BEQ $09    [$E177]      ;ゼロフラグが立っているとき[$E177]分岐
+;ゼロフラグON 向きが$80(右上)か$C0(左上)以外
+$C1/E177 LDA $000B,x[$00:1BEB]   ;Aに[$00:1BEB](敵位置のマス目のY座標)をロード
+$C1/E17A CLC                     ;キャリーフラグクリア
+$C1/E17B ADC $0005,y[$00:1A45]   ;A + [$00:1A45]（敵の縦幅）
+$C1/E17E DEC A                   ;Aをデクリメント -1
+$C1/E17F CMP $13    [$00:0313]   ;A($02)と[$00:0313](アキラ マス目のY座標=3)を減算比較（ステータスレジスタ変更のみ）
+$C1/E181 BCC $20    [$E1A3]      ;キャリーフラグが立っていないとき[$E1A3]分岐
+;$02-[$00:0313]=2-3で負の値、キャリーOFF
+$C1/E1A3 LDA #$01                ;Aに$01をロード
+$C1/E1A5 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>正面向きとの違いは<code><span class="r">$C1/E162</span></code>のキャリーフラグ分岐からである。<br>
+今回はアキラのX座標が<span class="formula">2</span>なので、<span class="formula"><code>[$00:0312]</code> - <code>[$00:1BEA]</code> = 2 - 3</span>でキャリーフラグが立たず、<code><span class="r">$C1/E167</span></code>の分岐先にジャンプする。<br>
+つまり、敵よりもアキラが左にいる場合の飛び先である。</p>
+
+<p><code><span class="r">$C1/E167</span></code>～<code><span class="r">$C1/E16C</span></code>で、再び<code>[$00:1BE4]</code>(敵の向き)と<span class="formula">$80</span>で論理積を取りゼロフラグ判定だが、これはゼロフラグが立つから<code><span class="r">$C1/E177</span></code>にジャンプである。<br>
+<code><span class="r">$C1/E177</span></code>からはY座標の判定だが、今回は敵の縦幅を考慮している。<br>
+「<span class="formula">敵のY座標 + <code>[$00:1A45]</code>（敵の縦幅） - 1</span>」と、アキラのY座標との減算比較である。<br>
+「<span class="formula">敵のY座標 + <code>[$00:1A45]</code>（敵の縦幅） - 1</span>」は敵の一番上のマスのY座標である。<br>
+クルセイダーＲＳでいえば、高さ2マスのキャラだが、座標は上側のマス基準である。<br>
+下側のマスのY座標は上の計算で算出できる。<br>
+よって、「敵の一番下のマスのY座標」と、アキラのY座標との減算比較になる。<br>
+結果、<span class="formula">$02 - <code>[$00:0313]</code> = 2 - 3</span>で負の値だからキャリーフラグが立ち、<code><span class="r">$C1/E1A3</span></code>にジャンプして<span class="formula">$01</span>を<code>A</code>にロードし、サブルーチンが戻る。</p>
+
+<div class="code-container"><pre>
+$C1/E0F7 STA $7E900B,x[$7E:ABEB] ;Aを[$7E:ABEB]に書き込み
+$C1/E0FB BEQ $21    [$E11E]      ;ゼロフラグが立っているとき[$E11E]分岐
+$C1/E0FD BMI $09    [$E108]      ;ネガティブフラグが立っているとき[$E108]分岐
+$C1/E0FF LDA $003D,y[$00:1A7D]   ;Aに[$00:1A7D](敵データ29　背後補正/側面補正)をロード
+$C1/E102 AND #$0F                ;A($C8)と$0Fで論理積
+$C1/E104 STA $11    [$00:0311]   ;A($08)を[$00:0311]に書き込み
+$C1/E106 BRA $0B    [$E113]      ;フラグにかかわりなく常に分岐[$E113]
+$C1/E113 LDA $10    [$00:0310]   ;Aに[$00:0310]($07)(敵LV(現在値))をロード
+$C1/E115 SEC                     ;キャリーフラグON
+$C1/E116 SBC $11    [$00:0311]   ;A($07) - [$00:0311]($08)
+$C1/E118 STA $10    [$00:0310]   ;A($FF)を[$00:0310]に書き込み
+$C1/E11A BCS $02    [$E11E]      ;キャリーフラグが立っているとき[$E11E]分岐
+$C1/E11C STZ $10    [$00:0310]   ;[$00:0310]に$00を書き込み
+$C1/E11E LDA $10    [$00:0310]   ;Aに[$00:0310]($00)をロード
+$C1/E120 STA $7E900A,x[$7E:ABEA] ;A($00)を[$7E:ABEA]に書き込み
+$C1/E124 BRA $8D    [$E0B3]      ;フラグにかかわりなく常に分岐[$E0B3]
+$C1/E0B3 JSR $E1A9  [$C1:E1A9]   ;[$C1:E1A9]へジャンプ
+</pre></div>
+
+<p>側面からの攻撃だと<code>[$7E:ABEB]</code>に入るのは<span class="formula">$01</span>となり、<code><span class="r">$C1/E0FB</span></code>～<code><span class="r">$C1/E0FD</span></code>でゼロフラグもネガティブフラグも立たないから、<code><span class="r">$C1/E0FF</span></code>に進む。<br>
+つまりここからは側面からの攻撃の処理である。<br>
+<code>[$00:1A7D]</code>(敵データ29　背後補正/側面補正)をロードして、<span class="formula">$0F</span>と論理積を取ることで、下1桁、つまり側面補正の値を取り出し、<code>[$00:0311]</code>に書き込む。<br>
+クルセイダーＲＳなら、<code>[$00:0311]</code>に入るのは<span class="formula">$08</span>である。<br>
+<code><span class="r">$C1/E113</span></code>から、レベルの値の処理である。<br>
+キャリーフラグをONにして、</p>
+
+<p><span class="formula"><code>[$00:0310]</code>(敵LV(現在値)) - <code>[$00:0311]</code>(側面補正)</span></p>
+
+<p>を計算する。<br>
+クルセイダーＲＳなら、キャリー分考慮で、</p>
+
+<p><span class="formula">$107 - $08 = $FF</span></p>
+
+<p>となる。<br>
+つまり現在レベルより、側面補正の方が大きいので、側面補正を考慮するとレベルが負の値になってしまう。<br>
+この場合は<code><span class="r">$C1/E11A</span></code>でキャリーフラグ分岐になり、<code>[$00:0310]</code>に<span class="formula">$00</span>を書き込み、<code>A</code>にロードする。<br>
+最終的に、<code>[$7E:ABEA]</code>には<code>A</code>の値が入るから、</p>
+
+<p><span class="formula"><code>[$7E:ABEA]</code> = <code>[$00:0310]</code>(敵LV(現在値)) - <code>[$00:0311]</code>(側面補正)</span><br>
+ただし減算結果が負の値の時は<span class="formula">0</span>とする</p>
+
+<p>と、いうことになる。<br>
+<code>[$7E:ABEA]</code>が、向き補正が入ったレベルの値となる。</p>
+
+<p>今回は、</p>
+
+<ul>
+	<li>クルセイダーＲＳ（の一番下側のマス）はY軸でアキラより上にいる</li>
+	<li>クルセイダーＲＳはX軸でアキラより右にいる</li>
+</ul>
+
+<p>という条件を満たしているので、側面の位置は以下のように判定されたことになる。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□<span style="background-color:#ddd;">ク</span>□□□<br>
+□□□<span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">ク</span>□□□<br>
+■■■□□□□<br>
+■■■□□□□<br>
+■■■□□□□<br>
+■■■□□□□
+</div>
+<p>では、背面から攻撃した場合も確認しておこう。</p>
+
+<div class="mono">
+□□□□□□□<br>
+□□□<span style="background-color:#ddd;">ク</span>□□□<br>
+□□ア<span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">ク</span>□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+</div>
+
+<p>クルセイダーＲＳは右下向きのまま、アキラは左から攻撃する。<br>
+今回は、アキラの位置は<span class="formula">(2,2)</span>になる。<br>
+クルセイダーＲＳの座標は<span class="formula">(3,1)</span>のまま。</p>
+
+<div class="code-container"><pre>
+$C1/E127 LDY $0002,x[$00:1BE2]   ;Yに[$00:1BE2]をロード
+$C1/E12A LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E12D BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/E12F BEQ $0E    [$E13F]      ;ゼロフラグが立っているとき[$E13F]分岐
+;ゼロフラグON 向きが$80(右上)か$C0(左上)以外
+$C1/E13F LDA $13    [$00:0313]   ;Aに[$00:0313]をロード
+$C1/E141 CMP $000B,x[$00:1BEB]   ;Aと[$00:1BEB]を減算比較（ステータスレジスタ変更のみ）
+$C1/E144 BCC $21    [$E167]      ;キャリーフラグが立っていないとき[$E167]分岐
+$C1/E146 BRA $00    [$E148]      ;フラグにかかわりなく常に分岐[$E148]
+$C1/E148 LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4]をロード
+$C1/E14B BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/E14D BEQ $0E    [$E15D]      ;ゼロフラグが立っているとき[$E15D]分岐
+;ゼロフラグON 向きが$40(左下)以外＝右下向き確定
+$C1/E15D LDA $12    [$00:0312]   ;Aに[$00:0312](アキラ マス目のX座標)をロード
+$C1/E15F CMP $000A,x[$00:1BEA]   ;Aと[$00:1BEA](敵位置のマス目のX座標)を減算比較（ステータスレジスタ変更のみ）
+$C1/E162 BCC $03    [$E167]      ;キャリーフラグが立っていないとき[$E167]分岐
+;[$00:0312]-[$00:1BEA]=2-3で負の値、キャリーOFF
+$C1/E167 LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E16A BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/E16C BEQ $09    [$E177]      ;ゼロフラグが立っているとき[$E177]分岐
+;ゼロフラグON 向きが$80(右上)か$C0(左上)以外
+$C1/E177 LDA $000B,x[$00:1BEB]   ;Aに[$00:1BEB](敵位置のマス目のY座標)をロード
+$C1/E17A CLC                     ;キャリーフラグクリア
+$C1/E17B ADC $0005,y[$00:1A45]   ;A + [$00:1A45]（敵の縦幅）
+$C1/E17E DEC A                   ;Aをデクリメント -1
+$C1/E17F CMP $13    [$00:0313]   ;Aと[$00:0313](アキラ マス目のY座標=2)を減算比較（ステータスレジスタ変更のみ）
+$C1/E181 BCC $20    [$E1A3]      ;キャリーフラグが立っていないとき[$E1A3]分岐
+;$02-[$00:0313]=2-2で0、キャリーON
+$C1/E183 BRA $00    [$E185]      ;フラグにかかわりなく常に分岐[$E185]
+$C1/E185 LDA $0004,x[$00:1BE4]   ;Aに[$00:1BE4](敵の向き（右下$00/左下$40/右上$80/左上$C0）)をロード
+$C1/E188 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/E18A BEQ $09    [$E195]      ;ゼロフラグが立っているとき[$E195]分岐
+;ゼロフラグON 向きが$40(左下)以外＝右下向き確定
+$C1/E195 LDA $000A,x[$00:1BEA]   ;Aに[$00:1BEA](敵位置のマス目のX座標)をロード
+$C1/E198 CLC                     ;キャリーフラグクリア
+$C1/E199 ADC $0004,y[$00:1A44]   ;A + [$00:1A44]（敵の横幅）
+$C1/E19C DEC A                   ;Aをデクリメント -1
+$C1/E19D CMP $12    [$00:0312]   ;Aと[$00:0312](アキラ マス目のX座標=2)を減算比較（ステータスレジスタ変更のみ）
+$C1/E19F BCC $02    [$E1A3]      ;キャリーフラグが立っていないとき[$E1A3]分岐
+;$03-[$00:0312]=3-2で正の値、キャリーON
+$C1/E1A1 BRA $03    [$E1A6]      ;フラグにかかわりなく常に分岐[$E1A6]
+$C1/E1A6 LDA #$80                ;Aに$80をロード
+$C1/E1A8 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/E181</span></code>までは側面の処理と同じだが、今回はアキラのY座標が<span class="formula">2</span>なので、<code><span class="r">$C1/E181</span></code>でキャリーフラグが立ち<code><span class="r">$C1/E183</span></code>に進む。<br>
+その先で<code>[$00:1BE4]</code>(敵の向き)と<span class="formula">$40</span>で論理積をとりゼロフラグ判定だが、これは<code><span class="r">$C1/E14D</span></code>の処理と同じでゼロフラグが立ち、向きが右下向き確定で<code><span class="r">$C1/E195</span></code>に進む。<br>
+<code><span class="r">$C1/E195</span></code>からX座標の判定で、敵の横幅<code>[$00:1A44]</code>を考慮した判定になる。<br>
+「<span class="formula">敵のX座標 + <code>[$00:1A44]</code>（敵の横幅） - 1</span>」と、アキラのX座標との減算比較である。<br>
+敵の一番右のマスの座標とアキラのX座標で減算比較となり、<span class="formula">$03 - <code>[$00:0312]</code> = 3 - 2</span>でキャリーフラグがONだから、<code><span class="r">$C1/E1A1</span></code>に進む。<br>
+<code>A</code>に<span class="formula">$80</span>をロードしてサブルーチン終了。</p>
+
+<div class="code-container"><pre>
+$C1/E0F7 STA $7E900B,x[$7E:ABEB] ;Aを[$7E:ABEB]に書き込み
+$C1/E0FB BEQ $21    [$E11E]      ;ゼロフラグが立っているとき[$E11E]分岐
+$C1/E0FD BMI $09    [$E108]      ;ネガティブフラグが立っているとき[$E108]分岐
+$C1/E108 LDA $003D,y[$00:1A7D]   ;Aに[$00:1A7D](敵データ29　背後補正/側面補正)をロード
+$C1/E10B LSR A                   ;Aを論理右シフト　(/2)
+$C1/E10C LSR A                   ;Aを論理右シフト　(/2)
+$C1/E10D LSR A                   ;Aを論理右シフト　(/2)
+$C1/E10E LSR A                   ;Aを論理右シフト　(/2)
+$C1/E10F AND #$0F                ;Aと$0Fで論理積
+$C1/E111 STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/E113 LDA $10    [$00:0310]   ;Aに[$00:0310]($07)(敵LV(現在値))をロード
+$C1/E115 SEC                     ;キャリーフラグON
+$C1/E116 SBC $11    [$00:0311]   ;A - [$00:0311]
+$C1/E118 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/E11A BCS $02    [$E11E]      ;キャリーフラグが立っているとき[$E11E]分岐
+$C1/E11C STZ $10    [$00:0310]   ;[$00:0310]に$00を書き込み
+$C1/E11E LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/E120 STA $7E900A,x[$7E:ABEA] ;Aを[$7E:ABEA]に書き込み
+$C1/E124 BRA $8D    [$E0B3]      ;フラグにかかわりなく常に分岐[$E0B3]
+$C1/E0B3 JSR $E1A9  [$C1:E1A9]   ;[$C1:E1A9]へジャンプ
+</pre></div>
+
+<p><code>[$7E:ABEB]</code>に書き込まれる値は<span class="formula">$80</span>になり、これが背面からの攻撃時に<code>[$7E:ABEB]</code>に入る値である。<br>
+<code><span class="r">$C1/E0FB</span></code>～<code><span class="r">$C1/E0FD</span></code>の判定で、ゼロフラグOFF、ネガティブフラグONとなり、<code><span class="r">$C1/E108</span></code>に進む。<br>
+<code>[$00:1A7D]</code>(敵データ29)を論理右シフト4回、つまり<span class="formula">$10</span>で割り、更に<span class="formula">$0F</span>と論理積を取るので、上1桁が取り出せる。<br>
+これが背後補正の値で、<code>[$00:0311]</code>に書き込まれる。<br>
+クルセイダーＲＳだと<code>[$00:0311]</code>に<span class="formula">$0C</span>が書き込まれる。<br>
+後の処理は側面補正時と同じで、</p>
+
+<p><span class="formula"><code>[$7E:ABEA]</code> = <code>[$00:0310]</code>(敵LV(現在値)) - <code>[$00:0311]</code>(背後補正)</span><br>
+ただし減算結果が負の値の時は<span class="formula">0</span>とする</p>
+
+<p>ということになる。</p>
+
+<p>今回は、</p>
+
+<ul>
+	<li>クルセイダーＲＳ（の一番下側のマス）はY軸でアキラと同じ、またはアキラより下にいる</li>
+	<li>クルセイダーＲＳ（の一番右側のマス）はX軸でアキラと同じ、またはアキラより右にいる</li>
+</ul>
+
+<p>という条件を満たしているので、背面の位置は以下のように判定されたことになる。</p>
+
+<div class="mono">
+■■■■□□□<br>
+■■■<span style="background-color:#ddd;">ク</span>□□□<br>
+■■■<span style="background:linear-gradient(135deg, #ddd 80%, #666 20%);">ク</span>□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□<br>
+□□□□□□□
+</div>
+
+<p>以上、クルセイダーＲＳが右下向きの場合に絞って3パターン説明したが、どちら向きであっても、敵の座標、向き、サイズ、及び味方の座標から、味方が敵を攻撃する時の敵の向き補正を判定していることがわかる。<br>
+全ての分岐を説明するとややこしくなるため省略するが、結局、サブルーチンは、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code><span class="r">$C1/E127</span></code>～<code><span class="r">$C1/E1A8</span></code></td><td>味方が敵を攻撃する時、向き補正を判定して<code>[$7E:ABnB]</code>に書き込む値を<code>A</code>にロードする</td></tr>
+	<tr><td><code><span class="r">$C1/E0F7</span></code>～<code><span class="r">$C1/E0B3</span></code></td><td>味方が敵を攻撃する時、向き補正<code>[$7E:ABnB]</code>から、向き補正したレベルの値を<code>[$7E:ABnA]</code>に書き込む</td></tr>
+</tbody>
+</table>
+
+<p>と、いうことになる。</p>
+
+<p>ここまでが味方が敵を攻撃する時だが、逆の場合、敵が味方を攻撃する時はどうなるかを<a href="program39_2.html">次ページ</a>で見ていく。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program38.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program39_2.html"><span class="button">&#9654;次</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

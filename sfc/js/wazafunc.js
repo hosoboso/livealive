@@ -740,6 +740,18 @@ document.getElementById('wazalist').addEventListener('change', (event) => {
 	}
 });
 
+// 選択した味方キャラ用
+document.getElementById("mikataSelect").addEventListener("change", () => {
+	document.getElementById("i6").checked = true;
+	updateTable();
+});
+
+// 選択した敵キャラ用
+document.getElementById("tekiSelect").addEventListener("change", () => {
+	document.getElementById("i7").checked = true;
+	updateTable();
+});
+
 // 選択式メニュー<select>用　実行
 document.getElementById('selecter').addEventListener('change', () => {
 	updateTable();
