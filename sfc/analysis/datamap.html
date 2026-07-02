@@ -134,6 +134,7 @@ table {
 		<li><a href="program37.html">特殊タイプの技処理</a></li>
 		<li><a href="program38.html">回避属性</a></li>
 		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">戦闘・その他</button>
@@ -426,6 +427,7 @@ table {
 	<tr><td><code>$C1:77CE</code>～<code>$C1:783A</code></td><td>単発ダメージ/回復量計算</td></tr>
 	<tr><td><code>$C1:7843</code>～<code>$C1:7851</code></td><td>単発ダメージ＋乱数ブレ分</td></tr>
 	<tr><td><code>$C1:7852</code>～<code>$C1:786B</code></td><td>技使用時、<code>$7E:9010～$7E:9028</code>に技データをコピー</td></tr>
+	<tr><td><code>$C1:7AED</code>～<code>$C1:7B01</code></td><td>味方キャラが行動可能か判定（状態異常とタメ時間中でないか確認）</td></tr>
 	<tr><td><code>$C1:7BCE</code>～<code>$C1:7F92</code></td><td>最終編ラストバトル　ピュアオディオ出現判定・処理</td></tr>
 	<tr><td><code>$C1:835E</code>～<code>$C1:8368</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタに<span class="formula">$0F</span>書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C1:8AD8</code>～<code>$C1:8AFD</code></td><td>戦闘用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
@@ -433,6 +435,7 @@ table {
 	<tr><td><code>$C1:92D0</code>～<code>$C1:92F8</code></td><td>行動異常発生後、BREAKDOWN対象の敵のみ行動異常解除</td></tr>
 	<tr><td><code>$C1:941E</code>～<code>$C1:943E</code></td><td>敵行動時の行動ポイント処理 (<span class="formula">行動ポイント<code>[$00:03AF][$00:03AE]</code> & $6F | $10</span>)</td></tr>
 	<tr><td><code>$C1:9D13</code>～<code>$C1:9D86</code></td><td>Xボタンの「ひとつ前の技」関連処理</td></tr>
+	<tr><td><code>$C1:9EFA</code>～<code>$C1:9F51</code></td><td>味方の行動順決定（<code>[$00:035B]</code><code>[$00:035A]</code>を更新）</td></tr>
 	<tr><td><code>$C1:A00B</code>～<code>$C1:A0DE</code></td><td>味方が出した技が回復技または無属性ではないとき、技の属性を取り出す</td></tr>
 	<tr><td><code>$C1:A12C</code>～<code>$C1:A179</code></td><td>敵が出した技が回復技または無属性ではないとき、技の属性を取り出す</td></tr>
 	<tr><td><code>$C1:A1BD</code>～<code>$C1:A21B</code></td><td>敵から1ヒット以上の攻撃を食らった時、習得技で反撃できるか判定し、反撃技が出せなくなる状態異常ではないか判定</td></tr>
@@ -679,9 +682,10 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:0A47</code></td><td>各シナリオの仲間3人目ID　最終編以外</td></tr> -->
 	<tr><td><code>$00:0A60</code></td><td>フィールド上BGM　サウンドルームBGMとは異なる　<a href="#BGMlist">BGM一覧表</a></td></tr>
 	<tr><td><code>$00:0A61</code></td><td>BGMの再生ピッチ？（通常<span class="formula">$FF</span>、「いいお天気でしょっ!」の夜バージョンは<span class="formula">$60</span>）</td></tr>
-	<tr><td><code>$00:0AB0</code></td><td>最終編だと<span class="formula">$01</span>　他シナリオは<span class="formula">$00</span></td></tr>
-	<tr><td><code>$00:0AB1</code></td><td>最終編だと<span class="formula">$00</span>　他シナリオは<span class="formula">$01</span></td></tr>
-
+	<tr><td><code>$00:0AB0</code></td><td>隊形で上の位置にいる味方キャラ<br>（主人公:<span class="formula">$00</span>, 仲間1:<span class="formula">$01</span>, 仲間2:<span class="formula">$02</span>, 仲間3:<span class="formula">$03</span>, 入る数値は<code>$00:0AB3</code>まで同じ、最終編は加入順）</td></tr>
+	<tr><td><code>$00:0AB1</code></td><td>隊形で左の位置にいる味方キャラ</td></tr>
+	<tr><td><code>$00:0AB2</code></td><td>隊形で右の位置にいる味方キャラ</td></tr>
+	<tr><td><code>$00:0AB3</code></td><td>隊形で下の位置にいる味方キャラ</td></tr>
 <!-- 	<tr><td><code>$00:0AB6～$00:0ABD</code></td><td>中世・最終以外は$FF、中世は$03/$02/$05/$04/$01/$06/$07/$FF、最終は$00/$03/$02/$05/$04/$01/$06/$07</td></tr> -->
 	
 	<tr><td><code>$00:0AB4</code>～<code>$00:0AB5</code></td><td>セーブ回数　下位バイト/上位バイト<br>999回（<span class="formula">$03E7</span>）を越えると0に戻る</td></tr>
@@ -1056,7 +1060,9 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:0355</code></td><td>敵パーティレベル</td></tr>
 	<tr><td><code>$00:0356</code></td><td>操作キャラがブリキ大王かどうか（ブリキ大王操作時は<span class="formula">$01</span>、それ以外は<span class="formula">$00</span>）</td></tr>
 	<tr><td><code>$00:0358</code></td><td>上位バイトはアイテムドロップ率計算用数値、下位バイトは敵の総数</td></tr>
-	<tr><td><code>$00:0378</code>～<code>$00:0379</code></td><td>攻撃中の敵0～Eに対応したアドレス<span class="formula">1Bx0</span>が2バイトで入る（アドレス呼び出し用）</td></tr>
+	<tr><td><code>$00:035A</code>～<code>$00:035B</code></td><td>味方行動順の値（2バイト）<br>1人目から順に、<span class="formula">$1C00, $1C40, $1C80, $1CC0</span>が入る</td></tr>
+	
+	<tr><td><code>$00:0378</code>～<code>$00:0379</code></td><td>攻撃中の敵0～Eに対応したアドレス<br><span class="formula">1Bx0</span>が2バイトで入る（アドレス呼び出し用）</td></tr>
 	<tr><td><code>$00:03AE</code></td><td>行動ポイント（下位バイト）</td></tr>
 	<tr><td><code>$00:03AF</code></td><td>行動ポイント（上位バイト）</td></tr>
 	<tr><td><code>$00:036C</code></td><td>ステータス復元用計算値(Yで<span class="formula">$40</span>、向き変えで<span class="formula">$20</span>）</td></tr>
@@ -1782,6 +1788,7 @@ document.addEventListener("DOMContentLoaded",function(){let e=document.getElemen
 		<li><a href="program37.html">特殊タイプの技処理</a></li>
 		<li><a href="program38.html">回避属性</a></li>
 		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
 	</ul>
 </div>
 </div>
