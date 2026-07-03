@@ -181,19 +181,14 @@ table {
 <p>なお、順序ポイントの増減は条件による分岐が多くややこしいため、このページでは行動ポイント中心に説明をしていく。<br>
 味方行動順の決定方法は敵ほど複雑ではないため、このページ一番下で紹介している。</p>
 
-<h3>メモリアドレス</h3>
+<p>順序ポイントについては<a href="program40_2.html">次ページ</a>で説明するが、まずは行動ポイントについてお読みいただきたい。</p>
 
+<h3>メモリアドレス</h3>
 
 <h5>行動ポイント</h5>
 
 <p><code>[$00:03AF]</code><code>[$00:03AE]</code>2バイトで戦闘中の行動ポイントの値。<br>
 敵味方共通。</p>
-
-<h5>順序ポイント</h5>
-
-<code>[$7E:ACn5]</code><code>[$7E:ACn4]</code>
-<p>nは敵番号（0～E）<br>
-2バイトで各敵番号の順序ポイント。</p>
 
 <h5><code>[$00:03B8]</code></h5>
 
@@ -257,46 +252,6 @@ $C1/F3D8 STZ $B8    [$00:03B8]   ;[$00:03B8]に$00を書き込み
 </pre></div>
 
 <p>後に敵味方ターンを判定するために必要となる<code>[$00:03B8]</code>も、初期値は<span class="formula">$00</span>である。</p>
-
-<div class="code-container"><pre>
-;順序ポイント初期値設定
-$C1/EBCA BMI $1F    [$EBEB]      ;ネガティブフラグが立っているとき[$EBEB]分岐
-$C1/EBCC BEQ $F9    [$EBC7]      ;ゼロフラグが立っているとき[$EBC7]分岐
-$C1/EBCE LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
-$C1/EBD1 LDA #$00                ;Aに$00をロード
-$C1/EBD3 SEC                     ;キャリーフラグON
-$C1/EBD4 SBC $0028,y[$00:1A28]   ;A - [$00:1A28](敵データ08　知)
-$C1/EBD7 STA $7E9104,x[$7E:AC04] ;Aを[$7E:AC04]に書き込み
-$C1/EBDB LDA #$00                ;Aに$00をロード
-$C1/EBDD STA $7E9105,x[$7E:AC05] ;Aを[$7E:AC05]に書き込み
-$C1/EBE1 STA $7E9106,x[$7E:AC06] ;Aを[$7E:AC06]に書き込み
-$C1/EBE5 STA $7E9107,x[$7E:AC07] ;Aを[$7E:AC07]に書き込み
-$C1/EBE9 BRA $DC    [$EBC7]      ;フラグにかかわりなく常に分岐[$EBC7]
-$C1/EBC7 JSR $E1A9  [$C1:E1A9]   ;[$C1:E1A9]へジャンプ
-</pre></div>
-
-<p><span class="formula">X:1Bn0</span>（<span class="formula">n</span>は敵番号）で、戦闘開始時にいる敵すべてに上の処理を行う。<br>
-<span class="formula">Y:1A?0</span>で、敵種類1～4で<code>Y</code>はそれぞれ<span class="formula">$1A00, $1A40, $1A50, $1AC0</span>となる。<br>
-上は敵番号0、敵種類1としてアドレスを紹介しておく。<br>
-<code><span class="r">$C1/EBD1</span></code>～の処理を追ってみると、</p>
-
-<p><span class="formula"><code>[$7E:AC04]</code> = $100 - <code>[$00:1A28]</code>(敵データ08　知)</span><br>
-<span class="formula"><code>[$7E:AC05]</code> = $00</span></p>
-
-<p>と、なっている。<br>
-知が1以上の敵は繰り下がりがおき、キャリーフラグがOFFになる。<br>
-順序ポイント初期値は、その敵の「<span class="formula">$100(256) - 知</span>」になることがわかる。</p>
-
-<p>だが、知が0の敵（岩やしょく台など）は、</p>
-
-<p><span class="formula"><code>[$7E:AC04]</code> = $100 - $00 = $00</span>（キャリーフラグON）</p>
-
-<p>繰り下がりが起こらないまま、下1バイトがそのまま<code>[$7E:AC04]</code>に入るため、知が0の敵だけ、順序ポイント初期値は<span class="formula">$00</span>である。<br>
-つまり、</p>
-
-<p><span class="formula">順序ポイント初期値 = ($100(256) - 知) &#x26; $FF</span></p>
-
-<p>と考えれば良いことになる。</p>
 
 <p>ここからは、戦闘中の行動ポイントの計算について説明する。<br>
 まず、味方の行動について。</p>
@@ -423,7 +378,7 @@ $C1/93E0 RTS                     ;サブルーチン戻り
 $C1/281B JSR $2808  [$C1:2808]   ;[$C1:2808]へジャンプ
 
 $C1/2808 LDA $0035,x[$00:1C35]   ;Aに[$00:1C35](速(現在値))をロード
-$C1/280B CMP #$E2                ;Aと$E2(226,%1110 0010)を減算比較（ステータスレジスタ変更のみ）
+$C1/280B CMP #$E2                ;Aと$E2を減算比較（ステータスレジスタ変更のみ）
 $C1/280D BCC $02    [$2811]      ;キャリーフラグが立っていないとき[$2811]分岐
 ;キャリーフラグON
 $C1/280F LDA #$E2                ;Aに$E2をロード
@@ -973,6 +928,8 @@ $C1/7B01 RTS                     ;サブルーチン戻り
 <p>ことを確認した上で、現在の行動キャラとして<code>X</code>が<code>[$00:035B]</code><code>[$00:035A]</code>に書き込まれる。<br>
 味方ターンが回る度に、上の処理で次に行動するキャラが決まる。</p>
 
+<p>次ページでは、<a href="program40_2.html">順序ポイント</a>について説明する。</p>
+
 <script>//ソースコード色分け処理
 window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
 </script>
@@ -980,7 +937,7 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 <div class="pagelink">
 	<div id="pageprev"><a href="program39_2.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-	<!-- <div id="pagenext"><a href="program40_2.html"><span class="button">&#9654;次</span></a></div> -->
+	<div id="pagenext"><a href="program40_2.html"><span class="button">&#9654;次 順序ポイント</span></a></div>
 </div>
 
 </div>
