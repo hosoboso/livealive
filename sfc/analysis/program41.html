@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 敵ターンにおける行動選択</head>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 敵ターンにおける行動選択">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 敵ターンにおける行動選択</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 敵ターンにおける行動選択</h1>
+<h2>敵ターンにおける行動選択</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>行動ポイントと順序ポイントで、どの敵が行動するかが決まるが、では実際にどのように行動を決めるのか。<br>
+詳しくは、<a href="http://zsnsk.sakura.ne.jp/livealive/battle_system.html" target="_blank">ZsnsK's F**kin' Site</a>様にある。<br>
+前ページまでの<a href="program40.html">行動ポイント</a>、<a href="program40_2.html">順序ポイント</a>の知識を前提としているので、予め御覧いただきたい。</p>
+
+<p>敵ターンが回ってきた時、順序ポイント最大の敵が行動するが、それは<code><span class="r">$C1/9335</span></code>までで決まる。<br>
+その後、<code><span class="r">$C1/8E5E</span></code>～<code><span class="r">$C1/8E7F</span></code>で、「行動不能な状態異常（石化、マヒ、眠り）で行動順が回ってきたかどうか」の判定をする。<br>
+行動不能な状態異常でなければ、<code><span class="r">$C1/90A2</span></code>～<code><span class="r">$C1/90C4</span></code>で、敵行動前の行動異常解除判定を行う（<a href="program17.html">行動異常回復判定</a>）。</p>
+
+<p>その後の、<code><span class="r">$C1/8E82</span></code>からが行動選択になる。</p>
+
+<ul>
+	<li><a href="#00">移動または向き変え判定</a></li>
+	<li><a href="#01">技使用判定</a></li>
+	<li><a href="#02">使用技判定</a></li>
+	<li><a href="program41_2.html">技の範囲判定</a></li>
+	<li><a href="program41_3.html">回復技判定</a></li>
+</ul>
+
+
+<h3 id="00">移動または向き変え判定</h3>
+
+<p>この先は敵種類1、敵番号0の前提で進める。</p>
+
+<div class="code-container"><pre>
+$C1/8E82 JSR $1CF7  [$C1:1CF7]   ;[$C1:1CF7]へジャンプ
+;
+;行動異常のデータ呼び出し
+$C1/1CF7 PHX                     ;Xをスタックにプッシュ
+$C1/1CF8 LDA $7E8F02,x           ;Aに[$7E:AAn2](敵番号nの行動異常)をロード （$00をロード）
+$C1/1CFC ASL A                   ;Aを算術左シフト *2
+$C1/1CFD ASL A                   ;Aを算術左シフト *2
+$C1/1CFE ASL A                   ;Aを算術左シフト *2
+$C1/1CFF REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/1D01 AND #$00F8              ;Aと$00F8で論理積
+$C1/1D04 ADC $D50060[$D5:0060]   ;A + [$D5:0060]
+$C1/1D08 TAX                     ;Aの値をXレジスタに転送
+$C1/1D09 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1D0B LDY #$0320              ;Yに$0320をロード
+;
+;ループ処理ここから
+$C1/1D0E LDA $D50000,x[$D5:644B] ;Aに[$D5:644B+n]をロード
+$C1/1D12 STA $0000,y[$00:0320]   ;Aを[$00:0320+n]に書き込み
+$C1/1D15 INX                     ;Xをインクリメント +1
+$C1/1D16 INY                     ;Yをインクリメント +1
+$C1/1D17 CPY #$0328              ;Yと$0328を減算比較（ステータスレジスタ変更のみ）
+$C1/1D1A BNE $F2    [$1D0E]      ;ゼロフラグが立っていないとき[$1D0E]分岐
+;ループ処理ここまで
+;
+$C1/1D1C PLX                     ;Xレジスタにスタックからプル
+$C1/1D1D RTS                     ;サブルーチン戻り
+;
+;移動・向き変え判定
+$C1/8E85 LDA $7E9106,x[$7E:AC06] ;Aに[$7E:AC06]をロード
+$C1/8E89 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/8E8C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/8E8E AND #$000F              ;Aと$000Fで論理積
+$C1/8E91 ASL A                   ;Aを算術左シフト *2
+$C1/8E92 ADC #$8DFE              ;A + $8DFE
+$C1/8E95 TAX                     ;Aの値をXレジスタに転送
+$C1/8E96 LDA $C10000,x[$C1:8DFE] ;Aに[$C1:8DFE]をロード
+$C1/8E9A STA $1C    [$00:031C]   ;Aを[$00:031C]に書き込み
+$C1/8E9C LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/8E9E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/8EA0 JMP ($031C)[$C1:8EA3]   ;[$C1:8EA3]へジャンプ(レジスタをスタックに積まない)
+;
+$C1/8EA3 LDA $0021,y[$00:1A21]   ;Aに[$00:1A21]（敵種類1の敵データ01）をロード
+$C1/8EA6 AND #$0F                ;Aと$0Fで論理積
+$C1/8EA8 STA $10    [$00:0310]   ;Aを[$00:0310](移動頻度)に書き込み
+$C1/8EAA JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+;判定
+$C1/8EAD AND #$1F                ;A(乱数$00～$FF)と$1F(%0001 1111)で論理積
+$C1/8EAF CMP $10    [$00:0310]   ;Aと[$00:0310](移動頻度)を減算比較（ステータスレジスタ変更のみ）
+$C1/8EB1 BCS $03    [$8EB6]      ;キャリーフラグが立っているとき[$8EB6]分岐
+;キャリーフラグOFF（移動・向き変え判定ON）
+$C1/8EB3 BRL $00A4  [$8F5A]      ;フラグにかかわりなく常に分岐[$8F5A]
+;キャリーフラグON（移動・向き変え判定OFF）
+$C1/8EB6 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+</pre></div>
+
+<p>行動異常のデータ呼び出し（<code><span class="r">$C1/1CF7</span></code>～<code><span class="r">$C1/1D1D</span></code>）は、<a href="program40_2.html">順序ポイント</a>で説明した通り。<br>
+該当の敵の行動異常データ0～7が、<code>[$00:0320]</code>～<code>[$00:0327]</code>にコピーされる。<br>
+その後の<code><span class="r">$C1/8E85</span></code>から、まず、移動・向き変え判定を行うのだが、ここから先はここで呼び出される<code>[$7E:ACn6]</code>（nは敵番号）が重要になる。<br>
+<code>[$7E:ACn6]</code>は初期値<span class="formula">$00</span>である。</p>
+
+<p><code><span class="r">$C1/8E85</span></code>～<code><span class="r">$C1/8EA0</span></code>は敵データのアドレスを呼び出すための計算。<br>
+<code><span class="r">$C1/8EA0</span></code>の飛び先は<code>[$7E:AC06]</code>に入っている値によって変動するが、ここはひとまず、<code>[$7E:AC06]</code>が初期値<span class="formula">$00</span>の前提で説明する。</p>
+
+<p><code><span class="r">$C1/8EA3</span></code>で呼び出した<code>[$00:1A21]</code>は敵種類1の敵データ01である。<br>
+<code><span class="r">$C1/8EA6</span></code>で<span class="formula">$0F</span>と論理積を取っているが、敵データ01の下1桁は「移動頻度」というパラメータになる（<span class="formula">$0～$F</span>）。<br>
+移動頻度は<code>[$00:0310]</code>に書き込まれる。</p>
+
+<p>続いて<code><span class="r">$C1/8EAA</span></code>から戦闘乱数を生成し、<code><span class="r">$C1/8EAD</span></code>で、乱数(<span class="formula">$00</span>～<span class="formula">$FF</span>)と<span class="formula">$1F</span>(<span class="formula">%0001 1111</span>)で論理積を取るから、乱数幅が<span class="formula">$00</span>～<span class="formula">$1F</span>（<span class="formula">0～31</span>）になる。<br>
+更に、この値と<code>[$00:0310]</code>(移動頻度)で減算比較、</p>
+
+<p><span class="formula">乱数（$00～$1F） - 移動頻度（$0～$F）</span><br>
+<span class="formula">=乱数（0～31） - 移動頻度（0～15）</span></p>
+
+<p>の結果でキャリーフラグ判定となっている。<br>
+減算結果が負の数の時、キャリーフラグOFFで、この時点で移動または向き変えが決定となる。<br>
+確率としては、</p>
+
+<span class="formula">移動頻度/32</span>
+
+<p>で移動または向き変えである。<br>
+移動頻度の値が高いほど、この時点で移動または向き変えの確率が高いことになる。</p>
+
+<p>敵の多くは移動頻度が<span class="formula">0</span>で、この最初の移動または向き変え判定では、移動または向き変えになる確率が<span class="formula">0</span>となり、技使用判定に移行する。<br>
+大半の敵が、「味方に技を出せる位置・向きなら攻撃し、それ以外なら移動」という行動を取るのは、移動頻度が<span class="formula">0</span>に設定されているためである。<br>
+移動頻度が<span class="formula">0</span>だから移動しないということではなく、技使用判定をしても技を出せない状況下なら移動、という判定をしていることになる。</p>
+
+
+<h3 id="01">技使用判定</h3>
+
+<p>上の移動または向き変え判定で、移動または向き変えとならなかった場合、技使用判定に移る。<br>
+つまり<code><span class="r">$C1/8EB1</span></code>の判定でキャリーフラグが立った時、<code><span class="r">$C1/8EB6</span></code>に進み、戦闘乱数を生成する。</p>
+
+<p>また、敵は技1～4の4種類の技を使うが、敵キャラデータ11～14に技IDが入っている。<br>
+敵キャラデータ11から、つまり使用技1から順に技を使用するか判定していく。<br>
+なお、敵キャラデータ09の上1ビットが<span class="formula">0</span>なら敵技ID、<span class="formula">1</span>なら味方技ID一覧から技を選ぶ。</p>
+
+<p>最初に使用技1の判定を行う。</p>
+
+<div class="code-container"><pre>
+;使用技1の判定
+$C1/8EB6 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+;使用技1使用判定
+$C1/8EB9 AND #$C0                ;A(乱数$00～$FF)と$C0(%1100 0000)で論理積
+$C1/8EBB BNE $03    [$8EC0]      ;ゼロフラグが立っていないとき[$8EC0]分岐
+;ゼロフラグON（使用技1の使用は見送り、次判定へ）
+$C1/8EBD BRL $0089  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+;ゼロフラグOFF（行動異常チェックへ）
+$C1/8EC0 LDA $20    [$00:0320]   ;Aに[$00:0320]（行動異常0　使用不可技判定）をロード
+$C1/8EC2 BPL $58    [$8F1C]      ;ネガティブフラグが立っていないとき[$8F1C]分岐
+;ネガティブフラグON（行動異常で使用不可）
+$C1/8EC4 BRL $0082  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+;ネガティブフラグOFF（行動異常で使用不可ではない）
+$C1/8F1C LDA $AF    [$00:03AF]   ;Aに[$00:03AF](行動ポイント上1バイト)をロード
+$C1/8F1E BEQ $29    [$8F49]      ;ゼロフラグが立っているとき[$8F49]分岐
+;ゼロフラグOFF 技1使用
+$C1/8F20 JSR $9252  [$C1:9252]   ;[$C1:9252]へジャンプ
+
+;使用技1の使用は見送り、次判定へ
+$C1/8F49 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/8F4B STZ $0005,x[$00:1B05]   ;[$00:1B05](技関係状態)に$00を書き込み
+$C1/8F4E LDA $7E9106,x[$7E:AC06] ;Aに[$7E:AC06]をロード
+$C1/8F52 INC A                   ;Aをインクリメント +1
+$C1/8F53 AND #$0F                ;Aと$0Fで論理積
+$C1/8F55 STA $7E9106,x[$7E:AC06] ;Aを[$7E:AC06]に書き込み
+$C1/8F59 RTS                     ;サブルーチン戻り
+
+;$C1/8F20のジャンプ先、使用技1使用可能
+$C1/9252 LDA $002B,y[$00:1A2B]   ;Aに[$00:1A2B](敵データ11　使用技1　技ID)をロード
+$C1/9255 JSR $3D5C  [$C1:3D5C]   ;[$C1:3D5C]へジャンプ
+</pre></div>
+
+<p>まず、戦闘乱数と<span class="formula">$C0</span>(<span class="formula">%1100 0000</span>)で論理積をとり、ゼロフラグ判定をしている。<br>
+つまり乱数が<span class="formula">$00</span>～<span class="formula">$3F</span>（<span class="formula">%0011 1111</span>）ならゼロフラグが立ち、<span class="formula">$40</span>～<span class="formula">$FF</span>はゼロフラグが立たない。<br>
+<span class="formula">64/256 = 1/4</span>の確率でゼロフラグが立ち、<code><span class="r">$C1/8EBD</span></code>→<code><span class="r">$C1/8F49</span></code>に進む。<br>
+後述するが、<code><span class="r">$C1/8F49</span></code>に進む場合は、ここでの判定を抜けた（使用技1の使用を選択しなかった）ことになる。</p>
+
+<p><span class="formula">3/4</span>の確率で使用技1の使用を選択して、<code><span class="r">$C1/8EC0</span></code>に進む。<br>
+その場合、まず、<code>[$00:0320]</code>をロードしてネガティブフラグ判定をする。<br>
+<code>[$00:0320]</code>には先に、行動異常データ0がロードされており、上1バイトの4ビット分に、使用技1～4が使用可能かどうか1ビットずつ記録されている。<br>
+ネガティブフラグの判定ということは、一番上の1ビットが<span class="formula">0</span>か<span class="formula">1</span>かの判定である。つまり敵の使用技1が、行動異常により使用不可になっていないかどうかの判定である。<br>
+ここで使用不可の判定をされたら、<code><span class="r">$C1/8EC4</span></code>→<code><span class="r">$C1/8F49</span></code>と飛ぶ。<br>
+一方、使用可能なら<code><span class="r">$C1/8F1C</span></code>にジャンプして、<code>[$00:03AF]</code>(行動ポイント上1バイト)が<span class="formula">1</span>以上かどうか、つまり敵ターンか判定して、<code><span class="r">$C1/8F20</span></code>に進む。<br>
+ここで、敵は使用技1使用確定である。<code>[$C1:9252]</code>へジャンプして技の使用処理を行う。</p>
+
+<p>以上の判定を抜けた場合、つまり使用技1の使用は見送った時は<code><span class="r">$C1/8F49</span></code>に進むが、次の判定へ進むための処理を<code><span class="r">$C1/8F49</span></code>～<code><span class="r">$C1/8F59</span></code>で行う。<br>
+<code>[$7E:AC06]</code>をインクリメント<span class="formula">+1</span>するのがポイントである。<br>
+ここで<code>[$7E:AC06]</code>が<span class="formula">$01</span>になる。</p>
+
+<p>一方、<code><span class="r">$C1/8F20</span></code>で使用技1の使用が選択された場合は<code><span class="r">$C1/9252</span></code>にジャンプし、<code>A</code>に<code>[$00:1A2B]</code>(敵データ11　使用技1　技ID)をロードして<code>[$C1:3D5C]</code>へと進むが、この時点で使用技1の使用が確定ではない。<br>
+<code><span class="r">$C1/3D5C</span></code>以降の、技使用判定後のサブルーチンについては後で説明するとして、ここでは使用技1が選択されず次の判定に進む場合（<code><span class="r">$C1/8F59</span></code>以降）を説明する。<br>
+使用技1の判定で選択されなかった場合、次は使用技2の判定へ移るのだが、そこまで別処理を挟んでおり、1フレーム後に判定する。</p>
+
+<div class="code-container"><pre>
+;使用技2の判定
+$C1/8E85 LDA $7E9106,x[$7E:AC06] ;Aに[$7E:AC06]($01)をロード
+$C1/8E89 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/8E8C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/8E8E AND #$000F              ;Aと$000Fで論理積
+$C1/8E91 ASL A                   ;Aを算術左シフト *2
+$C1/8E92 ADC #$8DFE              ;A + $8DFE
+$C1/8E95 TAX                     ;Aの値をXレジスタに転送
+$C1/8E96 LDA $C10000,x[$C1:8E00] ;Aに[$C1:8E00]をロード
+$C1/8E9A STA $1C    [$00:031C]   ;Aを[$00:031C]に書き込み
+$C1/8E9C LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/8E9E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/8EA0 JMP ($031C)[$C1:8EC7]   ;[$C1:8EC7]へジャンプ(レジスタをスタックに積まない)
+$C1/8EC7 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+;使用技2使用判定
+$C1/8ECA AND #$C0                ;Aと$C0で論理積
+$C1/8ECC BNE $03    [$8ED1]      ;ゼロフラグが立っていないとき[$8ED1]分岐
+;ゼロフラグON（使用技2の使用は見送り、次判定へ）
+$C1/8ECE BRL $0078  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+;ゼロフラグOFF（行動異常チェックへ）
+$C1/8ED1 INY                     ;Yをインクリメント +1
+$C1/8ED2 LDA $20    [$00:0320]   ;Aに[$00:0320](行動異常0　使用不可技判定をロード
+$C1/8ED4 BIT #$40                ;Aと$40(0100 0000)で論理積（ステータスフラグ変更のみ）
+$C1/8ED6 BEQ $44    [$8F1C]      ;ゼロフラグが立っているとき[$8F1C]分岐
+;ゼロフラグON（行動異常で使用不可ではない）
+$C1/8F1C LDA $AF    [$00:03AF]   ;Aに[$00:03AF]をロード
+$C1/8F1E BEQ $29    [$8F49]      ;ゼロフラグが立っているとき[$8F49]分岐
+$C1/8F20 JSR $9252  [$C1:9252]   ;[$C1:9252]へジャンプ
+;ゼロフラグOFF（行動異常で使用不可）
+$C1/8ED8 BRL $006E  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+
+;使用技2の使用は見送り、次判定へ
+$C1/8F49 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/8F4B STZ $0005,x[$00:1B05]   ;[$00:1B05]に$00を書き込み
+$C1/8F4E LDA $7E9106,x[$7E:AC06] ;Aに[$7E:AC06]をロード
+$C1/8F52 INC A                   ;Aをインクリメント +1
+$C1/8F53 AND #$0F                ;Aと$0Fで論理積
+$C1/8F55 STA $7E9106,x[$7E:AC06] ;Aを[$7E:AC06]に書き込み
+$C1/8F59 RTS                     ;サブルーチン戻り
+
+;$C1/8F20のジャンプ先、使用技2使用可能
+$C1/9252 LDA $002B,y[$00:1A2C]   ;Aに[$00:1A2C](敵データ12　使用技2　技ID)をロード
+$C1/9255 JSR $3D5C  [$C1:3D5C]   ;[$C1:3D5C]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/8E85</span></code>～<code><span class="r">$C1/8EA0</span></code>は移動・向き変え判定でも使用したアドレスの呼び出しサブルーチンなのだが、<code><span class="r">$C1/8E85</span></code>でロードする<code>[$7E:AC06]</code>は、この時点で<span class="formula">$01</span>に増加している。<br>
+このため、<code><span class="r">$C1/8EA0</span></code>で呼び出すジャンプ先が変わる。<br>
+<code>[$7E:AC06]</code>が<span class="formula">$01</span>の時、つまり使用技2の判定の時は、ジャンプ先が<code><span class="r">$C1/8EC7</span></code>に変わっている。</p>
+
+<p>その後の戦闘乱数計算と、戻り先の<code><span class="r">$C1/8ECA</span></code>からの処理は、使用技1の時とは少し処理が変わっているのだが、判定自体は同じ。<br>
+<code><span class="r">$C1/8ECA</span></code>からは、戦闘乱数と<span class="formula">$C0</span>で論理積をとり、ゼロフラグ判定なので、今回も1/4の確率でゼロフラグが立ち、<code><span class="r">$C1/8ECE</span></code>→<code><span class="r">$C1/8F49</span></code>に進む。<br>
+つまり使用技2も、3/4の確率で使用を選択して、<code><span class="r">$C1/8ED1</span></code>に進む。<br>
+この先からが少し異なり、<code>Y</code>をインクリメント（<span class="formula">+1</span>）してから、行動異常データ0で使用技2が使える状態かを判定する。<br>
+行動異常0の上から2ビット目に使用技2が使える状態か入っているため、<code><span class="r">$C1/8ED4</span></code>で<span class="formula">$40</span>(<span class="formula">%0100 0000</span>)と論理積を取り、ゼロフラグ判定になる。<br>
+つまり、使用技1とは判定のための計算方法が変わるが、判定自体は「行動異常により技が使える状態かどうか」という共通の内容である。<br>
+ここで使用不可の判定をされたら、<code><span class="r">$C1/8ED8</span></code>→<code><span class="r">$C1/8F49</span></code>と飛ぶ。<br>
+使用可能なら、使用技1と同じく、<code><span class="r">$C1/8F1C</span></code>にジャンプして、<code>[$00:03AF]</code>(行動ポイント上1バイト)が<span class="formula">1</span>以上かどうか、つまり敵ターンか判定して、<code><span class="r">$C1/8F20</span></code>に進む。<br>
+ここで、敵は使用技2使用確定である。<code>[$C1:9252]</code>へジャンプして技の使用処理を行う。<br>
+<code><span class="r">$C1/9252</span></code>で呼び出すのは敵データ12の使用技2であるが、先程<code>Y</code>の値をインクリメントしたので、呼び出すアドレスが使用技2になったのである。</p>
+
+<p>使用技2を使わないと判定された場合、使用技1判定の時と同じく、<code><span class="r">$C1/8F49</span></code>～<code><span class="r">$C1/8F59</span></code>のサブルーチンに移るが、<code>[$7E:AC06]</code>が再びインクリメントされるので、ここで<span class="formula"><code>[$7E:AC06]</code> = $02</span>となる。</p>
+
+<p>この後も使用技3、使用技4と順に判定が進むが、<code><span class="r">$C1/8EA0</span></code>のジャンプ先が<code>[$7E:AC06]</code>の値で決まることにより、何番目の使用技を判定しているか、分岐するという仕組みである。</p>
+
+<p>ということで、使用技3の判定（<span class="formula"><code>[$7E:AC06]</code> = $02</span>）は、以下のようになる。</p>
+
+<div class="code-container"><pre>
+;[$7E:AC06]が$02の時（使用技3判定）
+$C1/8EDB JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+;使用技3使用判定
+$C1/8EDE AND #$C0                ;Aと$C0で論理積
+$C1/8EE0 BNE $03    [$8EE5]      ;ゼロフラグが立っていないとき[$8EE5]分岐
+;ゼロフラグON（使用技3の使用は見送り、次判定へ）
+$C1/8EE2 BRL $0064  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+;ゼロフラグOFF（行動異常チェックへ）
+$C1/8EE5 INY                     ;Yをインクリメント +1
+$C1/8EE6 INY                     ;Yをインクリメント +1
+$C1/8EE7 LDA $20    [$00:0320]   ;Aに[$00:0320]（行動異常0　使用不可技判定）をロード
+$C1/8EE9 BIT #$20                ;Aと$20(%0010 0000)で論理積（ステータスフラグ変更のみ）
+$C1/8EEB BEQ $2F    [$8F1C]      ;ゼロフラグが立っているとき[$8F1C]分岐
+;ゼロフラグOFF（行動異常で使用不可）
+$C1/8EED BRL $0059  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+</pre></div>
+
+<p>行動異常の判定が行動異常データ1の上から3ビット目、<span class="formula">$20</span>(<span class="formula">%0010 0000</span>)との論理積で判断していることと、<code>Y</code>のインクリメント回数が変わる。<br>
+<code>Y</code>の数値が変わったので、使用技3を使用すると決定した後、<code>[$00:1A2D]</code>(敵データ13　使用技3　技ID)をロードすることになる。<br>
+次判定に飛ぶ時は<code><span class="r">$C1/8EED</span></code>→<code><span class="r">$C1/8F49</span></code>なので、<code>[$7E:AC06]</code>がインクリメントされ、<span class="formula">$03</span>になり、使用技4の判定へ続く。</p>
+
+<p>使用技4の判定（<span class="formula"><code>[$7E:AC06]</code> = $03</span>）は、以下のようになる。</p>
+
+<div class="code-container"><pre>
+;[$7E:AC06]が$03の時（使用技4判定）
+$C1/8EF0 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+;使用技4使用判定
+$C1/8EF3 AND #$C0                ;Aと$C0で論理積
+$C1/8EF5 BNE $03    [$8EFA]      ;ゼロフラグが立っていないとき[$8EFA]分岐
+;ゼロフラグON（使用技4の使用は見送り、次判定へ）
+$C1/8EF7 BRL $004F  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+;ゼロフラグOFF（行動異常チェックへ）
+$C1/8EFA INY                     ;Yをインクリメント +1
+$C1/8EFB INY                     ;Yをインクリメント +1
+$C1/8EFC INY                     ;Yをインクリメント +1
+$C1/8EFD LDA $20    [$00:0320]   ;Aに[$00:0320]をロード
+$C1/8EFF BIT #$10                ;Aと$10(%0001 0000)で論理積（ステータスフラグ変更のみ）
+$C1/8F01 BEQ $19    [$8F1C]      ;ゼロフラグが立っているとき[$8F1C]分岐
+;ゼロフラグON（行動異常で使用不可ではない）
+$C1/8F1C LDA $AF    [$00:03AF]   ;Aに[$00:03AF]をロード
+$C1/8F1E BEQ $29    [$8F49]      ;ゼロフラグが立っているとき[$8F49]分岐
+$C1/8F20 JSR $9252  [$C1:9252]   ;[$C1:9252]へジャンプ
+
+;ゼロフラグOFF（行動異常で使用不可）
+$C1/8F03 BRL $0043  [$8F49]      ;フラグにかかわりなく常に分岐[$8F49]
+
+$C1/8F49 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/8F4B STZ $0005,x[$00:1B05]   ;[$00:1B05]に$00を書き込み
+$C1/8F4E LDA $7E9106,x[$7E:AC06] ;Aに[$7E:AC06]をロード
+$C1/8F52 INC A                   ;Aをインクリメント +1
+$C1/8F53 AND #$0F                ;Aと$0Fで論理積
+$C1/8F55 STA $7E9106,x[$7E:AC06] ;Aを[$7E:AC06]に書き込み
+$C1/8F59 RTS                     ;サブルーチン戻り
+
+$C1/9477 RTS                     ;サブルーチン戻り
+
+$C1/0261 JSR $9480  [$C1:9480]   ;[$C1:9480]へジャンプ
+
+$C1/9480 LDA $F0    [$00:03F0]   ;Aに[$00:03F0]($FF)をロード
+$C1/9482 BIT #$EF                ;Aと$EFで論理積（ステータスフラグ変更のみ）
+$C1/9484 BEQ $01    [$9487]      ;ゼロフラグが立っているとき[$9487]分岐
+$C1/9486 RTS                     ;サブルーチン戻り
+
+$C1/0264 JSR $169E  [$C1:169E]   ;[$C1:169E]へジャンプ
+</pre></div>
+
+<p>こちらも、行動異常の判定が行動異常データ1の上から4ビット目、<span class="formula">$10</span>(<span class="formula">%0001 0000</span>)との論理積で判断していることと、<code>Y</code>のインクリメント回数が変わる。<br>
+<code>Y</code>の数値が変わったので、使用技4を使用すると決定した後、<code>[$00:1A2E]</code>(敵データ14　使用技3　技ID)をロードすることになる。</p>
+
+<p>ここまで、</p>
+
+<ol>
+	<li>移動または向き変え判定</li>
+	<li>使用技1の使用判定</li>
+	<li>使用技2の使用判定</li>
+	<li>使用技3の使用判定</li>
+	<li>使用技4の使用判定</li>
+</ol>
+
+<p>まで行ってきたことになるが、使用技4の使用判定で使用しないと判定されると、もう一度移動または向き変え判定に戻ることになる。<br>
+使用技4の使用判定まで終わると、<code><span class="r">$C1/9477</span></code>→<code><span class="r">$C1/0261</span></code>→<code><span class="r">$C1/9480</span></code>と進むが、一度目の使用技4の使用判定終了時には<code>[$00:03F0]</code>に<span class="formula">$FF</span>が入っていて、<code><span class="r">$C1/9484</span></code>のゼロフラグの分岐処理により、<code><span class="r">$C1/9486</span></code>でサブルーチンが終了する。<br>
+ところが、二度目の一度目の使用技4の使用判定終了時には<code>[$00:03F0]</code>に<span class="formula">$00</span>が入っていて、再び「移動または向き変え判定」に戻ることなく、「移動または向き変え」で決定になる。</p>
+
+<div class="code-container"><pre>
+$C1/9480 LDA $F0    [$00:03F0]   ;Aに[$00:03F0]($00)をロード
+$C1/9482 BIT #$EF                ;Aと$EFで論理積（ステータスフラグ変更のみ）
+$C1/9484 BEQ $01    [$9487]      ;ゼロフラグが立っているとき[$9487]分岐
+$C1/9487 LDA $62    [$00:0362]   ;Aに[$00:0362]をロード
+$C1/9489 BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/948B BNE $07    [$9494]      ;ゼロフラグが立っていないとき[$9494]分岐
+;（省略）
+$C1/9533 JSR $9589  [$C1:9589]   ;[$C1:9589]へジャンプ
+</pre></div>
+
+<p>整理すると、</p>
+
+<ol>
+	<li>移動または向き変え判定（確率：移動頻度/32）</li>
+	<li>使用技1の使用判定（確率：3/4）</li>
+	<li>使用技2の使用判定（確率：3/4）</li>
+	<li>使用技3の使用判定（確率：3/4）</li>
+	<li>使用技4の使用判定（確率：3/4）</li>
+	<li>移動または向き変え判定（確率：移動頻度/32）</li>
+	<li>使用技1の使用判定（確率：3/4）</li>
+	<li>使用技2の使用判定（確率：3/4）</li>
+	<li>使用技3の使用判定（確率：3/4）</li>
+	<li>使用技4の使用判定（確率：3/4）</li>
+	<li>移動または向き変えで確定</li>
+</ol>
+
+<p>という順に判定していくことになる。<br>
+ただし、使用技の使用判定で使用することが決まっても、その先で更に判定がある。</p>
+
+<ol>
+	<li>その技が使用できる状態異常か判定</li>
+	<li>技のタイプの判定（反撃技なら使用しない）</li>
+	<li>回復技の時、使用するか乱数判定</li>
+	<li>攻撃技の時、攻撃範囲内に味方がいるか判定</li>
+</ol>
+
+<p>ここまで判定してから、該当の技を使用するかどうかが決まる。<br>
+この先で、使用技判定について説明する。</p>
+
+<h3 id="02">使用技判定</h3>
+
+<p>技を使用する場合、以下サブルーチンから続く。<br>
+ここでは、使用技1の使用を選択したものとする。</p>
+
+<div class="code-container"><pre>
+$C1/8F1C LDA $AF    [$00:03AF]   ;Aに[$00:03AF]をロード
+$C1/8F1E BEQ $29    [$8F49]      ;ゼロフラグが立っているとき[$8F49]分岐
+$C1/8F20 JSR $9252  [$C1:9252]   ;[$C1:9252]へジャンプ
+
+$C1/9252 LDA $002B,y[$00:1A2B]   ;Aに[$00:1A2B](敵データ11　使用技1　技ID)をロード
+$C1/9255 JSR $3D5C  [$C1:3D5C]   ;[$C1:3D5C]へジャンプ
+
+$C1/3D5C STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/3D5F LDA $0001,x[$00:1B01]   ;Aに[$00:1B01]をロード
+$C1/3D62 AND #$BF                ;Aと$BFで論理積
+$C1/3D64 BEQ $32    [$3D98]      ;ゼロフラグが立っているとき[$3D98]分岐
+$C1/3D66 PHY                     ;Yをスタックへプッシュ
+$C1/3D67 LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/3D6A LDA $0029,y[$00:1A29]   ;Aに[$00:1A29](敵データ09)をロード
+$C1/3D6D PLY                     ;Yレジスタにスタックからプル
+$C1/3D6E ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/3D6F ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/3D70 AND #$01                ;Aと$01で論理積
+$C1/3D72 EOR #$01                ;Aと$01で排他的論理和XOR
+$C1/3D74 BEQ $22    [$3D98]      ;ゼロフラグが立っているとき[$3D98]分岐
+;ゼロフラグOFF（敵データ09の上1ビットが0、敵技）
+$C1/3D76 LDA #$01                ;Aに$01をロード
+$C1/3D78 BRA $1E    [$3D98]      ;フラグにかかわりなく常に分岐[$3D98]
+;ゼロフラグON（敵データ09の上1ビットが1、味方技）
+$C1/3D98 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/3D9B LDA #$19                ;Aに$19をロード
+$C1/3D9D STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/3DA0 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/3DA3 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/3DA5 LDA $2134  [$00:2134]   ;Aに[$00:2134]をロード
+$C1/3DA8 ADC $D50018[$D5:0018]   ;A + [$D5:0018]
+$C1/3DAC TAX                     ;Aの値をXレジスタに転送
+$C1/3DAD SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/3DAF RTS                     ;サブルーチン戻り
+
+;周囲攻撃・反撃専用・回復技判定
+$C1/9258 LDA $D5000D,x           ;Aに[$D5000D,x](技データ13)をロード
+$C1/925C BIT #$40                ;Aと$40(%0100 0000)で論理積（ステータスフラグ変更のみ）
+$C1/925E BNE $5B    [$92BB]      ;ゼロフラグが立っていないとき[$92BB]分岐
+;ゼロフラグON　反撃専用技ではない
+$C1/9260 BIT #$80                ;Aと$80(%1000 0000)で論理積（ステータスフラグ変更のみ）
+$C1/9262 BEQ $5A    [$92BE]      ;ゼロフラグが立っているとき[$92BE]分岐
+;ゼロフラグON　回復技ではない
+$C1/92BE LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/92C0 LDA #$FF                ;Aに$FFをロード
+$C1/92C2 RTS                     ;サブルーチン戻り
+
+$C1/8F23 BEQ $24    [$8F49]      ;ゼロフラグが立っているとき[$8F49]分岐
+$C1/8F25 JSR $920C  [$C1:920C]   ;[$C1:920C]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/3D5C</span></code>～<code><span class="r">$C1/3DAF</span></code>は、敵データ09の上1ビットに記録されている、使用技を敵技IDから取得するなら<span class="formula">0</span>、味方技IDから取得するなら<span class="formula">1</span>であり、敵技データのアドレスを取得するための計算である。詳細は省略。</p>
+
+<p><code><span class="r">$C1/9258</span></code>で呼び出す<code>[$D5000D,x]</code>が、選択した技の技データ13の値である。<br>
+技データ13は、上から2ビット目に<span class="formula">1</span>が立っていたら反撃専用技であり、<code><span class="r">$C1/925C</span></code>で<span class="formula">$40</span>と論理積を取ってゼロフラグがOFFなら反撃専用技である。<br>
+敵自身から反撃専用技を選択できないので、ここで判定が終了となり、次の判定へ移ることになる。</p>
+
+<p>更に、技データ13の一番上のビットに<span class="formula">1</span>が立っていたら回復技であり、<code><span class="r">$C1/9260</span></code>で<span class="formula">$80</span>と論理積を取ってゼロフラグがOFFなら回復技である。<br>
+回復技の場合、更に判定処理が続くので、<a href="program41_3.html">回復技判定</a>のページで詳しく紹介する。</p>
+
+<p>ここでゼロフラグがONなら攻撃技判定となり<code><span class="r">$C1/92BE</span></code>に進む。<br>
+更に<code><span class="r">$C1/920C</span></code>に判定が続くこととなる。</p>
+
+<div class="code-container"><pre>
+$C1/920C JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/920F AND #$F0                ;Aと$F0(%1111 0000)で論理積
+$C1/9211 BEQ $35    [$9248]      ;ゼロフラグが立っているとき[$9248]分岐
+;ゼロフラグOFF
+$C1/9213 STZ $10    [$00:0310]   ;[$00:0310]に$00を書き込み
+$C1/9215 LDX #$1C00              ;Xに$1C00をロード
+
+;ループ処理開始
+$C1/9218 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01+40n]（キャラ1～4戦闘状態）をロード
+$C1/921B BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/921D BEQ $0B    [$922A]      ;ゼロフラグが立っているとき[$922A]分岐
+;ゼロフラグOFF（$40:敵操作状態 $FF:通常,戦闘離脱ではない）
+$C1/921F LDA $0039,x[$00:1C39]   ;Aに[$00:1C39+40n]（キャラ1～4状態異常）をロード
+$C1/9222 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/9224 BEQ $04    [$922A]      ;ゼロフラグが立っているとき[$922A]分岐
+;ゼロフラグOFF（状態異常が%1111 1111=戦闘不能ではない）
+$C1/9226 ORA $10    [$00:0310]   ;Aと[$00:0310]で論理和
+$C1/9228 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+;$C1/921D, $C1/9224でゼロフラグON
+$C1/922A REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/922C TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/922D ADC #$0040              ;A + $0040
+$C1/9230 TAX                     ;Aの値をXレジスタに転送
+$C1/9231 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/9233 CPX #$1D00              ;Xと$1D00を減算比較（ステータスレジスタ変更のみ）
+$C1/9236 BNE $E0    [$9218]      ;ゼロフラグが立っていないとき[$9218]分岐
+;ループ処理ここまで
+
+$C1/9238 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/923A LDA $002B,y[$00:1A2C]   ;Aに[$00:1A2B](敵データ11　使用技1　技ID)をロード
+$C1/923D JSR $3D5C  [$C1:3D5C]   ;[$C1:3D5C]へジャンプ
+
+$C1/3D5C STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+;（アドレス計算処理、中略）
+$C1/3DAF RTS                     ;サブルーチン戻り
+
+$C1/9240 LDA $D50009,x           ;Aに[$D50009,x]（技データ09　状態異常（8ビット））をロード
+$C1/9244 AND $10    [$00:0310]   ;Aと[$00:0310]で論理積
+$C1/9246 BNE $05    [$924D]      ;ゼロフラグが立っていないとき[$924D]分岐
+;ゼロフラグON（使用技と敵の状態異常が被っていない）
+;$C1/9211でゼロフラグON
+$C1/9248 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/924A LDA #$FF                ;Aに$FFをロード
+$C1/924C RTS                     ;サブルーチン戻り
+;ゼロフラグOFF（使用技と敵の状態異常が被り）
+$C1/924D LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/924F LDA #$00                ;Aに$00をロード
+$C1/9251 RTS                     ;サブルーチン戻り
+
+$C1/8F28 BEQ $1F    [$8F49]      ;ゼロフラグが立っているとき[$8F49]分岐
+;ゼロフラグOFF（技範囲判定へ続く）
+$C1/8F2A LDA $002B,y[$00:1A2C]   ;Aに[$00:1A2B](敵データ11　使用技1　技ID)をロード
+$C1/8F2D JSR $E251  [$C1:E251]   ;[$C1:E251]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/920C</span></code>～<code><span class="r">$C1/9211</span></code>で、戦闘乱数(<span class="formula">$00</span>～<span class="formula">$FF</span>)と<span class="formula">$F0</span>(<span class="formula">%1111 0000</span>)で論理積を取り、ゼロフラグ判定をしている。<br>
+つまり、乱数が<span class="formula">$10</span>(<span class="formula">%0001 0000</span>)より大きい場合はゼロフラグが立たず、<span class="formula">$10</span>未満ならゼロフラグが立つ。<br>
+ゼロフラグが立っている時は<code><span class="r">$C1/9248</span></code>まで処理が飛ぶことになるのだが、その間の<code><span class="r">$C1/9213</span></code>～<code><span class="r">$C1/9246</span></code>の処理は、「味方全員の状態異常と、敵の使用技で発生する状態異常が被っていないか」の判定で、味方全員の状態異常と、敵の使用技で発生する状態異常が被っている時は技使用処理を抜ける、つまり該当技を使わない。</p>
+
+<p>つまり、<span class="formula">15/16</span>の確率で「味方全員の状態異常と、敵の使用技で発生する状態異常が被っていないか」を判定し、被っていたら技を使用しないことになる。<br>
+これが、「味方キャラがある状態異常の時、敵は同じ状態異常の追加効果のついた技の使用確率が減る（<span class="formula">15/16</span>になる）」という現象の正体である。<br>
+先に乱数で確率計算してから処理をする、という、ちょっと珍しいパターンである。<br>
+「味方全員の状態異常と、敵の使用技で発生する状態異常が被っている」という判定をしてから乱数計算をした方が処理を省けるように思えるが、このあたりの処理手順の理由はよくわからない。</p>
+
+<p><code><span class="r">$C1/9213</span></code>～<code><span class="r">$C1/9246</span></code>の処理は、<code><span class="r">$C1/9218</span></code>～<code><span class="r">$C1/9236</span></code>のループ処理で、フィールドにいる味方キャラ全員（戦闘不能キャラ除く）の<code>[$00:1C39+40n]</code>（味方５８キャラ1～4の状態異常）を、初期値00が入った<code>[$00:0310]</code>と論理和を取っていく、という処理になる。<br>
+結果、<code>[$00:0310]</code>には、フィールドにいる味方キャラ全員の状態異常をすべて重ねた値が入った状態でループ処理が終わる。<br>
+<code><span class="r">$C1/9240</span></code>～<code><span class="r">$C1/9246</span></code>で、敵の使用技の技データ09（技の追加効果の状態異常）と<code>[$00:0310]</code>で論理積を取るが、ここでゼロフラグが立つなら、「味方全員の状態異常と、敵の使用技で発生する状態異常が被っていない」ことになる。<br>
+その場合、<code><span class="r">$C1/924A</span></code>で<code>A</code>に<span class="formula">$FF</span>をロードし、<code><span class="r">$C1/8F28</span></code>にジャンプして、ゼロフラグがOFFだから<code><span class="r">$C1/8F2D</span></code>へ続く。<br>
+この先は、敵自身が該当の使用技を出せる状態異常かどうかの判定<code><span class="r">$C1/E251</span></code>～に続くことになる。</p>
+
+<p>一方、使用技と敵の状態異常が被っていたら、<code><span class="r">$C1/924D</span></code>に進み、<code>A</code>に<span class="formula">$00</span>をロードし、<code><span class="r">$C1/8F28</span></code>にジャンプして、ゼロフラグがONだから<code><span class="r">$C1/8F49</span></code>にジャンプする。<br>
+つまり、次の技の判定に進むことになり、現在の技判定から抜けることになる。</p>
+
+<div class="code-container"><pre>
+$C1/E251 LDA $002B,y[$00:1A2C]   ;Aに[$00:1A2B](敵データ11　使用技1　技ID)をロード
+$C1/E254 STA $7E9100,x[$7E:AC00] ;Aを[$7E:AC00]に書き込み
+$C1/E258 JSR $3D5C  [$C1:3D5C]   ;[$C1:3D5C]へジャンプ
+
+$C1/3D5C STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+;（アドレス計算処理、中略）
+$C1/3DAF RTS                     ;サブルーチン戻り
+
+$C1/E25B STX $68    [$00:0368]   ;Xを[$00:0368]に書き込み
+$C1/E25D LDA $D50008,x           ;Aに[$D50008,x](技データ08　使用不能状態異常（8ビット）)をロード
+$C1/E261 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/E263 AND $7E8F07,x[$7E:AA07] ;Aと[$7E:AA07]（敵の状態異常）で論理積
+$C1/E267 BNE $56    [$E2BF]      ;ゼロフラグが立っていないとき[$E2BF]分岐
+;ゼロフラグON（技を出せる状態異常の状態である）
+$C1/E269 JSR $3D2B  [$C1:3D2B]   ;[$C1:3D2B]へジャンプ
+
+;ゼロフラグOFF（技を出せる状態異常の状態ではない）
+$C1/E2BF LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/E2C1 LDA #$00                ;Aに$00をロード
+$C1/E2C3 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/E25D</span></code>～の処理で、使用技の技データ08を呼び出し、<code>[$7E:AAn7]</code>（敵番号nの状態異常）と論理積を取って、ゼロフラグ判定をしている。<br>
+技データ08には使用不能状態異常の値が入っているから、論理積が<span class="formula">0</span>なら該当技を出せる状態異常の状態である、ということになる。<br>
+この場合、次の判定である、技を出せる範囲に味方キャラがいるかどうかの判定<code>$C1:3D2B</code>～にジャンプする。</p>
+
+<p>ゼロフラグOFF、つまり技を出せる状態異常の状態ではないなら、<code><span class="r">$C1/E2BF</span></code>にジャンプして<code>A</code>に<span class="formula">$00</span>をロード、サブルーチン終了となる。</p>
+
+<p><code><span class="r">$C1/E269</span></code>から先、つまり<code><span class="r">$C1/3D2B</span></code>～からの処理だが、技を出せる範囲に味方キャラがいるかどうか、いる場合どの座標の味方キャラを攻撃するかの判定になる。<br>
+技の範囲判定は説明が長くなるので、次ページの<a href="program41_2.html">技の範囲判定</a>で詳しく述べる。</p>
+
+
+<h4>余談</h4>
+
+<p>結局、使用技1～4それぞれを使用する確率はどれくらいなのかを計算してみるとどうなるのか。<br>
+大半の敵が移動頻度0なので、移動頻度0で計算すると、2回判定を考慮して以下のようになるはず。</p>
+
+<table>
+<thead>
+	<tr><th>行動</th><th>計算式</th><th>確率</th></tr>
+</thead>
+<tbody>
+	<tr><td>使用技1</td><td class="formula">(3/4) + (1/4)<sup>4</sup>*(3/4)</td><td class="formula">0.753</td></tr>
+	<tr><td>使用技2</td><td class="formula">(1/4)*(3/4) + (1/4)<sup>4</sup>*(1/4)*(3/4)</td><td class="formula">0.188</td></tr>
+	<tr><td>使用技3</td><td class="formula">(1/4)<sup>2</sup>*(3/4) + (1/4)<sup>4</sup>*(1/4)<sup>2</sup>*(3/4)</td><td class="formula">0.0471</td></tr>
+	<tr><td>使用技4</td><td class="formula">(1/4)<sup>3</sup>*(3/4) + (1/4)<sup>4</sup>*(1/4)<sup>3</sup>*(3/4)</td><td class="formula">0.0118</td></tr>
+	<tr><td>移動または向き変え</td><td class="formula">(1/4)<sup>8</sup></td><td class="formula">0.0000153</td></tr>
+</tbody>
+</table>
+
+<p>使用技2は19％くらいなので、そこそこ出るように思えるが、使用技3は5％程度、使用技4は1％程度で、ほとんど選ばれないような確率に見える。<br>
+だが、上の計算は、使用技1～4全てが「その技を出せる状況である」場合の確率計算である。<br>
+実際は、その技を出せる位置に攻撃相手（味方キャラ）がいないと出せないので、使用技3や4が選ばれる状況もそれなりにあるはずである。<br>
+逆に、使用技1～4全てが出せる状況なのに、移動頻度0の敵が移動する確率は0.0015％と、まずありえない確率である。<br>
+このため、移動頻度0の敵は、使用技1～4のどれかが出せるならほぼ確実に何かの技で攻撃してくることになる。</p>
+
+<p>逆に、移動頻度が高めの敵だとどうなるかを計算してみる。<br>
+例えば、中世編で戦う時のストレイボウは移動頻度が6である。</p>
+
+<table>
+<thead>
+	<tr><th>行動</th><th>計算式</th><th>確率</th></tr>
+</thead>
+<tbody>
+	<tr><td>使用技1</td><td class="formula">(1-6/32)*(3/4) + (1-6/32)*(1/4)<sup>4</sup>*(1-6/32)*(3/4)</td><td class="formula">0.611</td></tr>
+	<tr><td>使用技2</td><td class="formula">(1-6/32)*(1/4)*(3/4) + (1-6/32)*(1/4)<sup>4</sup>*(1-6/32)*(1/4)*(3/4)</td><td class="formula">0.153</td></tr>
+	<tr><td>使用技3</td><td class="formula">(1-6/32)*(1/4)<sup>2</sup>*(3/4) + (1-6/32)*(1/4)<sup>4</sup>*(1-6/32)*(1/4)<sup>2</sup>*(3/4)</td><td class="formula">0.0382</td></tr>
+	<tr><td>使用技4</td><td class="formula">(1-6/32)*(1/4)<sup>3</sup>*(3/4) + (1-6/32)*(1/4)<sup>4</sup>*(1-6/32)*(1/4)<sup>3</sup>*(3/4)</td><td class="formula">0.00955</td></tr>
+	<tr><td>移動または向き変え</td><td class="formula">(6/32) + (1-6/32)*(1/4)<sup>4</sup>*(6/32) + (1-6/32)*(1/4)^4*(1-6/32)*(1/4)^4</td><td class="formula">0.188</td></tr>
+</tbody>
+</table>
+
+<p>使用技1～4全てが出せる状況でも、移動または向き変えの確率が19％まで上がる。<br>
+使用技2を選ぶ確率15％より高く、それなりの確率で移動を選ぶことがわかる。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program40_2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program41_2.html"><span class="button">&#9654;次 技の範囲判定</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 敵ターンにおける行動選択 &gt; 回復技判定</head>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 敵ターンにおける行動選択 &gt; 回復技判定">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 敵ターンにおける行動選択 &gt; 回復技判定</title>
+<link href="../../css/main.min.css?20251129" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program41.html">敵ターンにおける行動選択</a> &gt; 回復技判定</h1>
+<h2>敵ターンにおける行動選択 &gt; 回復技判定</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="program41.html">敵ターンにおける行動選択</a>において、<a href="program41.html#02">使用技判定</a>時に、回復技が選択されたパターンについて、このページで説明する。</p>
+
+<h3>回復技判定</h3>
+
+<p><code><span class="r">$C1/9258</span></code>で技データ13をロードしてから、反撃専用技ではないという判定後、<code><span class="r">$C1/9264</span></code>～が回復技の判定の分岐になる。</p>
+
+<div class="code-container"><pre>
+;周囲攻撃、反撃専用、回復判定
+$C1/9258 LDA $D5000D,x           ;Aに[$D5000D,x]をロード
+$C1/925C BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/925E BNE $5B    [$92BB]      ;ゼロフラグが立っていないとき[$92BB]分岐
+;ゼロフラグON　反撃専用技ではない
+$C1/9260 BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/9262 BEQ $5A    [$92BE]      ;ゼロフラグが立っているとき[$92BE]分岐
+;ゼロフラグON　回復技である
+$C1/9264 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/9266 LDA $0000,x[$00:1B50]   ;Aに[$00:1B50](敵ID)をロード
+$C1/9269 CMP #$D7                ;Aと$D7を減算比較（ステータスレジスタ変更のみ）
+$C1/926B BNE $11    [$927E]      ;ゼロフラグが立っていないとき[$927E]分岐
+;ゼロフラグON 敵ID$D7はスタビライザー
+$C1/926D JSR $927E  [$C1:927E]   ;[$C1:927E]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/9264</span></code>からが回復技用の処理になるのだが、まずやっているのが、敵IDの判断である。<br>
+<code><span class="r">$C1/9266</span></code>～<code><span class="r">$C1/926B</span></code>は、敵IDが<span class="formula">$D7</span>かどうかの判定である。<br>
+敵ID<span class="formula">$D7</span>は、ＳＦ編ラストバトルに登場するスタビライザーであり、ここでスタビライザーかどうかで専用の分岐が生じることになる。</p>
+
+<p>ここで、大まかな処理手順を見るため、<code><span class="r">$C1/926B</span></code>～の処理を追ってみよう。<br>
+途中のジャンプ処理などは省略する。</p>
+
+<div class="code-container"><pre>
+$C1/926B BNE $11    [$927E]      ;ゼロフラグが立っていないとき[$927E]分岐
+;ゼロフラグON 敵ID$D7,スタビライザー
+$C1/926D JSR $927E  [$C1:927E]   ;[$C1:927E]へジャンプ
+;★$C1:927E（回復技使用判定）へのジャンプ1回目
+$C1/9270 BEQ $01    [$9273]      ;ゼロフラグが立っているとき[$9273]分岐
+;ゼロフラグOFF
+$C1/9272 RTS                     ;サブルーチン戻り
+;ゼロフラグON
+$C1/9273 PHX                     ;Xをスタックにプッシュ
+$C1/9274 LDX #$1B00              ;Xに$1B00をロード
+$C1/9277 JSR $927E  [$C1:927E]   ;[$C1:927E]へジャンプ
+;★$C1:927E（回復技使用判定）へのジャンプ2回目
+$C1/927A PLX                     ;Xレジスタにスタックからプル
+$C1/927B AND #$FF                ;Aと$FFで論理積
+$C1/927D RTS                     ;サブルーチン戻り
+;ゼロフラグOFF スタビライザー以外の敵
+$C1/927E PHY                     ;Yをスタックへプッシュ
+$C1/927F LDY $0002,x             ;Yに[$0002,x]をロード
+$C1/9282 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/9284 LDA $7E8F00,x           ;Aに[$7E8F00,x]をロード
+$C1/9288 STA $4204  [$00:4204]   ;Aを[$00:4204]に書き込み
+$C1/928B LDA $0010,y             ;Aに[$0010,y]をロード
+$C1/928E PLY                     ;Yレジスタにスタックからプル
+$C1/928F ASL A                   ;Aを算術左シフト *2
+$C1/9290 ASL A                   ;Aを算術左シフト *2
+$C1/9291 ASL A                   ;Aを算術左シフト *2
+$C1/9292 ASL A                   ;Aを算術左シフト *2
+$C1/9293 BNE $03    [$9298]      ;ゼロフラグが立っていないとき[$9298]分岐
+$C1/9295 LDA #$0001              ;Aに$0001をロード
+$C1/9298 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/929A STA $4206  [$00:4206]   ;Aを[$00:4206]に書き込み
+$C1/929D JSR $46C8  [$C1:46C8]   ;[$C1:46C8]へジャンプ
+;($C1/46C8~$C1/46C9 計算時間稼ぎ用ジャンプ)
+$C1/92A0 LDA $4214  [$00:4214]   ;Aに[$00:4214]をロード
+$C1/92A3 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/92A5 LDA #$1F                ;Aに$1Fをロード
+$C1/92A7 SEC                     ;キャリーフラグON
+$C1/92A8 SBC $10    [$00:0310]   ;A - [$00:0310]
+$C1/92AA STA $4202  [$00:4202]   ;Aを[$00:4202]に書き込み
+$C1/92AD JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;戦闘乱数計算
+$C1/92B0 STA $4203  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C1/92B3 JSR $46C9  [$C1:46C9]   ;[$C1:46C9]へジャンプ
+;($C1/46C9 計算時間稼ぎ用ジャンプ)
+$C1/92B6 LDA $4217  [$00:4217]   ;Aに[$00:4217]をロード
+$C1/92B9 BEQ $03    [$92BE]      ;ゼロフラグが立っているとき[$92BE]分岐
+;ゼロフラグOFF
+$C1/92BB LDA #$00                ;Aに$00をロード
+$C1/92BD RTS                     ;サブルーチン戻り
+;ゼロフラグON
+$C1/92BE LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/92C0 LDA #$FF                ;Aに$FFをロード
+$C1/92C2 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>途中のジャンプ先の処理は端折ると、スタビライザー以外の敵は、<code><span class="r">$C1/927E</span></code>～の処理をして<code><span class="r">$C1/92B9</span></code>まで進み、この時点でゼロフラグが立っているかどうかで、サブルーチンの戻り位置が<code><span class="r">$C1/92BD</span></code>と<code><span class="r">$C1/92C2</span></code>のどちらかになる。<br>
+後で処理を見るとわかるが、<code><span class="r">$C1/92BD</span></code>だと技使用見送り（Aに<span class="formula">$00</span>を入れて戻ってくる）、<code><span class="r">$C1/92C2</span></code>だと技使用確定（Aに<span class="formula">$FF</span>を入れて戻ってくる）となる。<br>
+<code><span class="r">$C1/927E</span></code>～<code><span class="r">$C1/92C2</span></code>が、回復技使用判定ということである。</p>
+
+<p>ということを踏まえて、<code><span class="r">$C1/926D</span></code>～のスタビライザー用処理を見てみると、</p>
+
+<div class="code-container"><pre>
+$C1/926B BNE $11    [$927E]      ;ゼロフラグが立っていないとき[$927E]分岐
+;ゼロフラグON 敵ID$D7,スタビライザー
+$C1/926D JSR $927E  [$C1:927E]   ;[$C1:927E]へジャンプ
+;★$C1:927E（回復技使用判定）へのジャンプ1回目
+$C1/9270 BEQ $01    [$9273]      ;ゼロフラグが立っているとき[$9273]分岐
+;ゼロフラグOFF
+$C1/9272 RTS                     ;サブルーチン戻り
+;ゼロフラグON
+$C1/9273 PHX                     ;Xをスタックにプッシュ
+$C1/9274 LDX #$1B00              ;Xに$1B00をロード（敵番号0、マザーＣＯＭのアドレス呼び出し用）
+$C1/9277 JSR $927E  [$C1:927E]   ;[$C1:927E]へジャンプ
+;★$C1:927E（回復技使用判定）へのジャンプ2回目
+$C1/927A PLX                     ;Xレジスタにスタックからプル
+$C1/927B AND #$FF                ;Aと$FFで論理積
+$C1/927D RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/926D</span></code>で、<code><span class="r">$C1/927E</span></code>～<code><span class="r">$C1/92C2</span></code>の回復技使用判定に進む。<br>
+<code><span class="r">$C1/9270</span></code>で戻ってきたらゼロフラグ判定をしており、ゼロフラグOFFは技使用確定でサブルーチンを抜ける。<br>
+ゼロフラグONは技使用見送りになるのだが、そうなると<code><span class="r">$C1/9273</span></code>に進み、<code>X</code>に<span class="formula">$1B00</span>をロードしてから、<code><span class="r">$C1/9277</span></code>で再び<code><span class="r">$C1/927E</span></code>～<code><span class="r">$C1/92C2</span></code>の回復技使用判定に進んでいるのである。<br>
+つまり、スタビライザーだけ、回復技を使用する判定に進んだ時、</p>
+
+<ul>
+	<li>1回目の回復技使用判定はスタビライザーのステータスで行う</li>
+	<li>2回目の回復技使用判定はマザーＣＯＭのステータスで行う</li>
+</ul>
+
+<p>というように、使用判定を2回行っていることがわかる。<br>
+スタビライザーは使用技1～4がすべて「システムリカバー」だから、上処理は実質、スタビライザーが通常攻撃として「システムリカバー」を使う場合の専用処理である。<br>
+スタビライザーとマザーＣＯＭが隣接しているかどうか、といった位置関係は関係なく、必ず2回判定である。</p>
+
+<p>では、<code><span class="r">$C1/927E</span></code>～<code><span class="r">$C1/92C2</span></code>の回復技使用判定の処理について、詳しく見てみる。</p>
+
+<div class="code-container"><pre>
+;ゼロフラグOFF
+$C1/927E PHY                     ;Yをスタックへプッシュ
+$C1/927F LDY $0002,x             ;Yに[$0002,x]をロード
+$C1/9282 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/9284 LDA $7E8F00,x           ;Aに[$7E:AAn1][$7E:AAn0](現在HP)をロード
+$C1/9288 STA $4204  [$00:4204]   ;Aを[$00:4205][$00:4204]に書き込み
+$C1/928B LDA $0010,y             ;Aに[$00:1A11+$40n][$00:1A10+$40n](最大HP)をロード
+$C1/928E PLY                     ;Yレジスタにスタックからプル
+$C1/928F ASL A                   ;Aを算術左シフト *2
+$C1/9290 ASL A                   ;Aを算術左シフト *2
+$C1/9291 ASL A                   ;Aを算術左シフト *2
+$C1/9292 ASL A                   ;Aを算術左シフト *2
+$C1/9293 BNE $03    [$9298]      ;ゼロフラグが立っていないとき[$9298]分岐
+;ゼロフラグON（最大HP * $10が$0000）
+$C1/9295 LDA #$0001              ;Aに$0001をロード
+;ゼロフラグOFF（最大HP * $10が$0000ではない）
+$C1/9298 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/929A STA $4206  [$00:4206]   ;Aを[$00:4206]に書き込み
+$C1/929D JSR $46C8  [$C1:46C8]   ;[$C1:46C8]へジャンプ
+;
+;符号付16bit / 8bit
+$C1/46C8 NOP                     ;計算待ち
+$C1/46C9 RTS                     ;サブルーチン戻り
+;
+$C1/92A0 LDA $4214  [$00:4214]   ;Aに[$00:4214](商、下1バイト)をロード
+$C1/92A3 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/92A5 LDA #$1F                ;Aに$1F(31)をロード
+$C1/92A7 SEC                     ;キャリーフラグON
+$C1/92A8 SBC $10    [$00:0310]   ;A - [$00:0310]
+$C1/92AA STA $4202  [$00:4202]   ;Aを[$00:4202]に書き込み
+$C1/92AD JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+;
+;戦闘乱数計算
+$C1/6150 PHX                     ;戦闘乱数計算
+;（省略）
+$C1/61A4 RTS                     ;乱数がAと[$00:033B]に入る
+;
+$C1/92B0 STA $4203  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C1/92B3 JSR $46C9  [$C1:46C9]   ;[$C1:46C9]へジャンプ
+;
+;符号付8bit x 8bit
+$C1/46C9 RTS                     ;サブルーチン戻り
+;
+$C1/92B6 LDA $4217  [$00:4217]   ;Aに[$00:4217](乗算結果上1バイト)をロード
+$C1/92B9 BEQ $03    [$92BE]      ;ゼロフラグが立っているとき[$92BE]分岐
+;ゼロフラグOFF（技使用見送り）
+$C1/92BB LDA #$00                ;Aに$00をロード
+$C1/92BD RTS                     ;サブルーチン戻り
+;ゼロフラグON（技使用確定）
+$C1/92BE LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/92C0 LDA #$FF                ;Aに$FFをロード
+$C1/92C2 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>敵の現在HP、最大HP、戦闘乱数から技を使用するかどうかを計算・判定しているのだが、計算式が少々ややこしい。</p>
+
+<p><code><span class="r">$C1/9284</span></code>～<code><span class="r">$C1/92A0</span></code>は、符号付16bit / 8bit、つまり割り算である。<br>
+<code>$00:4204</code>～<code>$00:4205</code>に被除数2バイト、<code>$00:4206</code>に除数を書き込むと、一定時間後に<code>$00:4214</code>～<code>$00:4215</code>に商2バイト、<code>$00:4216</code>に余りが入る仕組み。<br>
+サブルーチンを見ると、</p>
+
+<p><span class="formula">trunc(現在HP / (最大HP * $10の下1バイト))</span><br>
+<span class="formula">=trunc(現在HP / ((最大HP * $10) &amp; $00FF))</span></p>
+
+<p>を計算し、<code><span class="r">$C1/92A0</span></code>で<code>[$00:4214]</code>(商の下1バイト)を<code>A</code>にロードしている。<br>
+ポイントは「最大HP * <span class="formula">$10</span>の下1バイト」である。<br>
+16進数で最大HPが下1桁が<span class="formula">0</span>の時、<span class="formula">$10</span>を掛け算すると、2バイト表記の時、下1バイトは必ず<span class="formula">$00</span>である。<br>
+例えばスタビライザーなら、最大HPは<span class="formula">$30</span>なので、2バイトで<span class="formula">$0030</span>とした時、<span class="formula">$10</span>倍すると<span class="formula">$0300</span>である。<br>
+「最大HP * <span class="formula">$10</span> &amp; <span class="formula">$00FF</span>」が<span class="formula">$00</span>になるので、</p>
+
+<p><span class="formula">=trunc(現在HP / ((最大HP * $10) &amp; $00FF))</span></p>
+
+<p>を計算すると、割り算部分で、</p>
+
+<p><span class="formula">現在HP / $00</span></p>
+
+<p>いわゆるゼロ除算になってしまう。難しい話は横におくが、「<span class="formula">0</span>で割ることはできないので答えが出せない」のである。<br>
+（<a href="https://ja.wikipedia.org/wiki/%E3%82%BC%E3%83%AD%E9%99%A4%E7%AE%97" target="_blank">ゼロ除算 - Wikipedia</a>）<br>
+ただ、65C816の符号付16bit / 8bitの計算では、こういう場合にエラーが出ないよう、商2バイトは<span class="formula">$FFFF</span>、余りは被除数を返すようになっている。<br>
+ここから、</p>
+
+<p>16進数で最大HPが下1桁が<span class="formula">0</span>の敵は、現在HPに関係なく、「<span class="formula">=trunc(現在HP / ((最大HP * $10) &amp; $00FF))</span>」の商として<span class="formula">$FFFF</span>が返ってくる</p>
+
+<p>ということがわかる。<br>
+よって、<code><span class="r">$C1/92A0</span></code>では、<code>[$00:4214]</code>に<span class="formula">$FF</span>が入っているから、<code>A</code>に<span class="formula">$FF</span>がロードされる。</p>
+
+<p>さて、敵の最大HPだが、敵キャラデータ04に入っており、数値が<span class="formula">$80</span>未満ならそのままHPとするが、<span class="formula">$80</span>以上の時は、<br>
+<span class="formula">実際のHP = (敵キャラデータ04 &amp; $7F) * $10</span><br>
+で計算している。<br>
+つまり、HPが<span class="formula">$80</span>（10進数<span class="formula">128</span>）以上の敵はすべて、16進数で下1桁が<span class="formula">0</span>であり、回復技を使う場合、上のゼロ除算のケースが当てはまることになる。<br>
+<span class="formula">$80</span>未満でも、スタビライザーのように最大HPの下1桁が<span class="formula">0</span>の敵なら、もちろん当てはまる。</p>
+
+<p>下1桁が<span class="formula">0</span>以外かつ回復技を使う敵ももちろんいる。<br>
+回復技「クォ～ン」は、ちびマンモス（HP:<span class="formula">$28 = 40</span>）が使うのならHPの下1桁が<span class="formula">0</span>ではない。<br>
+マンモス♀も「クォ～ン」を使うが、最大HPが<span class="formula">480</span>（敵キャラデータ04が<span class="formula">$9E</span>）なので、HPの下1桁が<span class="formula">0</span>である。</p>
+
+<p>ということで、最大HPの下1桁次第で分岐と見なしてよい。<br>
+最大HPの下1桁が<span class="formula">0</span>以外なら、<code><span class="r">$C1/92A0</span></code>に<code>A</code>にロードされるのは、</p>
+
+<p><span class="formula">=trunc(現在HP / ((最大HP * $10) &amp; $00FF)) &amp; $00FF</span></p>
+
+<p>最大HPの下1桁が<span class="formula">0</span>なら、<span class="formula">$FF</span>がロードされる、ということになる。<br>
+とりあえずこの値を暫定的に<span class="formula">N</span>としておく。</p>
+
+<p>なお、最大HPの下1桁が<span class="formula">0</span>以外の時、<span class="formula">N</span>がとる範囲は<span class="formula">$00</span>～<span class="formula">$07</span>のはずである。<br>
+最大HPが<span class="formula">$79</span>以下として、<span class="formula">N</span>が最大になるのは、最大HPの下1桁ができるだけ小さい、<span class="formula">1</span>の時になる。<br>
+最大HPが<span class="formula">$71</span>として考えてみる（ちなみに最大HPが<span class="formula">$71</span>の敵はいないのだが、便宜上である）。<br>
+HPが満タンの時、</p>
+
+<p><span class="formula">trunc(現在HP / ((最大HP * $10) &amp; $00FF)) &amp; $00FF</span><br>
+<span class="formula">= trunc($71 / ($71 * $10) &amp; $00FF ) &amp; $00FF</span><br>
+<span class="formula">= ($71 / $10) &amp; $00FF</span><br>
+<span class="formula">= $07 &amp; $00FF</span><br>
+<span class="formula">= $07</span></p>
+
+<p><span class="formula">(最大HP * $10) &amp; $00FF</span>の解は<span class="formula">$10</span>, <span class="formula">$20</span>, ... <span class="formula">$90</span>のいずれかであり、最大HPが<span class="formula">$00</span>～<span class="formula">$71</span>であるから、割り算をするとどうやっても商が<span class="formula">$00</span>～<span class="formula">$07</span>にしかならない。<br>
+よって、<span class="formula">N</span>が取る範囲は、<span class="formula">$00</span>～<span class="formula">$07</span>または<span class="formula">$FF</span>しかない。</p>
+
+<p>先に上げた、ちびマンモス（HP:<span class="formula">$28</span>）であれば、<br>
+<span class="formula">trunc(現在HP / ((最大HP * $10) &amp; $00FF)) &amp; $00FF</span><br>
+<span class="formula">= trunc(現在HP($00~$28) / $80) &amp; $00FF</span><br>
+なのだが、<span class="formula">trunc(現在HP($00~$28) / $80)</span>は、現在HPが幾つであっても答えは<span class="formula">$00</span>で確定である。<br>
+現在HPが<span class="formula">$80</span>以上の時計算値は<span class="formula">1</span>以上の値になるが、最大HPが<span class="formula">$28</span>だからありえない。<br>
+最大HPの下1桁の値次第で、現在HPは計算には全く関係ない値になってしまうこともある、ということがわかる。</p>
+
+<p>続いて<code><span class="r">$C1/92A0</span></code>～だが、<code><span class="r">$C1/92A8</span></code>で、キャリーフラグを立てた状態で</p>
+
+<p><span class="formula">$1F - N</span></p>
+
+<p>を計算している。<br>
+先に述べた通り、<span class="formula">N</span>が取る範囲は、<span class="formula">$00</span>～<span class="formula">$07</span>または<span class="formula">$FF</span>である。<br>
+よって、</p>
+
+<p>最大HPの下1桁が<span class="formula">0</span>以外なら、</p>
+
+<p><span class="formula">$1F - N($00～$07のいずれか)</span><br>
+<span class="formula">=$18～$1F</span></p>
+
+<p>最大HPの下1桁が<span class="formula">0</span>なら、</p>
+
+<p><span class="formula">$11F - $FF</span><br>
+<span class="formula">=$20</span></p>
+
+<p>この計算値を<span class="formula">M</span>としておく。<br>
+<span class="formula">M</span>と、<code><span class="r">$C1/92B0</span></code>で<code>A</code>にロードされた戦闘乱数（<span class="formula">$00</span>～<span class="formula">$FF</span>）を掛け算している（符号付8bit x 8bit）。<br>
+<code><span class="r">$C1/92B6</span></code>で、乗算結果の上1バイトをロードし、<code><span class="r">$C1/9270</span></code>のゼロフラグ判定で、最終的に回復技使用判定となる。</p>
+
+<p><span class="formula">M * 戦闘乱数（$00～$FF）</span></p>
+
+<p>の結果、<span class="formula">$0100</span>を越えたら乗算結果の上1バイトは<span class="formula">$01</span>以上になりゼロフラグが立たない。<br>
+<span class="formula">$0100</span>未満なら、ゼロフラグが立つ。<br>
+という分岐である。</p>
+
+<p>ここまでの計算で、<span class="formula">M</span>は<span class="formula">$18</span>(<span class="formula">%0001 1000</span>)～<span class="formula">$20</span>(<span class="formula">%0010 0000</span>)のいずれかを取ることがわかった。<br>
+最大HPの下1桁が<span class="formula">0</span>のケースで考えると、</p>
+
+<p><span class="formula">M * 戦闘乱数（$00～$FF）</span><br>
+<span class="formula">= $20 * 戦闘乱数（$00～$FF）</span></p>
+
+<p>この乗算結果が<span class="formula">$0100</span>を越える乱数は<span class="formula">$08</span>以上である。<br>
+つまり、乱数が<span class="formula">$00</span>～<span class="formula">$07</span>なら、<code><span class="r">$C1/9270</span></code>のゼロフラグ判定でゼロフラグがONになる（技使用確定）。<br>
+<span class="formula">$08</span>以上なら、ゼロフラグ判定でゼロフラグがOFFになる（技使用見送り）。</p>
+
+<p>ゼロフラグが立つ確率は<span class="formula">8/256 = 1/32</span>ということだから、回復技使用確定になる確率はかなり低いことがわかる。</p>
+
+<p>最大HPの下1桁が<span class="formula">0</span>以外のケースなら、</p>
+
+<p><span class="formula">M * 戦闘乱数（$00～$FF）</span><br>
+<span class="formula">= $18～$1F * 戦闘乱数（$00～$FF）</span></p>
+
+<p><span class="formula">M</span>が<span class="formula">$18</span>なら乱数<span class="formula">$10</span>以上で、<span class="formula">M</span>が<span class="formula">$1F</span>なら乱数<span class="formula">$09</span>以上で、乗算結果が<span class="formula">$0100</span>を越える。<br>
+要するに、最大HPの下1桁が<span class="formula">0</span>以外のケースだと、ゼロフラグが立つ確率は<span class="formula">9/256</span>か<span class="formula">10/256</span>のどちらか。<br>
+結局、最大HPや現在HPがいくつでも、回復技使用確定になる確率は<span class="formula">8/256</span>, <span class="formula">9/256</span>, <span class="formula">10/256</span>のいずれかであり、大差ないのである。</p>
+
+<p>計算式からして、HPが減ってきたら（<span class="formula">現在HP/最大HP</span>が小さくなってきたら）、回復技使用確率を上げる、という処理のようだが、実際のプレイでどれほど差が出ているかというと謎である。<br>
+（差が出にくかったからこそ、スタビライザーは回復技を頻繁に使うように、2回判定にしているのかもしれない）</p>
+
+<p>最後に、<code><span class="r">$C1/92BD</span></code>または<code><span class="r">$C1/92C2</span></code>でサブルーチンを終えた後の続きを見ておく。</p>
+
+<div class="code-container"><pre>
+$C1/92B9 BEQ $03    [$92BE]      ;ゼロフラグが立っているとき[$92BE]分岐
+;ゼロフラグOFF（技使用見送り）
+$C1/92BB LDA #$00                ;Aに$00をロード
+$C1/92BD RTS                     ;サブルーチン戻り
+;ゼロフラグON（技使用確定）
+$C1/92BE LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+$C1/92C0 LDA #$FF                ;Aに$FFをロード
+$C1/92C2 RTS                     ;サブルーチン戻り
+
+$C1/8F23 BEQ $24    [$8F49]      ;ゼロフラグが立っているとき[$8F49]分岐
+;ゼロフラグOFF（技使用確定）
+$C1/8F25 JSR $920C  [$C1:920C]   ;[$C1:920C]へジャンプ
+;ゼロフラグON（技使用見送り、次判定へ）
+$C1/8F49 LDX $AC    [$00:03AC]   ;Xに[$00:03AC]をロード
+</pre></div>
+
+<p>戻り先の<code><span class="r">$C1/8F23</span></code>でゼロフラグ判定となり、<code><span class="r">$C1/92BE</span></code>の戻りで<code>A</code>に<span class="formula">$FF</span>を入れている場合はゼロフラグOFF、回復技使用確定となり、回復技の処理<code>[$C1:920C]</code>にジャンプする。<br>
+<code><span class="r">$C1/92BB</span></code>の戻りで<code>A</code>に<span class="formula">$00</span>を入れている場合はゼロフラグON、攻撃技の時と同じように技使用見送りとなって、次の技判定の<code><span class="r">$C1/8F49</span></code>に飛ぶ。</p>
+
+<p>以上が回復技に関する判定である。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program41_2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<!-- <div id="pagenext"><a href="program43.html"><span class="button">&#9654;次</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
