@@ -7,7 +7,7 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="msapplication-TileImage" content="../img/social.png">
 <meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
-<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; アイテム並び替え</head>
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; アイテム並び替え">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livealive.client.jp/sfc/">
 <meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
@@ -186,7 +186,8 @@ table {
 	<li>装備先：装備アイテム優先で並び替える。装備アイテム以外はそのまま上に詰める。</li>
 </ul>
 
-<p>というようにソートしてくれるのだが、実際のサブルーチンはどうなっているのかを確認してみた。</p>
+<p>というようにソートしてくれるのだが、実際のサブルーチンはどうなっているのかを確認してみた。<br>
+また、ソートとは別機能だが、アイテム入れ替えについても最後に記してある。</p>
 
 <p>ちなみに、「装備先」の場合、装備品を、<br>
 主装備位置が頭→右→左→体→足→アクセサリー→自由<br>
@@ -304,7 +305,9 @@ table {
 	<li><code>MVN</code>（データ転送）を使って、整頓用メモリアドレスから元のメモリアドレス（<code>$00:0B01</code>～<code>$00:0BFF</code>, <code>$00:0C01</code>～<code>$00:0CFF</code>）に書き戻す。</li>
 </ol>
 
-<p>と、なっている。</p>
+<p>と、なっている。<br>
+ちなみに、持ち物欄を開いた時点で、1.のコピー作業が一度行われている。<br>
+このため、整頓前には、<code>$7E:8A00</code>～<code>$7E:8AFE</code>, <code>$7E:8B00</code>～<code>$7E:8BFE</code>を一度リセット（すべてに00を書き込む）してから、各種整頓処理を行う。</p>
 
 <p>実際のソートの前に、メニュー画面を開いた時の処理で、<code>[$00:0555]</code>と<code>[$00:0559]</code>に書き込まれる値が重要になるので、まずそちらを紹介する。<br>
 <code>[$00:0555]</code>は、シナリオによるアイテムID記録アドレスの開始位置、<code>[$00:0559]</code>はシナリオによるアイテム種類最大所持数が入る仕組みである。</p>
@@ -1046,6 +1049,144 @@ $C2/63BC JSR $6301  [$C2:6301]   ;[$C2:6301]へジャンプ
 
 <p>以上が持ち物欄における整頓処理である。</p>
 
+<h4>アイテム入れ替え</h4>
+
+<p>アイテムの入れ替えは、</p>
+
+<ol>
+	<li>カーソル位置の交換元アイテムをAボタンで選択</li>
+	<li>カーソルを動かして、交換先アイテムをAボタンで選択で入れ替え</li>
+</ol>
+
+<p>というように行うため、カーソル位置が記録されるアドレスが重要である。<br>
+カーソル位置が入るアドレスは、<br>
+<code>[$00:0544]</code><code>[$00:0545]</code><br>
+の2バイトで、現在のカーソル位置の値が入る。<br>
+このアドレスには、メニュー画面であればどの階層（ページ）でもカーソルの位置が入る。<br>
+持ち物欄なら、左上から右下へ、順に<span class="formula">$0000</span>から番号が入る、といったような処理である。<br>
+隊形なら4キャラ分の位置、<span class="formula">$0000</span>～<span class="formula">$0003</span>が入る。</p>
+
+<p>もうひとつ重要なのが、「カーソル位置の何かをAボタンで選択している状態」を記録するアドレスである。<br>
+<code>[$00:0565]</code>～<code>[$00:0568]</code>に記録されるのだが、まずこのアドレスに入る値の処理が持ち物欄を開いた時に行われる。<br>
+（先に記したが、アイテム一覧のアイテムIDと個数のメモリアドレス内容（<code>$00:0B01</code>～<code>$00:0BFF</code>, <code>$00:0C01</code>～<code>$00:0CFF</code>）を、整頓用に確保してあるメモリアドレス（<code>$7E:8A00</code>～<code>$7E:8AFE</code>, <code>$7E:8B00</code>～<code>$7E:8BFE</code>）にコピーすることも、持ち物欄を開いた時点で行っている）</p>
+
+<div class="code-container"><pre>
+$C2/0EA5 LDA #$FFFF              ;Aに$FFFFをロード
+$C2/0EA8 STA $65    [$00:0565]   ;Aを[$00:0566][$00:0565]に書き込み
+$C2/0EAA STA $67    [$00:0567]   ;Aを[$00:0568][$00:0567]に書き込み
+$C2/0EAC LDX #$7DF9              ;Aに$7DF9をロード
+$C2/0EAF JSR $35AD  [$C2:35AD]   ;[$C2:35AD]へジャンプ
+</pre></div>
+
+<p>上の処理で、<code>[$00:0565]</code>～<code>[$00:0568]</code>の4バイト分すべて<span class="formula">$FF</span>で埋まる。<br>
+さて、Aボタンで交換元のアイテムを選ぶと以下のような処理になる。</p>
+
+<div class="code-container"><pre>
+$C2/0651 BCS $03    [$0656]      ;キャリーフラグが立っているとき[$0656]分岐
+$C2/0653 JMP ($0532)[$C2:0BB9]   ;[$C2:0BB9]へジャンプ(レジスタをスタックに積まない)
+$C2/0BB9 LDA $65    [$00:0565]   ;Aに[$00:0566][$00:0565]($FFFF)をロード
+$C2/0BBB BPL $13    [$0BD0]      ;ネガティブフラグが立っていないとき[$0BD0]分岐
+;ネガティブフラグON
+$C2/0BBD LDA $44    [$00:0544]   ;Aに[$00:0545][$00:0544](現在のカーソル位置)をロード
+$C2/0BBF CLC                     ;キャリーフラグクリア
+$C2/0BC0 ADC $36    [$00:0536]   ;A + [$00:0537][$00:0536]（初期値$0000）
+$C2/0BC2 AND #$00FF              ;Aと$00FFで論理積
+$C2/0BC5 STA $65    [$00:0565]   ;Aを[$00:0566][$00:0565]に書き込み
+$C2/0BC7 LDA #$0200              ;Aに$0200をロード
+$C2/0BCA JSR $4281  [$C2:4281]   ;[$C2:4281]へジャンプ
+</pre></div>
+
+<p><code>[$00:0566]</code><code>[$00:0565]</code>のネガティブフラグ判定は、「Aボタンで既に何かを選択しているかどうか」である。<br>
+初期状態で<span class="formula">$FFFF</span>が入っており、Aボタンで何か選択していない状態である。<br>
+この時にAボタンを押すと、<code><span class="r">$C2/0BBD</span></code>～の処理を行い、<code>[$00:0545]</code><code>[$00:0544]</code>(カーソル位置)を<code>[$00:0566]</code><code>[$00:0565]</code>に上書きする。</p>
+
+<p>続いて、交換先アイテム位置にカーソルを移動する。<br>
+<code>[$00:0545]</code><code>[$00:0544]</code>(現在のカーソル位置)が更新されることになる。<br>
+この上でAボタンを押すと、交換元アイテムと交換先アイテムが交換されるが、それが以下処理である。</p>
+
+<div class="code-container"><pre>
+$C2/0651 BCS $03    [$0656]      ;キャリーフラグが立っているとき[$0656]分岐
+$C2/0653 JMP ($0532)[$C2:0BB9]   ;[$C2:0BB9]へジャンプ(レジスタをスタックに積まない)
+$C2/0BB9 LDA $65    [$00:0565]   ;Aに[$00:0566][$00:0565]（交換元アイテム位置）をロード
+$C2/0BBB BPL $13    [$0BD0]      ;ネガティブフラグが立っていないとき[$0BD0]分岐
+;ネガティブフラグOFF
+$C2/0BD0 LDA $44    [$00:0544]   ;Aに[$00:0545][$00:0544]（現在のカーソル位置）をロード
+$C2/0BD2 CLC                     ;キャリーフラグクリア
+$C2/0BD3 ADC $36    [$00:0536]   ;A + [$00:0537][$00:0536]（初期値$0000）
+$C2/0BD5 AND #$00FF              ;Aと$00FFで論理積
+$C2/0BD8 STA $67    [$00:0567]   ;A（現在のカーソル位置）を[$00:0568][$00:0567]に書き込み
+$C2/0BDA LDA $000050[$00:0050]   ;Aに[$00:0051][$00:0050]をロード
+$C2/0BDE AND #$000F              ;Aと$000Fで論理積
+$C2/0BE1 CMP #$0004              ;Aと$0004を減算比較（ステータスレジスタ変更のみ）
+$C2/0BE4 BEQ $4E    [$0C34]      ;ゼロフラグが立っているとき[$0C34]分岐
+$C2/0BE6 CMP #$0005              ;Aと$0005を減算比較（ステータスレジスタ変更のみ）
+$C2/0BE9 BEQ $44    [$0C2F]      ;ゼロフラグが立っているとき[$0C2F]分岐
+$C2/0BEB LDA $67    [$00:0567]   ;Aに[$00:0568][$00:0567]（現在のカーソル位置）をロード
+$C2/0BED CMP $65    [$00:0565]   ;Aと[$00:0566][$00:0565]（交換元アイテム位置）を減算比較
+$C2/0BEF BEQ $6A    [$0C5B]      ;ゼロフラグが立っているとき[$0C5B]分岐
+;ゼロフラグOFF（交換元と交換先のアイテム位置が同一ではない）
+$C2/0BF1 LDX $65    [$00:0565]   ;Xに[$00:0566][$00:0565]をロード
+$C2/0BF3 LDY $67    [$00:0567]   ;Yに[$00:0568][$00:0567]をロード
+$C2/0BF5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/0BF7 LDA $8A00,x             ;Aに[$8A00,x]（交換元アイテムID）をロード
+$C2/0BFA XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/0BFB LDA $8A00,y             ;Aに[$8A00,y]（交換先アイテムID）をロード
+$C2/0BFE STA $8A00,x             ;Aを[$8A00,x]に書き込み
+$C2/0C01 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/0C02 STA $8A00,y             ;Aを[$8A00,y]に書き込み
+$C2/0C05 LDA $8B00,x             ;Aに[$8B00,x]（交換元アイテム個数）をロード
+$C2/0C08 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/0C09 LDA $8B00,y             ;Aに[$8B00,y]（交換先アイテム個数）をロード
+$C2/0C0C STA $8B00,x             ;Aを[$8B00,x]に書き込み
+$C2/0C0F XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/0C10 STA $8B00,y             ;Aを[$8B00,y]に書き込み
+$C2/0C13 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/0C15 JSR $4514  [$C2:4514]   ;[$C2:4514]へジャンプ
+</pre></div>
+
+<p>まず<code><span class="r">$C2/0BBB</span></code>で<code>[$00:0566]</code><code>[$00:0565]</code>のネガティブフラグ判定だが、先ほど、<code>[$00:0566]</code><code>[$00:0565]</code>には交換元アイテムの位置が入っており、上位バイトの<code>[$00:0566]</code>は<span class="formula">$00</span>なので、ネガティブフラグが立たない。<br>
+よって、<code><span class="r">$C2/0BD0</span></code>に進む。つまり、何かのアイテムが選択されている時の処理に進む。<br>
+続いて、<code>[$00:0545]</code><code>[$00:0544]</code>（現在のカーソル位置）を<code>[$00:0568]</code><code>[$00:0567]</code>に書き込む。<br>
+<code>[$00:0568]</code><code>[$00:0567]</code>にはこれまで$FFFFが入っていたが、ここで交換先のアイテム位置が書き込まれたことになる。</p>
+
+<p><code><span class="r">$C2/0BDA</span></code>～の<code>[$00:0051]</code><code>[$00:0050]</code>だが、メニュー画面を開いた時点で以下処理で<span class="formula">$0003</span>が入っており、持ち物欄でも変化しない。</p>
+
+<div class="code-container"><pre>
+$C0/08BA LDA #$03                ;Aに$03をロード
+$C0/08BC STA $50    [$00:0050]   ;Aを[$00:0050]に書き込み
+$C0/08BE JSR $0DCC  [$C0:0DCC]   ;[$C0:0DCC]へジャンプ
+</pre></div>
+
+<p>このため、<code><span class="r">$C2/0BEB</span></code>まで処理が進む。<br>
+<code><span class="r">$C2/0BEB</span></code>からは、<code>[$00:0568]</code><code>[$00:0567]</code>と<code>[$00:0566]</code><code>[$00:0565]</code>の減算比較だが、<code>[$00:0568]</code><code>[$00:0567]</code>は交換先アイテムの位置、<code>[$00:0566]</code><code>[$00:0565]</code>は交換元アイテムの位置が入っている。<br>
+<code><span class="r">$C2/0BEF</span></code>でゼロフラグ判定をしているが、ここでゼロフラグが立つのは、交換先アイテムと交換元アイテムが同じ位置にある時のみである。<br>
+この場合は交換処理をする必要がないので分岐処理になる。<br>
+ゼロフラグが立たない時は、交換先アイテムと交換元アイテムが別の位置にある場合である。<br>
+よって、<code><span class="r">$C2/0BF1</span></code>からが交換処理になる。</p>
+
+<p><code><span class="r">$C2/0BF1</span></code>からは、</p>
+
+<ul>
+	<li><code>X</code>に交換元アイテムの位置<code>[$00:0566]</code><code>[$00:0565]</code></li>
+	<li><code>Y</code>に交換先アイテムの位置<code>[$00:0568]</code><code>[$00:0567]</code></li>
+</ul>
+
+<p>をロードし、まず<code>A</code>に<code>[$8A00,x]</code>、つまり整頓用メモリアドレスのアイテムIDを格納してある<code>[$7E:8Axx]</code>をロードする。<br>
+<code><span class="r">$C2/0BFA</span></code>の<code>XBA</code>で、<code>A</code>の上位バイトと下位バイトを交換するから、<code>A</code>の上位バイトに交換元アイテムIDが入る。<br>
+更に、<code>A</code>に<code>[$8A00,y]</code>、つまり<code>[$7E:8Ayy]</code>（交換先アイテムID）をロードするので、<code>A</code>の下位バイトに交換先アイテムIDが入る。<br>
+後は、再び<code>XBA</code>を使いつつ、</p>
+
+<ul>
+	<li><code>A</code>の下位バイト（交換先アイテムID）→<code>[$8A00,x]</code>（交換元のアドレス）</li>
+	<li><code>A</code>の上位バイト（交換元アイテムID）→<code>[$8A00,y]</code>（交換先のアドレス）</li>
+</ul>
+
+<p>と処理して、アイテムIDを入れ替える。</p>
+
+<p><code><span class="r">$C2/0C05</span></code>～<code><span class="r">$C2/0C10</span></code>は同じ処理をアイテム個数の<code>[$8B00,x]</code>と<code>[$8B00,y]</code>で行っている。<br>
+これで、交換元・交換先のアイテムIDとアイテム個数が入れ替えられた。<br>
+ジャンプ先の<code><span class="r">$C2/4514</span></code>～<code><span class="r">$C2/453C</span></code>は既に上で紹介した<code>$7E:8A00</code>～<code>$7E:8AFE</code>, <code>$7E:8B00</code>～<code>$7E:8BFE</code>を、<code>$00:0B01</code>～<code>$00:0BFF</code>, <code>$00:0C01</code>～<code>$00:0CFF</code>に書き戻すサブルーチンなので、紹介は省く。<br>
+交換したアイテムは2種類だけだが、その部分だけ書き戻しではなく、持ち物欄すべて書き戻しになる。</p>
 
 <script>//ソースコード色分け処理
 window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
