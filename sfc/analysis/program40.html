@@ -160,6 +160,7 @@ table {
 		<li><a href="program19.html">副能力変動値</a></li>
 		<li><a href="program21.html">文字入力と判定</a></li>
 		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
 		<li><a href="program35.html">セーブ・ロード</a></li>
 	</ul>
 </li>
@@ -802,31 +803,37 @@ $C1/8E5B JSR $92C3  [$C1:92C3]   ;[$C1:92C3]へジャンプ
 
 <table>
 <thead>
-	<tr><th>キャラ</th><th>アドレス</th></tr>
+	<tr><th>アドレス</th><th>キャラ</th></tr>
 </thead>
 <tbody>
-	<tr><td><code>$00:0AB0</code></td><td>隊形で上の位置にいる味方キャラの値</td></tr>
-	<tr><td><code>$00:0AB1</code></td><td>隊形で左の位置にいる味方キャラの値</td></tr>
-	<tr><td><code>$00:0AB2</code></td><td>隊形で右の位置にいる味方キャラの値</td></tr>
-	<tr><td><code>$00:0AB3</code></td><td>隊形で下の位置にいる味方キャラの値</td></tr>
+	<tr><td><code>$00:0AB0</code></td><td>主人公の行動順-1<br></td></tr>
+	<tr><td><code>$00:0AB1</code></td><td>味方キャラ1の行動順-1</td></tr>
+	<tr><td><code>$00:0AB2</code></td><td>味方キャラ2の行動順-1</td></tr>
+	<tr><td><code>$00:0AB3</code></td><td>味方キャラ3の行動順-1</td></tr>
 </tbody>
 </table>
 
-<p>上アドレスに入る値は、</p>
+<p>上アドレスに入る値は、<span class="formula">$00</span>～<span class="formula">$03</span>のいずれか、味方キャラ順は加入順。<br>
+例えば功夫編なら、主人公は老師、味方キャラ1～3は加入順により変動するがユン、レイ、サモとしたら、上にレイ、左にサモ、右に老師、下にユンだと、<code>$00:0AB0</code>～<code>$00:0AB3</code>には順に、</p>
 
-<ul>
-	<li>主人公：<span class="formula">$00</span></li>
-	<li>仲間1：<span class="formula">$01</span></li>
-	<li>仲間2：<span class="formula">$02</span></li>
-	<li>仲間3：<span class="formula">$03</span></li>
-</ul>
+<table>
+<thead>
+	<tr><th>アドレス</th><th>キャラ</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:0AB0</code></td><td>老師の行動順-1</td><td><span class="formula">$02</span>（3番目）</td></tr>
+	<tr><td><code>$00:0AB1</code></td><td>ユンの行動順-1</td><td><span class="formula">$03</span>（4番目）</td></tr>
+	<tr><td><code>$00:0AB2</code></td><td>レイの行動順-1</td><td><span class="formula">$00</span>（1番目）</td></tr>
+	<tr><td><code>$00:0AB3</code></td><td>サモの行動順-1</td><td><span class="formula">$01</span>（2番目）</td></tr>
+</tbody>
+</table>
 
-<p>主人公・仲間1・仲間2・仲間3の対応は<a href="d5.html#charaparty">味方パーティIDリスト</a>の通りだが、最終編の仲間1～3は加入順。</p>
+<p>こんな感じで値が入る。</p>
 
-<p>例えば近未来編だと、仲間1が無法松で仲間2がタロイモになるが、無法松は最初の戦闘の後一時離脱する。<br>
-タロイモが加入した後も、<span class="formula">$01</span>が入っているアドレスが無法松の位置のままで、無法松がいない間に<span class="formula">$01</span>が入っているアドレス位置と入れ替えると、筑波研究所での再加入時に対応した位置に加わる。</p>
+<!-- <p>例えば近未来編だと、仲間1が無法松で仲間2がタロイモになるが、無法松は最初の戦闘の後一時離脱する。<br>
+タロイモが加入した後も、<span class="formula">$01</span>が入っているアドレスが無法松の位置のままで、無法松がいない間に<span class="formula">$01</span>が入っているアドレス位置と入れ替えると、筑波研究所での再加入時に対応した位置に加わる。</p> -->
 
-<p><code>$00:0AB0</code>～<code>$00:0AB3</code>のキャラに対応した順で、戦闘中のキャラアドレス開始位置が決まる。</p>
+<p><code>$00:0AB0</code>～<code>$00:0AB3</code>の値に対応した順で、戦闘中のキャラアドレス開始位置が決まる。</p>
 
 
 <table>
@@ -844,11 +851,9 @@ $C1/8E5B JSR $92C3  [$C1:92C3]   ;[$C1:92C3]へジャンプ
 <p><code>[$00:035B]</code><code>[$00:035A]</code>には行動可能な味方キャラのアドレス部分（<span class="formula">$1C00, $1C40, $1C80, $1CC0</span>）が入る。<br>
 味方が行動すると更新されていく。</p>
 
-<p>戦闘中は、<br>
-<code>$00:0AB0</code>→<code>$00:0AB1</code>→<code>$00:0AB2</code>→<code>$00:0AB3</code>→<code>$00:0AB0</code>……<br>
-と、順番に行動していくことになる。</p>
+<p>戦闘中は、<code>$00:0AB0</code>～<code>$00:0AB3</code>に入っている値の小さい順に行動していくことになる。</p>
 
-<p>サブルーチンは以下の通り。<br>
+<!-- <p>サブルーチンは以下の通り。<br>
 開始時点で<code>X</code>に入っているのが、ひとつ前に行動した味方キャラのアドレス部分（<span class="formula">$1C00, $1C40, $1C80, $1CC0</span>）の値になる。</p>
 
 <div class="code-container"><pre>
@@ -935,7 +940,7 @@ $C1/7B01 RTS                     ;サブルーチン戻り
 </ul>
 
 <p>ことを確認した上で、現在の行動キャラとして<code>X</code>が<code>[$00:035B]</code><code>[$00:035A]</code>に書き込まれる。<br>
-味方ターンが回る度に、上の処理で次に行動するキャラが決まる。</p>
+味方ターンが回る度に、上の処理で次に行動するキャラが決まる。</p> -->
 
 <p>次ページでは、<a href="program40_2.html">順序ポイント</a>について説明する。</p>
 
