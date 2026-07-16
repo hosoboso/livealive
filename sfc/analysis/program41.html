@@ -266,7 +266,7 @@ $C1/8EB6 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
 <code>[$7E:ACn6]</code>は初期値<span class="formula">$00</span>である。</p>
 
 <p><code><span class="r">$C1/8E85</span></code>～<code><span class="r">$C1/8EA0</span></code>は敵データのアドレスを呼び出すための計算。<br>
-<code><span class="r">$C1/8EA0</span></code>の飛び先は<code>[$7E:AC06]</code>に入っている値によって変動するが、ここはひとまず、<code>[$7E:AC06]</code>が初期値<span class="formula">$00</span>の前提で説明する。</p>
+<code><span class="r">$C1/8EA0</span></code>の飛び先は<code>JMP ($031C)</code>で指定しているが、これは<code>[$00:031C]</code>に入っている値がアドレスになるという意味で、辿ってみると、<code><span class="r">$C1/8E85</span></code>でロードする<code>[$7E:AC06]</code>の値で変わってくるのだが、ここはひとまず、<code>[$7E:AC06]</code>が初期値<span class="formula">$00</span>の前提で説明する。</p>
 
 <p><code><span class="r">$C1/8EA3</span></code>で呼び出した<code>[$00:1A21]</code>は敵種類1の敵データ01である。<br>
 <code><span class="r">$C1/8EA6</span></code>で<span class="formula">$0F</span>と論理積を取っているが、敵データ01の下1桁は「移動頻度」というパラメータになる（<span class="formula">$0～$F</span>）。<br>
@@ -291,6 +291,17 @@ $C1/8EB6 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
 大半の敵が、「味方に技を出せる位置・向きなら攻撃し、それ以外なら移動」という行動を取るのは、移動頻度が<span class="formula">0</span>に設定されているためである。<br>
 移動頻度が<span class="formula">0</span>だから移動しないということではなく、技使用判定をしても技を出せない状況下なら移動、という判定をしていることになる。</p>
 
+<p>なお、技判定使用をすべて通過し最後の移動判定にたどり着いた場合は以下のように<code><span class="r">$C1/8EA0</span></code>の飛び先が<code><span class="r">$C1/8F5A</span></code>固定になって、移動確定となる。</p>
+
+<div class="code-container"><pre>
+$C1/8EA0 JMP ($031C)[$C1:8F5A]   ;[$C1:8F5A]へジャンプ(レジスタをスタックに積まない)
+$C1/8F5A LDA #$00                ;Aに$00をロード
+$C1/8F5C STA $7E9106,x           ;Aを[$7E9106,x]に書き込み
+$C1/8F60 LDA $7E8F07,x           ;Aに[$7E8F07,x]をロード
+$C1/8F64 BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C1/8F66 BNE $0F    [$8F77]      ;ゼロフラグが立っていないとき[$8F77]分岐
+$C1/8F68 JSR $913A  [$C1:913A]   ;[$C1:913A]へジャンプ
+</pre></div>
 
 <h3 id="01">技使用判定</h3>
 

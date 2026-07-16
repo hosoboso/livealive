@@ -404,6 +404,7 @@ table {
 </thead>
 <tbody>
 	<tr><td><code>$C1:0000</code>～<code>$C1:0079</code></td><td>戦闘開始時処理</td></tr>
+	<tr><td><code>$C1:00A7</code>～<code>$C1:00AA</code></td><td>戦闘開始時 味方行動順決定</td></tr>
 	<tr><td><code>$C1:0136</code>～<code>$C1:0140</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタ書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C1:03F1</code>～<code>$C1:03F9</code></td><td>敵データ15・タイプと<span class="formula">$04</span>(OBJECT)で論理積を取る処理</td></tr>
 	<tr><td><code>$C1:0BF7</code>～<code>$C1:0C10</code></td><td>ＳＦ編主人公　キューブにデータ切り替え開始</td></tr>
@@ -424,10 +425,12 @@ table {
 	<tr><td><code>$C1:1C91</code>～<code>$C1:1CA8</code></td><td>順序ポイント計算（行動異常発生時）</td></tr>
 	<tr><td><code>$C1:1CAC</code>～<code>$C1:1CF6</code></td><td>順序ポイント計算（敵がダメージを受ける）</td></tr>
 	<tr><td><code>$C1:1CF7</code>～<code>$C1:1D1D</code></td><td>行動異常のデータ呼び出し</td></tr>
-	<tr><td><code>$C1:1DF8</code>～<code>$C1:1E19</code></td><td>味方キャラのフィールドダメージ処理</td></tr>
-	<tr><td><code>$C1:1E26</code>～<code>$C1:1E42</code></td><td>味方キャラのフィールド吸収処理</td></tr>
-	<tr><td><code>$C1:1E71</code>～<code>$C1:1E9A</code></td><td>敵キャラのフィールドダメージ処理</td></tr>
-	<tr><td><code>$C1:1EA3</code>～<code>$C1:1ECA</code></td><td>敵キャラのフィールド吸収処理</td></tr>
+	<tr><td><code>$C1:1DD0</code>～<code>$C1:1DF1</code></td><td>味方キャラの毒状態判定及び、毒状態の時ダメージ量計算</td></tr>
+	<tr><td><code>$C1:1DF8</code>～<code>$C1:1E19</code></td><td>味方キャラのダメージ処理</td></tr>
+	<tr><td><code>$C1:1E26</code>～<code>$C1:1E42</code></td><td>味方キャラの吸収処理</td></tr>
+	<tr><td><code>$C1:1E4C</code>～<code>$C1:1E6F</code></td><td>敵キャラの毒状態判定及び、毒状態の時ダメージ量計算</td></tr>
+	<tr><td><code>$C1:1E71</code>～<code>$C1:1E9A</code></td><td>敵キャラのダメージ処理</td></tr>
+	<tr><td><code>$C1:1EA3</code>～<code>$C1:1ECA</code></td><td>敵キャラの吸収処理</td></tr>
 	<tr><td><code>$C1:1ECE</code>～<code>$C1:1F05</code></td><td>ダメージフィールド消去判定</td></tr>
 	<tr><td><code>$C1:1F06</code>～<code>$C1:1F47</code></td><td><code>$7E:FEFD</code>を+1＆ダメージフィールド発動判定</td></tr>
 	<tr><td><code>$C1:1F5C</code>～<code>$C1:1FAB</code></td><td>ダメージフィールド消去処理</td></tr>
@@ -485,6 +488,14 @@ table {
 	<tr><td><code>$C1:8F1C</code>～<code>$C1:8F2D</code></td><td>敵ターン　敵の使用技判定</td></tr>
 	<tr><td><code>$C1:8F77</code>～<code>$C1:8F8C</code></td><td>順序ポイント計算（敵が1マス移動）</td></tr>
 	<tr><td><code>$C1:90A2</code>～<code>$C1:90C4</code></td><td>行動異常継続判定</td></tr>
+	<tr><td><code>$C1:90DB</code>～<code>$C1:9139</code></td><td>敵の向き・味方との相対距離から、敵移動データ読み込み</td></tr>
+	<tr><td><code>$C1:913A</code>～<code>$C1:9165</code></td><td>敵の移動・向き判定用　敵味方の状態と座標獲得して、敵に一番近い味方の位置と距離獲得</td></tr>
+	<tr><td><code>$C1:9166</code>～<code>$C1:917A</code></td><td>敵の移動・向き判定用　味方キャラ状態獲得</td></tr>
+	<tr><td><code>$C1:917D</code>～<code>$C1:91AA</code></td><td>敵の移動・向き判定用　敵味方の座標、距離判定</td></tr>
+	<tr><td><code>$C1:91AB</code>～<code>$C1:91C5</code></td><td>敵の移動・向き判定用　X座標相対位置判定</td></tr>
+	<tr><td><code>$C1:91C6</code>～<code>$C1:91E0</code></td><td>敵の移動・向き判定用　Y座標相対位置判定</td></tr>
+	<tr><td><code>$C1:91E1</code>～<code>$C1:91EF</code></td><td>敵の移動・向き判定用　相対位置判定で、味方-敵でキャリーフラグOFF</td></tr>
+	<tr><td><code>$C1:91F0</code>～<code>$C1:920B</code></td><td>敵の移動・向き判定用　敵座標と敵幅を<code>[$00:0314]</code>～<code>[$00:0317]</code>へコピー
 	<tr><td><code>$C1:920C</code>～<code>$C1:9251</code></td><td>味方全員の状態異常と、敵の使用技で発生する状態異常が被っていないか判定</td></tr>
 	<tr><td><code>$C1:9252</code>～<code>$C1:92C2</code></td><td>技IDから、周囲攻撃・反撃専用・回復技判定～回復技使用判定<br><code>$C1:926D</code>～<code>$C1:927D</code>は敵ID<span class="formula">$D7</span>のスタビライザー専用処理</td></tr>
 	<tr><td><code>$C1:92C3</code>～<code>$C1:9335</code></td><td>敵ターンで行動する敵を順序ポイントから決定</td></tr>
@@ -498,6 +509,7 @@ table {
 	<tr><td><code>$C1:990D</code>～<code>$C1:9927</code></td><td>行動ポイント計算（味方が向き変え）</td></tr>
 	<tr><td><code>$C1:9D13</code>～<code>$C1:9D86</code></td><td>Xボタンの「ひとつ前の技」関連処理</td></tr>
 	<tr><td><code>$C1:9EFA</code>～<code>$C1:9F51</code></td><td>味方の行動順決定（<code>[$00:035B]</code><code>[$00:035A]</code>を更新）</td></tr>
+	<tr><td><code>$C1:9F5A</code>～<code>$C1:9F75</code></td><td>味方キャラ戦闘状態確認</td></tr>
 	<tr><td><code>$C1:A00B</code>～<code>$C1:A0DE</code></td><td>味方が出した技が回復技または無属性ではないとき、技の属性を取り出す</td></tr>
 	<tr><td><code>$C1:A12C</code>～<code>$C1:A179</code></td><td>敵が出した技が回復技または無属性ではないとき、技の属性を取り出す</td></tr>
 	<tr><td><code>$C1:A1BD</code>～<code>$C1:A21B</code></td><td>敵から1ヒット以上の攻撃を食らった時、習得技で反撃できるか判定し、反撃技が出せなくなる状態異常ではないか判定</td></tr>
@@ -543,6 +555,7 @@ table {
 	<tr><td><code>$C1:E0A2</code>～<code>$C1:E0F4</code></td><td>敵キャラ　回避属性判定</td></tr>
 	<tr><td><code>$C1:E0F7</code>～<code>$C1:E124</code></td><td>味方が敵を攻撃する時、向き補正<code>[$7E:ABnB]</code>から、向き補正したレベルの値を<code>[$7E:ABnA]</code>に書き込む</td></tr>
 	<tr><td><code>$C1:E127</code>～<code>$C1:E1A8</code></td><td>味方が敵を攻撃する時、向き補正を判定して<code>[$7E:ABnB]</code>に書き込む値を<code>A</code>にロードする</td></tr>
+	<tr><td><code>$C1:E1A9</code>～<code>$C1:E1C7</code></td><td>敵キャラ戦闘状態確認</td></tr>
 	<tr><td><code>$C1:E251</code>～<code>$C1:E2E9</code></td><td>該当の技IDの技が出せる状態か判定</td></tr>
 	<tr><td><code>$C1:E3D9</code>～<code>$C1:E401</code></td><td>行動ポイント計算（敵が移動）</td></tr>
 	<tr><td><code>$C1:E894</code>～<code>$C1:E8C8</code></td><td>仲間キャラ敵対時　敵キャラデータを味方キャラデータにコピー</td></tr>
@@ -558,6 +571,7 @@ table {
 	<tr><td><code>$C1:F05F</code>～<code>$C1:F2B1</code></td><td>最終編オルステッドルート　対戦キャラのステータスセット</td></tr>
 	<tr><td><code>$C1:F3CE</code>～<code>$C1:F3D8</code></td><td><code>[$00:03AA]</code>, <code>[$00:038B]</code>, <code>[$00:0395]</code>, <code>[$00:0396]</code>, <code>[$00:03B7]</code>, <code>[$00:03B7]</code>, <code>[$00:03B8]</code>に初期値$00を設定</td></tr>
 	<tr><td><code>$C1:F50E</code>～<code>$C1:F623</code></td><td>最終編ランダムエンカウント時の敵パーティ算出</td></tr>
+	<tr><td><code>$C1:F55D</code>～<code>$C1:F727</code></td><td>味方ステータスのセット</td></tr>
 	<tr><td><code>$C1:F575</code>～<code>$C1:F57C</code></td><td><code>[$00:0041]</code>（背景番号）から上6ビットを<code>[$00:0354]</code>に書き込み</td></tr>
 	<tr><td><code>$C1:F626</code>～<code>$C1:F65E</code></td><td>敵パーティデータから味方キャラ4キャラ分の向きと座標を獲得・設置</td></tr>
 	<tr><td><code>$C1:F661</code>～<code>$C1:F6E9</code></td><td>敵キャラ操作時　敵種類1～4セット</td></tr>
@@ -567,6 +581,7 @@ table {
 	<tr><td><code>$C1:F9E1</code>～<code>$C1:FA19</code></td><td>最終編オルステッドルート　敵対キャラの戦闘状態書き込み</td></tr>
 	<tr><td><code>$C1:FA31</code>～<code>$C1:FB2A</code></td><td>仲間キャラ敵対時　味方キャラデータを敵種類・敵個別データにコピー</td></tr>
 	<tr><td><code>$C1:FB62</code>～<code>$C1:FBB8</code></td><td>敵種類1の敵ID書き込み</td></tr>
+	<tr><td><code>$C1:FB2B</code>～<code>$C1:FB5D</code></td><td>味方の隊形から行動順を判定</td></tr>
 	<tr><td><code>$C1:FBBE</code>～<code>$C1:FBFD</code></td><td>敵キャラ操作時　敵IDや敵座標セット</td></tr>
 	<tr><td><code>$C1:FC0A</code>～<code>$C1:FC3E</code></td><td>戦闘開始時 敵データのロード＆<code>$00:1A??</code>～への書き込み</td></tr>
 	<tr><td><code>$C1:FC3F</code>～<code>$C1:FC58</code></td><td>最終編オルステッドルート　技1～4の反撃属性1/反撃属性2/使用不可になるステータス異常書き込み</td></tr>

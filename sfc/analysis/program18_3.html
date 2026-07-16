@@ -7,20 +7,20 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="msapplication-TileImage" content="../img/social.png">
 <meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
-<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常 &gt; 毒状態のダメージ">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livealive.client.jp/sfc/">
 <meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
 <meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="Summary">
-<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常 &gt; 毒状態のダメージ">
 <meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
 <meta name="twitter:url" content="https://livealive.client.jp/sfc/">
 <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
 <link rel="icon alternate" href="../img/social.png" type="image/png">
-<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値</title>
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 状態異常 &gt; 毒状態のダメージ</title>
 <link href="../../css/main.min.css?20260714" rel="stylesheet">
 <link href="../../css/sfc.css?20260301" rel="stylesheet">
 <link href="../../css/cssmenu.css?20240801" rel="stylesheet">
@@ -100,7 +100,7 @@ table {
 		<li><a href="memo.html">雑多メモ</a></li>
 	</ul>
 </li>
-<li class="other"><button type="button">戦闘・基本</button>
+<li class="here"><button type="button">戦闘・基本</button>
 	<ul>
 		<li><a href="program4.html">ダメージ計算式</a></li>
 		<li><a href="program5.html">戦闘用乱数計算</a></li>
@@ -149,7 +149,7 @@ table {
 		<li><a href="program33.html">オディオ戦</a></li>
 	</ul>
 </li>
-<li class="here"><button type="button">フィールド関係</button>
+<li class="other"><button type="button">フィールド関係</button>
 	<ul>
 		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
 		<li><a href="program7.html">マップ乱数について</a></li>
@@ -169,267 +169,181 @@ table {
 </div>
 
 <div class="maincontents">
-<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 副能力変動値</h1>
-<h2>副能力変動値</h2>
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program18.html">状態異常</a> &gt; 毒状態のダメージ</h1>
+<h2>毒状態のダメージ</h2>
 
 <div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
 まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
 
-<p>装備品の中には、複数の箇所に装備可能だが、装備位置を変えるとステータス変動値が変わるものがある。<br>
-例えば「ガツングローブ」は、右と左、どちらにも装備可能であるが、左だと防御<span class="formula">+5</span>, 力<span class="formula">+16</span>の効果なのに、右だと力<span class="formula">+8</span>になる。</p>
+<p>状態異常の中で、毒状態だと一定のタイミングで毒ダメージをくらうことになる。<br>
+どのタイミングで毒ダメージが発動し、毒ダメージ量が計算されるのかを紹介する。</p>
 
-<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様のアイテムデータページによれば、アイテム（装備品）には「主装備位置」「性能」「主能力変動」「副能力変動」といった、ステータス変動に関わる設定がある。</p>
+<p>タイミングだが、<a href="program40.html">行動ポイント</a>判定で味方側にターンが回る時、つまり行動ポイントが<span class="formula">256</span>以上から<span class="formula">0</span>以上<span class="formula">256</span>未満に変動した直後に、敵味方すべての状態異常を判定して、毒状態のキャラは毒ダメージが入る。</p>
 
-<blockquote>性能値は右の場合攻撃力・頭左体足の場合防御力・装飾は意味なし？<br>
-複数個所に装備可能な場合、主装備位置が自由となっている場合は、どこに装備しても同じ性能が得られます。<br>
-主装備位置が指定されている場合、主装備位置以外では副能力変動の値が使われます。また、性能値は0となります。回避属性も得られないようです。</blockquote>
+<p>まず、味方キャラの判定とダメージ量計算のサブルーチンを紹介。</p>
 
-<p>「ガツングローブ」だと、主装備位置が「左」であり、左に装備した時だけ、「性能」の値の<span class="formula">+5</span>が防御の値に加わり、「主能力変動」の力<span class="formula">+16</span>も得られる。<br>
-だが、「右」は装備可能ではあるが主装備位置ではないため、「性能」の値は反映されず、「副能力変動」の力<span class="formula">+8</span>だけが得られるようになっている。<br>
-「副能力変動」の値は「主能力変動」の1/2（小数点以下切り捨て）であることが多いのだが、例外もある。</p>
+<h3>味方キャラのサブルーチン</h3>
 
-<p>例えば「グラブ」は、主装備位置が「右」で、左装備も可能。<br>
-右に装備すると、「性能」の値の<span class="formula">+4</span>が武器の攻撃力になる。「主能力変動」の値は設定されていない。<br>
-なのだが、左に装備すると、「副能力変動」の速<span class="formula">-5</span>が働くのである。<br>
-「主能力変動」には何も設定されていないのに、「副能力変動」の値があったり、「副能力変動」が「主能力変動」の1/2（小数点以下切り捨て）でない場合などもある。<br>
-これらの「副能力変動」の数値は、どこで決まっているのだろうか？</p>
+<p>味方キャラは以下サブルーチンで全キャラ判定を行う。</p>
 
-<p>まず、アイテムデータを確認してみよう。<br>
-アイテムデータは、1アイテムにつき00～15の16バイト分のデータが格納されている。</p>
+<div class="code-container"><pre>
+$C1/9F5A REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/9F5C TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/9F5D ADC #$0040              ;A + $0040
+$C1/9F60 TAX                     ;Aの値をXレジスタに転送
+$C1/9F61 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/9F63 LDA $0000,x[$00:1CC0]   ;Aに[$00:1C00+40x]をロード
+$C1/9F66 INC A                   ;Aをインクリメント +1
+$C1/9F67 BEQ $07    [$9F70]      ;ゼロフラグが立っているとき[$9F70]分岐
+$C1/9F69 LDA $0001,x[$00:1CC1]   ;Aに[$00:1C01+40x]（戦闘状態）をロード
+$C1/9F6C BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/9F6E BNE $03    [$9F73]      ;ゼロフラグが立っていないとき[$9F73]分岐
+;ゼロフラグOFF $00（戦闘離脱）、$20（味方キャラ敵対）以外
+$C1/9F73 ORA #$FF                ;Aと$FFで論理和
+$C1/9F75 RTS                     ;サブルーチン戻り
 
-<table>
-<thead>
-	<tr><th>No.</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td>00</td><td>上4ビット：1～7は主装備位置、8以上なら罠アイテム/下4ビット：装備品なら装備種類、装備品以外ならアイテム種別</td></tr>
-	<tr><td>01</td><td>上6ビット：装備部位/下1ビット：材料アイテム</td></tr>
-	<tr><td>02</td><td>無効状態異常（8ビット）</td></tr>
-	<tr><td>03</td><td>上4ビット：装備タイプ/下4ビット：フィールド吸収</td></tr>
-	<tr><td>04</td><td>回避属性1（8ビット）</td></tr>
-	<tr><td>05</td><td>回避属性2（8ビット）</td></tr>
-	<tr><td>06</td><td>力　主能力変動値（符号付き8ビット整数値、一番上のビットが正負、下7ビットが数値になる。以下09まで同じ）</td></tr>
-	<tr><td>07</td><td>速　主能力変動値</td></tr>
-	<tr><td>08</td><td>体　主能力変動値</td></tr>
-	<tr><td>09</td><td>知　主能力変動値</td></tr>
-	<tr><td>10</td><td>使用時に技が発動する場合、味方技IDの値</td></tr>
-	<tr><td>11</td><td>副能力変動値計算用の値</td></tr>
-	<tr><td>12</td><td>メカがアクセサリ装備で技追加（<span class="formula">$08～$0F</span>）</td></tr>
-	<tr><td>13</td><td>上4ビット：戦闘開始時行動異常を起こす敵種族/下4ビット：戦闘開始時行動異常</td></tr>
-	<tr><td>14</td><td>下6ビット：攻撃または防御の値</td></tr>
-	<tr><td>15</td><td>状態異常追加効果（8ビット）</td></tr>
-</tbody>
-</table>
+$C1/1DD0 BEQ $F6    [$1DC8]      ;ゼロフラグが立っているとき[$1DC8]分岐
+$C1/1DD2 LDA $0039,x[$00:1CF9]   ;Aに[$00:1C39+40x]（味方n状態異常）をロード
+$C1/1DD5 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/1DD7 BEQ $EF    [$1DC8]      ;ゼロフラグが立っているとき[$1DC8]分岐
+;ゼロフラグON 戦闘不能状態
+$C1/1DD9 BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C1/1DDB BEQ $EB    [$1DC8]      ;ゼロフラグが立っているとき[$1DC8]分岐
+;ゼロフラグOFF 毒状態
+$C1/1DDD JSR $1DE3  [$C1:1DE3]   ;[$C1:1DE3]へジャンプ
 
-<p>「主能力変動」の値は、アイテムデータ06～09に入っている。<br>
-「性能」の値は、アイテムデータ14の下6ビットに入っている。<br>
-だが、「副能力変動」の値はない。<br>
-その代わりに、アイテムデータ11に、副能力変動値計算用の値が入っている。<br>
-この値を使って「副能力変動」が計算されている。<br>
-アイテムデータ11に格納されているのは、上2ビットが「変動する能力値」、下6ビットが「マイナスする値」なのだが、16進数の正負の表現方法と、10進数の正負の表現方法がまったく異なっているため、単純に足し引きしただけでは変動値が算出されず、少し面倒に見える計算を行っている。</p>
+;毒状態計算
+$C1/1DE3 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/1DE5 LDY $0002,x[$00:1CC2]   ;Yに[$0002,x+1][$0002,x]をロード
+$C1/1DE8 LDA $0008,y[$00:0E08]   ;Aに[$0008,y+1][$0008,y](キャラデータ現在HP 2バイト)をロード
+$C1/1DEB LSR A                   ;Aを論理右シフト　(/2)
+$C1/1DEC LSR A                   ;Aを論理右シフト　(/2)
+$C1/1DED LSR A                   ;Aを論理右シフト　(/2)
+$C1/1DEE LSR A                   ;Aを論理右シフト　(/2)
+$C1/1DEF BNE $03    [$1DF4]      ;ゼロフラグが立っていないとき[$1DF4]分岐
+;ゼロフラグON 計算結果が0
+$C1/1DF1 LDA #$0001              ;Aに$0001をロード
+;ゼロフラグOFF 計算結果が0以外
+$C1/1DF4 STA $10    [$00:0310]   ;Aを[$00:0311][$00:0310]に書き込み
+$C1/1DF6 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1DF8 LDA #$01                ;Aに$01をロード
+$C1/1DFA STA $003A,x[$00:1CFA]   ;Aを[$003A,x](被ダメージ/回復量のヒット数)に書き込み
+$C1/1DFD STA $003B,x[$00:1CFB]   ;Aを[$003B,x](被ダメージ/回復量のヒット数)に書き込み
+$C1/1E00 LDA #$00                ;Aに$00をロード
+$C1/1E02 STA $7ECE33,x[$7E:EAF3] ;Aを[$7E:EAF3]に書き込み
+$C1/1E06 STA $7ECE35,x[$7E:EAF5] ;Aを[$7E:EAF5]に書き込み
+$C1/1E0A REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/1E0C LDA $10    [$00:0310]   ;Aに[$00:0311][$00:0310]をロード
+$C1/1E0E STA $003C,x[$00:1CFC]   ;Aを[$003C,x+1][$003C,x](被ダメージの単発値)に書き込み
+$C1/1E11 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1E13 LDA #$01                ;Aに$01をロード
+$C1/1E15 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/1E17 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み
+$C1/1E19 JSR $CBA6  [$C1:CBA6]   ;[$C1:CBA6]へジャンプ
+</pre></div>
 
-<p>サブルーチンの説明は<a href="program19_2.html">次ページ</a>にして、計算方法を先に記す。<br>
-「副能力変動」の計算方法は、以下のようになっている。<br>
-主能力変動値を符号付き8ビット整数値（2進数にして一番上の値が1なら負の値であり、下7ビット分が整数値）として計算することに注意。</p>
+<p><code><span class="r">$C1/9F5A</span></code>～<code><span class="r">$C1/9F75</span></code>で、味方キャラアドレスから戦闘状態を判定している。<br>
+<code>[$00:1C01+40x]</code>（<code>x</code>は<span class="formula">0～3</span>）には戦闘状態が入っているが、<span class="formula">$40</span>と論理積をとってゼロフラグが立つのは、<span class="formula">$00</span>（戦闘離脱）、<span class="formula">$20</span>（味方キャラ敵対）のみであり、この場合は状態異常判定をスキップする。</p>
 
-<div style="border: 1px solid gray; padding: .1em;"><p>まず、「副能力用計算値」を以下のように計算する。</p>
+<p><code><span class="r">$C1/1DD2</span></code>からが状態異常判定である。<br>
+<code><span class="r">$C1/1DD5</span></code>～<code><span class="r">$C1/1DD7</span></code>の<span class="formula">$FF</span>の減算・ゼロフラグ判定だが、状態異常は8ビットで各ビットが状態異常のON・OFFを表しているがすべてに<span class="formula">1</span>が立っている時は戦闘不能状態である。<br>
+よってここでゼロフラグが立つ場合は状態異常判定をスキップする。<br>
+続いて、<code><span class="r">$C1/1DD9</span></code>から、状態異常と<span class="formula">$08</span>（<span class="formula">%0000 1000</span>）で論理積を取りゼロフラグ判定となる。<br>
+上から5ビット目の<span class="formula">%0000 1000</span>に<span class="formula">1</span>が立っている場合は毒状態なので、ゼロフラグが立たない場合は毒状態で確定である。<br>
+ゼロフラグが立つ場合は毒状態ではないので、サブルーチンから抜ける。<br>
+<code><span class="r">$C1/1DDD</span></code>から先が、毒状態での処理となる。</p>
 
-<ul>
-	<li>主能力変動値が正の値（<span class="formula">$00～$79</span>）の場合は、<br>
-	<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span></li>
-
-	<li>主能力変動値が負の値（<span class="formula">$80～$FF</span>）の場合は、頭に<span class="formula">$FF</span>をつけて符号付き16ビット整数値として扱い、<br>
-	<span class="formula">副能力用計算値 = trunc($FF(主能力変動値)/2) &amp; $00FF</span><br>
-	例：主能力変動値が<span class="formula">$F5</span>（10進数<span class="formula">-11</span>）なら、<span class="formula">trunc($FFF5/2) = $7FFA</span>、下1バイト<span class="formula">$FA</span>（10進数<span class="formula">-6</span>）が副能力変動値。</li>
-</ul>
-
-<p>次に、アイテムデータ11（副能力変動値計算用の値）に<span class="formula">$00</span>が入っているかどうかで分岐する。</p>
-
-<ul>
-	<li>アイテムデータ11（副能力変動値計算用の値）に<span class="formula">$00</span>が入っている場合、<br>
-	<span class="formula">副能力変動値 = 副能力用計算値</span></li>
-
-	<li>アイテムデータ11に<span class="formula">$00</span>以外の値が入っている場合は、まずアイテムデータ11から必要な値を算出する。
-
-<ul>
-	<li>アイテムデータ11の上2ビット：<br>変動する能力値の値。以下に対応。</li>
-
-<table>
-<thead>
-	<tr><th>上2ビット</th><th>能力値</th></tr>
-</thead>
-<tbody>
-	<tr><td>00</td><td>力</td></tr>
-	<tr><td>01</td><td>速</td></tr>
-	<tr><td>10</td><td>体</td></tr>
-	<tr><td>11</td><td>知</td></tr>
-</tbody>
-</table>
-
-	<li>アイテムデータ11の下6ビット：<br>変動値を以下のように計算する。<br>副能力用計算値は上で算出した値。<br>
-	<span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
-	計算結果が<span class="formula">$100</span>以上の時は下1バイト分が変動値になる（※符号付き8ビット整数）。</li>
-</ul>
-以上から副能力変動するステータス＆副能力変動値が算出される。
-</li>
-</ul></div>
-
-<p>とてもややこしそうだが、ステータス変動がマイナスの時に符号付き8ビット整数値を使っていることと、アイテムデータ11に<span class="formula">$00</span>以外が入っているかどうかの分岐があるため、ややこしく見えているようなものである。<br>
-アイテムデータ11の例外を考えない場合、基本的に、副能力変動値は主能力変動値の<span class="formula">1/2</span>（小数点以下切り捨て）である。<br>
-要するに、副能力変動値は主能力変動値の絶対値の半分しか変動しないようにする意図での計算である。<span class="formula">+10</span>なら半分の<span class="formula">+5</span>にしたい、<span class="formula">-10</span>なら半分の<span class="formula">-5</span>にしたい、ということである。</p>
-
-<p>ただ、主能力変動値がマイナスの値の時の計算がややこしい。<br>
-例えば主能力変動値が10進数で<span class="formula">-10</span>の時、16進数（符号付き8ビット）だと<span class="formula">$F6</span>である。<br>
-<span class="formula">$F6</span>を単純に<span class="formula">1/2</span>すると、<span class="formula">$7B</span>である。<br>
-符号付き8ビット整数値とみなすと、10進数<span class="formula">+123</span>という扱いになってしまう。<br>
-符号付き8ビット整数は、上1ビットに正負、下7ビットに数値（絶対値）が入っているが、上1ビットはそのままで、下7ビット部分だけを<span class="formula">1/2</span>したい、という場合、単純に<span class="formula">÷2</span>だけでは上1ビットも巻き込んで計算してしまうため、うまくいかないのである。</p>
-
-<p>そこでどうするかというと、上の計算方法のように、<span class="formula">$F6</span>の上に<span class="formula">FF</span>をつけて、符号付き16ビット整数の<span class="formula">$FFF6</span>としてから<span class="formula">1/2</span>する。<br>
-（プログラム上の処理は後で紹介するが、<span class="formula">$FF00</span>との論理和を取っている）<br>
-こうすると、<span class="formula">trunc($FFF6/2) = $7FFB</span>、下の2桁のみ取り出し符号付き8ビット整数値<span class="formula">$FB</span>とすれば、10進数<span class="formula">-5</span>になる。<br>
-ということで、符号付き8ビット整数値だからややこしくなっているが、絶対値を半分にすることができている。</p>
-
-<p>ただし、余りが出る時の切り捨てには注意。<br>
-主能力変動値が<span class="formula">$F5</span>（10進数<span class="formula">-11</span>）の時は、<br>
-<span class="formula">trunc($FFF5/2) = $7FFA</span><br>
-なので、<span class="formula">$FA</span>（10進数<span class="formula">-6</span>）が副能力変動値になる。<br>
-10進数の計算<span class="formula">trunc(-11/2) = -5</span>とは異なる値が返ってくるので、計算自体はあくまでも符号付き8ビット整数値で行う必要がある。</p>
-
-<p>アイテムデータ11に<span class="formula">$00</span>が入っている場合は、以上で計算終了で、副能力変動値が算出できた。<br>
-アイテムデータ11に<span class="formula">$00</span>以外の値が入っている場合は、副能力変動値は主能力変動値の半減だけではなく、別に計算をしなければならない、という意味になる。<br>
-アイテムデータ11の上2ビットと下6ビットに分けて、上2ビットから変動する能力値がどれなのかを判断する。<br>
-下6ビットの値だが、上の計算式はややこしく見えるものの、実際には、「<span class="formula">副能力変動値 = 主能力変動値/2 - 下6ビットの値</span>」である。ただしこちらも、符号付き8ビット整数値なのでややこしい計算式になっているだけである。</p>
-
-<p>実際の例を示す。</p>
-
-<p>「野性バッグ」は右と左に装備可能で、主装備位置は右である。<br>
-主能力変動値は力<span class="formula">$14</span>(10進数<span class="formula">20</span>)、知<span class="formula">$08</span>(10進数<span class="formula">8</span>)。他の値は<span class="formula">0</span>である。<br>
-アイテムデータ11は<span class="formula">$14</span>である。<br>
-このため、左に装備した場合は、副能力変動値でステータスが変動することになる。<br>
-左装備時の変動値を計算してみよう。</p>
-
-<p>まず、アイテムデータ11（<span class="formula">$14</span>）の上2ビットと下6ビットを取り出してみる。</p>
-
-<p><span class="formula">$14 = %0001 0100</span><br>
-アイテムデータ11の上2ビット：<span class="formula">$00</span><br>
-アイテムデータ11の下6ビット：<span class="formula">%0001 0100 = $14</span></p>
-
-<p>上2ビットの値は変動する能力値を示しており、<span class="formula">$00</span>だと「力」である。</p>
-
-<table>
-<thead>
-	<tr><th>上2ビット</th><th>能力値</th></tr>
-</thead>
-<tbody>
-	<tr><td>00</td><td>力</td></tr>
-	<tr><td>01</td><td>速</td></tr>
-	<tr><td>10</td><td>体</td></tr>
-	<tr><td>11</td><td>知</td></tr>
-</tbody>
-</table>
-
-<p>「力」だけ、アイテムデータ11の下6ビットの値も使って変動値を計算しなければならない。<br>
-逆にいえば、他の「速」「体」「知」の計算は、アイテムデータ11の値に影響されず、単純に主能力変動値を<span class="formula">1/2</span>すれば良いということである。<br>
-アイテムデータ11が影響するのは、1種類のアイテムにつき1つのステータスのみということがわかる。</p>
-
-<p>次に、<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span>を計算する。<br>
-「野性バッグ」の主能力変動値の中に負の値はないので、この計算式で計算して構わない。<br>
-「速」「体」「知」は、この計算結果がそのまま、副能力変動値になる。</p>
-
-<p>速：<br>
-<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
-<span class="formula"> = trunc($00/2)</span><br>
-<span class="formula"> = $00</span></p>
-
-<p>体：<br>
-<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
-<span class="formula"> = trunc($00/2)</span><br>
-<span class="formula"> = $00</span></p>
-
-<p>知：<br>
-<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
-<span class="formula"> = trunc($08/2)</span><br>
-<span class="formula"> = $04</span></p>
-
-<p>「速」「体」は元の変動値がゼロなのでそのまま<span class="formula">0</span>が副能力変動値だが、「知」は元の変動値が<span class="formula">$08</span>なので、半分の<span class="formula">$04</span>が副能力変動値ということになる。<br>
-では、「力」について計算してみる。</p>
-
-<p>力：<br>
-<span class="formula">副能力用計算値 = trunc($14/2)</span><br>
-<span class="formula"> = $0A</span></p>
-
-<p><span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
-<span class="formula"> = ($0A + ($14 XOR $FF + $01)) &amp; $FF</span><br>
-<span class="formula"> = ($0A + $EC) &amp; $FF</span><br>
-<span class="formula"> = $F6</span></p>
-
-<p>「野性バッグ」の「力」の副能力変動値は「<span class="formula">$F6</span>」と計算された。<br>
-<span class="formula">$100-$F6 = $0A</span>、10進数<span class="formula">10</span>なので、「野性バッグ」の「力」の副能力変動値は10進数で<span class="formula">-10</span>となる。</p>
-
-<p>これで計算は終わりなのだが、以上を10進数でもう一度見てみよう。<br>
-アイテムデータ11の下6ビットは、<span class="formula">%0001 0100 = $14</span>だったから、10進数だと「<span class="formula">20</span>」である。<br>
-そして、副能力用計算値を10進数で計算すると、</p>
-
-<p><span class="formula">副能力用計算値 = trunc(20/2)</span><br>
-<span class="formula"> = 10</span></p>
-
-<p>この値から、アイテムデータ11の下6ビットを10進数で引き算すれば、それが「野性バッグ」の「力」の副能力変動値なのである。<br>
+<p><code><span class="r">$C1/1DE3</span></code>～の処理を見ると、味方キャラデータの現在HP・2バイトの値を、論理右シフト4回、つまり<span class="formula">/2</span>を4回しているから、トータルで<span class="formula">/$10</span>である。<br>
 つまり、</p>
 
-<p><span class="formula">10 - 20 = -10</span></p>
+<p><span class="formula">trunc(現在HP/$10)</span></p>
 
-<p>これで計算終了である。<br>
-先に記した通り、主能力変動値が負の値の時は、<span class="formula">trunc</span>での小数点以下切り捨ての方法が16進数と10進数で変わるので気をつけなければならないが、それを除けば、10進数で見た方がわかりやすい。</p>
+<p>であるが、現在HPが<span class="formula">$10（10進数で16）</span>未満だと計算結果が<span class="formula">0</span>になる。<br>
+<code><span class="r">$C1/1DEF</span></code>でゼロフラグ判定があり、計算結果が<span class="formula">0</span>なら<code><span class="r">$C1/1DF1</span></code>で<span class="formula">$0001</span>をロードしている。<br>
+<code><span class="r">$C1/1DF4</span></code>で、ここまでの計算結果を<code>[$00:0311]</code><code>[$00:0310]</code>に書き込んでいるが、これは、</p>
 
-<p>もうひとつの例として、主能力変動値が負の値の「ワタナベのパンツ」の計算方法を見てみよう。<br>
-「ワタナベのパンツ」は、頭と体に装備可能で、主装備位置は体である。<br>
-主能力変動値は知<span class="formula">$E7</span>。他の値は<span class="formula">0</span>である。<br>
-<span class="formula">$E7</span>は符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-25</span>」である。<br>
-アイテムデータ11は<span class="formula">$E0</span>である。<br>
-このため、頭に装備した場合は、副能力変動値でステータスが変動することになる。</p>
+<p><span class="formula">max(trunc(現在HP/$10), 1)</span></p>
 
-<p>まず、アイテムデータ11（<span class="formula">$E0</span>）の上2ビットと下6ビットを取り出してみる。</p>
+<p>と、なることがわかる。<br>
+これが毒状態のダメージ量にあたる。</p>
 
-<p><span class="formula">$E0 = %1110 0000</span><br>
-アイテムデータ11の上2ビット：<span class="formula">$11</span><br>
-アイテムデータ11の下6ビット：<span class="formula">%0010 0000 = $20</span></p>
+<p><code><span class="r">$C1/1DF6</span></code>以降では、毒状態のダメージ量はヒット数<span class="formula">1</span>、被ダメージの単発値は<code>[$00:0311]</code><code>[$00:0310]</code>と処理されており、最終的なダメージ量となる。<br>
+ここから<span class="formula">現在HP - 毒のダメージ量</span>の計算へと続くが、省略する。</p>
 
-<p>上2ビットから、変動する能力値は「知」である。<br>
-下6ビットは<span class="formula">$20</span>、10進数だと「<span class="formula">32</span>」である。</p>
+<h3>敵キャラのサブルーチン</h3>
 
-<p>以下、「知」の副能力変動値だけ計算する。</p>
+<p>敵キャラのサブルーチンは、アドレスこそ異なるが味方側と処理はほぼ同一である。<br>
+こちらも全ての敵キャラに対し処理を行う。</p>
 
-<p><span class="formula">副能力用計算値 = trunc($FFE7/2) &amp; $00FF</span><br>
-<span class="formula"> = $F3</span></p>
+<div class="code-container"><pre>
+$C1/E1A9 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/E1AB TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/E1AC ADC #$0010              ;A + $0010
+$C1/E1AF TAX                     ;Aの値をXレジスタに転送
+$C1/E1B0 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/E1B2 CPX #$1C00              ;Xと$1C00を減算比較（ステータスレジスタ変更のみ）
+$C1/E1B5 BEQ $11    [$E1C8]      ;ゼロフラグが立っているとき[$E1C8]分岐
+$C1/E1B7 LDA $0001,x[$00:1B01]   ;Aに[$00:1Bx1]（戦闘状態）をロード
+$C1/E1BA BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/E1BC BNE $07    [$E1C5]      ;ゼロフラグが立っていないとき[$E1C5]分岐
+;ゼロフラグOFF $00（戦闘離脱）、$20（敵キャラをプレイヤーが操作）以外
+$C1/E1C5 LDA #$7F                ;Aに$7Fをロード
+$C1/E1C7 RTS                     ;サブルーチン戻り
 
-<p><span class="formula">主能力変動値/2</span>の計算になるが、答えは<span class="formula">$F3</span>、符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-13</span>」である。<br>
-主能力変動値<span class="formula">$E7</span>は10進数の「<span class="formula">-25</span>」だが、<span class="formula">trunc(-25/2)</span>を計算すると、「<span class="formula">-12</span>」になってしまう。<br>
-このズレが生じてしまうため、符号付き8ビット整数値で計算を行っていかなければならない。</p>
+$C1/1E4C BMI $0F    [$1E5D]      ;ネガティブフラグが立っているとき[$1E5D]分岐
+$C1/1E4E BEQ $F9    [$1E49]      ;ゼロフラグが立っているとき[$1E49]分岐
+$C1/1E50 LDA $7E8F07,x[$7E:AA07] ;Aに[$7E:AAx7]（敵番号xの状態異常）をロード
+$C1/1E54 BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C1/1E56 BEQ $F1    [$1E49]      ;ゼロフラグが立っているとき[$1E49]分岐
+;ゼロフラグOFF 毒状態
+$C1/1E58 JSR $1E5E  [$C1:1E5E]   ;[$C1:1E5E]へジャンプ
 
-<p><span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
-<span class="formula"> = ($F3 + ($20 XOR $FF + $01)) &amp; $FF</span><br>
-<span class="formula"> = ($F3 + ($DF + $01)) &amp; $FF</span><br>
-<span class="formula"> = ($F3 + $E0) &amp; $FF</span><br>
-<span class="formula"> = $1D3 &amp; $FF</span><br>
-<span class="formula"> = $D3</span></p>
+;毒状態計算
+$C1/1E5E REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/1E60 LDA $7E8F00,x[$7E:AA00] ;Aに[$7E:AAx1][$7E:AAx0]（敵番号x現在HP 2バイト）をロード
+$C1/1E64 LSR A                   ;Aを論理右シフト　(/2)
+$C1/1E65 LSR A                   ;Aを論理右シフト　(/2)
+$C1/1E66 LSR A                   ;Aを論理右シフト　(/2)
+$C1/1E67 LSR A                   ;Aを論理右シフト　(/2)
+$C1/1E68 BNE $03    [$1E6D]      ;ゼロフラグが立っていないとき[$1E6D]分岐
+;ゼロフラグON 計算結果が0
+$C1/1E6A LDA #$0001              ;Aに$0001をロード
+;ゼロフラグOFF 計算結果が0以外
+$C1/1E6D STA $10    [$00:0310]   ;Aを[$00:0311][$00:0310]に書き込み
+$C1/1E6F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1E71 LDA #$01                ;Aに$01をロード
+$C1/1E73 STA $7E9002,x[$7E:AB02] ;Aを[$7E:ABx2](被ダメージ/回復量のヒット数)に書き込み
+$C1/1E77 STA $7E9003,x[$7E:AB03] ;Aを[$7E:ABx3](被ダメージ/回復量のヒット数)に書き込み
+$C1/1E7B LDA #$00                ;Aに$00をロード
+$C1/1E7D STA $7E9202,x[$7E:AD02] ;Aを[$7E:ADx2]に書き込み
+$C1/1E81 STA $7E920A,x[$7E:AD0A] ;Aを[$7E:ADxA]に書き込み
+$C1/1E85 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/1E87 LDA $10    [$00:0310]   ;Aに[$00:0311][$00:0310]をロード
+$C1/1E89 STA $7E9004,x[$7E:AB04] ;Aを[$7E:ABx5][$7E:ABx4]（被ダメージの単発値（2バイト））に書き込み
+$C1/1E8D LDA #$0000              ;Aに$0000をロード
+$C1/1E90 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/1E92 LDA #$01                ;Aに$01をロード
+$C1/1E94 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/1E96 STZ $81    [$00:0381]   ;[$00:0381]に$00を書き込み
+$C1/1E98 STX $60    [$00:0360]   ;Xを[$00:0360]に書き込み
+$C1/1E9A JSR $CC72  [$C1:CC72]   ;[$C1:CC72]へジャンプ
+</pre></div>
 
-<p><span class="formula">$D3</span>を符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-45</span>」である。<br>
-よって、「ワタナベのパンツ」の「知」の副能力変動値は<span class="formula">-45</span>である。<br>
-下6ビットは10進数「<span class="formula">32</span>」だったので、主能力変動値/2の「<span class="formula">-13</span>」から<span class="formula">32</span>を引いた、</p>
+<p>毒状態判定の時、毒ダメージを計算し、</p>
 
-<p><span class="formula">-13-32 = -45</span></p>
+<p><span class="formula">max(trunc(現在HP/$10), 1)</span></p>
 
-<p>こちらの方が計算としては手っ取り早い。</p>
+<p>が単発ダメージ量となって、ヒット数<span class="formula">1</span>、被ダメージの単発値（2バイト）<code>[$7E:ABx5]</code><code>[$7E:ABx4]</code>にダメージ量を書き込む、と、味方キャラと手順は全く同じ。<br>
+ダメージ計算式も変わらない。</p>
 
-<p>以上のようにして、副能力変動値が計算されている。<br>
-アイテムデータ11に格納されている値自体は、上2ビットが「変動する能力値」、下6ビットが「マイナスする値」とシンプルなのだが、16進数のため計算方法がくどくなっているように見えてしまう。</p>
-
-<p>では、このなかなか面倒な計算が、プログラムでは実際にどういう風に処理されているのか、<a href="program19_2.html">次ページ</a>で解説する。</p>
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
 
 <div class="pagelink">
-	<div id="pageprev"><a href="program18_3.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pageprev"><a href="program18_2.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-	<div id="pagenext"><a href="program19_2.html"><span class="button">&#9654;次　副能力変動値処理</span></a></div>
+	<div id="pagenext"><a href="program19.html"><span class="button">&#9654;次　副能力変動値処理</span></a></div>
 </div>
 
 </div>
