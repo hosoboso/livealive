@@ -858,6 +858,92 @@ $C1/909E RTS                     ;サブルーチン戻り
 乱数が奇数なら、行動パターン<span class="formula">$10</span>（反時計回りに向き変え）にジャンプ。<br>
 乱数が偶数なら、行動パターン<span class="formula">$11</span>（時計回りに向き変え）にジャンプとなる。</p>
 
+<h3>移動パターンの説明</h3>
+
+<p>移動パターンの大半は、</p>
+
+<ul>
+	<li>味方の方を向いているなら味方の方へ1マス移動</li>
+	<li>味方の方を向いていないなら、味方の方へ向き変え</li>
+</ul>
+
+<p>という、ID<span class="formula">$00</span>、ID<span class="formula">$04</span>、<span class="formula">$05</span>$06<span class="formula">$0F</span>などや、その中でも敵が向いている方向に味方キャラが隣接している時は逃げるID<span class="formula">$01</span>、ID<span class="formula">$02</span>、ID<span class="formula">$03</span>などがあるが、中でも特徴的なパターンについてざっと解説する。</p>
+
+<h4>ID<span class="formula">$01</span></h4>
+
+<p>浪人やアクロフォビアなど。<br>
+敵が向いている方向に味方キャラが隣接していると、行動パターン<span class="formula">$0A</span>や<span class="formula">$0B</span>で向いている方向の逆に移動する以外は、味方の方を向いているなら味方の方へ1マス移動、味方の方を向いていないなら、味方の方へ向き変え。<br>
+浪人は移動頻度が3とやや高めなこともあり、目の前に味方キャラがいるのに移動して逃げる、という行動をしばしば見せるのはこのため。</p>
+
+<h4>ID<span class="formula">$06</span></h4>
+
+<p>敵対時のストレイボウ、ヘッドプラッカー、フェミノフォビアなど。<br>
+右下向きのとき、</p>
+
+<div class="mono">0B 12 12<br>
+12 ↘ 0B<br>
+09 0A 09</div>
+
+<ul>
+	<li><span class="formula">$09</span>：向いている縦方向に1マス移動</li>
+	<li><span class="formula">$0A</span>：向いている反対の横方向に1マス移動</li>
+	<li><span class="formula">$0B</span>：向いている反対の縦方向に1マス移動</li>
+	<li><span class="formula">$12</span>：一番近くの味方キャラの方向へ向き変え</li>
+</ul>
+
+<p>と、味方が正面にいる時にも遠ざかろうとするパターンがあるので、ストレイボウ戦のようにうまく動くと嵌めて倒せる。<br>
+ヘッドプラッカー戦で、ヘッドプラッカーを隅に追い詰めて閉じ込めた時、上下移動しながら攻撃してくるのも上の挙動のため。</p>
+
+<h4>ID<span class="formula">$07</span></h4>
+<p>（行動異常<span class="formula">$8</span>）</p>
+
+<p>ジェムパラペット、スタビライザー、マザーＣＯＭなどに最初から設定されている他、行動異常<span class="formula">$8</span>の時もこれだが、すべての位置で行動パターン<span class="formula">$F0</span>のため、移動しない。<br>
+ジェムパラペット、スタビライザー、マザーＣＯＭは移動せず技を使うが、行動異常<span class="formula">$8</span>は全ての技が使用不可なので、一切行動しなくなる。</p>
+
+<h4>ID<span class="formula">$08</span></h4>
+<p>（行動異常<span class="formula">$9</span>）</p>
+<p>ボイスハートのみ設定されている他、行動異常<span class="formula">$9</span>の移動パターン。「マザーイメージ」などで発生。<br>
+原始編の&#x2640;の敵に悪属性技、&#x2642;の敵に善属性技でも発生。<br>
+味方に接近してくるが、隣接するとランダムで向き変えをする。<br>
+行動異常<span class="formula">$9</span>も全ての技が使用不可なので、技を一切使わず味方に接近してくる。</p>
+
+<h4>ID<span class="formula">$09</span></h4>
+<p>（行動異常<span class="formula">$A</span>）</p>
+
+<p>オディオモールやピュアオディオ、大顔面、ヘーベル１号など。<br>
+行動異常<span class="formula">$A</span>の効果でもあり、基本は反時計回りに向き変え（味方が真後ろ4マス以上の位置のみ時計回り）。<br>
+オディオモールやピュアオディオが移動せず向き変えばかりするのはこれが原因。<br>
+また、「忍法コマまわし」「ウホ」の行動異常<span class="formula">$A</span>の反時計回り回転の仕組みもこれが原因。</p>
+
+<h4>ID<span class="formula">$0A</span></h4>
+<p>（行動異常<span class="formula">$B</span>）</p>
+
+<p>ケケモグラ、ひとだま、翔電、ポウンバードに設定。<br>
+行動異常<span class="formula">$B</span>の効果でもあり、どの位置でも上下左右それぞれ1/4の確率で、ランダムに1マス移動のランダム移動効果。</p>
+
+<h4>ID<span class="formula">$0C</span></h4>
+<p>（行動異常<span class="formula">$D</span>）</p>
+
+<p>技でのみ発生の行動異常$Dの効果。<br>
+味方技だと、「スリートイメージ」「ウォ～ウォ～」など。<br>
+敵自身に発生する技だと、「のたうち」「静岩くずし」など。<br>
+カウンター行動異常だと、王国兵、コスモストローラ、ジェムパラペット。原始編の動物系の敵に火属性技でも発生。<br>
+味方が3マス以内なら行動パターン<span class="formula">$02</span>か<span class="formula">$03</span>、4マス以上なら行動パターン<span class="formula">$0A</span>（向いている反対の横方向に1マス移動）。<br>
+だが、先に述べた通り、行動パターン<span class="formula">$03</span>が問題で、</p>
+
+<ul>
+	<li><span class="formula">$02</span>：味方キャラから遠ざかる方向へ横方向に1マス移動</li>
+	<li><span class="formula">$03</span>：味方キャラから遠ざかる方向へ縦方向に1マス移動？（座標指定がおかしい？）</li>
+</ul>
+
+<p>縦移動が正しく起こらない可能性があり、ランダム移動のようになってしまう可能性もあり。</p>
+
+<h4>ID<span class="formula">$0D</span></h4>
+<p>（行動異常<span class="formula">$E</span>）</p>
+<p>技でのみ発生の行動異常<span class="formula">$E</span>の効果。<br>
+「シャドウイメージ」「ならくの暗黒」「ブラウンシュガー」で発生する。<br>
+隣接していないなら上へ移動、隣接時は向き変えや何もしない。</p>
+
 <script>//ソースコード色分け処理
 window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
 </script>
