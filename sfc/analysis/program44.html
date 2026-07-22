@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 戦闘コマンドについて">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 戦闘コマンドについて">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 戦闘コマンドについて</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 戦闘コマンドについて</h1>
+<h2>戦闘コマンドについて</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>戦闘では味方にターンが回った時にAボタンを押すと、コマンドが表示される。<br>
+通常は、</p>
+
+<div style="border: 1px solid gray; padding: .1em;width:fit-content;">戦う<br>
+パス<br>
+アイテムを使う<br>
+逃げる</div>
+
+<p>と、4つのコマンドが並ぶが、アキラがいるなら最後のコマンドが「テレポート」、キャプテンスクウェアのプレイ中なら「やめる」、最終編オルステッド主人公時に特定の条件を満たすと「ハルマゲドン」となる。<br>
+また、「ハルマゲドン」は操作キャラのHPが最大HPの25％以下になると出現するが、25％以上に回復すると表示が「逃げる」になり、選択すると「ハルマゲドン」が発動する、というバグっぽい挙動もある。<br>
+その他、「アイテムを使う」はアイテムを所持していないと文字色が灰色になって使えないし、「逃げる」もボス戦など一部イベント戦闘では文字色が灰色になって選択できない。<br>
+というような表示の判別は、どう行っているのかを調べてみた。<br>
+ハルマゲドンのバグっぽい挙動は、最後の「<a href="#a_command">ハルマゲドン用コマンドについて</a>」で説明している。</p>
+
+<h3>メモリアドレス</h3>
+
+<p>重要なメモリアドレスを紹介。</p>
+
+<h5>「逃げる」判定</h5>
+
+<p><code>$00:0043</code></p>
+
+<p>「逃げる」が選べる戦闘は<span class="formula">$00</span>、選べない（逃げられない）戦闘は<span class="formula">$01</span>が入るアドレス。<br>
+「逃げる」だけではなく、「テレポート」「やめる」も含まれる。<br>
+戦闘に入る直前に<code>$00:0043</code>の値が決まる。シナリオ進行やエンカウントするエリアで値が決まるようだが未調査。</p>
+
+<h5>味方キャラID</h5>
+
+<p><code>$00:1C00 + 40n</code> <span class="formula">(n = 0~3)</span></p>
+
+<p>戦闘中に味方キャラIDが入るアドレス。<br>
+戦闘コマンド判定にも使うが、必要となるのはキャプテンスクウェアのキャラID<span class="formula">$15</span>と、テレポート判定のためのアキラのキャラID<span class="formula">$11</span>である。</p>
+
+<table>
+<thead>
+	<tr><th>ID</th><th>キャラクター名</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>オルステッド</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>ストレイボウ</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>ウラヌス</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>ハッシュ</td></tr>
+	<tr><td><span class="formula">$04</span></td><td>ポゴ</td></tr>
+	<tr><td><span class="formula">$05</span></td><td>ゴリ</td></tr>
+	<tr><td><span class="formula">$06</span></td><td>べる</td></tr>
+	<tr><td><span class="formula">$07</span></td><td>ざき</td></tr>
+	<tr><td><span class="formula">$08</span></td><td>心山拳老師</td></tr>
+	<tr><td><span class="formula">$09</span></td><td>ユン・ジョウ</td></tr>
+	<tr><td><span class="formula">$0A</span></td><td>レイ・クウゴ</td></tr>
+	<tr><td><span class="formula">$0B</span></td><td>サモ・ハッカ</td></tr>
+	<tr><td><span class="formula">$0C</span></td><td>サンダウン</td></tr>
+	<tr><td><span class="formula">$0D</span></td><td>マッドドッグ</td></tr>
+	<tr><td><span class="formula">$0E</span></td><td>おぼろ丸</td></tr>
+	<tr><td><span class="formula">$0F</span></td><td>とらわれの男</td></tr>
+	<tr><td><span class="formula">$10</span></td><td>高原　日勝</td></tr>
+	<tr><td><span class="formula">$11</span></td><td>アキラ</td></tr>
+	<tr><td><span class="formula">$12</span></td><td>タロイモ</td></tr>
+	<tr><td><span class="formula">$13</span></td><td>無法松</td></tr>
+	<tr><td><span class="formula">$14</span></td><td>キューブ</td></tr>
+	<tr><td><span class="formula">$15</span></td><td>キャプテンＳ</td></tr>
+	<tr><td><span class="formula">$16</span></td><td>カラクリ丸</td></tr>
+</tbody>
+</table>
+
+<h5>戦闘コマンドのテキスト</h5>
+
+<p>戦闘コマンドのテキストは4種類用意されていて、戦闘では<code>$C1:FDA6</code>～<code>$C1:FDFC</code>からロードする。<br>
+テキストのデコード・エンコードは<a href="fontdata.html">文字コード</a>の通り。<br>
+各コマンドの間は<span class="formula">$01</span>で区切られており、種類毎に<span class="formula">$00</span>で区切り。<br>
+デコード済みのテキストは以下のようになる。カッコ内は区切りの値。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>テキスト</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$C1:FDA6</code>～<code>$C1:FDBA</code></td><td>戦う（<span class="formula">$01</span>）パス（<span class="formula">$01</span>）アイテムを使う（<span class="formula">$01</span>）逃げる（<span class="formula">$00</span>）</td></tr>
+	<tr><td><code>$C1:FDBB</code>～<code>$C1:FDCE</code></td><td>戦う（<span class="formula">$01</span>）パス（<span class="formula">$01</span>）アイテムを使う（<span class="formula">$01</span>）やめる（<span class="formula">$00</span>）</td></tr>
+	<tr><td><code>$C1:FDCF</code>～<code>$C1:FDE4</code></td><td>戦う（<span class="formula">$01</span>）パス（<span class="formula">$01</span>）アイテムを使う（<span class="formula">$01</span>）テレポート（<span class="formula">$00</span>）</td></tr>
+	<tr><td><code>$C1:FDE5</code>～<code>$C1:FDFC</code></td><td>戦う（<span class="formula">$01</span>）パス（<span class="formula">$01</span>）アイテムを使う（<span class="formula">$01</span>）ハルマゲドン（<span class="formula">$00</span>）</td></tr>
+</tbody>
+</table>
+
+<p>上から順に、通常、キャプテンスクウェア、テレポート、ハルマゲドン時の戦闘コマンドということになる。<br>
+ここからは便宜上、「通常用コマンド」「キャプテンスクウェア用コマンド」「テレポート用コマンド」「ハルマゲドン用コマンド」とする。</p>
+
+<h3>サブルーチン</h3>
+
+<p>味方ターンの時にAボタンを押すとコマンド表示用サブルーチンが回り、戦闘コマンドが「通常用コマンド」「キャプテンスクウェア用コマンド」「テレポート用コマンド」「ハルマゲドン用コマンド」とのどれが選ばれるか、以下のように判定される。</p>
+
+<div class="code-container"><pre>
+$C1/998E JSR $4FFB  [$C1:4FFB]   ;[$C1:4FFB]へジャンプ
+
+$C1/4FFB JSR $4FDC  [$C1:4FDC]   ;[$C1:4FDC]へジャンプ
+
+$C1/4FDC JSR $FD76  [$C1:FD76]   ;[$C1:FD76]へジャンプ
+
+$C1/FD76 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00](シナリオID)をロード
+$C1/FD79 CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/FD7B BNE $03    [$FD80]      ;ゼロフラグが立っていないとき[$FD80]分岐
+;ゼロフラグON　最終編
+$C1/FD7D LDA $0A10  [$00:0A10]   ;Aに[$00:0A10]（最終編主人公ID）をロード
+;ゼロフラグOFF　最終編ではない
+$C1/FD80 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>最初の分岐は、<span class="formula"><code>[$00:0A00]</code>(シナリオID) - $08</span>のゼロフラグ判定である。</p>
+
+<table>
+<thead>
+	<tr><th>シナリオ</th><th>ID</th><th>対応キャラクター</th></tr>
+</thead>
+<tbody>
+	<tr><td>中世</td><td><span class="formula">$00</span></td><td>オルステッド</td></tr>
+	<tr><td>原始</td><td><span class="formula">$01</span></td><td>ポゴ</td></tr>
+	<tr><td>ＳＦ</td><td><span class="formula">$02</span></td><td>キューブ</td></tr>
+	<tr><td>功夫</td><td><span class="formula">$03</span></td><td>心山拳老師</td></tr>
+	<tr><td>西部</td><td><span class="formula">$04</span></td><td>サンダウン</td></tr>
+	<tr><td>現代</td><td><span class="formula">$05</span></td><td>高原日勝</td></tr>
+	<tr><td>近未来</td><td><span class="formula">$06</span></td><td>アキラ</td></tr>
+	<tr><td>幕末</td><td><span class="formula">$07</span></td><td>おぼろ丸</td></tr>
+	<tr><td>最終</td><td><span class="formula">$08</span></td><td>（主人公のシナリオIDが入る）</td></tr>
+</tbody>
+</table>
+
+<p><span class="formula">$08</span>は最終編であり、ゼロフラグが立って<code><span class="r">$C1/FD7D</span></code>に進む。その場合は<code>[$00:0A10]</code>（最終編主人公ID）を<code>A</code>にロードする。<br>
+最終編以外のシナリオだと、減算結果は必ず負の値である。</p>
+
+<p>一方、最終編以外は<code><span class="r">$C1/FD80</span></code>でサブルーチンを抜ける。<br>
+よって、<code><span class="r">$C1/FD80</span></code>の時点でゼロフラグが立っているのは、最終編主人公IDが<span class="formula">$00</span>、つまり最終編オルステッド主人公時のみということになる。</p>
+
+<div class="code-container"><pre>
+$C1/4FDF BNE $19    [$4FFA]      ;ゼロフラグが立っていないとき[$4FFA]分岐
+;ゼロフラグON　最終編オルステッド主人公時
+$C1/4FE1 LDX #$0D00              ;Xに$0D00をロード
+$C1/4FE4 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/4FE6 LDA $000A,x[$00:0D0A]   ;Aに[$00:0D0B][$00:0D0A]（操作キャラ最大HP）をロード
+$C1/4FE9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/4FEA LSR A                   ;Aを論理右シフト　(/2)
+$C1/4FEB CMP $0008,x[$00:0D08]   ;Aと[$00:0D09][$00:0D08]（操作キャラ現在HP）を減算比較（ステータスレジスタ変更のみ）
+$C1/4FEE SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/4FF0 BCC $08    [$4FFA]      ;キャリーフラグが立っていないとき[$4FFA]分岐
+;キャリーフラグON　ハルマゲドンコマンドON
+$C1/4FF2 LDA #$FF                ;Aに$FFをロード
+$C1/4FF4 STA $7EFEFA[$7E:FEFA]   ;Aを[$7E:FEFA]に書き込み
+$C1/4FF8 LDA #$00                ;Aに$00をロード
+;ゼロフラグOFF　最終編オルステッド主人公時以外　またはハルマゲドンコマンドOFF
+$C1/4FFA RTS                     ;サブルーチン戻り
+
+$C1/4FFE BNE $02    [$5002]      ;ゼロフラグが立っていないとき[$5002]分岐
+;ゼロフラグON　ハルマゲドンコマンドON
+$C1/5000 BRA $13    [$5015]      ;フラグにかかわりなく常に分岐[$5015]
+;ゼロフラグOFF　ハルマゲドンコマンドOFF
+$C1/5002 LDA #$15                ;Aに$15をロード
+$C1/5004 JSR $5040  [$C1:5040]   ;[$C1:5040]へジャンプ
+
+;ゼロフラグON　ハルマゲドンコマンドONの飛び先
+$C1/5015 LDX #$FDE5              ;Xに$FDE5をロード
+$C1/5018 BRA $08    [$5022]      ;[$C1:5022]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/4FDF</span></code>に戻った時点でゼロフラグが立つのは、前述の通り最終編オルステッド主人公時のみ。<br>
+その場合、<code><span class="r">$C1/4FE1</span></code>に進むが、<code><span class="r">$C1/4FE6</span></code>でロードする<code>[$00:0D0B]</code><code>[$00:0D0A]</code>は、本来ならシナリオ別キャラデータのオルステッドの最大HPである。<br>
+<code><span class="r">$C1/4FEB</span></code>でロードする<code>[$00:0D09]</code><code>[$00:0D08]</code>も、シナリオ別キャラデータのオルステッドの現在HPである。<br>
+だが、<a href="program24_4.html">最終編オルステッド主人公時(2)</a>で説明した通り、最終編オルステッド主人公時は、オルステッドのステータスの一部を、操作するボスキャラのステータスで上書きしながら戦闘を行う。<br>
+つまり、ここで呼び出すのは、最終編オルステッド主人公時の戦闘で操作しているボスキャラの現在HPと最大HPなのである。<br>
+<code><span class="r">$C1/4FE6</span></code>～の処理を見てみると、</p>
+
+<p><span class="formula">trunc(操作キャラ最大HP/4) - 操作キャラ現在HP</span></p>
+
+<p>の計算結果でキャリーフラグ判定である。<br>
+減算の結果が<span class="formula">0</span>か正ならキャリーフラグONだが、これは現在HPが<span class="formula">trunc(操作キャラ最大HP/4)</span>以下ということを意味する。<br>
+つまり、ハルマゲドンコマンド出現条件であり、この場合は<code><span class="r">$C1/4FF2</span></code>に進んで、<code>[$7E:FEFA]</code>に<span class="formula">$FF</span>を書き込み、<code>A</code>に<span class="formula">$00</span>をロードして、<code><span class="r">$C1/4FFA</span></code>でサブルーチンを抜ける。<br>
+「ハルマゲドン用コマンド」の条件を満たす場合、<code>[$7E:FEFA]</code>に<span class="formula">$FF</span>が入り、この先の判定にも使われることになる。</p>
+
+<p>一方、減算の結果が負ならキャリーフラグOFFで、<code><span class="r">$C1/4FFA</span></code>でサブルーチンを抜けるが、これは他処理と合流である。<br>
+つまり、現在HPが<span class="formula">trunc(操作キャラ最大HP/4)</span>より大きい場合は、他処理と合流である。</p>
+
+<p><code><span class="r">$C1/4FFE</span></code>に戻った時点でゼロフラグ判定だが、ここでゼロフラグが立つのは、<code><span class="r">$C1/4FFA</span></code>でゼロフラグONでサブルーチンを抜けてきた「ハルマゲドン用コマンド」の条件時のみである。<br>
+この時は、<code><span class="r">$C1/5000</span></code>→<code><span class="r">$C1/5015</span></code>とジャンプするが、その場合は<code>X</code>に<span class="formula">$FDE5</span>をロードしてから<code>[$C1:5022]</code>へジャンプとなる。<br>
+<code><span class="r">$C1/5022</span></code>からが、戦闘コマンドテキスト呼び出しのサブルーチンになり、他処理との合流地点でもあるが、後述する。</p>
+
+<p>以上から、<code><span class="r">$C1/4FDF</span></code>～<code><span class="r">$C1/4FFA</span></code>が、「ハルマゲドン用コマンド」の判定用サブルーチンということがわかった。</p>
+
+<p><span style="font-weight:bold;">「ハルマゲドン用コマンド」出現条件は、最終編オルステッド主人公時、かつ、現在HPが<span class="formula">trunc(操作キャラ最大HP/4)</span>以下</span>ということも判明した。</p>
+
+<p>一方、最終編以外か、最終編でもオルステッド主人公時のハルマゲドンコマンドOFFだと、<code><span class="r">$C1/4FFE</span></code>でゼロフラグが立たない。<br>
+よって、<code><span class="r">$C1/5002</span></code>に進み、<code>A</code>に<span class="formula">$15</span>をロードして<code><span class="r">$C1/5040</span></code>へジャンプする。<br>
+この先はキャプテンスクウェア用判定である。</p>
+
+<div class="code-container"><pre>
+$C1/5040 STA $10    [$00:0310]   ;A($15)を[$00:0310]に書き込み
+$C1/5042 LDX #$1C00              ;Xに$1C00をロード
+$C1/5045 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]をロード
+$C1/5048 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/504A BEQ $0E    [$505A]      ;ゼロフラグが立っているとき[$505A]分岐
+;ゼロフラグOFF $00:戦闘離脱 $20:味方キャラ敵対　ではない
+$C1/504C LDA $0039,x[$00:1C39]   ;Aに[$00:1C39](状態異常)をロード
+$C1/504F CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/5051 BEQ $07    [$505A]      ;ゼロフラグが立っているとき[$505A]分岐
+;ゼロフラグOFF 戦闘不能ではない
+$C1/5053 LDA $0000,x[$00:1C00]   ;Aに[$00:1C00]（キャラID）をロード
+$C1/5056 CMP $10    [$00:0310]   ;Aと[$00:0310]($15)を減算比較（ステータスレジスタ変更のみ）
+$C1/5058 BEQ $0F    [$5069]      ;ゼロフラグが立っているとき[$5069]分岐
+;ゼロフラグOFF キャプテンスクウェアではない、または該当キャラが戦闘不能・戦闘離脱
+$C1/505A REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/505C TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/505D ADC #$0040              ;A + $0040
+$C1/5060 TAX                     ;Aの値をXレジスタに転送
+$C1/5061 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/5063 CPX #$1D00              ;Xと$1D00を減算比較（ステータスレジスタ変更のみ）
+$C1/5066 BNE $DD    [$5045]      ;ゼロフラグが立っていないとき[$5045]分岐
+;ゼロフラグON　操作キャラにキャプテンスクウェアが含まれない
+$C1/5068 RTS                     ;サブルーチン戻り
+;$C1/5058でゼロフラグON キャプテンスクウェア
+$C1/5069 LDA #$FF                ;Aに$FFをロード
+$C1/506B RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>[$00:0310]</code>に<span class="formula">$15</span>を書き込んだ後は、戦闘コマンドを開く味方キャラの状態の判定である。<br>
+ここでは、味方キャラ1としておく。その場合は<code>X:1C00</code>である。<br>
+<code><span class="r">$C1/5045</span></code>から、<code>[$00:1C01]</code>、つまり味方キャラの現在の状態をロードし、<span class="formula">$40</span>と論理積をとってゼロフラグ判定だが、ゼロフラグが立たないのは、戦闘離脱状態か、味方キャラが敵対状態の時であり、通常、戦闘中に戦闘コマンドを開く時点で、どちらでもないはずである。</p>
+
+<p>続いて、<code><span class="r">$C1/504C</span></code>から、<code>[$00:1C39]</code>(状態異常)と<span class="formula">$FF</span>で減算比較し、ゼロフラグ判定である。<br>
+つまり<code>[$00:1C39]</code>(状態異常)が<span class="formula">$FF</span>かどうかだが、状態異常が<span class="formula">$FF</span>ということは戦闘不能状態のことなので、こちらでも通常、戦闘中に戦闘コマンドを開く時点で、戦闘不能はありえないはずである。</p>
+
+<p>ということで、おそらく通常なら<code><span class="r">$C1/5053</span></code>まで処理が進むはずである。<br>
+<code><span class="r">$C1/5053</span></code>からは<code>[$00:1C00]</code>（味方キャラID）と<code>[$00:0310]</code>(<span class="formula">$15</span>)との減算比較でゼロフラグ判定である。<br>
+味方キャラIDが<span class="formula">$15</span>はキャプテンＳ、つまりキャプテンスクウェアである。<br>
+ゼロフラグが立っているのなら、<code><span class="r">$C1/5058</span></code>→<code><span class="r">$C1/5069</span></code>で<code>A</code>に<span class="formula">$FF</span>をロードしてサブルーチンが戻る。</p>
+
+<p>ゼロフラグが立っていないのなら<code><span class="r">$C1/505A</span></code>からの処理だが、これは味方キャラ全員を判定するための処理へ飛ぶ準備になる。<br>
+キャプテンスクウェアかどうかの判定なら、<code>X:1C00</code>の時だけ判定すれば良いような気もするが、後述の通り、このサブルーチンはテレポート判定（アキラがパーティにいるかどうか）にも使っている汎用サブルーチンなので、全員分の判定となる。</p>
+
+<p><code><span class="r">$C1/505D</span></code>で、<code>X:1C00</code> + <span class="formula">$0040</span>を計算しているから、味方キャラ2呼び出し用の<code>X:1C40</code>を算出している。<br>
+<code><span class="r">$C1/5063</span></code>で<code>X</code>と<span class="formula">$1D00</span>の減算比較をし、ゼロフラグOFFなら<code><span class="r">$C1/5045</span></code>に戻るから、</p>
+
+<ul>
+	<li><code>X:1C00</code>, <code>1C40</code>, <code>1C80</code>ならループ頭に戻る</li>
+	<li><code>X:1CC0</code>だと<span class="formula">+$40</span>して<span class="formula">$1D00</span>になるからループを抜け、<code><span class="r">$C1/5068</span></code>でサブルーチンを戻る</li>
+</ul>
+
+<p>という処理であり、味方キャラ4人全員分、味方キャラIDが<span class="formula">$15</span>かどうかの判定を行うことになる。<br>
+4キャラ全員がキャプテンスクウェアではない場合、最後の減算比較は<span class="formula">$1D00 - $1D00</span>で、ゼロフラグが立った状態で<code><span class="r">$C1/5068</span></code>でサブルーチンを抜けることになる。</p>
+
+<div class="code-container"><pre>
+$C1/5007 BNE $11    [$501A]      ;ゼロフラグが立っていないとき[$501A]分岐
+;ゼロフラグON　キャプテンスクウェアではない
+$C1/5009 LDA #$11                ;Aに$11をロード
+$C1/500B JSR $5040  [$C1:5040]   ;[$C1:5040]へジャンプ
+;ゼロフラグOFF　キャプテンスクウェア
+$C1/501A LDX #$FDBB              ;Xに$FDBBをロード
+$C1/501D BRA $03    [$5022]      ;[$C1:5022]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/5007</span></code>でゼロフラグ分岐となり、ゼロフラグOFF、つまり<span style="font-weight:bold;">操作キャラがキャプテンスクウェアの時は、「キャプテンスクウェア用コマンド」確定</span>で、<code>X</code>に<span class="formula">$FDBB</span>をロードして、<code>[$C1:5022]</code>へジャンプである。<br>
+ハルマゲドンコマンドに続き、ここでキャプテンスクウェア時の判定が終了である。</p>
+
+<p>一方、キャプテンスクウェアが操作キャラに含まれなかった場合はゼロフラグが立ち、<code>A</code>に<span class="formula">$11</span>をロードして<code>[$C1:5040]</code>へジャンプだが、これは先程、キャプテンスクウェアのIDと一致するかどうかを判定したサブルーチンと同じである。<br>
+今度は比較するキャラIDが<span class="formula">$11</span>、つまりアキラかどうかに変わるということである。</p>
+
+<div class="code-container"><pre>
+$C1/5040 STA $10    [$00:0310]   ;A($11)を[$00:0310]に書き込み
+$C1/5042 LDX #$1C00              ;Xに$1C00をロード
+$C1/5045 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01](戦闘状態)をロード
+$C1/5048 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C1/504A BEQ $0E    [$505A]      ;ゼロフラグが立っているとき[$505A]分岐
+
+;ゼロフラグOFF 戦闘離脱ではない
+$C1/504C LDA $0039,x[$00:1C39]   ;Aに[$00:1C39](状態異常)をロード
+$C1/504F CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/5051 BEQ $07    [$505A]      ;ゼロフラグが立っているとき[$505A]分岐
+;ゼロフラグOFF 戦闘不能ではない
+$C1/5053 LDA $0000,x[$00:1C00]   ;Aに[$00:1C00]をロード
+$C1/5056 CMP $10    [$00:0310]   ;Aと[$00:0310]($11 アキラのID)を減算比較（ステータスレジスタ変更のみ）
+$C1/5058 BEQ $0F    [$5069]      ;ゼロフラグが立っているとき[$5069]分岐
+;ゼロフラグOFF キャラがアキラではない、または該当キャラが戦闘不能・戦闘離脱
+$C1/505A REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/505C TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/505D ADC #$0040              ;A + $0040
+$C1/5060 TAX                     ;Aの値をXレジスタに転送
+$C1/5061 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/5063 CPX #$1D00              ;Xと$1D00を減算比較（ステータスレジスタ変更のみ）
+$C1/5066 BNE $DD    [$5045]      ;ゼロフラグが立っていないとき[$5045]分岐
+;ゼロフラグON　操作キャラにアキラが含まれない
+$C1/5068 RTS                     ;サブルーチン戻り
+;$C1/5058でゼロフラグON キャラがアキラ　かつ戦闘不能・戦闘離脱ではない
+$C1/5069 LDA #$FF                ;Aに$FFをロード
+$C1/506B RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>判定はキャプテンスクウェア時と同じなのだが、今回は、近未来編・最終編両方に登場するアキラの判定で、他に仲間キャラがいる場合もある、という点が重要。<br>
+処理を追って考えると、</p>
+
+<p style="font-weight:bold;">アキラが戦闘離脱または戦闘不能ではない状態で、パーティ内にいる状態なら、<code><span class="r">$C1/5069</span></code>にたどりつく（「テレポート用コマンド」ON）</p>
+
+<p>と、いうことがわかる。<br>
+このため、アキラが戦闘離脱または戦闘不能ではない状態でパーティにいるのなら、アキラ以外のキャラの戦闘コマンドを開いた時でも、「逃げる」が「テレポート」に変わるのである。<br>
+また、「テレポート」コマンドが表示される条件は、アキラが戦闘離脱または戦闘不能ではない状態、ということもわかる。<br>
+アキラ自身が行動できない、マヒや眠り、石化状態の時でも、テレポートが可能なのはここの分岐処理のためである。</p>
+
+<p>さて、アキラが戦闘離脱または戦闘不能ではない状態で、パーティ内にいる状態なら、<code>A</code>に<span class="formula">$FF</span>をロードしてサブルーチンを戻り、それ以外はゼロフラグが立った状態でサブルーチンが戻る。</p>
+
+<div class="code-container"><pre>
+$C1/500E BNE $0F    [$501F]      ;ゼロフラグが立っていないとき[$501F]分岐
+;ゼロフラグON 「テレポート用コマンド」OFF
+$C1/5010 LDX #$FDA6              ;Xに$FDA6をロード
+$C1/5013 BRA $0D    [$5022]      ;フラグにかかわりなく常に分岐[$5022]
+;ゼロフラグOFF 「テレポート用コマンド」ON
+$C1/501F LDX #$FDCF              ;Xに$FDCFをロード
+;ハルマゲドンコマンド・キャプテンスクウェア処理と合流
+$C1/5022 STX $DC    [$00:03DC]   ;Xを[$00:03DD][$00:03DC]に書き込み
+$C1/5024 LDX #$1200              ;Xに$1200をロード
+$C1/5027 STX $D8    [$00:03D8]   ;Xを[$00:03D9][$00:03D8]に書き込み
+$C1/5029 JSR $506C  [$C1:506C]   ;[$C1:506C]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/500E</span></code>はキャプテンスクウェアと同じくゼロフラグ分岐で、「テレポート用コマンド」ONなら<code>X</code>に<span class="formula">$FDCF</span>をロード、それ以外なら<code>X</code>に<span class="formula">$FDA6</span>をロードである。<br>
+その先の<code><span class="r">$C1/5022</span></code>が、これまでの「ハルマゲドン用コマンド」「キャプテンスクウェア用コマンド」確定時のジャンプ先であり、ここで処理が合流である。<br>
+それぞれ直前に、<code>X</code>に別の値を読み込んでいる。</p>
+
+<table>
+<thead>
+	<tr><th>戦闘コマンド</th><th><code>X</code>の値</th></tr>
+</thead>
+<tbody>
+	<tr><td>ハルマゲドン用コマンド</td><td><span class="formula">$FDE5</span></td></tr>
+	<tr><td>キャプテンスクウェア用コマンド</td><td><span class="formula">$FDBB</span></td></tr>
+	<tr><td>テレポート用コマンド</td><td><span class="formula">$FDCF</span></td></tr>
+	<tr><td>通常</td><td><span class="formula">$FDA6</span></td></tr>
+</tbody>
+</table>
+
+<p>ここまでで実質、戦闘コマンド表示の分岐は終了である。<br>
+後はコマンドを実際にゲーム画面に表示するための処理になる。<br>
+ここまでで決まったのは、あくまでも戦闘コマンドに表示する文字列である。<br>
+該当コマンドが使用可能かどうか、つまり文字色が黒になるか灰色になるかは、まだ判定していない。<br>
+また、もうひとつ、味方キャラの座標によって戦闘コマンドの表示位置が4ヶ所あるのだが（味方キャラ位置を隠さないようにするため、右上・右下・左上・左下の4ヶ所のいずれかに戦闘コマンドが表示される）、その分岐も行っていないため、この先で味方キャラ座標から判定をする。</p>
+
+<p>ということで以降はある意味おまけではあるが、続けて説明していく。</p>
+
+<p><code>X</code>の値は<code><span class="r">$C1/5022</span></code>で<code>[$00:03DD]</code><code>[$00:03DC]</code>に書き込まれ、<code>X</code>に<span class="formula">$1200</span>をロードしてから<code>[$00:03D9]</code><code>[$00:03D8]</code>に書き込み、<code>[$C1:506C]</code>にジャンプする。</p>
+
+<div class="code-container"><pre>
+$C1/506C LDX #$B000              ;Xに$B000をロード
+$C1/506F STX $D6    [$00:03D6]   ;Xを[$00:03D7][$00:03D6]に書き込み
+$C1/5071 LDA #$00                ;Aに$00をロード
+$C1/5073 STZ $E0    [$00:03E0]   ;[$00:03E0]に$00を書き込み
+$C1/5075 RTS                     ;サブルーチン戻り
+
+$C1/502C LDA #$08                ;Aに$08をロード
+$C1/502E STA $E3    [$00:03E3]   ;A($08)を[$00:03E3]に書き込み
+$C1/5030 STA $E1    [$00:03E1]   ;A($08)を[$00:03E1]に書き込み
+$C1/5032 LDA #$04                ;Aに$04をロード
+$C1/5034 STA $E2    [$00:03E2]   ;A($04)を[$00:03E2]に書き込み
+$C1/5036 LDA #$C1                ;Aに$C1をロード
+$C1/5038 JSR $3E4B  [$C1:3E4B]   ;[$C1:3E4B]へジャンプ
+
+$C1/3E4B JSR $3E61  [$C1:3E61]   ;[$C1:3E61]へジャンプ
+</pre></div>
+
+<p>この先から戦闘コマンドの文字列の取得用ループ処理に移るのだが、その前の準備が上。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:03DD]</code><code>[$00:03DC]</code></td><td>（コマンド別の値）</td></tr>
+	<tr><td><code>[$00:03D9]</code><code>[$00:03D8]</code></td><td><span class="formula">$1200</span></td></tr>
+	<tr><td><code>[$00:03D7]</code><code>[$00:03D6]</code></td><td><span class="formula">$B000</span></td></tr>
+	<tr><td><code>[$00:03E0]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:03E1]</code></td><td><span class="formula">$08</span></td></tr>
+	<tr><td><code>[$00:03E2]</code></td><td><span class="formula">$04</span></td></tr>
+	<tr><td><code>[$00:03E3]</code></td><td><span class="formula">$08</span></td></tr>
+</tbody>
+</table>
+
+<p>このように値が入った状態、かつ、<code>A</code>に<span class="formula">$C1</span>が入った状態で<code>[$C1:3E61]</code>へジャンプする。</p>
+
+<div class="code-container"><pre>
+;文字列取得 $7E:FF00～$7E:FF60
+$C1/3E61 LDX #$0000              ;Xに$0000をロード
+$C1/3E64 PHB                     ;DBレジスタをスタックにプッシュ
+$C1/3E65 PHA                     ;Aをスタックにプッシュ
+$C1/3E66 PLB                     ;DBレジスタに値をプル
+$C1/3E67 PHY                     ;Yをスタックへプッシュ
+$C1/3E68 LDY $DC    [$00:03DC]   ;Yに[$00:03DD][$00:03DC]をロード
+$C1/3E6A CMP #$7E                ;A($C1)と$7Eを減算比較（ステータスレジスタ変更のみ）
+$C1/3E6C BNE $04    [$3E72]      ;ゼロフラグが立っていないとき[$3E72]分岐
+;ゼロフラグON
+$C1/3E6E LDA #$0C                ;Aに$0Cをロード
+$C1/3E70 BRA $02    [$3E74]      ;フラグにかかわりなく常に分岐[$3E74]
+;ゼロフラグOFF
+$C1/3E72 LDA #$60                ;Aに$60をロード
+$C1/3E74 STA $08    [$00:0308]   ;A($60)を[$00:0308]に書き込み
+$C1/3E76 STZ $09    [$00:0309]   ;[$00:0309]に$00を書き込み
+
+;ループ処理開始 X:$0000で開始
+$C1/3E78 LDA $0000,y[$C1:FDCF]   ;Aに[$0000,y]をロード
+$C1/3E7B INY                     ;Yをインクリメント +1
+$C1/3E7C CMP #$1D                ;Aと$1Dを減算比較（ステータスレジスタ変更のみ）
+$C1/3E7E BEQ $2D    [$3EAD]      ;ゼロフラグが立っているとき[$3EAD]分岐
+;ゼロフラグOFF 漢字判定（1）$1Dではない
+$C1/3E80 CMP #$1E                ;Aと$1Eを減算比較（ステータスレジスタ変更のみ）
+$C1/3E82 BEQ $29    [$3EAD]      ;ゼロフラグが立っているとき[$3EAD]分岐
+;ゼロフラグOFF 漢字判定（2）$1Eではない
+$C1/3E84 CMP #$1F                ;Aと$1Fを減算比較（ステータスレジスタ変更のみ）
+$C1/3E86 BEQ $25    [$3EAD]      ;ゼロフラグが立っているとき[$3EAD]分岐
+;ゼロフラグOFF 漢字判定（3）$1Fではない
+$C1/3E88 CMP #$0E                ;Aと$0Eを減算比較（ステータスレジスタ変更のみ）
+$C1/3E8A BEQ $16    [$3EA2]      ;ゼロフラグが立っているとき[$3EA2]分岐
+;ゼロフラグOFF $0Eではない
+$C1/3E8C CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C1/3E8E BNE $26    [$3EB6]      ;ゼロフラグが立っていないとき[$3EB6]分岐
+;ゼロフラグON $07「‥‥」
+$C1/3E90 LDA #$3D                ;Aに$3D「‥」をロード
+$C1/3E92 STA $7EFF00,x[$7E:FF00] ;Aを[$7EFF00,x]に書き込み
+$C1/3E96 INX                     ;Xをインクリメント +1
+$C1/3E97 LDA #$3D                ;Aに$3D「‥」をロード
+$C1/3E99 STA $7EFF00,x[$7E:FF00] ;Aを[$7EFF00,x+1]に書き込み
+$C1/3E9D INX                     ;Xをインクリメント +1
+$C1/3E9E LDA #$00                ;Aに$00（終了用）をロード
+$C1/3EA0 BRA $14    [$3EB6]      ;フラグにかかわりなく常に分岐[$3EB6]
+;$C1/3E8AでゼロフラグON $0Eである
+$C1/3EA2 LDA #$21                ;Aに$21をロード
+$C1/3EA4 STA $7EFF00,x[$7E:FF00] ;Aを[$7EFF00,x]に書き込み
+$C1/3EA8 INX                     ;Xをインクリメント +1
+$C1/3EA9 LDA #$00                ;Aに$00をロード
+$C1/3EAB BRA $09    [$3EB6]      ;フラグにかかわりなく常に分岐[$3EB6]
+;漢字処理（$1D, $1E $1F）
+$C1/3EAD STA $7EFF00,x[$7E:FF00] ;Aを[$7EFF00,x]に書き込み
+$C1/3EB1 INX                     ;Xをインクリメント +1
+$C1/3EB2 LDA $0000,y[$C1:FDD0]   ;Aに[$0000,y+1]をロード
+$C1/3EB5 INY                     ;Yをインクリメント +1
+;処理合流
+$C1/3EB6 STA $7EFF00,x[$7E:FF01] ;Aを[$7EFF00,x]に書き込み
+$C1/3EBA INX                     ;Xをインクリメント +1
+$C1/3EBB CPX $08    [$00:0308]   ;Xと[$00:0308](初期値$60)を減算比較（ステータスレジスタ変更のみ）
+$C1/3EBD BCC $B9    [$3E78]      ;キャリーフラグが立っていないとき[$3E78]分岐
+;ループ処理ここまで
+
+$C1/3EBF LDA #$00                ;Aに$00をロード
+$C1/3EC1 STA $7EFF00,x[$7E:AF00] ;$00を[$7EFF00,x]に書き込み
+$C1/3EC5 PLY                     ;Yレジスタにスタックからプル
+$C1/3EC6 PLB                     ;DBレジスタにスタックからプル
+$C1/3EC7 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>$0000,y</code>（<span class="formula">y</span>はコマンド別の値）の<code>Y</code>を増やしながらを<code>$7E:FF00</code>から<code>$7E:FF60</code>まで61バイト分埋める（厳密には<code>$7E:FF5F</code>までで、最後の<code>$7E:FF60</code>は<span class="formula">$00</span>を書き込むから、60バイトのコピー）というループ処理である。<br>
+ループ前、<code>X</code>初期値として<span class="formula">$0000</span>を入れ、<code>X:0060</code>まで増加したら（<code>$7E:FF5F</code>まで値を書き込んだら）ループをぬける仕組み。<br>
+文字コードによって分岐がある。<br>
+テキストのデコード・エンコードは<a href="datamap.html#captionlist_2_5">文字コード</a>にあり、今回はデコードしながら<code>$7E:FF00</code>～へ書き込む作業になるが、</p>
+
+<ul>
+	<li>漢字（<span class="formula">$1D</span>, <span class="formula">$1E</span> <span class="formula">$1F</span>で開始なら2バイトで漢字）の処理</li>
+	<li><span class="formula">$07</span>「‥‥」は<span class="formula">$3D</span>「‥」を2回分として処理</li>
+	<li><span class="formula">$0E</span>は<span class="formula">$21</span>に変換</li>
+</ul>
+
+<p>という分岐があり、これ以外ならそのままの値を<code>$7E:FF00</code>～へ書き込んでいる。</p>
+
+<p>例として、テレポート用コマンドだった場合を考えてみよう。<br>
+この場合、<code>[$00:03DD]</code><code>[$00:03DC]</code>に入っているのは<span class="formula">$FDCF</span>で、<code><span class="r">$C1/3E78</span></code>のループ1周目の<code>$0000,y</code>のアドレスは<code>$C1:FDCF</code>である。<br>
+つまり、テレポート用コマンド文字列の開始位置は<code>$C1:FDCF</code>である。<br>
+ループを開始すると、まず<code>Y</code>を<span class="formula">+1</span>する（次のアドレス呼び出し用）。<br>
+<code>$C1:FDCF</code>からの値は、</p>
+
+<div class="mono">
+1E A4 B3 01 A6 6D 01 61 62 73 81 B0 1E 04 B3 01 73 8A AA 40 74 00
+</div>
+
+<p>と入っているのだが、<code>$C1:FDCF</code>は「<span class="formula">$1E</span>」だから、ループ処理にかけると<code><span class="r">$C1/3E82</span></code>の<span class="formula">$1E</span>かどうかの判定でゼロフラグが立って、漢字処理の<code><span class="r">$C1/3EAD</span></code>に飛ぶ。<br>
+<code><span class="r">$C1/3EAD</span></code>で、まず<code>[$7E:FF00]</code>に<span class="formula">$1E</span>を書き込み、<code>X</code>を<span class="formula">+1</span>する。<br>
+続いて、<code>$C1:FDCF</code>の次のアドレス、<code>$C1:FDD0</code>（<span class="formula">$A4</span>）をロードし、<code>Y</code>をインクリメント<span class="formula">+1</span>して、他処理との合流<code><span class="r">$C1/3EB6</span></code>にて<code>[$7EFF00,x]</code>、つまり<code>$7E:FF01</code>に<code>A</code>を書き込み、<code>X</code>をインクリメント<span class="formula">+1</span>してループ頭に戻る。<br>
+というように処理が進む。</p>
+
+<p>60バイト分コピーするが、戦闘用コマンドの場合、長くても23バイト分の読み込みで事足りる。<br>
+つまり過剰に読み込んでいるのだが、この文字列コピー処理は他でも使われる汎用のサブルーチンであるため。<br>
+また、漢字は2バイトで成立しているため、最後の<code>$7E:FF5F</code>へのコピー時に漢字2バイト分、<code>$7E:FF5F</code>と<code>$7E:FF60</code>に書き込むというケースもあり得る。<br>
+その時も最終的に<code><span class="r">$C1/3EBF</span></code>でと<code>$7E:FF60</code>を00を上書きするので、最後の漢字は完全な形ではコピーされないことになる。<br>
+それも含めて、60バイトと余分に文字列を読み込み、<code>$7E:FF00</code>～<code>$7E:FF60</code>へコピーしているのだと思われる。</p>
+
+<p>この先は、<code>$7E:FF00</code>～<code>$7E:FF60</code>へコピーしたデータから、文字の画像データをロードしていくサブルーチンである。</p>
+
+<div class="code-container"><pre>
+$C1/3E4E BRL $0077  [$3EC8]      ;フラグにかかわりなく常に分岐[$3EC8]
+$C1/3EC8 LDX #$0000              ;Xに$0000をロード
+$C1/3ECB STX $DC    [$00:03DC]   ;X($0000)を[$00:03DD][$00:03DC]に書き込み
+$C1/3ECD STZ $DF    [$00:03DF]   ;[$00:03DF]に$00を書き込み
+$C1/3ECF STZ $A7    [$00:03A7]   ;[$00:03A7]に$00を書き込み
+
+;ループ処理開始
+$C1/3ED1 LDA $A7    [$00:03A7]   ;Aに[$00:03A7](初期値$00)をロード
+$C1/3ED3 BEQ $04    [$3ED9]      ;ゼロフラグが立っているとき[$3ED9]分岐
+$C1/3ED9 LDX $DC    [$00:03DC]   ;Xに[$00:03DD][$00:03DC](初期値$0000)をロード
+$C1/3EDB LDA $7EFF00,x           ;Aに[$7E:FF00+x]をロード
+$C1/3EDF STA $DE    [$00:03DE]   ;Aを[$00:03DE]に書き込み
+$C1/3EE1 INX                     ;Xをインクリメント +1
+$C1/3EE2 STX $DC    [$00:03DC]   ;Xを[$00:03DD][$00:03DC](初期値$0000+1)に書き込み
+$C1/3EE4 CMP #$00                ;A([$7E:FF00+x])と$00を減算比較（ステータスレジスタ変更のみ）
+$C1/3EE6 BNE $03    [$3EEB]      ;ゼロフラグが立っていないとき[$3EEB]分岐
+;ゼロフラグON（$00は文字列終了）
+$C1/3EE8 BRL $0054  [$3F3F]      ;フラグにかかわりなく常に分岐[$3F3F]→★ループ抜ける
+;ゼロフラグOFF（文字列終了ではない）
+$C1/3EEB CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/3EED BNE $03    [$3EF2]      ;ゼロフラグが立っていないとき[$3EF2]分岐
+;ゼロフラグON（01は改行）
+$C1/3EEF BRL $0062  [$3F54]      ;フラグにかかわりなく常に分岐[$3F54]→☆ループ抜ける
+;ゼロフラグOFF（改行ではない）
+$C1/3EF2 CMP #$0A                ;Aと$0Aを減算比較（ステータスレジスタ変更のみ）
+$C1/3EF4 BEQ $0C    [$3F02]      ;ゼロフラグが立っているとき[$3F02]分岐
+;ゼロフラグOFF $0A「スペース×2」ではない
+$C1/3EF6 CMP #$0B                ;Aと$0Bを減算比較（ステータスレジスタ変更のみ）
+$C1/3EF8 BEQ $06    [$3F00]      ;ゼロフラグが立っているとき[$3F00]分岐
+;ゼロフラグOFF $0B「スペース×3」ではない
+$C1/3EFA CMP #$0C                ;Aと$0Cを減算比較（ステータスレジスタ変更のみ）
+$C1/3EFC BNE $0A    [$3F08]      ;ゼロフラグが立っていないとき[$3F08]分岐
+;ゼロフラグON $0B「スペース×4」
+$C1/3EFE INC $A7    [$00:03A7]   ;[$00:03A7]をインクリメント +1
+$C1/3F00 INC $A7    [$00:03A7]   ;[$00:03A7]をインクリメント +1
+$C1/3F02 INC $A7    [$00:03A7]   ;[$00:03A7]をインクリメント +1
+$C1/3F04 STZ $DE    [$00:03DE]   ;[$00:03DE]に$00を書き込み
+$C1/3F06 BRA $1B    [$3F23]      ;フラグにかかわりなく常に分岐[$3F23]
+;ゼロフラグOFF $0B「スペース×4」ではない
+$C1/3F08 CMP #$1D                ;Aと$1Dを減算比較（ステータスレジスタ変更のみ）
+$C1/3F0A BEQ $08    [$3F14]      ;ゼロフラグが立っているとき[$3F14]分岐
+;ゼロフラグOFF 漢字判定（1）$1Dではない
+$C1/3F0C CMP #$1E                ;Aと$1Eを減算比較（ステータスレジスタ変更のみ）
+$C1/3F0E BEQ $04    [$3F14]      ;ゼロフラグが立っているとき[$3F14]分岐
+;ゼロフラグOFF 漢字判定（2）$1Eではない
+$C1/3F10 CMP #$1F                ;Aと$1Fを減算比較（ステータスレジスタ変更のみ）
+$C1/3F12 BNE $0F    [$3F23]      ;ゼロフラグが立っているとき[$3F23]分岐
+;ゼロフラグOFF 漢字判定　$1D, $1E, $1Fのいずれか
+$C1/3F14 SBC #$1C                ;A([$7E:FF00+x]) - $1C
+$C1/3F16 STA $DF    [$00:03DF]   ;Aを[$00:03DF]に書き込み
+$C1/3F18 LDA $7EFF00,x           ;Aに[$7E:FF00+ x+1]をロード
+$C1/3F1C INX                     ;Xをインクリメント +1
+$C1/3F1D STX $DC    [$00:03DC]   ;Xを[$00:03DC]に書き込み
+$C1/3F1F STA $DE    [$00:03DE]   ;Aを[$00:03DE]に書き込み
+$C1/3F21 BRA $02    [$3F25]      ;フラグにかかわりなく常に分岐[$3F25]
+;$C1/3F12でゼロフラグON 漢字ではない
+$C1/3F23 STZ $DF    [$00:03DF]   ;[$00:03DF]に$00を書き込み
+;処理合流
+$C1/3F25 JSR $5095  [$C1:5095]   ;[$C1:5095]へジャンプ
+
+;文字ビットマップ呼び出し
+;符号付16bit x 8bitでアドレスを計算　[$00:03DF][$00:03DE] * $18
+$C1/5095 LDA $DE    [$00:03DE]   ;Aに[$00:03DE]をロード
+$C1/5097 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/509A LDA $DF    [$00:03DF]   ;Aに[$00:03DF]をロード
+$C1/509C STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/509F LDA #$18                ;Aに$18をロード
+$C1/50A1 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/50A4 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/50A7 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/50A9 LDA #$9200              ;Aに$9200をロード
+$C1/50AC ADC $2134  [$00:2134]   ;A + [$00:2135][$00:2134]
+;$9200 + [$00:03DF][$00:03DE] * $18
+$C1/50AF TAX                     ;Aの値をXレジスタに転送
+$C1/50B0 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/50B2 LDA $E0    [$00:03E0]   ;Aに[$00:03E0]（初期値$00）をロード
+$C1/50B4 AND #$01                ;Aと$01で論理積
+$C1/50B6 BEQ $03    [$50BB]      ;ゼロフラグが立っているとき[$50BB]分岐
+;ゼロフラグOFF
+$C1/50B8 BRL $0030  [$50EB]      ;フラグにかかわりなく常に分岐[$50EB]
+;ゼロフラグON（[$00:03E0]が偶数処理）
+$C1/50BB PHB                     ;DBレジスタをスタックにプッシュ
+$C1/50BC LDA #$7E                ;Aに$7Eをロード
+$C1/50BE PHA                     ;Aをスタックにプッシュ
+$C1/50BF PLB                     ;DBレジスタに値をプル
+$C1/50C0 LDY $D6    [$00:03D6]   ;Yに[$00:03D7][$00:03D6]（初期値$B000）をロード
+$C1/50C2 LDA #$0C                ;Aに$0Cをロード
+$C1/50C4 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+;ループ処理ここから
+$C1/50C6 LDA $D40000,x           ;Aに[$D40000,x]をロード
+$C1/50CA STA $0005,y             ;Aを[$7E:B005,y]に書き込み
+$C1/50CD LDA $D40001,x           ;Aに[$D40001,x]をロード
+$C1/50D1 STA $0025,y             ;Aを[$7E:B025,y]に書き込み
+$C1/50D4 INX                     ;Xをインクリメント +1
+$C1/50D5 INX                     ;Xをインクリメント +1
+$C1/50D6 INY                     ;Yをインクリメント +1
+$C1/50D7 INY                     ;Yをインクリメント +1
+$C1/50D8 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/50DA BNE $EA    [$50C6]      ;ゼロフラグが立っていないとき[$50C6]分岐
+;ループ処理ここまで
+$C1/50DC REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/50DE LDA $D6    [$00:03D6]   ;Aに[$00:03D7][$00:03D6]（初期値$B000）をロード
+$C1/50E0 ADC #$0020              ;A + $0020
+$C1/50E3 STA $D6    [$00:03D6]   ;Aを[$00:03D7][$00:03D6]（初期値$B000 + $0020）に書き込み
+$C1/50E5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/50E7 INC $E0    [$00:03E0]   ;[$00:03E0]をインクリメント +1
+$C1/50E9 PLB                     ;DBレジスタに値をプル
+$C1/50EA RTS                     ;サブルーチン戻り
+
+;$C1/50B8から（[$00:03E0]が奇数処理）
+$C1/50EB PHB                     ;DBレジスタをスタックにプッシュ
+$C1/50EC LDA #$7E                ;Aに$7Eをロード
+$C1/50EE PHA                     ;Aレジスタをスタックにプッシュ
+$C1/50EF PLB                     ;DBレジスタにスタックからプル
+$C1/50F0 LDY $D6    [$00:03D6]   ;Yに[$00:03D7][$00:03D6]（初期値$B000）をロード
+$C1/50F2 LDA #$0C                ;Aに$0Cをロード
+$C1/50F4 STA $08    [$00:0308]   ;Aを[$00:0308]に書き込み
+;ループ処理ここから
+$C1/50F6 LDA $D40001,x           ;Aに[$D40001,x]をロード
+$C1/50FA STA $00211B[$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/50FE LDA $D40000,x           ;Aに[$D40000,x]をロード
+$C1/5102 STA $00211B[$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/5106 LDA #$10                ;Aに$10をロード
+$C1/5108 STA $00211C[$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/510C STA $00211C[$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/5110 LDA $002136[$00:2136]   ;Aに[$00:2136]をロード
+$C1/5114 AND #$0F                ;Aと$0Fで論理積
+$C1/5116 ORA $0005,y             ;Aと[$7E:B005+y]で論理和
+$C1/5119 STA $0005,y             ;Aを[$7E:B005+y]に書き込み
+$C1/511C LDA $002135[$00:2135]   ;Aに[$00:2135]をロード
+$C1/5120 STA $0025,y             ;Aを[$7E:B025+y]に書き込み
+$C1/5123 INX                     ;Xをインクリメント +1
+$C1/5124 INX                     ;Xをインクリメント +1
+$C1/5125 INY                     ;Yをインクリメント +1
+$C1/5126 INY                     ;Yをインクリメント +1
+$C1/5127 DEC $08    [$00:0308]   ;[$00:0308]をデクリメント -1
+$C1/5129 BNE $CB    [$50F6]      ;ゼロフラグが立っていないとき[$50F6]分岐
+;ループ処理ここまで
+$C1/512B REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/512D LDA $D6    [$00:03D6]   ;Aに[$00:03D6]（初期値$B000）をロード
+$C1/512F ADC #$0040              ;A + $0040
+$C1/5132 STA $D6    [$00:03D6]   ;Aを[$00:03D6]（初期値$B000 + $0020）に書き込み
+$C1/5134 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/5136 INC $E0    [$00:03E0]   ;[$00:03E0]をインクリメント +1
+$C1/5138 PLB                     ;DBレジスタにスタックからプル
+$C1/5139 RTS                     ;サブルーチン戻り
+;文字ビットマップ呼び出しここまで
+
+$C1/3F28 DEC $E1    [$00:03E1]   ;[$00:03E1]をデクリメント -1
+$C1/3F2A BNE $A5    [$3ED1]      ;ゼロフラグが立っていないとき[$3ED1]分岐
+;ループここまで
+
+;$C1/3EE8　$00で文字列終了、★ループ抜ける
+$C1/3F3F LDA $8B    [$00:038B]   ;Aに[$00:038B]をロード
+$C1/3F41 BEQ $03    [$3F46]      ;ゼロフラグが立っているとき[$3F46]分岐
+$C1/3F46 JSR $3F72  [$C1:3F72]   ;[$C1:3F72]へジャンプ
+
+;$C1/3EEF　$01は改行、☆ループ抜ける
+$C1/3F54 LDA $E1    [$00:03E1]   ;Aに[$00:03E1]をロード
+$C1/3F56 CMP $E3    [$00:03E3]   ;Aと[$00:03E3]を減算比較（ステータスレジスタ変更のみ）
+$C1/3F58 BEQ $06    [$3F60]      ;ゼロフラグが立っているとき[$3F60]分岐
+$C1/3F5A JSR $3F72  [$C1:3F72]   ;[$C1:3F72]へジャンプ
+
+;$C1/3F46または$C1/3F5Aからのジャンプ先
+$C1/3F72 STZ $DF    [$00:03DF]   ;[$00:03DF]に$00を書き込み
+$C1/3F74 STZ $DE    [$00:03DE]   ;[$00:03DE]に$00を書き込み
+$C1/3F76 JSR $5095  [$C1:5095]   ;[$C1:5095]へジャンプ→文字ビットマップ呼び出し
+
+$C1/3F79 DEC $E1    [$00:03E1]   ;[$00:03E1]をデクリメント -1
+$C1/3F7B BNE $F9    [$3F76]      ;ゼロフラグが立っていないとき[$3F76]分岐
+;ゼロフラグON
+$C1/3F7D RTS                     ;サブルーチン戻り
+;ここで1行分終わり
+
+$C1/3F49 LDA $E3    [$00:03E3]   ;Aに[$00:03E3]をロード
+$C1/3F4B STA $E1    [$00:03E1]   ;Aを[$00:03E1]に書き込み
+$C1/3F4D DEC $E2    [$00:03E2]   ;[$00:03E2]をデクリメント -1
+$C1/3F4F BNE $F5    [$3F46]      ;ゼロフラグが立っていないとき[$3F46]分岐
+$C1/3F51 BRL $FFE7  [$3F3B]      ;フラグにかかわりなく常に分岐[$3F3B]
+$C1/3F3B JSR $5076  [$C1:5076]   ;[$C1:5076]へジャンプ
+
+$C1/5076 LDA $E0    [$00:03E0]   ;Aに[$00:03E0]をロード
+$C1/5078 INC A                   ;Aをインクリメント +1
+$C1/5079 AND #$FE                ;Aと$FEで論理積
+$C1/507B STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/507E LDA #$00                ;Aに$00をロード
+$C1/5080 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/5083 LDA #$30                ;Aに$30をロード
+$C1/5085 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/5088 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/508B LDX $2134  [$00:2134]   ;Xに[$00:2134]をロード
+$C1/508E STX $DA    [$00:03DA]   ;Xを[$00:03DA]に書き込み
+$C1/5090 LDA #$FF                ;Aに$FFをロード
+$C1/5092 STA $FB    [$00:03FB]   ;Aを[$00:03FB]に書き込み
+$C1/5094 RTS                     ;サブルーチン戻り
+
+$C1/3F3E RTS                     ;サブルーチン戻り
+
+$C1/503B LDA #$FF                ;Aに$FFをロード
+$C1/503D STA $FB    [$00:03FB]   ;Aを[$00:03FB]に書き込み
+$C1/503F RTS                     ;サブルーチン戻り
+
+$C1/9991 JSR $8A60  [$C1:8A60]   ;[$C1:8A60]へジャンプ
+</pre></div>
+
+<p>今回のサブルーチン開始位置、<code><span class="r">$C1/998E</span> JSR $4FFB</code>の戻り先が<code><span class="r">$C1/9991</span></code>であり、ここまでが戦闘コマンド判定～コマンド用文字列呼び出しのサブルーチンだった、ということがわかる。<br>
+長いし分岐も多いのでざっくりと説明する。</p>
+
+<p><code>$7E:FF00</code>～<code>$7E:FF60</code>にコピーされたテキストデータ（文字コード）は、<code><span class="r">$C1/3ED1</span></code>～<code><span class="r">$C1/3F2A</span></code>のループ処理で、1文字ずつどの文字かを判定する。<br>
+漢字なら2バイトだし、<span class="formula">$0A</span>～<span class="formula">$0D</span>のように全角スペースが連続する場合は文字としては存在しないので、その分を空欄としてあけておく必要がある。</p>
+
+<p>文字画像のアドレスの呼び出しについては、<a href="fontdata.html" target="_blank">文字データ &gt; 文字の画像ファイル</a>を参照。<br>
+<code>[$00:03DF]</code><code>[$00:03DE]</code>の2バイトが文字コードになり、<code><span class="r">$C1/5095</span></code>からアドレスを計算する。</p>
+
+<p><span class="formula">$D40000 + $9200 + <code>[$00:03DF]</code><code>[$00:03DE]</code> * $18</span></p>
+
+<p>が、該当文字の画像データ開始位置である。<br>
+呼び出した値は、<code>[$7E:B005]</code>、さらにその次のアドレスが<code>[$7E:B025]</code>に書き込まれる。<br>
+この作業をアドレスを増やしながらループ処理するが、24バイト分のデータが、</p>
+
+<p><code>[$7E:B005]</code><code>[$7E:B025]</code><br>
+<code>[$7E:B007]</code><code>[$7E:B027]</code><br>
+<code>[$7E:B009]</code><code>[$7E:B029]</code><br>
+<code>[$7E:B00B]</code><code>[$7E:B02B]</code><br>
+<code>[$7E:B00D]</code><code>[$7E:B02D]</code><br>
+<code>[$7E:B00F]</code><code>[$7E:B02F]</code><br>
+<code>[$7E:B011]</code><code>[$7E:B031]</code><br>
+<code>[$7E:B013]</code><code>[$7E:B033]</code><br>
+<code>[$7E:B015]</code><code>[$7E:B035]</code><br>
+<code>[$7E:B017]</code><code>[$7E:B037]</code><br>
+<code>[$7E:B019]</code><code>[$7E:B039]</code><br>
+<code>[$7E:B01B]</code><code>[$7E:B03B]</code></p>
+
+<p>と、ちょっと妙なアドレスにコピーされる。<br>
+これで1文字分のデータである。</p>
+
+<p>さらに、1文字分読み込んだ後は、初期値として00を入れた<code>[$00:03E0]</code>の値を<span class="formula">+1</span>していく。<br>
+<code><span class="r">$C1/50B2</span></code>～<code><span class="r">$C1/50B6</span></code>の処理を見ると、<code>[$00:03E0]</code>が奇数か偶数かで、文字読み込みサブルーチンが分岐する。<br>
+偶数なら<code><span class="r">$C1/50BB</span></code>～、奇数なら<code><span class="r">$C1/50EB</span></code>～である。<br>
+これは次に読み込む文字の表示位置の調整のためと思われる。<br>
+というのは、本作における1文字分のサイズは横16ピクセル、縦12ピクセルで収めている。ただし横16ピクセルの中で右隅4ピクセル幅は透過部分でデータがないので、実質12×12ピクセルである。<br>
+右隅4ピクセル幅のうち、2ピクセル分は次の文字と被せて表示させており、実際には12×12ピクセルの文字を2ピクセル間隔で横に並べている。<br>
+その被せ部分を<code><span class="r">$C1/50EB</span></code>～の処理において、<code><span class="r">$C1/5116</span></code>の論理和で処理しているのである。</p>
+
+<p>とりあえず<code><span class="r">$C1/9991</span></code>までで全データが送られたと考えてもらえばよい。<br>
+最終的に<code>$7E:B5FB</code>まで値が送られる。</p>
+
+<p><code><span class="r">$C1/9991</span></code>の後は以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C1/9991 JSR $8A60  [$C1:8A60]   ;[$C1:8A60]へジャンプ
+
+$C1/8A60 LDA #$0F                ;Aに$0Fをロード
+$C1/8A62 STA $40    [$00:0340]   ;Aを[$00:0340]に書き込み
+$C1/8A64 STA $41    [$00:0341]   ;Aを[$00:0341]に書き込み
+$C1/8A66 RTS                     ;サブルーチン戻り
+
+$C1/9994 LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/9996 LDY $0002,x             ;Yに[$00:1C02 + 40x]をロード
+$C1/9999 LDA #$00                ;Aに$00をロード
+$C1/999B STA $E6    [$00:03E6]   ;Aを[$00:03E6]に書き込み
+$C1/999D STA $E7    [$00:03E7]   ;Aを[$00:03E7]に書き込み
+$C1/999F JSR $E6BD  [$C1:E6BD]   ;[$C1:E6BD]へジャンプ
+
+$C1/E6BD LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/E6BF LDA $0018,x             ;Aに[$00:1C18 + 40x](キャラのX座標)をロード
+$C1/E6C2 CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/E6C4 BPL $11    [$E6D7]      ;ネガティブフラグが立っていないとき[$E6D7]分岐
+;ネガティブフラグON（X座標0～3）
+$C1/E6C6 LDA $0019,x             ;Aに[$00:1C19 + 40x](キャラのY座標)をロード
+$C1/E6C9 CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/E6CB BPL $05    [$E6D2]      ;ネガティブフラグが立っていないとき[$E6D2]分岐
+;ネガティブフラグON（Y座標0～3）
+$C1/E6CD LDX #$C45E              ;Xに$C45Eをロード
+$C1/E6D0 BRA $14    [$E6E6]      ;フラグにかかわりなく常に分岐[$E6E6]
+;$C1/E6CBでネガティブフラグOFF（Y座標4～6）
+$C1/E6D2 LDX #$C11E              ;Xに$C11Eをロード
+$C1/E6D5 BRA $0F    [$E6E6]      ;フラグにかかわりなく常に分岐[$E6E6]
+;$C1/E6C4でネガティブフラグOFF（X座標4～6）
+$C1/E6D7 LDA $0019,x             ;Aに[$00:1C19 + 40x](キャラのY座標)をロード
+$C1/E6DA CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/E6DC BPL $05    [$E6E3]      ;ネガティブフラグが立っていないとき[$E6E3]分岐
+;ネガティブフラグON（Y座標0～3）
+$C1/E6DE LDX #$C442              ;Xに$C442をロード
+$C1/E6E1 BRA $03    [$E6E6]      ;フラグにかかわりなく常に分岐[$E6E6]
+;$C1/E6DCでネガティブフラグOFF（Y座標4～6）
+$C1/E6E3 LDX #$C102              ;Xに$C102をロード
+;処理合流
+$C1/E6E6 STX $E4    [$00:03E4]   ;Xを[$00:03E4]に書き込み
+$C1/E6E8 PHB                     ;DBレジスタをスタックにプッシュ
+$C1/E6E9 LDA #$7E                ;Aに$7Eをロード
+$C1/E6EB PHA                     ;Aをスタックにプッシュ
+$C1/E6EC PLB                     ;DBレジスタに値をプル
+$C1/E6ED JSR $E77A  [$C1:E77A]   ;[$C1:E77A]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/999B</span></code>～で<code>[$00:03E7]</code><code>[$00:03E6]</code>に<span class="formula">$00</span>を書き込んでいるが、<code>[$00:03E6]</code>は戦闘コマンドにおけるカーソル位置である。<br>
+上から順に<span class="formula">$00</span>, <span class="formula">$01</span>, <span class="formula">$02</span>, <span class="formula">$03</span>が入る。<br>
+技一覧やアイテム一覧を開いた時でも、このアドレスにカーソル位置が入る。<br>
+戦闘コマンドを開いた時は必ず一番上にカーソルがある状態なので、<span class="formula">$00</span>を書き込んでいる。</p>
+
+<p><code><span class="r">$C1/E6BD</span></code>からは、キャラのX座標、Y座標がそれぞれ0～3か、4～6かで分岐し、<code>X</code>に異なる値をロードして、<code><span class="r">$C1/E6E6</span></code>で合流している。<br>
+<code>X</code>の値は<code><span class="r">$C1/E6E6</span></code>で<code>[$00:03E4]</code>に書き込まれている。<br>
+まとめてみると、</p>
+
+<table>
+<thead>
+	<tr><th>X座標</th><th>Y座標</th><th><code>[$00:03E4]</code></th><th>戦闘コマンド位置</th></tr>
+</thead>
+<tbody>
+	<tr><td>0～3</td><td>0～3</td><td><span class="formula">$C45E</span></td><td>右下</td></tr>
+	<tr><td>0～3</td><td>4～6</td><td><span class="formula">$C11E</span></td><td>右上</td></tr>
+	<tr><td>4～6</td><td>0～3</td><td><span class="formula">$C442</span></td><td>左下</td></tr>
+	<tr><td>4～6</td><td>4～6</td><td><span class="formula">$C102</span></td><td>左上</td></tr>
+</tbody>
+</table>
+
+<p>となる。<br>
+これは戦闘コマンド表示位置用の分岐である。今回は戦闘コマンド位置判定は省略するが、上に記した通り、キャラのいる対角位置にウィンドウが表示されるようになっている。<br>
+最終編オルステッド主人公時やブリキ大王操作時など、大型のキャラ操作時は、該当キャラの座標（左上マス）が基準になる（このためX座標・Y座標ともに3の位置などだと、キャラとコマンドが被ることがある）。<br>
+また、上の値は戦闘コマンドの中で灰色文字にしなければならない時の位置判定にも使う。</p>
+
+<p>この後から少し飛んで、戦闘コマンドの灰色部分、つまり使用可能なコマンドの判定処理まで飛ばそう。</p>
+
+<div class="code-container"><pre>
+$C1/99A2 JSR $14DD  [$C1:14DD]   ;[$C1:14DD]へジャンプ
+
+$C1/14DD LDA $7EFEFA[$7E:FEFA]   ;Aに[$7E:FEFA]（ハルマゲドンフラグ）をロード
+$C1/14E1 BNE $08    [$14EB]      ;ゼロフラグが立っていないとき[$14EB]分岐
+;ゼロフラグON ハルマゲドンフラグが立っていない
+$C1/14E3 LDA $0043  [$00:0043]   ;Aに[$00:0043]をロード
+$C1/14E6 BEQ $03    [$14EB]      ;ゼロフラグが立っているとき[$14EB]分岐
+;ゼロフラグOFF（「逃げる」が選べない）
+$C1/14E8 JSR $14FD  [$C1:14FD]   ;[$C1:14FD]へジャンプ
+;ゼロフラグON（「逃げる」が選べる）
+$C1/14EB JSR $14C7  [$C1:14C7]   ;[$C1:14C7]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/14DD</span></code>～の<code>[$7E:FEFA]</code>は戦闘コマンド表示の判定時、ハルマゲドンコマンド表示の時だけ<span class="formula">$FF</span>が入っており、それ以外は<span class="formula">$00</span>が入っているアドレスである。<br>
+<code><span class="r">$C1/14E3</span></code>～の<code>[$00:0043]</code>は、最初に紹介した通り、詳細は省くが「逃げる」が選べる戦闘なら<span class="formula">$00</span>、選べない戦闘なら<span class="formula">$01</span>が戦闘開始直前に入る。<br>
+この「逃げる」は「テレポート」や「やめる」も含まれる。<br>
+以上から、「逃げる」が選べない時は<code>[$C1:14FD]</code>にジャンプ、ハルマゲドンコマンドと「逃げる」が選べる時は<code>[$C1:14C7]</code>にジャンプすることがわかる。<br>
+<code><span class="r">$C1/14FD</span></code>～が「逃げる」（「テレポート」や「やめる」含む）を選択不可にし灰色文字にする処理になるが、詳細は省く。</p>
+
+<p>一方、ハルマゲドンコマンドと「逃げる」が選べる時は<code><span class="r">$C1/14C7</span></code>に処理が続く。<br>
+（<code><span class="r">$C1/14FD</span></code>～にジャンプした後でも、この処理は通る）<br>
+この<code><span class="r">$C1/14C7</span></code>からの処理が実は「アイテムを使う」が選択可能かの判定である。</p>
+
+<div class="code-container"><pre>
+$C1/14C7 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]（シナリオID）をロード
+$C1/14CA CMP #$02                ;Aと$02（ＳＦ）を減算比較（ステータスレジスタ変更のみ）
+$C1/14CC BEQ $0E    [$14DC]      ;ゼロフラグが立っているとき[$14DC]分岐
+;ゼロフラグOFF
+$C1/14CE CMP #$05                ;Aと$05（現代）を減算比較（ステータスレジスタ変更のみ）
+$C1/14D0 BEQ $0A    [$14DC]      ;ゼロフラグが立っているとき[$14DC]分岐
+;ゼロフラグOFF
+$C1/14D2 LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/14D4 LDA $0001,x             ;Aに[$00:1C01 + 40x]（戦闘状態）をロード
+$C1/14D7 CMP #$40                ;Aと$40（$40:敵操作状態）を減算比較（ステータスレジスタ変更のみ）
+$C1/14D9 BEQ $01    [$14DC]      ;ゼロフラグが立っているとき[$14DC]分岐
+;ゼロフラグOFF
+$C1/14DB RTS                     ;サブルーチン戻り
+;ゼロフラグON ＳＦ編、現代編、最終編オルステッド主人公、ブリキ大王
+$C1/14DC RTS                     ;サブルーチン戻り
+
+$C1/14EE BEQ $01    [$14F1]      ;ゼロフラグが立っているとき[$14F1]分岐
+;ゼロフラグOFF
+$C1/14F0 RTS                     ;サブルーチン戻り
+;ゼロフラグON ＳＦ編、現代編、最終編オルステッド主人公、ブリキ大王
+$C1/14F1 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+...
+...
+</pre></div>
+
+<p>最終的に<code><span class="r">$C1/14EE</span></code>のゼロフラグ判定でゼロフラグが立っている場合は「アイテムを使う」が選択できず灰色表示になる分岐なのだが、それまでを辿ってみると、</p>
+
+<ul>
+	<li>シナリオIDが<span class="formula">$02</span>（ＳＦ編）または<span class="formula">$05</span>（現代編）である</li>
+	<li>味方キャラの戦闘状態が<span class="formula">$40</span>の敵操作状態である、つまり、最終編オルステッド主人公時かブリキ大王の操作中である</li>
+</ul>
+
+<p>この場合は「アイテムを使う」が選択できない。<br>
+アイテムの所持数で判定ということはなく、上の状況以外なら、アイテム所持数が<span class="formula">0</span>でも「アイテムを使う」を選んでアイテム欄を開くことができる。<br>
+とはいえ開いてもアイテムはひとつもないが。<br>
+（近未来編や中世編の最初の戦闘など、初期状態でアイテムがない、かつイベント戦闘から始まるシナリオなら必ず見られる）</p>
+
+<p>ブリキ大王操作時はアイテムを使えると戦闘バランスが崩れてしまうなどの問題も起こるので、上の処理でアイテムを選べないようにしているのだろう。</p>
+
+<p>以上でざっとだが戦闘コマンド関係の処理の紹介を終了とする。</p>
+
+
+<h3 id="a_command">ハルマゲドン用コマンドについて</h3>
+
+<p>最後に、「ハルマゲドン用コマンド」関係について。</p>
+
+<p><code><span class="r">$C1/4FDF</span></code>～<code><span class="r">$C1/4FFA</span></code>の処理から、</p>
+
+<p><span class="formula">trunc(操作キャラ最大HP/4) - 操作キャラ現在HP ≧ 0</span></p>
+
+<p>が、「ハルマゲドン用コマンド」の条件ということが判明した。<br>
+ただ、本作の敵は、仕様上HPが<span class="formula">$80</span>(<span class="formula">128</span>)以上だと(<span class="formula">味方キャラデータ00 &amp; $7F) * $10</span>で最大HPを計算するため、<span class="formula">trunc(操作キャラ最大HP/4)</span>は必ず割り切れる。<br>
+よって、最終編オルステッド主人公時は、</p>
+
+<p><span class="formula">操作キャラ最大HP/4 - 操作キャラ現在HP ≧ 0</span></p>
+
+<p>が「ハルマゲドン用コマンド」の条件になる、ということで問題ない。<br>
+つまり最大HPの1/4以下で「ハルマゲドン」コマンドに切り替えである。<br>
+また、処理からして、最大HPの1/4以下からHPが回復したら、「逃げる」に表示が戻ることもわかる。</p>
+
+<p>さらに、「ハルマゲドン用コマンド」条件の処理中に、<code>[$7E:FEFA]</code>に<span class="formula">$FF</span>を書き込むことで処理分岐を行うこともわかった。<br>
+ただし、</p>
+
+<p>最大HPの1/4以下からHPが回復したら、<code>[$7E:FEFA]</code>に<span class="formula">$00</span>を書き込んで初期状態に戻す</p>
+
+<p><span style="font-weight:bold;">という処理は存在していない。</span><br>
+<code><span class="r">$C1/4FDF</span></code>～<code><span class="r">$C1/4FFA</span></code>の処理で、最大HPの1/4以下からHPが回復し、「逃げる」に表示が戻った状態で、<code><span class="r">$C1/14DD</span></code>～の処理を通るとどうなるか。</p>
+
+<div class="code-container"><pre>
+$C1/14DD LDA $7EFEFA[$7E:FEFA]   ;Aに[$7E:FEFA]（ハルマゲドンフラグ）をロード
+$C1/14E1 BNE $08    [$14EB]      ;ゼロフラグが立っていないとき[$14EB]分岐
+;ゼロフラグON ハルマゲドンフラグが立っていない
+$C1/14E3 LDA $0043  [$00:0043]   ;Aに[$00:0043]をロード
+$C1/14E6 BEQ $03    [$14EB]      ;ゼロフラグが立っているとき[$14EB]分岐
+;ゼロフラグOFF（「逃げる」が選べない）
+$C1/14E8 JSR $14FD  [$C1:14FD]   ;[$C1:14FD]へジャンプ
+;ゼロフラグON（「逃げる」が選べる）
+$C1/14EB JSR $14C7  [$C1:14C7]   ;[$C1:14C7]へジャンプ
+</pre></div>
+
+<p><code>[$7E:FEFA]</code>だけでハルマゲドンフラグを判断しているため、<code><span class="r">$C1/14E1</span></code>の時点で「逃げる」可能と判定されてしまう。<br>
+よって、本来なら最終編オルステッド主人公時では選べないはずの「逃げる」が選べる状態になる。<br>
+だが、最終編オルステッド主人公時の戦闘コマンドでは、一番下のコマンドを選ぶと、文字列が「ハルマゲドン」だろうが「逃げる」だろうが、「ハルマゲドン」を実行するようサブルーチンが組まれている。<br>
+よって、一度「ハルマゲドン」コマンドが出てからHPを回復した場合、「逃げる」表示に戻るが、選ぶとハルマゲドン発動、というバグっぽい挙動が発生することになる。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program43.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<!-- <div id="pagenext"><a href="program45.html"><span class="button">&#9654;次</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
