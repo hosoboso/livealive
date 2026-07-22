@@ -7,25 +7,26 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="msapplication-TileImage" content="../img/social.png">
 <meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
-<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 文字データ">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livealive.client.jp/sfc/">
 <meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
 <meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="Summary">
-<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 文字データ">
 <meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
 <meta name="twitter:url" content="https://livealive.client.jp/sfc/">
 <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
 <link rel="icon alternate" href="../img/social.png" type="image/png">
-<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 副能力変動値</title>
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 文字データ</title>
 <link href="../../css/main.min.css?20260714" rel="stylesheet">
 <link href="../../css/sfc.css?20260301" rel="stylesheet">
 <link href="../../css/cssmenu.css?20240801" rel="stylesheet">
 <link href="../../css/GEsubset.css?20231001" rel="stylesheet">
 <link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
 <style>
 .code-container {
   border: 1px solid #ccc;
@@ -91,7 +92,7 @@ table {
 <nav class="droplinetabs">
 <ul>
 <li class="other"><a href="index.html">TOP</a></li>
-<li class="other"><button type="button">データ一覧</button>
+<li class="here"><button type="button">データ一覧</button>
 	<ul>
 		<li><a href="datamap.html">データマップ</a></li>
 		<li><a href="flag.html">フラグ</a></li>
@@ -151,7 +152,7 @@ table {
 		<li><a href="program33.html">オディオ戦</a></li>
 	</ul>
 </li>
-<li class="here"><button type="button">フィールド関係</button>
+<li class="other"><button type="button">フィールド関係</button>
 	<ul>
 		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
 		<li><a href="program7.html">マップ乱数について</a></li>
@@ -171,267 +172,235 @@ table {
 </div>
 
 <div class="maincontents">
-<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 副能力変動値</h1>
-<h2>副能力変動値</h2>
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 文字データ</h1>
+<h2>文字データ</h2>
 
 <div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
 まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
 
-<p>装備品の中には、複数の箇所に装備可能だが、装備位置を変えるとステータス変動値が変わるものがある。<br>
-例えば「ガツングローブ」は、右と左、どちらにも装備可能であるが、左だと防御<span class="formula">+5</span>, 力<span class="formula">+16</span>の効果なのに、右だと力<span class="formula">+8</span>になる。</p>
+<p>スーパーファミコンのゲームソフトのデータは16進数で記述されており（バイナリデータ）、日本語が直接記録されているのではない。<br>
+文字データも16進数で記述されており、一定の法則でアルファベットや日本語に変換できる。<br>
+16進数のデータから日本語などへ変換することをデコード、その逆をエンコードという。</p>
 
-<p><a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様のアイテムデータページによれば、アイテム（装備品）には「主装備位置」「性能」「主能力変動」「副能力変動」といった、ステータス変動に関わる設定がある。</p>
+<p>本作の文字は、セリフや戦闘中のテキストなどに使われている通常の文字の場合、1文字あたり、ひらがな・カタカナ・アルファベット・記号は1バイト、漢字は2バイトのデータを使っている。<br>
+（戦闘中に敵味方のダメージ量として表示される数字などは別扱い）</p>
 
-<blockquote>性能値は右の場合攻撃力・頭左体足の場合防御力・装飾は意味なし？<br>
-複数個所に装備可能な場合、主装備位置が自由となっている場合は、どこに装備しても同じ性能が得られます。<br>
-主装備位置が指定されている場合、主装備位置以外では副能力変動の値が使われます。また、性能値は0となります。回避属性も得られないようです。</blockquote>
-
-<p>「ガツングローブ」だと、主装備位置が「左」であり、左に装備した時だけ、「性能」の値の<span class="formula">+5</span>が防御の値に加わり、「主能力変動」の力<span class="formula">+16</span>も得られる。<br>
-だが、「右」は装備可能ではあるが主装備位置ではないため、「性能」の値は反映されず、「副能力変動」の力<span class="formula">+8</span>だけが得られるようになっている。<br>
-「副能力変動」の値は「主能力変動」の1/2（小数点以下切り捨て）であることが多いのだが、例外もある。</p>
-
-<p>例えば「グラブ」は、主装備位置が「右」で、左装備も可能。<br>
-右に装備すると、「性能」の値の<span class="formula">+4</span>が武器の攻撃力になる。「主能力変動」の値は設定されていない。<br>
-なのだが、左に装備すると、「副能力変動」の速<span class="formula">-5</span>が働くのである。<br>
-「主能力変動」には何も設定されていないのに、「副能力変動」の値があったり、「副能力変動」が「主能力変動」の1/2（小数点以下切り捨て）でない場合などもある。<br>
-これらの「副能力変動」の数値は、どこで決まっているのだろうか？</p>
-
-<p>まず、アイテムデータを確認してみよう。<br>
-アイテムデータは、1アイテムにつき00～15の16バイト分のデータが格納されている。</p>
-
-<table>
-<thead>
-	<tr><th>No.</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td>00</td><td>上4ビット：1～7は主装備位置、8以上なら罠アイテム/下4ビット：装備品なら装備種類、装備品以外ならアイテム種別</td></tr>
-	<tr><td>01</td><td>上6ビット：装備部位/下1ビット：材料アイテム</td></tr>
-	<tr><td>02</td><td>無効状態異常（8ビット）</td></tr>
-	<tr><td>03</td><td>上4ビット：装備タイプ/下4ビット：フィールド吸収</td></tr>
-	<tr><td>04</td><td>回避属性1（8ビット）</td></tr>
-	<tr><td>05</td><td>回避属性2（8ビット）</td></tr>
-	<tr><td>06</td><td>力　主能力変動値（符号付き8ビット整数値、一番上のビットが正負、下7ビットが数値になる。以下09まで同じ）</td></tr>
-	<tr><td>07</td><td>速　主能力変動値</td></tr>
-	<tr><td>08</td><td>体　主能力変動値</td></tr>
-	<tr><td>09</td><td>知　主能力変動値</td></tr>
-	<tr><td>10</td><td>使用時に技が発動する場合、味方技IDの値</td></tr>
-	<tr><td>11</td><td>副能力変動値計算用の値</td></tr>
-	<tr><td>12</td><td>メカがアクセサリ装備で技追加（<span class="formula">$08～$0F</span>）</td></tr>
-	<tr><td>13</td><td>上4ビット：戦闘開始時行動異常を起こす敵種族/下4ビット：戦闘開始時行動異常</td></tr>
-	<tr><td>14</td><td>下6ビット：攻撃または防御の値</td></tr>
-	<tr><td>15</td><td>状態異常追加効果（8ビット）</td></tr>
-</tbody>
-</table>
-
-<p>「主能力変動」の値は、アイテムデータ06～09に入っている。<br>
-「性能」の値は、アイテムデータ14の下6ビットに入っている。<br>
-だが、「副能力変動」の値はない。<br>
-その代わりに、アイテムデータ11に、副能力変動値計算用の値が入っている。<br>
-この値を使って「副能力変動」が計算されている。<br>
-アイテムデータ11に格納されているのは、上2ビットが「変動する能力値」、下6ビットが「マイナスする値」なのだが、16進数の正負の表現方法と、10進数の正負の表現方法がまったく異なっているため、単純に足し引きしただけでは変動値が算出されず、少し面倒に見える計算を行っている。</p>
-
-<p>サブルーチンの説明は<a href="program19_2.html">次ページ</a>にして、計算方法を先に記す。<br>
-「副能力変動」の計算方法は、以下のようになっている。<br>
-主能力変動値を符号付き8ビット整数値（2進数にして一番上の値が1なら負の値であり、下7ビット分が整数値）として計算することに注意。</p>
-
-<div style="border: 1px solid gray; padding: .1em;"><p>まず、「副能力用計算値」を以下のように計算する。</p>
+<p>1～2バイトの文字コードから、「文字の画像ファイル」を呼び出して、ゲーム画面に表示、という手順で、本作のセリフや戦闘中の敵の名前・技名、メニュー画面のテキストが表示されている。</p>
 
 <ul>
-	<li>主能力変動値が正の値（<span class="formula">$00～$79</span>）の場合は、<br>
-	<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span></li>
-
-	<li>主能力変動値が負の値（<span class="formula">$80～$FF</span>）の場合は、頭に<span class="formula">$FF</span>をつけて符号付き16ビット整数値として扱い、<br>
-	<span class="formula">副能力用計算値 = trunc($FF(主能力変動値)/2) &amp; $00FF</span><br>
-	例：主能力変動値が<span class="formula">$F5</span>（10進数<span class="formula">-11</span>）なら、<span class="formula">trunc($FFF5/2) = $7FFA</span>、下1バイト<span class="formula">$FA</span>（10進数<span class="formula">-6</span>）が副能力変動値。</li>
+	<li><a href="#01">文字コード</a></li>
+	<li><a href="#02">キャラクターの名前</a></li>
+	<li><a href="#03">文字の画像ファイル</a></li>
 </ul>
 
-<p>次に、アイテムデータ11（副能力変動値計算用の値）に<span class="formula">$00</span>が入っているかどうかで分岐する。</p>
+<h3 id="01">文字コード</h3>
 
-<ul>
-	<li>アイテムデータ11（副能力変動値計算用の値）に<span class="formula">$00</span>が入っている場合、<br>
-	<span class="formula">副能力変動値 = 副能力用計算値</span></li>
+<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ76u1DG13aRJetBHMDE6Dp3AccNpdgh7a0jKPPZmiz58svvUkPGFyY2hxs-c4mnfjV-50anNFMnSdD/pubhtml" target="_blank">文字コード表（Google スプレッドシート）</a></p>
 
-	<li>アイテムデータ11に<span class="formula">$00</span>以外の値が入っている場合は、まずアイテムデータ11から必要な値を算出する。
+<p>本作における文字のデコード・エンコードの法則は上表の通り。<br>
+ひらがな・カタカナ・アルファベット・記号は256種、漢字は256×3＝768種。<br>
+容量節約のため、空白（スペース）複数個分に1バイトのデータを割り振っていたりもする。改行用コードなども記号に含まれる。</p>
 
-<ul>
-	<li>アイテムデータ11の上2ビット：<br>変動する能力値の値。以下に対応。</li>
+<p>1バイトの場合は上の文字コード表に対応した値をそのまま使うが、漢字は上位バイトに<span class="formula">$1D</span>・<span class="formula">$1E</span>・<span class="formula">$1F</span>、下位バイトに<span class="formula">$00</span>～<span class="formula">$FF</span>の数値を入れて、<span class="formula">$1D??</span>, <span class="formula">$1E??</span>, <span class="formula">$1F??</span>とする。</p>
+
+<p>一部記号の<span class="formula">$2C</span>～<span class="formula">$2F</span>, <span class="formula">$3F</span>、数字にあたる<span class="formula">$30</span>～<span class="formula">$39</span>、アルファベット大文字にあたる<span class="formula">$41</span>～<span class="formula">$5A</span>はASCII文字コード（<a href="https://ja.wikipedia.org/wiki/ASCII" target="_blank">ASCII - Wikipedia</a>、<a href="https://ja.wikipedia.org/wiki/JIS_X_0201" target="_blank">JIS X 0201 - Wikipedia</a>参照）からと思われる。</p>
+
+<p>例えば、16進数の文字データで以下のように記されていたとする。</p>
+
+<div class="mono">
+AD 88 67 1E D7 1D 2F
+</div>
+<p><span class="formula">$1D</span>, <span class="formula">$1E</span>, <span class="formula">$1F</span> は次の1バイトと続けて2バイトで漢字になるので、上の文字コード表から該当文字を当てはめると、</p>
 
 <table>
-<thead>
-	<tr><th>上2ビット</th><th>能力値</th></tr>
-</thead>
 <tbody>
-	<tr><td>00</td><td>力</td></tr>
-	<tr><td>01</td><td>速</td></tr>
-	<tr><td>10</td><td>体</td></tr>
-	<tr><td>11</td><td>知</td></tr>
+	<tr class="formula"><td>AD</td><td>88</td><td>67</td><td>1ED7</td><td>1D2F</td></tr>
+	<tr><td>ブ</td><td>リ</td><td>キ</td><td>大</td><td>王</td></tr>
 </tbody>
 </table>
 
-	<li>アイテムデータ11の下6ビット：<br>変動値を以下のように計算する。<br>副能力用計算値は上で算出した値。<br>
-	<span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
-	計算結果が<span class="formula">$100</span>以上の時は下1バイト分が変動値になる（※符号付き8ビット整数）。</li>
+<p>となる。</p>
+
+<p>雑に作ったがJavaScriptでデコード・エンコードできるようにした（エンコードはあまりあてにできない）。不具合がある可能性大。</p>
+
+<ul>
+	<li><a href="https://paiza.io/projects/InnZQCAVdMOGJnYEz4XRmg" target="_blank">text処理（デコード）| paiza.IO</a></li>
+	<li><a href="https://paiza.io/projects/wLhzbUlaxOpR_J6mlAOJ8A" target="_blank">text処理（エンコード）| paiza.IO</a></li>
 </ul>
-以上から副能力変動するステータス＆副能力変動値が算出される。
-</li>
-</ul></div>
 
-<p>とてもややこしそうだが、ステータス変動がマイナスの時に符号付き8ビット整数値を使っていることと、アイテムデータ11に<span class="formula">$00</span>以外が入っているかどうかの分岐があるため、ややこしく見えているようなものである。<br>
-アイテムデータ11の例外を考えない場合、基本的に、副能力変動値は主能力変動値の<span class="formula">1/2</span>（小数点以下切り捨て）である。<br>
-要するに、副能力変動値は主能力変動値の絶対値の半分しか変動しないようにする意図での計算である。<span class="formula">+10</span>なら半分の<span class="formula">+5</span>にしたい、<span class="formula">-10</span>なら半分の<span class="formula">-5</span>にしたい、ということである。</p>
+<h3 id="02">キャラクターの名前</h3>
 
-<p>ただ、主能力変動値がマイナスの値の時の計算がややこしい。<br>
-例えば主能力変動値が10進数で<span class="formula">-10</span>の時、16進数（符号付き8ビット）だと<span class="formula">$F6</span>である。<br>
-<span class="formula">$F6</span>を単純に<span class="formula">1/2</span>すると、<span class="formula">$7B</span>である。<br>
-符号付き8ビット整数値とみなすと、10進数<span class="formula">+123</span>という扱いになってしまう。<br>
-符号付き8ビット整数は、上1ビットに正負、下7ビットに数値（絶対値）が入っているが、上1ビットはそのままで、下7ビット部分だけを<span class="formula">1/2</span>したい、という場合、単純に<span class="formula">÷2</span>だけでは上1ビットも巻き込んで計算してしまうため、うまくいかないのである。</p>
+<p>本作では各シナリオの主人公（功夫編は拳法の名前）をプレイヤーが決めることが可能であるが、決定した名前はシナリオ別キャラデータ<span class="formula">$34</span>～<span class="formula">$3F</span>の12バイトに記録される。<br>
+ひらがなやカタカナなら12文字まで格納できることになるが、実際には最大6文字である。<br>
+漢字だと2バイト使うため、漢字のみだと最大6文字になることに合わせていると思われる。<br>
+功夫編の拳法名は最大3文字だが、これはキャラ名が「○○○拳老師」「○○○拳師範」と、トータルで6文字に収まるよう調整しているためである。</p>
 
-<p>そこでどうするかというと、上の計算方法のように、<span class="formula">$F6</span>の上に<span class="formula">FF</span>をつけて、符号付き16ビット整数の<span class="formula">$FFF6</span>としてから<span class="formula">1/2</span>する。<br>
-（プログラム上の処理は後で紹介するが、<span class="formula">$FF00</span>との論理和を取っている）<br>
-こうすると、<span class="formula">trunc($FFF6/2) = $7FFB</span>、下の2桁のみ取り出し符号付き8ビット整数値<span class="formula">$FB</span>とすれば、10進数<span class="formula">-5</span>になる。<br>
-ということで、符号付き8ビット整数値だからややこしくなっているが、絶対値を半分にすることができている。</p>
-
-<p>ただし、余りが出る時の切り捨てには注意。<br>
-主能力変動値が<span class="formula">$F5</span>（10進数<span class="formula">-11</span>）の時は、<br>
-<span class="formula">trunc($FFF5/2) = $7FFA</span><br>
-なので、<span class="formula">$FA</span>（10進数<span class="formula">-6</span>）が副能力変動値になる。<br>
-10進数の計算<span class="formula">trunc(-11/2) = -5</span>とは異なる値が返ってくるので、計算自体はあくまでも符号付き8ビット整数値で行う必要がある。</p>
-
-<p>アイテムデータ11に<span class="formula">$00</span>が入っている場合は、以上で計算終了で、副能力変動値が算出できた。<br>
-アイテムデータ11に<span class="formula">$00</span>以外の値が入っている場合は、副能力変動値は主能力変動値の半減だけではなく、別に計算をしなければならない、という意味になる。<br>
-アイテムデータ11の上2ビットと下6ビットに分けて、上2ビットから変動する能力値がどれなのかを判断する。<br>
-下6ビットの値だが、上の計算式はややこしく見えるものの、実際には、「<span class="formula">副能力変動値 = 主能力変動値/2 - 下6ビットの値</span>」である。ただしこちらも、符号付き8ビット整数値なのでややこしい計算式になっているだけである。</p>
-
-<p>実際の例を示す。</p>
-
-<p>「野性バッグ」は右と左に装備可能で、主装備位置は右である。<br>
-主能力変動値は力<span class="formula">$14</span>(10進数<span class="formula">20</span>)、知<span class="formula">$08</span>(10進数<span class="formula">8</span>)。他の値は<span class="formula">0</span>である。<br>
-アイテムデータ11は<span class="formula">$14</span>である。<br>
-このため、左に装備した場合は、副能力変動値でステータスが変動することになる。<br>
-左装備時の変動値を計算してみよう。</p>
-
-<p>まず、アイテムデータ11（<span class="formula">$14</span>）の上2ビットと下6ビットを取り出してみる。</p>
-
-<p><span class="formula">$14 = %0001 0100</span><br>
-アイテムデータ11の上2ビット：<span class="formula">$00</span><br>
-アイテムデータ11の下6ビット：<span class="formula">%0001 0100 = $14</span></p>
-
-<p>上2ビットの値は変動する能力値を示しており、<span class="formula">$00</span>だと「力」である。</p>
-
+<p>例：<br>
+「オルステッド」だと、<code>$7E:0D34</code>～<code>$7E:0D3F</code>の12バイトに入っているデータは、</p>
 <table>
 <thead>
-	<tr><th>上2ビット</th><th>能力値</th></tr>
+	<tr><th>数値</th><td class="formula">$65</td><td class="formula">$89</td><td class="formula">$6D</td><td class="formula">$73</td><td class="formula">$91</td><td class="formula">$A5</td><td class="formula">$00</td><td class="formula">$00</td><td class="formula">$00</td><td class="formula">$00</td><td class="formula">$00</td><td class="formula">$00</td></tr>
 </thead>
 <tbody>
-	<tr><td>00</td><td>力</td></tr>
-	<tr><td>01</td><td>速</td></tr>
-	<tr><td>10</td><td>体</td></tr>
-	<tr><td>11</td><td>知</td></tr>
+	<tr><th>対応文字</th><td>オ</td><td>ル</td><td>ス</td><td>テ</td><td>ッ</td><td>ド</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
 </tbody>
 </table>
 
-<p>「力」だけ、アイテムデータ11の下6ビットの値も使って変動値を計算しなければならない。<br>
-逆にいえば、他の「速」「体」「知」の計算は、アイテムデータ11の値に影響されず、単純に主能力変動値を<span class="formula">1/2</span>すれば良いということである。<br>
-アイテムデータ11が影響するのは、1種類のアイテムにつき1つのステータスのみということがわかる。</p>
+<p>「高原　日勝」だと、<code>$7E:0E74</code>～<code>$7E:E73F</code>の12バイトに入っているデータは、</p>
+<table>
+<thead>
+	<tr><th>数値</th><td class="formula">$1D</td><td class="formula">$E1</td><td class="formula">$1D</td><td class="formula">$BC</td><td class="formula">$20</td><td class="formula">$1F</td><td class="formula">$3A</td><td class="formula">$1E</td><td class="formula">$55</td><td class="formula">$00</td><td class="formula">$00</td><td class="formula">$00</td></tr>
+</thead>
+<tbody>
+	<tr><th>対応文字</th><td colspan="2">高</td><td colspan="2">原</td><td>(空白)</td><td colspan="2">日</td><td colspan="2">勝</td><td>-</td><td>-</td><td>-</td></tr>
+</tbody>
+</table>
 
-<p>次に、<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span>を計算する。<br>
-「野性バッグ」の主能力変動値の中に負の値はないので、この計算式で計算して構わない。<br>
-「速」「体」「知」は、この計算結果がそのまま、副能力変動値になる。</p>
+<h3 id="03">文字の画像ファイル</h3>
 
-<p>速：<br>
-<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
-<span class="formula"> = trunc($00/2)</span><br>
-<span class="formula"> = $00</span></p>
+<p>本作では1文字に<span class="formula">$16</span>バイト（<span class="formula">24</span>バイト）分の画像データを使用している。<br>
+16×16ピクセルの正方形の中で12×12ピクセル分が文字である。<br>
+1バイト、つまり8ビットの1ビットずつが文字画像の1ピクセルに対応していて、<span class="formula">1</span>なら文字部分、<span class="formula">0</span>なら透過部分である。<br>
+2バイト、つまり16ビットを横に並べ、次からは2行目として、12行目まで並べることができる。<br>
+横16ビット×縦12ビットのビットマップ画像となるが、実際には右横の4ビット×12ビット部分は透過扱いの<span class="formula">0</span>しか並んでいない。</p>
 
-<p>体：<br>
-<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
-<span class="formula"> = trunc($00/2)</span><br>
-<span class="formula"> = $00</span></p>
+<p>文字コードから文字の画像ファイルを呼び出すには、まず、該当の文字の画像ファイルがあるアドレスを計算する必要がある。<br>
+文字コード表では、漢字なら<span class="formula">$1D</span>, <span class="formula">$1E</span>, <span class="formula">$1F</span>を頭につけて2バイトのデータにしたが、アドレス計算の場合、</p>
 
-<p>知：<br>
-<span class="formula">副能力用計算値 = trunc(主能力変動値/2)</span><br>
-<span class="formula"> = trunc($08/2)</span><br>
-<span class="formula"> = $04</span></p>
+<ul>
+	<li>ひらがな・カタカナ・アルファベット・記号：<span class="formula">$00</span></li>
+	<li>漢字<span class="formula">$1D</span>列：<span class="formula">$01</span></li>
+	<li>漢字<span class="formula">$1E</span>列：<span class="formula">$02</span></li>
+	<li>漢字<span class="formula">$1F</span>列：<span class="formula">$03</span></li>
+</ul>
 
-<p>「速」「体」は元の変動値がゼロなのでそのまま<span class="formula">0</span>が副能力変動値だが、「知」は元の変動値が<span class="formula">$08</span>なので、半分の<span class="formula">$04</span>が副能力変動値ということになる。<br>
-では、「力」について計算してみる。</p>
+<p>と、頭に数字をつけて2バイトにする。<br>
+つまり、<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ76u1DG13aRJetBHMDE6Dp3AccNpdgh7a0jKPPZmiz58svvUkPGFyY2hxs-c4mnfjV-50anNFMnSdD/pubhtml" target="_blank">文字コード表（Google スプレッドシート）</a>でいえば、一番左の列は上1バイトが<span class="formula">00</span>、そこから右の列は順に<span class="formula">01</span>、<span class="formula">02</span>、<span class="formula">03</span>と値が入る、ということで、2バイトだと<span class="formula">$0000</span>～<span class="formula">$03FF</span>と連番になったと見なしても良い。</p>
 
-<p>力：<br>
-<span class="formula">副能力用計算値 = trunc($14/2)</span><br>
-<span class="formula"> = $0A</span></p>
+<p>該当の文字の画像ファイルの最初のアドレスは、</p>
 
-<p><span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
-<span class="formula"> = ($0A + ($14 XOR $FF + $01)) &amp; $FF</span><br>
-<span class="formula"> = ($0A + $EC) &amp; $FF</span><br>
-<span class="formula"> = $F6</span></p>
+<p><span class="formula">$D49200 + ($0000～$03FF) * $18</span></p>
 
-<p>「野性バッグ」の「力」の副能力変動値は「<span class="formula">$F6</span>」と計算された。<br>
-<span class="formula">$100-$F6 = $0A</span>、10進数<span class="formula">10</span>なので、「野性バッグ」の「力」の副能力変動値は10進数で<span class="formula">-10</span>となる。</p>
+<p>で計算できる。<br>
+例えば戦闘におけるコマンドの一番上、「戦う」という2文字であれば、「戦」「う」と別々に見ると、文字コードから、</p>
 
-<p>これで計算は終わりなのだが、以上を10進数でもう一度見てみよう。<br>
-アイテムデータ11の下6ビットは、<span class="formula">%0001 0100 = $14</span>だったから、10進数だと「<span class="formula">20</span>」である。<br>
-そして、副能力用計算値を10進数で計算すると、</p>
+<p>「戦」<span class="formula">$02A4</span><br>
+<span class="formula">$D49200 + $02A4 * $18 = $D4 D160</span></p>
 
-<p><span class="formula">副能力用計算値 = trunc(20/2)</span><br>
-<span class="formula"> = 10</span></p>
+<p>「う」<span class="formula">$00B3</span><br>
+<span class="formula">$D49200 + $00B3 * $18 = $D4 A2C8</span></p>
 
-<p>この値から、アイテムデータ11の下6ビットを10進数で引き算すれば、それが「野性バッグ」の「力」の副能力変動値なのである。<br>
-つまり、</p>
+<p>「戦」は<code>$D4:D160</code>～<code>$D4:D177</code>の<span class="formula">$16</span>バイト、「う」は<code>$D4:A2C8</code>～<code>$D4:A2DF</code>の<span class="formula">$16</span>バイトが画像データである。</p>
 
-<p><span class="formula">10 - 20 = -10</span></p>
+<p>「戦」<code>$D4:D160</code>～<code>$D4:D177</code></p>
+<div class="mono">
+A4 A0 A8 90 00 80 F8 F0<br>
+AB 80 F8 90 A8 90 F8 A0<br>
+20 40 F8 D0 21 50 22 20
+</div>
 
-<p>これで計算終了である。<br>
-先に記した通り、主能力変動値が負の値の時は、<span class="formula">trunc</span>での小数点以下切り捨ての方法が16進数と10進数で変わるので気をつけなければならないが、それを除けば、10進数で見た方がわかりやすい。</p>
+<p>「う」<code>$D4:A2C8</code>～<code>$D4:A2DF</code></p>
+<div class="mono">
+08 00 07 00 00 00 0F 00<br>
+30 80 00 40 00 40 00 40<br>
+00 80 03 00 0C 00 00 00
+</div>
 
-<p>もうひとつの例として、主能力変動値が負の値の「ワタナベのパンツ」の計算方法を見てみよう。<br>
-「ワタナベのパンツ」は、頭と体に装備可能で、主装備位置は体である。<br>
-主能力変動値は知<span class="formula">$E7</span>。他の値は<span class="formula">0</span>である。<br>
-<span class="formula">$E7</span>は符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-25</span>」である。<br>
-アイテムデータ11は<span class="formula">$E0</span>である。<br>
-このため、頭に装備した場合は、副能力変動値でステータスが変動することになる。</p>
+<p>1文字ずつ、2進数8ビットに変換し、2バイトずつ12行並べると以下のようになる。<br>
+一番右の4ビット分は必ず<span class="formula">0000</span>である。</p>
 
-<p>まず、アイテムデータ11（<span class="formula">$E0</span>）の上2ビットと下6ビットを取り出してみる。</p>
+<p>「戦」</p>
+<div class="mono">
+1010 0100 1010 0000<br>
+1010 1000 1001 0000<br>
+0000 0000 1000 0000<br>
+1111 1000 1111 0000<br>
+1010 1011 1000 0000<br>
+1111 1000 1001 0000<br>
+1010 1000 1001 0000<br>
+1111 1000 1010 0000<br>
+0010 0000 0100 0000<br>
+1111 1000 1101 0000<br>
+0010 0001 0101 0000<br>
+0010 0010 0010 0000
+</div>
 
-<p><span class="formula">$E0 = %1110 0000</span><br>
-アイテムデータ11の上2ビット：<span class="formula">$11</span><br>
-アイテムデータ11の下6ビット：<span class="formula">%0010 0000 = $20</span></p>
+<p>「う」</p>
+<div class="mono">
+0000 1000 0000 0000<br>
+0000 0111 0000 0000<br>
+0000 0000 0000 0000<br>
+0000 1111 0000 0000<br>
+0011 0000 1000 0000<br>
+0000 0000 0100 0000<br>
+0000 0000 0100 0000<br>
+0000 0000 0100 0000<br>
+0000 0000 1000 0000<br>
+0000 0011 0000 0000<br>
+0000 1100 0000 0000<br>
+0000 0000 0000 0000
+</div>
 
-<p>上2ビットから、変動する能力値は「知」である。<br>
-下6ビットは<span class="formula">$20</span>、10進数だと「<span class="formula">32</span>」である。</p>
+<p>これだけではわかりにくいから、<span class="formula">1</span>を■、<span class="formula">0</span>を□にしてみよう。</p>
 
-<p>以下、「知」の副能力変動値だけ計算する。</p>
+<div class="mono">
+■□■□□■□□■□■□□□□□<br>
+■□■□■□□□■□□■□□□□<br>
+□□□□□□□□■□□□□□□□<br>
+■■■■■□□□■■■■□□□□<br>
+■□■□■□■■■□□□□□□□<br>
+■■■■■□□□■□□■□□□□<br>
+■□■□■□□□■□□■□□□□<br>
+■■■■■□□□■□■□□□□□<br>
+□□■□□□□□□■□□□□□□<br>
+■■■■■□□□■■□■□□□□<br>
+□□■□□□□■□■□■□□□□<br>
+□□■□□□■□□□■□□□□□<br>
+<br>
+□□□□■□□□□□□□□□□□<br>
+□□□□□■■■□□□□□□□□<br>
+□□□□□□□□□□□□□□□□<br>
+□□□□■■■■□□□□□□□□<br>
+□□■■□□□□■□□□□□□□<br>
+□□□□□□□□□■□□□□□□<br>
+□□□□□□□□□■□□□□□□<br>
+□□□□□□□□□■□□□□□□<br>
+□□□□□□□□■□□□□□□□<br>
+□□□□□□■■□□□□□□□□<br>
+□□□□■■□□□□□□□□□□<br>
+□□□□□□□□□□□□□□□□
+</div>
 
-<p><span class="formula">副能力用計算値 = trunc($FFE7/2) &amp; $00FF</span><br>
-<span class="formula"> = $F3</span></p>
+<p>これでもちょっとわかりにくいと思うので、16×16のマスを作り、<span class="formula">1</span>の部分だけを黒で塗りつぶしてみた画像も作ってみた。<br>
+（あまりお行儀が良くはないがエクセル方眼紙的なものが楽）</p>
 
-<p><span class="formula">主能力変動値/2</span>の計算になるが、答えは<span class="formula">$F3</span>、符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-13</span>」である。<br>
-主能力変動値<span class="formula">$E7</span>は10進数の「<span class="formula">-25</span>」だが、<span class="formula">trunc(-25/2)</span>を計算すると、「<span class="formula">-12</span>」になってしまう。<br>
-このズレが生じてしまうため、符号付き8ビット整数値で計算を行っていかなければならない。</p>
 
-<p><span class="formula">副能力変動値 = (副能力用計算値 + (アイテムデータ11の下6ビットと$FFの排他的論理和 + 1)) &amp; $FF</span><br>
-<span class="formula"> = ($F3 + ($20 XOR $FF + $01)) &amp; $FF</span><br>
-<span class="formula"> = ($F3 + ($DF + $01)) &amp; $FF</span><br>
-<span class="formula"> = ($F3 + $E0) &amp; $FF</span><br>
-<span class="formula"> = $1D3 &amp; $FF</span><br>
-<span class="formula"> = $D3</span></p>
+<div class="modal-set">
+	<div class="imgbox"><a href="img/tatakau.png" class="modal-link">
+		<img src="img/tatakau.png" alt="戦う" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
 
-<p><span class="formula">$D3</span>を符号付き8ビット整数値として見ると負の値で、10進数の「<span class="formula">-45</span>」である。<br>
-よって、「ワタナベのパンツ」の「知」の副能力変動値は<span class="formula">-45</span>である。<br>
-下6ビットは10進数「<span class="formula">32</span>」だったので、主能力変動値/2の「<span class="formula">-13</span>」から<span class="formula">32</span>を引いた、</p>
 
-<p><span class="formula">-13-32 = -45</span></p>
+<p>というように、文字の画像データは、2進数の<span class="formula">1</span>が不透明部分、<span class="formula">0</span>が透明部分（透過）で作られている。<br>
+2進数でバイナリデータを記録するという意味ではWindows bitmap (*.bmp) ファイルと構造は同じなので、実際に16×16ピクセルのビットマップを作って、16進数の数値を入れると同じ画像を作ることができる。<br>
+（ビットマップの場合は一番下のラインから順に、2バイトの場合残り2バイトに<span class="formula">00</span>をつけて4バイトでデータを記述する）</p>
 
-<p>こちらの方が計算としては手っ取り早い。</p>
+<div class="modal-set">
+	<div class="imgbox"><a href="img/binari.png" class="modal-link">
+		<img src="img/binari.png" alt="ビットマップバイナリ" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
 
-<p>以上のようにして、副能力変動値が計算されている。<br>
-アイテムデータ11に格納されている値自体は、上2ビットが「変動する能力値」、下6ビットが「マイナスする値」とシンプルなのだが、16進数のため計算方法がくどくなっているように見えてしまう。</p>
+<p>※バイナリエディタはTSXBINを使用させていただきました。<br>
+<a href="https://www.vector.co.jp/soft/winnt/util/se513258.html" target="_blank">バイナリエディタ TSXBIN 64版の詳細情報 : Vector</a></p>
 
-<p>では、このなかなか面倒な計算が、プログラムでは実際にどういう風に処理されているのか、<a href="program19_2.html">次ページ</a>で解説する。</p>
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
 
 <div class="pagelink">
-	<div id="pageprev"><a href="program18_3.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-	<div id="pagenext"><a href="program19_2.html"><span class="button">&#9654;次　副能力変動値処理</span></a></div>
 </div>
 
 </div>
@@ -441,6 +410,9 @@ table {
 <div class="innertube">
 
 <!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
 
 <div class="accordion">
 
