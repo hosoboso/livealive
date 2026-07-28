@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スプライトについて">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スプライトについて">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スプライトについて</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="here"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; スプライトについて</h1>
+<h2>スプライトについて</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>スーパーファミコンにおけるグラフィックは、背景（BG）とキャラのドット絵（スプライト）に分かれる。<br>
+背景はそのまま、マップの画像であり、透過部分も設定可能。セリフ表示のウィンドウなどは一番上に表示させるなど、最大4枚まで重ねることができる。<br>
+その背景の上に載せて動かすことができる小さめサイズの画像がスプライトである。<br>
+RPGであればキャラクターのドット絵に使われることでおなじみである。</p>
+
+<p>ここでは、キャラのドット絵（スプライト）の仕様を大まかに説明する。<br>
+筆者は専門家でも何でもないので、説明に間違いが含まれているかもしれないし、用語の使い方もおかしいかもしれないが、ご了承いただきたい。<br>
+ネットを探しても、ある程度噛み砕いた説明はほとんど英語で、日本語での説明はあまりなく（あるかもしれないが筆者は見つけられなかった）、ここでは「ライブ・ア・ライブ」を元にして、スーパーファミコンの仕様を説明してみる。</p>
+
+<p>スーパーファミコンの仕様では、背景を最大4枚、スプライトを最大128体設置できるとのことである。<br>
+これら画像データは、</p>
+
+<ol>
+	<li>ゲームのカセット</li>
+	<li>スーパーファミコン本体のメモリ</li>
+	<li>グラフィックデータ用のメモリ<br>VRAM, CGRAM, OAM</li>
+	<li>画像処理用チップ<br>PPU（Picture Processing Unit）</li>
+	<li>テレビ画面</li>
+</ol>
+
+<p>というような順序で処理をしている、らしい。</p>
+
+<p>グラフィックデータ用のメモリが3種類もあるが、</p>
+
+<ul>
+	<li>VRAM: Video RAM<br>グラフィックデータ（画像の構造）を記録するメモリ。<br><span class="formula">$10000(65,536)</span>バイト<span class="formula"> = 64</span>キロバイト。</li>
+	<li>CGRAM: Color Generator RAM<br>スプライトや背景の色情報（カラーパレット）を記録するメモリ。カラーパレット16色（32バイト）を1単位として16テーブルを格納できる。<br><span class="formula">$200(512)</span>バイト。</li>
+	<li>OAM: Object Attribute Memory<br>スプライトの配置を記録するメモリ。<br><span class="formula">$220(544)</span>バイト。</li>
+</ul>
+
+<p>となっている。この先で説明していく。</p>
+
+<ul>
+	<li><a href="#01">スプライトのデータの基本</a></li>
+	<li><a href="#02">色のデータとCGRAM</a></li>
+	<li><a href="#03">OAMについて</a></li>
+	<li><a href="#04">サブルーチン</a></li>
+</ul>
+
+<h3 id="01">スプライトのデータの基本</h3>
+
+<p>ライブ・ア・ライブの話に戻すと、ライブ・ア・ライブにおいては、フィールド（マップ）上では、キャラクターのスプライトのサイズは16×16ピクセルである。<br>
+戦闘では32×32ピクセルであり、別々のグラフィックが用意されていることは見るだけでもわかる。<br>
+どちらのサイズにしても、データは8×8ピクセルを1つの単位として、16×16ピクセルのキャラなら8×8ピクセルを4個、32×32ピクセルのキャラなら8×8ピクセルを16個並べてドット絵キャラが作られている。</p>
+
+<p>例を見た方がわかりやすいので、ここでは、フィールドにおけるサンダウンの正面向きのスプライトがどういう構造かを説明していく。<br>
+16×16ピクセルのドット絵は以下のようなデータで作られている。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/sundown01.png" class="modal-link">
+		<img src="img/sundown01.png" alt="サンダウン正面向き" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>いわゆるエクセル方眼紙形式だが、1マス分が1×1ピクセルに対応していると見ていただきたい。<br>
+8×8ピクセル単位で赤線で区切っているが、これが8×8ピクセルを4個つかって描いた16×16ピクセルのキャラである。<br>
+画像は8×8ピクセルを1単位として読み込み・書き出しをするため、8×8ピクセルサイズの画像をタイル1個、というような数え方をするようである。</p>
+
+<p>各マスに番号が書かれているが、これが色情報に対応した値である。<br>
+0に指定されているのは白色ではなく、透過部分であり、背景の上にキャラを設置すると、<span class="formula">0</span>の部分は透過して背景が表示される。1以上が色に対応。</p>
+
+<p>スーパーファミコンのスプライトの色だが、色自体は32,768色から選択できる。<br>
+（後で説明するが、色はBGR555フォーマットという形式を使っている）<br>
+ただし、1つのスプライトの中では、予め決めておいた16色、つまり1バイト（<span class="formula">$0～$F</span>）分から各ピクセルの色を決めて割り振る。<br>
+「予め決めておいた16色」のことをカラーパレットといい、サンダウンでいえば、カラーパレットの<span class="formula">$0</span>に透過色、<span class="formula">$1</span>に黒……というように色と値を割り振ってある。<br>
+上画像を見るとわかるが、サンダウンの正面向きのスプライトだと、実際に使っている色は透過部分込みでも10色である。<br>
+16×16ピクセルの各ピクセルに4ビット（<span class="formula">$0～$F</span>）の値を割り振るのだから、2ピクセルを1バイトとして、キャラのドット部分と色を記録すればいいのでは？<br>
+つまり左上から順に、<span class="formula">00 00 01 11, </span>次の行は<span class="formula">00 00 18 77, 00 11 18 88……</span>としたら赤い8×8ピクセル領域は32バイトのデータになるのではないか。</p>
+
+<p>……と思いきや、実はスプライトのデータの記録方法はそうではない。<br>
+人間の感覚とは少々ずれているというか、ややこしい。</p>
+
+<p>8×8ピクセルを1つの単位として、スプライトのデータが記録されている、と述べたが、その8×8ピクセル分のデータが以下の通り。<br>
+以下がサンダウンの左上部分8×8ピクセル領域のデータになる。</p>
+
+<div class="mono">
+07 00 0B 03 38 00 73 30 2F 0F 1F 00 27 00 3D 09<br>
+00 00 03 04 00 07 30 0F 0F 10 00 00 00 18 0A 00
+</div>
+
+<p>32バイト分のデータになるが、サンダウンの画像と比較して、どこの数値とも一致していないことがわかる。<br>
+では、どうやって上の図のような数値になるのか？</p>
+
+<p>先に、16×16ピクセルの各ピクセルに4ビット（<span class="formula">$0～$F</span>）の値を割り振る、と記した。<br>
+1ピクセルにつき、4ビットのデータが必要になるので、ドット絵を4枚に分けて、1枚ずつに1～4ビット目の値を記して重ねてデータにしよう。<br>
+というのが、スーパーファミコンにおけるスプライトのデータ記述方法なのである。</p>
+
+<p>実例を出した方がわかりやすいので、サンダウンのスプライトで説明する。</p>
+
+<p>サンダウンの左上8×8ピクセル部分を取り出し、さらに横1列ずつ（4バイト分）に分けてみよう。<br>
+1ピクセルにつき4ビットのデータがあるから、例えば一番上の列「<span class="formula">00000111</span>」は、</p>
+
+<table>
+<tbody>
+	<tr class="formula"><th>数値</th><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+	<tr class="formula"><th>2進数4ビット</th><td>0000</td><td>0000</td><td>0000</td><td>0000</td><td>0000</td><td>0001</td><td>0001</td><td>0001</td></tr>
+</tbody>
+</table>
+
+<p>2進数4ビットの各桁を、上から順にbit3, bit2, bit1, bit0とすると、各桁だけ集めて、</p>
+
+<table>
+<thead>
+	<tr><th>bit</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>bit3</td><td><span class="formula">%0000 0000</span> = <span class="formula">$00</span></td></tr>
+	<tr><td>bit2</td><td><span class="formula">%0000 0000</span> = <span class="formula">$00</span></td></tr>
+	<tr><td>bit1</td><td><span class="formula">%0000 0000</span> = <span class="formula">$00</span></td></tr>
+	<tr><td>bit0</td><td><span class="formula">%0000 0111</span> = <span class="formula">$07</span></td></tr>
+</tbody>
+</table>
+
+<p>これを、</p>
+
+<div class="mono">
+bit0 bit1<br>
+bit2 bit3
+</div>
+
+<p>と並べると</p>
+
+<div class="mono">
+07 00<br>
+00 00
+</div>
+
+<p>となるが、これが、サンダウンの左上部分8×8ピクセル領域のデータの</p>
+
+<div class="mono">
+07 00 0B 03 38 00 73 30 2F 0F 1F 00 27 00 3D 09<br>
+00 00 03 04 00 07 30 0F 0F 10 00 00 00 18 0A 00
+</div>
+
+<p>左隅の2×2部分に合致している。<br>
+初めてだとまったくもってわかりにくいこの方法で、スプライトのデータを記述しているのである。</p>
+
+<p>2列目以降も同じ処理をするのだが、図解すると以下のような感じである。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/setumei01.png" class="modal-link">
+		<img src="img/setumei01.png" alt="スプライト図解" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>2列目は以下のように考える。</p>
+
+<table>
+<tbody>
+	<tr class="formula"><th>数値</th><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>8</td><td>7</td><td>7</td></tr>
+	<tr class="formula"><th>2進数4ビット</th><td>0000</td><td>0000</td><td>0000</td><td>0000</td><td>0001</td><td>1000</td><td>0111</td><td>0111</td></tr>
+</tbody>
+</table>
+<br>
+<table>
+<thead>
+	<tr><th>bit</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>bit3</td><td><span class="formula">%0000 1000</span> = <span class="formula">$04</span></td></tr>
+	<tr><td>bit2</td><td><span class="formula">%0000 0011</span> = <span class="formula">$03</span></td></tr>
+	<tr><td>bit1</td><td><span class="formula">%0000 0011</span> = <span class="formula">$03</span></td></tr>
+	<tr><td>bit0</td><td><span class="formula">%0000 1011</span> = <span class="formula">$0B</span></td></tr>
+</tbody>
+</table>
+
+<p>となり、次の2バイト部分に対応している。</p>
+
+<div class="mono">
+07 00 0B 03 38 00 73 30 2F 0F 1F 00 27 00 3D 09<br>
+00 00 03 04 00 07 30 0F 0F 10 00 00 00 18 0A 00
+</div>
+
+<p>……という手順でスプライト画像からデータができるが、逆にデータから画像へ変換する場合はデータを区切りながら逆算して……と、何にせよ手で計算するのは面倒なので、やっつけではあるが<a href="https://gist.github.com/hosoboso/3543a470db2fb1f3b5bcbf28d7827ec5#file-sprite-js" target="_blank">JavaScriptで出力できるようにしてみた</a>。<br>
+JavaScriptをブラウザで実行してコンソール出力できる<a href="https://developer.mozilla.org/ja/play" target="_blank">Playground | MDN</a>などで試してみていただきたい。</p>
+
+<p>さて、ここまでが「サンダウンのドット絵を4分割した左上部分」の話である。<br>
+この作業を残り3ヶ所繰り返して、分割されたデータをくっつけると、サンダウンの16×16ピクセルのドット絵が完成、ということになる。<br>
+16×16ピクセルで<span class="formula">$80</span>(<span class="formula">128</span>)バイトの容量を使っていることがわかる。<br>
+実際のデータは以下の通りなので、興味があれば試してみていただきたい。</p>
+
+<div class="mono">
+左上<br>
+07000B03380073302F0F1F0027003D09<br>
+000003040007300F0F10000000180A00<br>
+<br>
+右上<br>
+E000D0C01C00CE0CF4F0F800E400BC90<br>
+0000C02000E00CF0F008000000185000<br>
+<br>
+左下<br>
+2F013F1E5E215E1D7F387D207F060F00<br>
+01101E003D3D1D213800200206060000<br>
+<br>
+右下<br>
+F480FC787C807A98FE0C1E045E4434E0<br>
+80087800B8B898840C0004E044A0E0E0
+</div>
+
+<p>さて、この正面向きサンダウンのデータは、ROM上では<code>$CF:074B</code>～<code>$CF:07CA</code>に格納されている。<br>
+ただ、上の数値そのままではない。<br>
+左上と右上は数値が少し異なる。<br>
+スプライトのデータを呼び出すサブルーチンが<code><span class="r">$CE/D47E</span></code>～<code><span class="r">$CE/D89D</span></code>で、<code>$7E:8000</code>～にスプライトのデータを順にコピーしていくのだが、特定条件の時に値を計算し直している。<br>
+その計算し直した<code>$7E:8000</code>～を、VRAMに送り、スプライトに変換しているようである。</p>
+
+<p>ここでVRAMについてざっと説明する。<br>
+VRAMの容量は<span class="formula">64</span>KB、グラフィックデータを置けるのはメモリアドレス<span class="formula">$0000</span>～<span class="formula">$FFFF</span>の領域ということになる。<br>
+<span class="formula">$0000</span>～<span class="formula">$BFFF</span>がBG（背景）用、<span class="formula">$C000</span>～<span class="formula">$FFFF</span>がスプライト用である。</p>
+
+<p>VRAMに送るデータは、キャラ1人分のスプライトだけではない。<br>
+例えば西部編なら、西部編を開始した時点で、VRAMのスプライトの領域にサンダウン、マッドドッグ、サクセズタウンの人々、馬など、<span class="formula">$C000</span>～<span class="formula">$FFFF</span>に一斉に設置される。<br>
+4×4ピクセル（<span class="formula">32</span>バイト=<span class="formula">$20</span>バイト）の画像を単位として（一般的な名称として「タイル」にする）、16個（<span class="formula">$10</span>個）のタイルを横に並べると、タイル16個で<span class="formula">$200</span>バイト分になるが、これを横1列としてVRAMにスプライトを並べていく。<br>
+ただ、4個のタイルで1つのキャラのスプライトを作る都合で、あたかも、キャラの上半身部分だけ横に8人分並べてから、次の行にキャラの下半身部分を8人分並べる、といったデータ構成になる。<br>
+タイル1個を■とすると下のような感じである。</p>
+
+<div class="mono">
+■■<span style="color: #0000FF">■■</span>■■<span style="color: #00FF00">■■</span><span style="color: #FF0000">■■</span><span style="color: #FFFF00">■■</span><span style="color: #00FFFF">■■</span><span style="color: #0000FF">■■</span><br>
+■■<span style="color: #0000FF">■■</span>■■<span style="color: #00FF00">■■</span><span style="color: #FF0000">■■</span><span style="color: #FFFF00">■■</span><span style="color: #00FFFF">■■</span><span style="color: #0000FF">■■</span>
+</div>
+
+<p>4×4のデータが4つ集まった、</p>
+<div class="mono">■■<br>■■</div>
+<p>が、16×16ピクセルのキャラ1人分のデータである。<br>
+2行に分けられているので、</p>
+
+<table>
+<thead>
+	<tr><th>スプライトの部分</th><th>VRAMのアドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td>左上</td><td><span class="formula">$C000</span>～<span class="formula">$C01F</span></td></tr>
+	<tr><td>右上</td><td><span class="formula">$C020</span>～<span class="formula">$C03F</span></td></tr>
+	<tr><td>左下</td><td><span class="formula">$C200</span>～<span class="formula">$C21F</span></td></tr>
+	<tr><td>右下</td><td><span class="formula">$C220</span>～<span class="formula">$C23F</span></td></tr>
+</tbody>
+</table>
+
+<p>に、書き込まれるようになっている。</p>
+
+<p>つまり先に示したサンダウンのデータは、VRAM上だと、</p>
+
+<div class="mono">
+左上　<span class="formula">$C000</span>～<span class="formula">$C01F</span><br>
+07000B03380073302F0F1F0027003D09<br>
+000003040007300F0F10000000180A00<br>
+<br>
+右上　<span class="formula">$C020</span>～<span class="formula">$C03F</span><br>
+E000D0C01C00CE0CF4F0F800E400BC90<br>
+0000C02000E00CF0F008000000185000<br>
+<br>
+左下　<span class="formula">$C200</span>～<span class="formula">$C21F</span><br>
+2F013F1E5E215E1D7F387D207F060F00<br>
+01101E003D3D1D213800200206060000<br>
+<br>
+右下　<span class="formula">$C220</span>～<span class="formula">$C23F</span><br>
+F480FC787C807A98FE0C1E045E4434E0<br>
+80087800B8B898840C0004E044A0E0E0
+</div>
+
+<p>に入っているデータなのである。<br>
+VRAMからスプライトを読み取るなら上の点に注意しなければならない。</p>
+
+<h3 id="02">色のデータとCGRAM</h3>
+
+<p>これまでのデータから、サンダウンの16×16ピクセルのスプライトのデータとして、</p>
+
+<div class="mono">
+00000111 11100000<br>
+00001877 77810000<br>
+00111888 88811100<br>
+01778899 99887710<br>
+00187777 77778100<br>
+00011111 11111000<br>
+00188111 11188100<br>
+00117143 34171100<br>
+00181117 71118100<br>
+00177771 17777100<br>
+01EDDD1E E1DDD100<br>
+0187771E E1177810<br>
+01777111 11117710<br>
+01711181 88811710<br>
+01111FF1 87811710<br>
+00001111 EEF10100
+</div>
+
+<p>という32バイトのデータができた。<br>
+ただ、これだけでは、数値に対応した色がどれなのかがわからない。</p>
+
+<p>ここで、スーパーファミコンで扱える、32,768色の色について説明する。<br>
+スーパーファミコンにおける色データは、BGR555フォーマットという形式を使用している。</p>
+
+<p>BGRのBは「Blue」、Gは「Green」、Rは「Red」であり、青・緑・赤の3色をどれだけ混ぜるかという度合いで色を作る。<br>
+「BGR」ではなく「RGB」なら聞いたことがある、という方もいらっしゃるかもしれない。</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/RGB" target="_blank">RGB - Wikipedia</a></p>
+
+<p>現代のコンピュータなどのデジタルデータにおいて、RGB24ビットカラーがだいたい標準である。<br>
+RGBは赤・緑・青という色の順番で、各色を<span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">0～255</span>）の度合いで混ぜ、色データを24ビットのデータとする。<br>
+純粋な「赤」だったら、赤・緑・青の順に、「<span class="formula">$FF0000</span>」だし、赤・緑が最大で青がない「<span class="formula">$FFFF00</span>」は黄色になる、といった感じである。</p>
+
+<p>一方、上の説明にある「15ビットカラー」が、BGR555フォーマットの正体である。<br>
+色データに15ビット使う、つまり、青・緑・赤にそれぞれ5ビットずつ割り振るのである。<br>
+これなら、<span class="formula">%0 00000 00000 00000</span> と16ビット＝2バイトに色データが収まる（一番上のビットは使わず<span class="formula">0</span>とする）。<br>
+ただ、24ビットカラーだと、例えば赤に<span class="formula">$00</span>～<span class="formula">$FF</span>の256段階色調が使えたが、15ビットカラーでは、<span class="formula">$00</span>～<span class="formula">$1F</span>の32段階色調に減ってしまう。<br>
+青が32通り×緑が32通り×赤が32通りで、32,768色が使えるということになるから、基本的には大半の色が使用可能と考えても問題はないのだが。<br>
+ただ、色調が減ったことで少々問題もありそうなので、この先の説明もお読みいただきたい。</p>
+
+<p>さて、スプライトには最大で16色を割り振ることができる。ただしその中で1色は透過部分に使うので15色と考えて良い。<br>
+色を16色割り振ったデータを「カラーパレット」という。<br>
+各番号に対応した15ビットカラー2バイトの値から、スプライトの色が決まる。<br>
+カラーパレット1個につき、2バイト×16色だから、<span class="formula">$20</span>バイト（<span class="formula">32</span>バイト）が使われている。</p>
+
+<p>現在のゲーム画面にあったカラーパレットのデータを格納するのが、CGRAM(Color Generator RAM)になる。<br>
+CGRAMは<span class="formula">$200</span>バイト（<span class="formula">512</span>バイト）の容量がある。<br>
+CGRAMには、背景用カラーパレットを8個、スプライト用カラーパレットを8個格納できるようになっている。<br>
+CGRAMの領域の、アドレス<span class="formula">$0000</span>～<span class="formula">$00FF</span>が背景用カラーパレット割り当て領域で、<span class="formula">$0100</span>～<span class="formula">$01FF</span>がスプライト用カラーパレット割り当て領域である。</p>
+
+<p>ライブ・ア・ライブにおけるカラーパレットのデータは、<code>$CF:F960</code>～に格納されていて、必要な時にCGRAMに転送する。<br>
+各シナリオの主人公キャラのカラーパレットは、シナリオIDから呼び出している（サブルーチンは<code><span class="r">$C0/9A09</span></code>～、後で紹介する）。<br>
+サンダウンのカラーパレットは、<code>$CF:FA80</code>から<span class="formula">$20</span>バイト分である。</p>
+
+<div class="mono">
+103E A514 FF7F 3F43 5D26 1033 0602 FA01<br>
+F200 7F03 7F01 495E 8445 B56E AD35 0821
+</div>
+
+<p>2バイトずつで区切ると上のようになる。<br>
+サンダウンのポンチョ部分などメインカラーになる<span class="formula">$07</span>番目のデータにあたる「<span class="formula">FA01</span>」をRGB24ビットカラーに変換してみよう。<br>
+上位バイト・下位バイトの順に並べると、「<span class="formula">01FA</span>」である。</p>
+
+<p><span class="formula">$01FA = %0 00000 01111 11010</span></p>
+
+<p>下から5ビット毎に区切って、一番上の1ビットは無視、上から順にBGRの順だが、5ビットのデータの下に3ビットの<span class="formula">000</span>をつけて、8ビットデータとする。</p>
+
+<p>B: <span class="formula">%00000 000 = $00</span><br>
+G: <span class="formula">%01111 000 = $78</span><br>
+R: <span class="formula">%11010 000 = $D0</span></p>
+
+<p>これをRGBの順に並べれば24ビットカラー表記である。</p>
+
+<p>RGB: <span class="formula">$D07800</span></p>
+
+<p>RGBで「<span class="formula">$D07800</span>」は、<span style="color: #D07800">■こんな色</span>になる。<br>
+なのだが、これだけだと少々不具合がある。</p>
+
+<p>24ビットカラーを基準とすると、RGBの各色の下3ビットを切り捨てて15ビットカラーとしている。<br>
+つまり、24ビットカラーの白「<span class="formula">$FFFFFF</span>」は、本来なら各色が「<span class="formula">%11111111</span>」というデータなのだが、下3ビット切り捨てで、</p>
+
+<p>B: <span class="formula">%11111 000 = $F8</span><br>
+G: <span class="formula">%11111 000 = $F8</span><br>
+R: <span class="formula">%11111 000 = $F8</span></p>
+
+<p><span class="formula">$F8F8F8</span>になってしまう。<br>
+<span class="formula">$FFFFFF</span>と<span class="formula">$F8F8F8</span>ではそこそこ色が異なるので、ゲーム画面（当時ならブラウン管テレビ）ではさほどではなくても、現代のパソコン用ディスプレイや携帯電話（スマホ）などの画面で見比べると、違いがわかってしまうだろう。</p>
+
+<table>
+<tbody>
+	<tr><td style="background:#FFFFFF">背景色<br><span class="formula">$FFFFFF</span></td><td style="background:#F8F8F8">背景色<br><span class="formula">$F8F8F8</span></td></tr>
+</tbody>
+</table>
+
+<p>これは15ビットカラーのデータを強引に24ビットカラーに計算し直したためであり、<span class="formula">%11111000</span>～<span class="formula">%11111111</span>の間の値であるのに無視したから起こる。<br>
+この強引な数値切り捨てを補正する手段として<a href="https://wiki.superfamicom.org/palettes" target="_blank">Palettes | Super Famicom Development Wiki</a>では</p>
+
+<p>R補正<span class="formula"> = R + R / 32</span><br>
+G補正<span class="formula"> = G + G / 32</span><br>
+B補正<span class="formula"> = B + B / 32</span></p>
+
+<p>として変換する方法を提案している。<br>
+これなら、</p>
+
+<p>B: <span class="formula">$F8 + $F8 / 32 = $FF</span><br>
+G: <span class="formula">$F8 + $F8 / 32 = $FF</span><br>
+R: <span class="formula">$F8 + $F8 / 32 = $FF</span></p>
+
+<p>と、ほぼ元の色が再現できる、ということである。<br>
+ネットを探すと、BGR555からRGB24ビットカラー変換を行うウェブサイトなどでも同じような補正をしているようだった。<br>
+（結局、スーパーファミコン側でどう調整しているのかまでは、資料を見てもよくわからなかったが）</p>
+
+<p>ということで、<span class="formula">$20</span>バイトのデータを入れたら<a href="https://gist.github.com/hosoboso/3543a470db2fb1f3b5bcbf28d7827ec5#file-colorpalette-js" target="_blank">RGBカラー16色に変換するJavaScript</a>もやっつけで書いてみた。ソースコードが雑なのはお許しいただきたい。<br>
+上の方法での補正も込みにしている。<br>
+計算結果は以下のようになった。</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>BGR15<br>ビットカラー</th><th colspan="2">RGB24<br>ビットカラー</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$0</span></td><td><span class="formula">$103E</span></td><td><span class="formula">$84847B</span></td><td style="background:#84847B">　</td></tr>
+	<tr><td><span class="formula">$1</span></td><td><span class="formula">$A514</span></td><td><span class="formula">$292929</span></td><td style="background:#292929">　</td></tr>
+	<tr><td><span class="formula">$2</span></td><td><span class="formula">$FF7F</span></td><td><span class="formula">$FFFFFF</span></td><td style="background:#FFFFFF">（※白）</td></tr>
+	<tr><td><span class="formula">$3</span></td><td><span class="formula">$3F43</span></td><td><span class="formula">$FFCE84</span></td><td style="background:#FFCE84">　</td></tr>
+	<tr><td><span class="formula">$4</span></td><td><span class="formula">$5D26</span></td><td><span class="formula">$EF944A</span></td><td style="background:#EF944A">　</td></tr>
+	<tr><td><span class="formula">$5</span></td><td><span class="formula">$1033</span></td><td><span class="formula">$84C663</span></td><td style="background:#84C663">　</td></tr>
+	<tr><td><span class="formula">$6</span></td><td><span class="formula">$0602</span></td><td><span class="formula">$318400</span></td><td style="background:#318400">　</td></tr>
+	<tr><td><span class="formula">$7</span></td><td><span class="formula">$FA01</span></td><td><span class="formula">$D67B00</span></td><td style="background:#D67B00">　</td></tr>
+	<tr><td><span class="formula">$8</span></td><td><span class="formula">$F200</span></td><td><span class="formula">$943900</span></td><td style="background:#943900">　</td></tr>
+	<tr><td><span class="formula">$9</span></td><td><span class="formula">$7F03</span></td><td><span class="formula">$FFDE00</span></td><td style="background:#FFDE00">　</td></tr>
+	<tr><td><span class="formula">$A</span></td><td><span class="formula">$7F01</span></td><td><span class="formula">$FF5A00</span></td><td style="background:#FF5A00">　</td></tr>
+	<tr><td><span class="formula">$B</span></td><td><span class="formula">$495E</span></td><td><span class="formula">$4A94BD</span></td><td style="background:#4A94BD">　</td></tr>
+	<tr><td><span class="formula">$C</span></td><td><span class="formula">$8445</span></td><td><span class="formula">$21638C</span></td><td style="background:#21638C">　</td></tr>
+	<tr><td><span class="formula">$D</span></td><td><span class="formula">$B56E</span></td><td><span class="formula">$ADADDE</span></td><td style="background:#ADADDE">　</td></tr>
+	<tr><td><span class="formula">$E</span></td><td><span class="formula">$AD35</span></td><td><span class="formula">$6B6B6B</span></td><td style="background:#6B6B6B">　</td></tr>
+	<tr><td><span class="formula">$F</span></td><td><span class="formula">$0821</span></td><td><span class="formula">$424242</span></td><td style="background:#424242">　</td></tr>
+</tbody>
+</table>
+
+<p>上の色に従って色を塗れば、サンダウンのスプライトが完成する。<br>
+No.<span class="formula">$0</span>にも色が入っているが、実際には透過部分に当たる。</p>
+
+<p>かつてスーパーファミコンの出力先であったブラウン管テレビと、バーチャルコンソールなどWiiU出力やニンテンドー3DSの画面、そして上の色を現代のパソコン用ディスプレイなどで見た場合、色味には差が感じられるのではないかと思われる。<br>
+おそらく開発当時は、ブラウン管テレビでちょうど良い感じに色味を調整したのだろう。</p>
+
+<p>ちなみに、スプライトのデータを呼び出すサブルーチンが<code><span class="r">$CE/D47E</span></code>～<code><span class="r">$CE/D89D</span></code>で、<code>$7E:8000</code>～に一気に<span class="formula">$200</span>バイト（<span class="formula">512</span>バイト）分のデータをコピーしている。<br>
+サンダウンなら<code>$CF:074B</code>～<code>$CF:0905</code>にあたる。<br>
+16×16ピクセルで<span class="formula">$80</span>(<span class="formula">128</span>)バイトだから、<span class="formula">$200</span>バイトなら16×16ピクセルサイズを4個分ということになる。<br>
+（戦闘中の32×32サイズなら1個分である）<br>
+先の計算と同じようにして、データをマス目に並べて色を塗ってみると下のようになった。</p>
+
+<div class="flexwrap">
+	<div class="flexitem">
+		<div class="modal-set">
+			<div class="imgbox"><a href="img/sundown02.png" class="modal-link">
+				<img src="img/sundown02.png" alt="サンダウン・その1" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+			</div>
+		</div>
+	</div>
+	<div class="flexitem">
+		<div class="modal-set">
+			<div class="imgbox"><a href="img/sundown03.png" class="modal-link">
+				<img src="img/sundown03.png" alt="サンダウン・その2" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<p>順に、サンダウン正面向き、後ろ向き、横向きの歩行アニメーション用2パターンということになる。<br>
+これらのスプライトを左右反転させれば、正面向きや後ろ向きなら歩行アニメーションになるし、横向きは右向きにも左向きにもできる。<br>
+この4種がキャラの基本のスプライト4パターンということになる。<br>
+サンダウンの場合、後はイベント用のドット絵パターンがいくつかあり（クリスタルバーの扉を開ける時や、クレイジーバンチ銃撃時、最終編の銃を向けるドット絵など）、これらでフィールド（マップ）用のサンダウンのスプライトが揃う。</p>
+
+<h3 id="03">OAMについて</h3>
+
+<p>さて、VRAMとCGRAMの説明はしたが、最後にスプライトの配置を記録するメモリOAM（Object Attribute Memory）についてざっくりと説明する。<br>
+OAMは<span class="formula">$220</span>バイトで、アドレス<span class="formula">$0000</span>～<span class="formula">$01FF</span>と、<span class="formula">$0200</span>～<span class="formula">$021F</span>の領域に分かれている。<br>
+スプライト1つ分のデータは、<span class="formula">$0000</span>～<span class="formula">$01FF</span>に4バイト、<span class="formula">$0200</span>～<span class="formula">$021F</span>に2ビットで記録される。<br>
+2ヶ所に分かれるので、最初の<span class="formula">$0000</span>～<span class="formula">$01FF</span>を下位テーブル（Primary (low) table）、<span class="formula">$0200</span>～<span class="formula">$021F</span>を上位テーブル（Secondary (high) table）と記述し説明しているウェブサイトが多く、ここでも採用させていただく。<br>
+スプライトは最大で128個設置可能。</p>
+
+<p>キャラが動けば表示位置は上書きされて新しくなっていく。<br>
+<a href="program1.html">ボタン判定</a>にも記したが、スーパーファミコンの画面1枚分を描画する処理の間の空白時間VBlank（1フレームに1回入る）で、VRAMはじめ、CGRAMやOAMのデータを更新している。</p>
+
+<h4>下位テーブル（<span class="formula">$0000</span>～<span class="formula">$01FF</span>）のデータ</h4>
+
+<p>4バイトのデータは以下のように割り振られている。</p>
+
+<ul>
+	<li>1バイト目：<br>キャラ表示位置 ピクセル単位の水平位置（X座標）<br>※上位テーブルのbit0を一番上のビットに設置</li>
+	<li>2バイト目：<br>キャラ表示位置 ピクセル単位の垂直位置（Y座標）</li>
+	<li>3バイト目：<br>CHAR / VRAMの中のスプライトのアドレス<br>※4バイト目のbit0を上につけて9ビットでアドレスとする</li>
+	<li>4バイト目：</li>
+	<ul>
+		<li>bit1-3：PAL / カラーパレットNo.の値(3ビット、<span class="formula">0～7</span>がそれぞれ、カラーパレットNo.8～Fに対応)</li>
+		<li>bit4-5：PRI / 背景に対する優先度（下参照）</li>
+		<li>bit6：FLIP / スプライトをX軸反転するなら<span class="formula">1</span></li>
+		<li>bit7：FLIP / スプライトをY軸反転するなら<span class="formula">1</span></li>
+	</ul>
+</ul>
+
+<p>1バイト目の、ピクセル単位の水平位置（X座標）だが、スーパーファミコンの画面サイズが横256×縦224ピクセルのため、X方向にキャラを少しはみ出した状態にしたい時など、X座標が<span class="formula">$FF</span>を越えることがあるため、上位テーブルに<span class="formula">$FF</span>以上の値がはみ出した時のための1ビットの値が確保してある。つまり9ビット表示である。<br>
+ちなみに座標は負の値を設定でき、その場合はキャラを画面隅に一部だけ表示させたり、一時的に非表示にする、といったことが可能。</p>
+
+<p>bit4-5の背景に対する優先度だが、2ビット（つまり<span class="formula">0～3</span>）で、背景とスプライトの重ね順を表す。<br>
+基本は値が大きいほど、スプライトが手前側、つまり重ねた時に上に設置されることになる。<br>
+背景にも1枚ずつ優先度が設定されているので、そちらと合わせて実際の重ね順を判定することになるのだが、ここでは詳細は省く。<br>
+<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/obj/priority.md" target="_blank">snes-docs-ja/video/obj/priority.md 優先度</a><br>
+などを参照のこと。</p>
+
+<p>なお、CHAR、PAL、PRI、FLIPといった省略表記は、海外の解説サイトなどで使われているので、参照のため併記した。</p>
+
+<h4>上位テーブル（<span class="formula">$0200</span>～<span class="formula">$021F</span>）のデータ</h4>
+
+<ul>
+	<li>bit0：X座標(上位1bit)</li>
+	<li>bit1：サイズ (<span class="formula">0</span>=小, <span class="formula">1</span>=大)</li>
+</ul>
+
+<p>bit0は上で説明した通り、X座標の一番上のビットになる。</p>
+
+<p>bit1はスプライトのサイズを表すのだが、この値と、<code>$00:2101</code>経由でVRAMに送られる命令によって実際のサイズが決まる。<br>
+<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/obj/obsel.md" target="_blank">snes-docs-ja/video/obj/obsel.md 2101h - OBSEL - オブジェクトサイズ/ベースアドレス (W)</a></p>
+
+<p>bit1が<span class="formula">0</span>ならサイズ小、<span class="formula">1</span>ならサイズ大の指定だが、<code>$00:2101</code>のbit5～7に入る4ビットの値で、実際のピクセル数が以下のように決まっている。</p>
+
+<table>
+<thead>
+	<tr><th>bit5～7</th><th>サイズ小</th><th>サイズ大</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$0</span></td><td>8×8</td><td>16×16</td></tr>
+	<tr><td><span class="formula">$1</span></td><td>8×8</td><td>32×32</td></tr>
+	<tr><td><span class="formula">$2</span></td><td>8×8</td><td>64×64</td></tr>
+	<tr><td><span class="formula">$3</span></td><td>16×16</td><td>32×32</td></tr>
+	<tr><td><span class="formula">$4</span></td><td>16×16</td><td>64×64</td></tr>
+	<tr><td><span class="formula">$5</span></td><td>32×32</td><td>64×64</td></tr>
+	<tr><td><span class="formula">$6</span></td><td>16×32</td><td>32×64</td></tr>
+	<tr><td><span class="formula">$7</span></td><td>16×32</td><td>32×32</td></tr>
+</tbody>
+</table>
+
+<p>実際の例を示す。<br>
+さきほどのサンダウンのスプライトが、上位テーブルの2バイトは「<span class="formula">$785D0024</span>」、下位テーブルの2ビットは「<span class="formula">%00</span>」とする。</p>
+
+<ul>
+	<li>X座標：<span class="formula">$78</span>(<span class="formula">120</span>)<br>※下位テーブルbit0は<span class="formula">0</span>なので<span class="formula">$78 = %0111 1000</span>の頭に<span class="formula">0</span>をつける、つまり<span class="formula">$78</span>そのままで問題ない</li>
+	<li>Y座標：<span class="formula">$5D</span>(<span class="formula">93</span>)</li>
+	<li>VRAMの中スプライトのアドレス位置：<span class="formula">$00</span><br>（一番最初の位置のスプライトにあたる）</li>
+	<li>カラーパレットNo.：<span class="formula">%010</span>（カラーパレットNo.A）</li>
+	<li>背景に対する優先度：<span class="formula">%10</span>（優先度は2）</li>
+	<li>スプライトをX軸反転：<span class="formula">%0</span>（反転しない）</li>
+	<li>スプライトをY軸反転：<span class="formula">%0</span>（反転しない）</li>
+	<li>スプライトサイズ：<span class="formula">%0</span>（小）</li>
+</ul>
+
+<p>というようになる。<br>
+座標やスプライトの反転などはキャラの動きにより1フレーム毎に刻々と変化していくことになる。<br>
+サンダウンが左を向いたなら、VRAMの中のスプライトの呼び出しアドレスを変えて、サンダウンが左向きのスプライトをロードして表示する、といったことも内部で処理し続けているのである。</p>
+
+<h3>戦闘におけるスプライト</h3>
+
+<p>マップでは16×16サイズだったキャラのスプライトであるが、戦闘では32×32ピクセルの別のスプライトを使っている。<br>
+先に述べたとおり、32×32ピクセルサイズだと、容量は<span class="formula">$200</span>(<span class="formula">512</span>)バイトになる。</p>
+
+<p>敵はサイズが様々だが、画像データをVRAMにロードした後、背景として設置している。<br>
+味方の場合はフィールドと同じくスプライト扱いである。<br>
+ちなみに、ダメージを受けた時に表示される数字、攻撃範囲を表示するカッコのような表示もスプライトとして表示するが、キャラの上に被せる形になる。</p>
+
+<p>ここでは操作する味方キャラのスプライトについてざっと紹介する。<br>
+味方キャラのスプライトはVRAMのアドレス<span class="formula">$4000</span>以降に設置される。<br>
+戦闘では1つの向きのアニメーション2パターンだけが、アドレス<span class="formula">$4000</span>に設置され、向き変えをする度に更新される。<br>
+といっても、右上向きのスプライトを左右反転で左上向きになるし、右下向きのスプライトを左右反転で左下向きになる。<br>
+さらに、技のモーションや、ダメージをくらった時、戦闘不能時などのスプライトもあるから、1キャラあたりのパターン数はけっこうある。</p>
+
+<p>1つのスプライトで、8×8マスサイズのタイルが4×4＝16個必要になるので、最初の32×32ピクセルサイズのキャラは、</p>
+
+<table>
+<tbody>
+	<tr><td><span class="formula">$4000～401F</span></td><td><span class="formula">$4020～403F</span></td><td><span class="formula">$4040～405F</span></td><td><span class="formula">$4060～407F</span></td></tr>
+	<tr><td><span class="formula">$4200～421F</span></td><td><span class="formula">$4220～423F</span></td><td><span class="formula">$4240～425F</span></td><td><span class="formula">$4260～427F</span></td></tr>
+	<tr><td><span class="formula">$4400～441F</span></td><td><span class="formula">$4420～443F</span></td><td><span class="formula">$4440～445F</span></td><td><span class="formula">$4460～447F</span></td></tr>
+	<tr><td><span class="formula">$4600～461F</span></td><td><span class="formula">$4620～463F</span></td><td><span class="formula">$4640～465F</span></td><td><span class="formula">$4660～467F</span></td></tr>
+</tbody>
+</table>
+
+<p>と、散らばった位置に設置される。<br>
+値の変換やカラーパレットなどの処理はフィールド時と変わらない。</p>
+
+<p>試しに、アキラの戦闘中のスプライトを変換・色を塗ってみた。</p>
+
+<p>スプライトのデータは、<code>$D9:FC20</code>～<br>
+カラーパレットは、<code>$D6:22A0</code>～<br>
+（カラーパレットのデータは、同一キャラでも、フィールドと戦闘では別に設定されている）</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/akira01.png" class="modal-link">
+		<img src="img/akira01.png" alt="アキラ右下向き" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>実は通常の待機時、右隅の8ピクセル分は透過になっている。モーションによっては横いっぱいまで使うこともある。<br>
+それぞれのキャラのプロポーションのバランスなどから設定しているのであろう。</p>
+
+<h3 id="04">サブルーチン</h3>
+
+<p>スプライト及び、そのスプライトに使用するカラーパレットの呼び出しのサブルーチンの一部を紹介する。<br>
+ゲーム開始時、メニュー画面、フィールド、戦闘（開始時と戦闘中）と、サブルーチンが変わってくるようなので、以下で紹介するのはほんの一部であることをご了承いただきたい。<br>
+I/Oレジスタ（VRAMなど他メモリとやりとりをするためのアドレス）に何を指定しているかで、何のデータを送信しているかはなんとなく判別できるようになっている。<br>
+（きちんとプログラムを読める人は完璧に判別できると思うが、筆者は素人なのでなんとなくである）</p>
+
+<h4>スプライトのデータ呼び出し（フィールドなど）</h4>
+
+<p>スプライトのデータ呼び出しのサブルーチンは<code><span class="r">$CE/D47E</span></code>～<code><span class="r">$CE/D89D</span></code>。<br>
+大まかに見ると、スプライトのタイル1つ分、つまり8×8ピクセルサイズの<span class="formula">$20</span>バイト分のデータをループ処理でコピー、を繰り返しているのだが、後にスプライトを配置する時の都合で途中分岐が多くなっている。<br>
+下はサンダウンの例。</p>
+
+<div class="code-container"><pre>
+$CE/D47E PHB                     ;DBレジスタをスタックにプッシュ
+$CE/D47F LDA $65    [$00:0065]   ;Aに[$00:0065]をロード
+$CE/D481 PHA                     ;Aレジスタをスタックにプッシュ
+$CE/D482 PLB                     ;DBレジスタにスタックからプル
+$CE/D483 LDY #$0001              ;Yに$0001をロード
+$CE/D486 LDX $63    [$00:0063]   ;Xに[$00:0063]をロード
+$CE/D488 LDA [$60],y[$CF:074A]   ;Aに[$CF:074A]をロード
+$CE/D48A INY                     ;Yをインクリメント +1
+$CE/D48B CMP #$F0                ;Aと$F0を減算比較（ステータスレジスタ変更のみ）
+$CE/D48D BCC $0E    [$D49D]      ;キャリーフラグが立っていないとき[$D49D]分岐
+$CE/D49D INC A                   ;Aをインクリメント +1
+$CE/D49E LSR A                   ;Aを論理右シフト　(/2)
+$CE/D49F STA $66    [$00:0066]   ;Aを[$00:0066]に書き込み
+$CE/D4A1 BCC $0B    [$D4AE]      ;キャリーフラグが立っていないとき[$D4AE]分岐
+$CE/D4AE STZ $67    [$00:0067]   ;[$00:0067]に$00を書き込み
+$CE/D4B0 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+
+;ループ開始
+$CE/D4B2 LDA [$60],y[$CF:074B]   ;Aに[$CF:074B]をロード
+$CE/D4B4 STA $0000,x[$7E:8000]   ;Aを[$7E:8000]に書き込み
+$CE/D4B7 INX                     ;Xをインクリメント +1
+$CE/D4B8 INX                     ;Xをインクリメント +1
+$CE/D4B9 INY                     ;Yをインクリメント +1
+$CE/D4BA INY                     ;Yをインクリメント +1
+$CE/D4BB DEC $66    [$00:0066]   ;[$00:0066]をデクリメント -1
+$CE/D4BD BNE $F3    [$D4B2]      ;ゼロフラグが立っていないとき[$D4B2]分岐
+;ループここまで
+
+$CE/D48F STX $63    [$00:0063]   ;Xを[$00:0063]に書き込み
+$CE/D491 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$CE/D493 AND #$000F              ;Aと$000Fで論理積
+$CE/D496 ASL A                   ;Aを算術左シフト *2
+$CE/D497 TAX                     ;Aの値をXレジスタに転送
+$CE/D498 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/D49A JMP ($D89E,x)[$CE:D4C3] ;[$CE:D4C3]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$CE/D4BD BNE $F3    [$D4B2]      ;ゼロフラグが立っていないとき[$D4B2]分岐
+$CE/D4B2 LDA [$60],y[$CF:0905]   ;Aに[$CF:0905]をロード
+$CE/D4B4 STA $0000,x[$7E:81FE]   ;Aを[$7E:81FE]に書き込み
+$CE/D4B7 INX                     ;Xをインクリメント +1
+$CE/D4B8 INX                     ;Xをインクリメント +1
+$CE/D4B9 INY                     ;Yをインクリメント +1
+$CE/D4BA INY                     ;Yをインクリメント +1
+$CE/D4BB DEC $66    [$00:0066]   ;[$00:0066]をデクリメント -1
+$CE/D4BD BNE $F3    [$D4B2]      ;ゼロフラグが立っていないとき[$D4B2]分岐
+$CE/D4BF SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/D4C1 BRA $C5    [$D488]      ;フラグにかかわりなく常に分岐[$D488]
+$CE/D488 LDA [$60],y[$CF:0907]   ;Aに[$CF:0907]をロード
+$CE/D48A INY                     ;Yをインクリメント +1
+$CE/D48B CMP #$F0                ;Aと$F0を減算比較（ステータスレジスタ変更のみ）
+$CE/D48D BCC $0E    [$D49D]      ;キャリーフラグが立っていないとき[$D49D]分岐
+$CE/D48F STX $63    [$00:0063]   ;Xを[$00:0063]に書き込み
+$CE/D491 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$CE/D493 AND #$000F              ;Aと$000Fで論理積
+$CE/D496 ASL A                   ;Aを算術左シフト *2
+$CE/D497 TAX                     ;Aの値をXレジスタに転送
+$CE/D498 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/D49A JMP ($D89E,x)[$CE:D89C] ;[$CE:D89C]へジャンプ(レジスタをスタックに積まない)
+$CE/D89C PLB                     ;DBレジスタにスタックからプル
+$CE/D89D RTL                     ;サブルーチン戻り
+</pre></div>
+
+<p>途中をかなり省略したが、上がサンダウンの$200バイト分のデータ<code>$CF:074B</code>～<code>$CF:0905</code>を、<code>$7E:8000</code>～<code>$7E:81FE</code>にコピーする処理である（実際には途中で計算処理して値が変わっている場合もある。そのデータがそのままVRAMに送られる）。<br>
+基本は<code><span class="r">$CE/D4B2</span></code>～<code><span class="r">$CE/D4BD</span></code>のループ部分のコピー処理で、<span class="formula">$20</span>バイト毎に分岐処理をしているが、細かい説明は端折る。<br>
+この後、<code>$7E:8200</code>～以降にも他データがコピーされ、VRAMへデータが送られる。</p>
+
+<div class="code-container"><pre>
+$C0/4DC4 LDA #$01                ;Aに$01をロード
+$C0/4DC6 STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/4DC9 LDA #$18                ;Aに$18をロード
+$C0/4DCB STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/4DCE LDX #$0000              ;Xに$0000をロード
+$C0/4DD1 STX $2116  [$00:2116]   ;Xを[$00:2116]に書き込み
+$C0/4DD4 LDX #$2000              ;Xに$2000をロード
+$C0/4DD7 STX $26    [$00:0026]   ;Xを[$00:0026]に書き込み
+$C0/4DD9 LDA $0120  [$00:0120]   ;Aに[$00:0120]をロード
+$C0/4DDC STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/4DDE STZ $22    [$00:0022]   ;[$00:0022]に$00を書き込み
+$C0/4DE0 JSR $4E8A  [$C0:4E8A]   ;[$C0:4E8A]へジャンプ
+;（中略）
+$C0/4ECE LDX #$8000              ;Xに$8000をロード
+$C0/4ED1 STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/4ED4 LDA #$7E                ;Aに$7Eをロード
+$C0/4ED6 STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/4ED9 LDY #$2000              ;Yに$2000をロード
+$C0/4EDC STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
+$C0/4EDF LDA #$01                ;Aに$01をロード
+$C0/4EE1 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+</pre></div>
+
+<p>VRAMへのデータ転送は上で、書き込み先のアドレスはI/Oレジスタ、つまりVRAMとやりとりをするためのメモリアドレスになる。<br>
+詳しくは<br>
+<a href="https://github.com/akatsuki105/snes-docs-ja/tree/main/memory/dma" target="_blank">snes-docs-ja/memory/dma</a><br>
+<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a><br>
+を参照していただきたいが、GDMA(General Direct Memory Access)転送という方法で、スーパーファミコンのメモリからVRAMへデータを送る。<br>
+HDMA(HBlank DMA)という、HBlank（テレビ画面に横1列分のドット絵を描写してから、次の行への描写へ移る僅かな時間）を利用した転送もあるが、ここで使っているのはそれ以外でも使えるGDMA。<br>
+ちなみにGDMAで転送中は、スーファミ自体のCPUは一時停止する（計算を一時停止する）。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス（I/Oレジスタ）</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4300]</code></td><td>GDMA/HDMA設定レジスタ</td></tr>
+	<tr><td><code>[$00:4301]</code></td><td>転送先指定 <span class="formula">$04</span>=OAM, <span class="formula">$18</span>=VRAM, <span class="formula">$22</span>=CGRAM, <span class="formula">$80</span>=WRAM</td></tr>
+	<tr><td><code>[$00:4303]</code><code>[$00:4302]</code></td><td>データ元アドレス（開始位置）</td></tr>
+	<tr><td><code>[$00:4304]</code></td><td>データ元バンク</td></tr>
+	<tr><td><code>[$00:4306]</code><code>[$00:4305]</code></td><td>転送するデータ量</td></tr>
+	<tr><td><code>[$00:420B]</code></td><td>GDMA(General Direct Memory Access)チャネルレジスタ　(<span class="formula">0</span>=無効, <span class="formula">1</span>=有効)</td></tr>
+</tbody>
+</table>
+
+<p>上は、<code>$7E:8000</code>～<code>$7E:9FFF</code>のデータをVRAMに転送する処理になる。<br>
+転送先に<span class="formula">$18</span>（VRAM）、データ元バンクに<span class="formula">$7E</span>、データ元アドレス2バイトに<span class="formula">$8000</span>、転送するデータ量に<span class="formula">$2000</span>を指定して、<code>[$00:420B]</code>に<span class="formula">$01</span>を書き込むとVRAMに転送を行う、という処理を行っている。<br>
+この、<code>[$00:4300]</code>以降に値を指定してVRAMなどに転送、というDMA転送サブルーチンは上の例以外にも多数存在している。</p>
+
+<p>なお、<code>$00:43n0</code>の<span class="formula">n</span>は<span class="formula">0~7</span>の値をとり、上だと<span class="formula">n=0</span>である。<br>
+つまりGDMA転送は8つ設定できる（8チャネル）。<br>
+HDMAと共用で、HDMA転送が最優先、後はチャネル番号が小さいほど優先で転送を行う。<br>
+<code>$00:4300</code>のGDMA/HDMA設定レジスタの説明は長くなるので、下ウェブサイトなどを参照していただきたい。</p>
+
+<ul>
+	<li><a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a></li>
+	<li><a href="https://w.atwiki.jp/snesspec/pages/23.html" target="_blank">DMAとHDMA - SNES Spec - atwiki（アットウィキ）</a></li>
+</ul>
+
+<p>なお、戦闘では、キャラのスプライトデータを一度WRAM（<code>$7E:0000</code>～<code>$7F:FFFF</code>）にコピーし、そこから必要なデータだけVRAMへ送っているようである。<br>
+WRAMの<code>$7E:D000～DFFF</code>が戦闘中のキャラスプライトの格納アドレスになっている。</p>
+
+<h4>カラーパレットの呼び出し（フィールド）</h4>
+
+<p>フィールドでは、マップ切り替え時にカラーパレットが呼び出される。</p>
+
+<div class="code-container"><pre>
+$C0/9ACA LDA #$00                ;Aに$00をロード
+$C0/9ACC STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/9ACF LDA #$22                ;Aに$22をロード
+$C0/9AD1 STA $4301  [$00:4301]   ;Aを[$00:4301](転送先指定 $22=CGRAM)に書き込み
+;（中略）
+$C0/9A09 LDY #$3900              ;Yに$3900をロード
+$C0/9A0C LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード
+$C0/9A0F CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/9A11 BNE $03    [$9A16]      ;ゼロフラグが立っていないとき[$9A16]分岐
+;ゼロフラグON（最終編）
+$C0/9A13 LDA $0A10  [$00:0A10]   ;Aに[$00:0A10]（主人公ID）をロード
+;ゼロフラグOFF（最終編以外）
+$C0/9A16 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A18 AND #$00FF              ;Aと$00FFで論理積
+$C0/9A1B ASL A                   ;Aを算術左シフト *2
+$C0/9A1C ASL A                   ;Aを算術左シフト *2
+$C0/9A1D ASL A                   ;Aを算術左シフト *2
+$C0/9A1E ASL A                   ;Aを算術左シフト *2
+$C0/9A1F ASL A                   ;Aを算術左シフト *2
+$C0/9A20 CLC                     ;キャリーフラグクリア
+$C0/9A21 ADC #$F960              ;A + $F960
+$C0/9A24 TAX                     ;Aの値をXレジスタに転送
+$C0/9A25 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A26 LDA #$001F              ;Aに$001Fをロード
+$C0/9A29 MVN CF 7E               ;データ転送
+;A: 1F (転送データサイズ-1)
+;X: 主人公ID*$20 + $F960 (転送元アドレス)
+;Y: 3900 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:(主人公ID*$20 + $F960) -> $7E:3900 +$20
+$C0/9A29 MVN CF 7E               ;データ転送
+$C0/9A2C PLB                     ;DBレジスタにスタックからプル
+$C0/9A2D SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A2F LDA $0A0B  [$00:0A0B]   ;Aに[$00:0A0B]をロード
+$C0/9A32 BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C0/9A34 BNE $05    [$9A3B]      ;ゼロフラグが立っていないとき[$9A3B]分岐
+;ゼロフラグON
+$C0/9A36 LDX #$FA60              ;Xに$FA60をロード
+$C0/9A39 BRA $03    [$9A3E]      ;フラグにかかわりなく常に分岐[$9A3E]
+;ゼロフラグOFF
+$C0/9A3B LDX #$FE20              ;Xに$FE20をロード
+$C0/9A3E REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A40 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A41 LDA #$007F              ;Aに$007Fをロード
+$C0/9A44 MVN CF 7E               ;データ転送
+;A: 7F (転送データサイズ-1)
+;X: FE20またはFA60 (転送元アドレス)
+;Y: 3920 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:FE20/FA60 -> $7E:3920 +$7F
+$C0/9A44 MVN CF 7E               ;データ転送
+$C0/9A47 PLB                     ;DBレジスタにスタックからプル
+$C0/9A48 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A4A LDA $0A0B  [$00:0A0B]   ;Aに[$00:0A0B]をロード
+$C0/9A4D BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C0/9A4F BNE $19    [$9A6A]      ;ゼロフラグが立っていないとき[$9A6A]分岐
+;ゼロフラグON
+$C0/9A51 LDA $0ACF  [$00:0ACF]   ;Aに[$00:0ACF]（操作中のキャラID）をロード
+$C0/9A54 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/9A55 LDA #$00                ;Aに$00をロード
+$C0/9A57 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A59 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9A5A LSR A                   ;Aを論理右シフト　(/2)
+$C0/9A5B STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/9A5D LSR A                   ;Aを論理右シフト　(/2)
+$C0/9A5E CLC                     ;キャリーフラグクリア
+$C0/9A5F ADC $32    [$00:0032]   ;A + [$00:0032]
+$C0/9A61 CLC                     ;キャリーフラグクリア
+$C0/9A62 ADC #$FAE0              ;A + $FAE0
+$C0/9A65 TAX                     ;Aの値をXレジスタに転送
+$C0/9A66 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A68 BRA $18    [$9A82]      ;フラグにかかわりなく常に分岐[$9A82]
+;ゼロフラグOFF
+$C0/9A6A LDA $0ACF  [$00:0ACF]   ;Aに[$00:0ACF]（操作中のキャラID）をロード
+$C0/9A6D CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C0/9A6F BEQ $0E    [$9A7F]      ;ゼロフラグが立っているとき[$9A7F]分岐(西部)
+$C0/9A71 CMP #$07                ;Aと$07を減算比較（ステータスレジスタ変更のみ）
+$C0/9A73 BEQ $05    [$9A7A]      ;ゼロフラグが立っているとき[$9A7A]分岐(幕末)
+$C0/9A75 LDX #$FEA0              ;Xに$FEA0をロード
+$C0/9A78 BRA $08    [$9A82]      ;フラグにかかわりなく常に分岐[$9A82]
+$C0/9A7A LDX #$FF60              ;Xに$FF60をロード
+$C0/9A7D BRA $03    [$9A82]      ;フラグにかかわりなく常に分岐[$9A82]
+$C0/9A7F LDX #$FF00              ;Xに$FF00をロード
+;処理合流
+$C0/9A82 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A84 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A85 LDA #$005F              ;Aに$005Fをロード
+$C0/9A88 MVN CF 7E               ;データ転送
+;A: 5F (転送データサイズ-1)
+;X: ???? (転送元アドレス)
+;Y: 39A0 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:???? -> $7E:39A0 +$5F
+$C0/9A88 MVN CF 7E               ;データ転送
+$C0/9A8B PLB                     ;DBレジスタにスタックからプル
+$C0/9A8C SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A8E LDY #$3920              ;Yに$3920をロード
+$C0/9A91 LDA #$07                ;Aに$07をロード
+$C0/9A93 JSR $C449  [$C0:C449]   ;[$C0:C449]へジャンプ
+
+$C0/C449 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/C44B LDA $10E2  [$00:10E2]   ;Aに[$00:10E2]をロード
+$C0/C44E BEQ $4D    [$C49D]      ;ゼロフラグが立っているとき[$C49D]分岐
+$C0/C49D RTS                     ;サブルーチン戻り
+
+$C0/9A96 LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/9A98 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/9A9A BEQ $12    [$9AAE]      ;ゼロフラグが立っているとき[$9AAE]分岐
+$C0/9A9C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A9E PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A9F LDX #$F920              ;Xに$F920をロード
+$C0/9AA2 LDY #$3800              ;Yに$3800をロード
+$C0/9AA5 LDA #$003F              ;Aに$003Fをロード
+$C0/9AA8 MVN CF 7E               ;データ転送
+;A: 3F (転送データサイズ-1)
+;X: F920 (転送元アドレス)
+;Y: 3800 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F920 -> $7E:3800 +$3F
+$C0/9AA8 MVN CF 7E               ;データ転送
+$C0/9AAB PLB                     ;DBレジスタにスタックからプル
+$C0/9AAC SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9AAE LDA #$80                ;Aに$80をロード
+$C0/9AB0 STA $2121  [$00:2121]   ;Aを[$00:2121](パレットアドレス)に書き込み
+$C0/9AB3 LDX #$3900              ;Xに$3900をロード
+$C0/9AB6 STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/9AB9 LDA #$7E                ;Aに$7Eをロード
+$C0/9ABB STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/9ABE LDX #$0100              ;Xに$0100をロード
+$C0/9AC1 STX $4305  [$00:4305]   ;Xを[$00:4306][$00:4305]に書き込み
+$C0/9AC4 LDA #$01                ;Aに$01をロード
+$C0/9AC6 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+$C0/9AC9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>[$00:4301]</code>に指定する転送先が<span class="formula">$22</span>=CGRAMとなっているので、カラーパレットの設定を行うサブルーチンである、ということがわかる。<br>
+さらに、<code><span class="r">$C0/9A0C</span></code>でシナリオIDでの分岐を行っている。<br>
+最終編の場合は最終編主人公のIDをロードしている。<br>
+これらIDから、カラーパレットの最初のアドレスを計算している。<br>
+つまり、カラーパレットの最初のアドレスは、</p>
+
+<p><span class="formula">主人公ID*$20 + $F960</span></p>
+
+<p>で計算され、バンクは<span class="formula">$CF</span>で指定されているから、</p>
+
+<p><span class="formula">$CF:(主人公ID*$20 + $F960)</span></p>
+
+<p>から<span class="formula">$20</span>バイト分に、主人公キャラ8人（シナリオ）に対応したカラーパレットが格納されているということがわかる。<br>
+つまり、</p>
+
+<table>
+<thead>
+	<tr><th>シナリオ</th><th>ID</th><th>キャラクター</th><th>カラーパレット</th></tr>
+</thead>
+<tbody>
+	<tr><td>中世</td><td><span class="formula">$00</span></td><td>オルステッド</td><td><code>$CF:F960</code>～<code>$CF:F97F</code></td></tr>
+	<tr><td>原始</td><td><span class="formula">$01</span></td><td>ポゴ</td><td><code>$CF:F980</code>～<code>$CF:F99F</code></td></tr>
+	<tr><td>ＳＦ</td><td><span class="formula">$02</span></td><td>キューブ</td><td><code>$CF:F9A0</code>～<code>$CF:F9BF</code></td></tr>
+	<tr><td>功夫</td><td><span class="formula">$03</span></td><td>心山拳老師</td><td><code>$CF:F9C0</code>～<code>$CF:F9DF</code></td></tr>
+	<tr><td>西部</td><td><span class="formula">$04</span></td><td>サンダウン</td><td><code>$CF:F9E0</code>～<code>$CF:F9FF</code></td></tr>
+	<tr><td>現代</td><td><span class="formula">$05</span></td><td>高原日勝</td><td><code>$CF:F9E0</code>～<code>$CF:F9FF</code></td></tr>
+	<tr><td>近未来</td><td><span class="formula">$06</span></td><td>アキラ</td><td><code>$CF:FA00</code>～<code>$CF:FA1F</code></td></tr>
+	<tr><td>幕末</td><td><span class="formula">$07</span></td><td>おぼろ丸</td><td><code>$CF:FA20</code>～<code>$CF:FA3F</code></td></tr>
+</tbody>
+</table>
+
+<p>このようにカラーパレットが格納されていることがわかった。</p>
+
+<p>後の処理を見ていくと、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:3800</code>～<code>$7E:383F</code></td><td>（多分）背景など</td></tr>
+	<tr><td><code>$7E:3900</code>～<code>$7E:391F</code></td><td>主人公のカラーパレット</td></tr>
+	<tr><td><code>$7E:3920</code>～<code>$7E:399F</code></td><td>（多分）他の仲間キャラ用パレット</td></tr>
+	<tr><td><code>$7E:39A0</code>～<code>$7E:39FF</code></td><td>（多分）主人公や仲間以外のモブキャラ用パレット</td></tr>
+</tbody>
+</table>
+
+<p>というようにコピー先を指定しているようであり、<code>$7E:3900</code>～は各シナリオ対応のキャラ分のカラーパレット8パターン<span class="formula">$100</span>バイトに対応しているようである。<br>
+カラーパレットのデータ<code>$7E:3900</code>～は最終的に、<code><span class="r">$C0/9AB0</span></code>～で、CGRAMのアドレス<span class="formula">$0100</span>～<span class="formula">$01FF</span>に送られている。</p>
+
+<p>マップ背景用のカラーパレット（CGRAMのアドレス<span class="formula">$0000</span>～<span class="formula">$00FF</span>に入る）は別途処理をしているがここでは省く。</p>
+
+<p><code>[$00:43n1]</code>に<span class="formula">$22</span>を書き込んでいる、つまり下のような、</p>
+
+<div class="code-container"><pre>
+LDA #$22
+STA $4301  [$00:4301]
+</pre></div>
+
+<p>こういう処理は、転送先がCGRAM、カラーパレットで確定のため、この後からカラーパレットの処理をしているということがサブルーチンでもわかりやすいということである。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
