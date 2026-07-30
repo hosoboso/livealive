@@ -236,11 +236,12 @@ table {
 	<li>バンク<code>$40</code>～<code>$5F</code>のアドレス<code>$0000</code>～<code>$FFFF</code></li>
 </ul>
 
-<p>という位置に、ゲームカセット内のデータ16メガビット分が丸ごと入っている。</p>
+<p>という位置に、ゲームカセット内のデータ16メガビット分が丸ごと入っている（コピーされている）。</p>
 
 <p>ゲームカセット内のデータはゲームプレイの元となる基本のデータなので、ゲームプレイの最中、読み取りはしても上書きすることはない。<br>
 こういった領域をROM（Read-Only Memory）領域と呼ぶ。<br>
-一方で、戦闘のダメージ量計算などに使う、読み取りも書き込みもできる領域がRAM（Random-Access Memory）である。</p>
+一方で、戦闘のダメージ量計算などに使う、読み取りも書き込みもできる領域がRAM（Random-Access Memory）である。<br>
+（「ライブ・ア・ライブ」はバッテリーバックアップ機能つきで、セーブデータをカセット内に記録する時は読み書きをするが、SRAMという別のメモリがカセットの中に入っていて、そちらで読み書きをする。SRAMについては後で説明している）</p>
 
 <p>また、まったく同じデータが入っている（ミラーリング）箇所も多い。<br>
 例えばバンク<code>$00</code>～<code>$7D</code>は、バンク<code>$80</code>～<code>$FD</code>でミラーリングなので、大雑把に言えば、スーパーファミコンのメモリ領域を半分で区切り、前半部を後半部でミラーリングしているようなものである。<br>
@@ -305,8 +306,8 @@ table {
 	<tr><td rowspan="1"><code>$47～$4D</code></td><td rowspan="1"><code>$C7～$CD</code></td><td colspan="2">サウンドデータ　サイズ＆転送先アドレス</td></tr>
 	<!-- <tr><td>サウンドデータ　サイズ＆転送先アドレス</td><td><code>$CC:F002</code>～<code>$CC:FAF9</code></td></tr> -->
 	<tr><td><code>$4E</code></td><td><code>$CE</code></td><td colspan="2">プログラム（メニュー画面・マップ・スプライトのロードなどシステム周りの色々）</td></tr>
-	<tr><td rowspan="2"><code>$4F</code></td><td rowspan="2"><code>$CF</code></td><td colspan="2">画像（マップ用スプライトやマップ）のデータ</td></tr>
-	<tr><td>主人公キャラ8人（シナリオ）に対応したカラーパレット</td><td><code>$CF:F960</code>～<code>$CF:FA3F</code></td></tr>
+	<tr><td rowspan="2"><code>$4F～$50</code></td><td rowspan="2"><code>$CF～$D0</code></td><td colspan="2">画像（マップ用スプライトやマップ）のデータ</td></tr>
+	<tr><td>主人公キャラ8人（シナリオ）に対応したフィールド用カラーパレット</td><td><code>$CF:F960</code>～<code>$CF:FA3F</code></td></tr>
 	<tr><td><code>$51</code></td><td><code>$D1</code></td><td colspan="2">テキストデータ（シナリオ関連）</td></tr>
 	<tr><td rowspan="2"><code>$54</code></td><td rowspan="2"><code>$D4</code></td><td colspan="2">画像データ</td></tr>
 	<td>文字画像データ（<a href="fontdata.html">文字データ</a>参照）</td><td><code>$D4:9200</code>～<code>$D4:F1FF</code></td></tr>
@@ -318,7 +319,8 @@ table {
 	<tr><td>敵移動データ</td><td><code>$D5:64CB</code>～<code>$D5:71C3</code></td></tr>
 	<tr><td>アイテムデータ（<a href="d5.html#itemd">詳細</a>）</td><td><code>$D5:71C4</code>～<code>$D5:81C3</code></td></tr>
 	<tr><td>各シナリオのアイテム欄の開始アドレス＆枠数</td><td><code>$D5:FC51</code>～<code>$D5:FC60</code></td></tr>
-	<tr><td rowspan="7"><code>$56</code></td><td rowspan="7"><code>$D6</code></td>
+	<tr><td rowspan="8"><code>$56</code></td><td rowspan="8"><code>$D6</code></td>
+	<td>カラーパレット（味方キャラ、32×32サイズ時）</td><td><code>$D6:2080</code>～<code>$D6:235F</code></td></tr>
 	<td>最終編・敵パーティ編成テーブル</td><td><code>$D6:4080</code>～<code>$D6:40BF</code></td></tr>
 	<td>敵パーティデータ（<a href="d5.html#enemyparty">詳細</a>）</td><td><code>$D6:4280</code>～<code>$D6:512E</code></td></tr>
 	<td>各シナリオの味方パーティIDリスト（<a href="d5.html#charaparty">詳細</a>）</td><td><code>$D6:512F</code>～<code>$D6:514F</code></td></tr>
@@ -370,7 +372,9 @@ table {
 	<tr><td><code>$C0:37D8</code>～<code>$C0:3806</code></td><td>持ち物一覧を開いて何かのアイテムを選ぶことで進行するイベント</td></tr>
 	<tr><td><code>$C0:47E8</code>～<code>$C0:482C</code></td><td>アイテム取得時に持ち物欄の空欄に該当アイテムを入れ個数を+1する、または既に所持しているなら該当アイテムの個数を+1する処理</td></tr>
 	<tr><td><code>$C0:4839</code>～<code>$C0:4853</code></td><td>アイテム使用時に持ち物欄から指定アイテム個数を-1する処理</td></tr>
-	<tr><td><code>$C0:9A09</code>～<code>$C0:9A93</code></td><td>カラーパレット呼び出し</td></tr>
+	<tr><td><code>$C0:4DC4</code>～<code>$C0:4EE1</code></td><td>スプライトのデータをVRAMへGDMA転送</td></tr>
+	<tr><td><code>$C0:9A09</code>～<code>$C0:9AC9</code></td><td>カラーパレット呼び出し</td></tr>
+	<tr><td><code>$C0:9ACA</code>～<code>$C0:9AE5</code></td><td>カラーパレットGDMA転送設定</td></tr>
 	<tr><td><code>$C0:B83E</code>～<code>$C0:B8E5</code></td><td>マップ用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
 	<tr><td><code>$C0:B900</code>～<code>$C0:B924</code></td><td>マップ乱数計算</td></tr>
 	<tr><td><code>$C0:BA16</code>～<code>$C0:BA75</code></td><td>16bit×16bit乗算サブルーチン</td></tr>
@@ -436,6 +440,8 @@ table {
 	<tr><td><code>$C1:2800</code>～<code>$C1:281A</code></td><td>移動または向き変え時の行動ポイント計算用　<span class="formula">$40 - 速/4</span>（※向き変えはこの<span class="formula">1/2</span>で行動ポイント増減）</td></tr>
 	<tr><td><code>$C1:281E</code>～<code>$C1:2833</code></td><td>味方の行動時、行動ポイント<code>[$00:03AF]</code><code>[$00:03AE]</code>増加処理</td></tr>
 	<tr><td><code>$C1:283D</code>～<code>$C1:2856</code></td><td>敵の移動または向き変え時、行動ポイント<code>[$00:03AF]</code><code>[$00:03AE]</code>減少処理</td></tr>
+	<tr><td><code>$C1:34EA</code>～<code>$C1:34F5</code></td><td>HBlank判定用 Hカウンタ（画面描画水平位置）が$E0以上かまたはまたは$50未満か判定</td></tr>
+	<tr><td><code>$C1:34F6</code>～<code>$C1:3504</code></td><td>HBlank判定用 Hカウンタの値を取得</td></tr>
 	<tr><td><code>$C1:3546</code>～<code>$C1:35C3</code></td><td>戦闘開始時 行動異常</td></tr>
 	<tr><td><code>$C1:35C7</code>～<code>$C1:35E9</code></td><td>戦闘開始時 状態異常（実際のゲームでは未使用）</td></tr>
 	<tr><td><code>$C1:380E</code>～<code>$C1:38E1</code></td><td>範囲攻撃における範囲の計算</td></tr>
@@ -460,7 +466,9 @@ table {
 	<tr><td><code>$C1:5040</code>～<code>$C1:5075</code></td><td>キャラIDから、キャラIDのキャラがいるか及びキャラ状態の判定</td></tr>
 	<tr><td><code>$C1:5076</code>～<code>$C1:5139</code></td><td>テキストデータから文字ビットマップ呼び出し</td></tr>
 	<tr><td><code>$C1:51FB</code>～<code>$C1:5245</code></td><td>敵位置マス判定処理</td></tr>
+	<tr><td><code>$C1:5FE0</code>～<code>$C1:60C9</code></td><td>キャラのスプライトデータをWRAM<code>$00:D000</code>～<code>$00:D400</code>にGDMA転送</td></tr>
 	<tr><td><code>$C1:6150</code>～<code>$C1:61A4</code></td><td>戦闘用乱数計算</td></tr>
+	<tr><td><code>$C1:62BF</code>～<code>$C1:62EE</code></td><td>味方キャラIDからカラーパレットデータ開始位置を計算しCGRAMへGDMA転送</td></tr>
 	<tr><td><code>$C1:63F6</code>～<code>$C1:6725</code></td><td>敵種類の縦・横サイズ書き込み</td></tr>
 	<tr><td><code>$C1:6DCC</code>～<code>$C1:6E12</code></td><td>最終編ラストの7連戦後の画面上のドットがランダムに消えていく演出用計算</td></tr>
 	<tr><td><code>$C1:6F7C</code>～<code>$C1:6FBA</code></td><td>最終編オルステッドルート　おーでぃーおー戦でざき入れ替え判定</td></tr>
@@ -473,6 +481,8 @@ table {
 	<tr><td><code>$C1:7BCE</code>～<code>$C1:7F92</code></td><td>最終編ラストバトル　ピュアオディオ出現判定・処理</td></tr>
 	<tr><td><code>$C1:835E</code>～<code>$C1:8368</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタに<span class="formula">$0F</span>書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C1:8AD8</code>～<code>$C1:8AFD</code></td><td>戦闘用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
+	<tr><td><code>$C1:8C19</code>～<code>$C1:8C9E</code></td><td><code>$7E:F980</code>～<code>$7E:F99E</code>にロードした技用のカラーパレットをCGRAMに転送</td></tr>
+	<tr><td><code>$C1:8DC0</code>～<code>$C1:8DFD</code></td><td>WRAMにコピーしたスプライトデータをVRAM転送</td></tr>
 	<tr><td><code>$C1:8E51</code>～<code>$C1:8E5B</code></td><td>行動ポイントのチェック</td></tr>
 	<tr><td><code>$C1:8E5E</code>～<code>$C1:8E7E</code></td><td>順序ポイント計算（敵が行動不能な状態異常（石化、マヒ、眠り）の時）</td></tr>
 	<tr><td><code>$C1:8E82</code>～<code>$C1:8EB3</code></td><td>敵ターン　移動・向き変え判定</td></tr>
@@ -509,6 +519,7 @@ table {
 	<tr><td><code>$C1:A12C</code>～<code>$C1:A179</code></td><td>敵が出した技が回復技または無属性ではないとき、技の属性を取り出す</td></tr>
 	<tr><td><code>$C1:A1BD</code>～<code>$C1:A21B</code></td><td>敵から1ヒット以上の攻撃を食らった時、習得技で反撃できるか判定し、反撃技が出せなくなる状態異常ではないか判定</td></tr>
 	<tr><td><code>$C1:A312</code>～<code>$C1:A161</code></td><td>敵が技を出した直後、味方側の被ヒット数<code>$00:1C3B/1C7B/1CBB/1CFB</code>を、<code>$7E:EA20/EA60/EAA0/EAE0</code>にコピー</td></tr>
+	<tr><td><code>$C1:B0AF</code>～<code>$C1:B18C</code></td><td>技用のカラーパレットを<code>$7E:F980</code>～<code>$7E:F99E</code>にロード</td></tr>
 	<tr><td><code>$C1:C39D</code>～<code>$C1:C3B7</code></td><td>自爆999ダメージタイプ処理開始</td></tr>
 	<tr><td><code>$C1:C3DD</code>～<code>$C1:C3E7</code></td><td>技タイプが「外すとダメージ」「自爆999ダメージ」か判定</td></tr>
 	<tr><td><code>$C1:C40F</code>～<code>$C1:C42B</code></td><td>被ダメージの単発値、ヒット数書き込み</td></tr>
@@ -567,6 +578,8 @@ table {
 	<tr><td><code>$C1:EE2F</code>～<code>$C1:EE46</code></td><td>最終編で仲間キャラ敵対時　仲間キャラID・戦闘状態書き込み</td></tr>
 	<tr><td><code>$C1:EE56</code>～<code>$C1:EEC8</code></td><td>最終編以外で仲間キャラ敵対時　味方キャラID・アドレス呼び出し</td></tr>
 	<tr><td><code>$C1:F05F</code>～<code>$C1:F2B1</code></td><td>最終編オルステッドルート　対戦キャラのステータスセット</td></tr>
+	<tr><td><code>$C1:F2D1</code>～<code>$C1:F319</code></td><td>戦闘開始時 GDMA転送初期設定</td></tr>
+	<tr><td><code>$C1:F31F</code>～<code>$C1:F337</code></td><td>戦闘開始時 GDMA転送初期設定（チャネル4）</td></tr>
 	<tr><td><code>$C1:F3CE</code>～<code>$C1:F3D8</code></td><td><code>[$00:03AA]</code>, <code>[$00:038B]</code>, <code>[$00:0395]</code>, <code>[$00:0396]</code>, <code>[$00:03B7]</code>, <code>[$00:03B7]</code>, <code>[$00:03B8]</code>に初期値$00を設定</td></tr>
 	<tr><td><code>$C1:F50E</code>～<code>$C1:F623</code></td><td>最終編ランダムエンカウント時の敵パーティ算出</td></tr>
 	<tr><td><code>$C1:F55D</code>～<code>$C1:F727</code></td><td>味方ステータスのセット</td></tr>
@@ -658,9 +671,13 @@ table {
 
 <h3>RAM領域</h3>
 
-<p>RAM（Random-Access Memory）領域はバンク<code>$00</code>～<code>$3F</code>の<code>$0000～$1FFF</code>、バンク<code>$7E</code>（ただしバンク<code>$7E:$0000</code>～<code>$1FFF</code>はバンク<code>$00:$0000</code>～<code>$1FFF</code>のミラーリング）で、先に記した通りにバンク<code>$80</code>～にはバンク<code>$00</code>～がミラーリングされている。<br>
-何かしらの計算をする時はだいたい、<code>$00:0000</code>～<code>$00:1FFF</code>（ミラーリング：<code>$7E:0000</code>～<code>$7E:1FFF</code>）の領域を一時的な変数のように扱っている、と思って良い。<br>
-解説サイトなどでは、ミラーリングである<code>$7E:????</code>でどのメモリが何の役割かを説明していることが多い。ここではバンク<code>$00</code>の値を以下に記す。</p>
+<p>RAM（Random-Access Memory）領域はバンク<code>$00</code>～<code>$3F</code>の<code>$0000～$1FFF</code>、バンク<code>$7E</code>で、先に記した通りにバンク<code>$80</code>～にはバンク<code>$00</code>～がミラーリングされている。</p>
+
+<p><code>$7E:0000</code>～<code>$7F:FFFF</code>はWRAM（Work RAM）というメモリ領域で、<code>$7E:0000</code>～<code>$7F:1FFF</code>のみ、他バンクでもミラーリングされて共通の値が入る（バンク<code>$00</code>～<code>$3F</code>, <code>$80</code>～<code>$BF</code>）<br>
+だいたいの場合で<code>$00:0000</code>～<code>$00:1FFF</code>（またはミラーリングの<code>$7E:0000</code>～<code>$7F:1FFF</code>）にて数値の読み書き・計算をするのは、ここがWRAMだからである。</p>
+
+<p>WRAMの<code>$7F:2000</code>～<code>$7F:FFFF</code>はミラーリングされていないため、別途、<code>$00:2180</code>～<code>$00:2183</code>に値を読み書きすることで通信をして値を書き込む。<br>
+<code>$00:2180</code>～<code>$00:2183</code>のように外部メモリとやりとりをするためのアドレスをI/Oレジスタというが、この後で説明する。</p>
 
 <p>※下位バイト・上位バイトについて<br>
 アドレス1つに入るデータは1バイト（16進数2文字）だが、中には連続した2つのアドレスを使って、2バイト（16進数4文字）のデータを記録している値もある。<br>
@@ -676,23 +693,78 @@ table {
 <p>スーパーファミコンと周辺機器（ゲームカセット、操作用のコントローラ、及び、画像・音を出力するためのディスプレイやスピーカーつまりスーパーファミコンの時代だとブラウン管テレビ）が通信を行うための端子（接続部分）などをI/Oポートというのだが、これら周辺機器とのやりとり用に割り振られたメモリアドレスが「I/Oレジスタ」になる。<br>
 これはスーパーファミコンの仕様のため、どのスーパーファミコンソフトでも共通のはずである。<br>
 詳しいアドレスは上サイト様など参照。ここでは簡単な説明に留める。<br>
-プログラマーでない限りいろいろ詳しいことを知っておく必要はないし、筆者もわからないことだらけだが、とりあえず、以下のように見ておけばだいたいの判断ができる。</p>
+プログラマーでない限りいろいろ詳しいことを知っておく必要はないし、筆者もわからないことだらけだが、とりあえず、知っておくと良いレジスタだけピックアップする。<br>
+用語の説明は表の下。</p>
 
 <table>
 <thead>
 	<tr><th>アドレス</th><th>内容</th></tr>
 </thead>
 <tbody>
-	<tr><td><code>$00:2100</code>～<code>$00:213F</code><br><code>$00:211B</code>～<code>$00:2120</code>
-	</td><td>画像（映像）関係<br>※画像伸縮回転用</td></tr>
+	<tr><td><code>$00:2100</code></td><td>ディスプレイ制御レジスタ1 </td></tr>
+	<tr><td><code>$00:2101</code></td><td>OBSEL（スプライトのサイズを設定）</td></tr>
+	<tr><td><code>$00:2102～$00:2103</code></td><td>OAMアドレス (下位8bit～上位1bit)</td></tr>
+	<tr><td><code>$00:2104</code></td><td>OAM書き込み</td></tr>
+	<tr><td><code>$00:2105</code></td><td>背景（BG）制御レジスタ</td></tr>
+	<tr><td><code>$00:2107</code></td><td>背景（BG1）画面設定</td></tr>
+	<tr><td><code>$00:2108</code></td><td>背景（BG2）画面設定</td></tr>
+	<tr><td><code>$00:2109</code></td><td>背景（BG3）画面設定</td></tr>
+	<tr><td><code>$00:210A</code></td><td>背景（BG4）画面設定</td></tr>
+	<tr><td><code>$00:2116～$00:2117</code></td><td>VRAMアドレス (下位8bit～上位8bit)</td></tr>
+	<tr><td><code>$00:2118～$00:2119</code></td><td>VRAMデータ書き込み (下位8bit～上位8bit)</td></tr>
+	<tr><td><code>$00:2121</code></td><td>CGRAM カラーパレットアドレス指定</td></tr>
+	<tr><td><code>$00:2122</code></td><td>CGRAM カラーパレット書き込み</td></tr>
 	<tr><td><code>$00:2140</code>～<code>$00:2143</code></td><td>サウンド用CPUであるAPU（SPC700）とのI/Oレジスタ（<code>$00:2144</code>～<code>$00:217F</code>は<code>$00:2140</code>～<code>$00:2143</code>をミラーリング）</td></tr>
+	<tr><td><code>$00:2180</code></td><td>WRAMデータレジスタ</td></tr>
+	<tr><td><code>$00:2181～$00:2183</code></td><td>WRAMアドレスレジスタ 3バイト (下位8bit・中位8bit・上位1bit)</td></tr>
 	<tr><td><code>$00:4200</code></td><td>割り込み有効化レジスタ</td></tr>
-	<tr><td><code>$00:4201</code>～<code>$00:4217</code><br><code>$00:4212</code></td><td>乗算、除算、画像関係、その他諸々<br>自動ジョイパッド読み取り機能のON・OFF状態</td></tr>
+	<tr><td><code>$00:420B</code></td><td>GDMA開始レジスタ</td></tr>
+	<tr><td><code>$00:420C</code></td><td>HDMAチャネルレジスタ</td></tr>
+	<tr><td><code>$00:4212</code></td><td>自動ジョイパッド読み取り機能のON・OFF状態</td></tr>
+	<tr><td><code>$00:4212</code></td><td>bit7　自動ジョイパッド読み取り機能のONOFF記録</td></tr>
+	<tr><td><code>$00:4218～$00:4219</code></td><td>自動ジョイパッド読み取り機能のコントローラ1のボタン状態出力先</td></tr>
+	<tr><td><code>$00:421A～$00:421B</code></td><td>自動ジョイパッド読み取り機能のコントローラ2のボタン状態出力先（本作未使用）</td></tr>
 	<tr><td><code>$00:4218</code>～<code>$00:421F</code></td><td>コントローラ（ジョイパッド）出力</td></tr>
+	<tr><td><code>$00:43n0</code></td><td>GDMA/HDMA設定レジスタ(チャネルn)</td></tr>
+	<tr><td><code>$00:43n1</code></td><td>GDMA 転送先指定 <span class="formula">$04</span>=OAM, <span class="formula">$18</span>=VRAM, <span class="formula">$22</span>=CGRAM, <span class="formula">$80</span>=WRAM</td></tr>
+	<tr><td><code>$00:43n3</code>～<code>$00:43n2</code></td><td>GDMA データ元アドレス（開始位置）</td></tr>
+	<tr><td><code>$00:43n4</code></td><td>GDMA データ元バンク</td></tr>
+	<tr><td><code>$00:43n6</code>～<code>$00:43n5</code></td><td>GDMA 転送するデータ量</td></tr>
 </tbody>
 </table>
 
+<ul>
+	<li>WRAM: Work RAM<br>
+	容量：128KB<br>
+	スーパーファミコンのメインメモリ。<code>$7E:0000</code>～<code>$7F:FFFF</code></li>
+
+	<li>VRAM: Video RAM<br>
+	容量：64KB<br>
+	グラフィックデータ（画像の構造）を記録するメモリ。</li>
+
+	<li>CGRAM: Color Generator RAM<br>
+	容量：512バイト<br>
+	スプライトや背景の色情報（カラーパレット）を記録するメモリ。<br>
+	アドレスをbyteではなくwordで指定するため注意が必要。2byte(バイト)で1word(ワード)になる。
+	</li>
+
+	<li>OAM: Object Attribute Memory<br>
+	容量：544バイト<br>
+	スプライトの配置を記録するメモリ。</li>
+
+	<li>データ転送</li>
+	<ul>
+		<li>GDMA(General Direct Memory Access):<br>
+		データ転送のこと。HDMAと合わせて8チャネル設定可能。<br>
+		これでWRAM, VRAM, CGRAM, OAMへデータを送る。</li>
+
+		<li>HDMA(HBlank DMA):<br>
+		HBlank（画面1行のグラフィックを描画した後の次の行の描画までの僅かな時間）を利用したデータ転送。</li>
+	</ul>
+</ul>
+
 <p>サブルーチンを見て、<code>$00:2100</code>～<code>$00:213F</code>の読み書きをしているのならだいたい画像関係だし、<code>$00:2140</code>～<code>$00:217F</code>ならサウンド関係（バンク<code>$C3</code>）、<code>$00:4218</code>～<code>$00:4219</code>はコントローラ出力の判定である。<br>
+<code>$00:43n?</code>は他メモリとのデータのやりとり（大抵はグラフィックのデータ）で、<code>$00:43n1</code>に何の値を書き込んだかで、カラーパレットのデータ（<span class="formula">$22</span>=CGRAM）か、スプライト位置（<span class="formula">$04</span>=OAM）か、大雑把に把握できる。<br>
 また、スーパーファミコンには画像の伸縮回転を行う機能があるが、そのためのI/Oレジスタ<code>$00:211B</code>～<code>$00:2120</code>を利用した乗算、<code>$00:4202</code>～<code>$00:4206</code>の乗算・除算用レジスタを使った乗算・除算も頻繁に見られる。</p>
 
 <p>ゲームプレイ中、プレイヤーからのコントローラ（ジョイパッド）の入力待ちのため<code>$00:4212</code>の状態の読み取りを1フレームに1回行っており、ログを取ってみると<code>$00:4212</code>の読み取りループばかり並ぶのはこのため。</p>
@@ -727,6 +799,7 @@ table {
 <h4>フィールド</h4>
 
 <p>戦闘時の共通部分含む。</p>
+</p>
 
 <table>
 <thead>
@@ -913,10 +986,6 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:1D05</code></td><td>現在のBGM【戦闘・マップ共通】　<a href="#BGMlist">BGM一覧表</a></td></tr>
 	<tr><td><code>$00:1DE2</code></td><td>現在のBGM【戦闘・マップ共通】　<a href="#BGMlist">BGM一覧表</a></td></tr>
 
-	<tr><td><code>$00:2140</code></td><td>APU（SPC700）通信ポート サウンドデータ転送ステータス</td></tr>
-	<tr><td><code>$00:2141</code></td><td>APU（SPC700）通信ポート サウンドデータサイズ<br>0以外の値が送られると転送開始、0が送られると転送終了および実行開始</td></tr>
-	<tr><td><code>$00:2142</code>～<code>$00:2143</code></td><td>APU（SPC700）通信ポート 転送先アドレス2バイト</td></tr>
-	
 	<tr><td><code>$7E:2A00</code>～<code>$7E:2A3F</code></td><td>メニュー→装備で、該当キャラのシナリオ別キャラデータがそのまま入る（<span class="formula">$23</span>のみ例外、異なる値が入る）</td></tr>
 	<tr><td><code>$7E:2F3C</code></td><td>文字入力画面　ページ数（<span class="formula">$00</span>～、シナリオなどにより最大ページ数は変動）</td></tr>
 	<tr><td><code>$7E:2F40</code></td><td>文字入力画面　X軸のカーソル位置　左上座標を(0,0)とする。横方向は11文字。<span class="formula">$00</span>～<span class="formula">$0A</span></td></tr>
@@ -928,10 +997,8 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$7E:2F4C</code>～<code>$7E:2F4d</code></td><td>文字入力画面　入力欄4文字目（2バイト）</td></tr>
 	<tr><td><code>$7E:2F4E</code>～<code>$7E:2F4f</code></td><td>文字入力画面　入力欄5文字目（2バイト）</td></tr>
 	<tr><td><code>$7E:2F50</code>～<code>$7E:2F51</code></td><td>文字入力画面　入力欄6文字目（2バイト）</td></tr>
-	<tr><td><code>$00:4200</code></td><td>下1ビット　自動ジョイパッド読み取り機能のONOFF</td></tr>
-	<tr><td><code>$00:4212</code></td><td>下1ビット　自動ジョイパッド読み取り機能のONOFF記録</td></tr>
-	<tr><td><code>$00:4218</code>～<code>$00:4219</code></td><td>自動ジョイパッド読み取り機能のコントローラ1のボタン状態出力先</td></tr>
-	<tr><td><code>$00:421A</code>～<code>$00:421B</code></td><td>自動ジョイパッド読み取り機能のコントローラ2のボタン状態出力先（本作未使用）</td></tr>
+	<tr><td><code>$7E:3800</code>～<code>$7E:39FF</code></td><td>カラーパレットのデータ コピー先</td></tr>
+
 	<tr><td><code>$7E:8000</code>～<code>$7E:81FF</code></td><td>カラーパレットのコピー先アドレス</td></tr>
 	<tr><td><code>$7E:8A00</code>～<code>$7E:8AC6</code></td><td>文字入力画面　文字コード（1文字2バイト、左上から右下へ、横11文字分、縦9文字分）</td></tr>
 	<tr><td><code>$7E:8A00</code>～<code>$7E:8AFF</code></td><td>メニュー画面＞持ち物欄 整頓時アイテムIDコピー用アドレス</td></tr>
@@ -1218,6 +1285,7 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$7E:A01D</code></td><td>現代編ワタナベイベントのエイジャの向き判定　左上向きは<span class="formula">$79</span>、それ以外は<span class="formula">$38</span></td></tr>
 	<tr><td><code>$7E:B005</code>～<code>$7E:B5FB</code></td><td>表示する文字列のビットマップデータ（文字の画像データ）コピー先</td></tr>
 	<tr><td><code>$7E:D000</code>～<code>$7E:DFFF</code></td><td>戦闘中のキャラスプライト（元データからのコピー）</td></tr>
+	<tr><td><code>$7E:F980</code>～<code>$7E:F99E</code></td><td>技用のカラーパレットコピー先</td></tr>
 	<tr><td><code>$7E:FEF0</code></td><td>戦闘中タイマー（下位バイト）</td></tr>
 	<tr><td><code>$7E:FEF1</code></td><td>戦闘中タイマー（上位バイト）</td></tr>
 	<tr><td><code>$7E:FEFA</code></td><td>通常<span class="formula">$00</span>、ハルマゲドンコマンドONの時<span class="formula">$FF</span>が入る</td></tr>
