@@ -378,6 +378,8 @@ table {
 	<tr><td><code>$C0:B83E</code>～<code>$C0:B8E5</code></td><td>マップ用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
 	<tr><td><code>$C0:B900</code>～<code>$C0:B924</code></td><td>マップ乱数計算</td></tr>
 	<tr><td><code>$C0:BA16</code>～<code>$C0:BA75</code></td><td>16bit×16bit乗算サブルーチン</td></tr>
+	<tr><td><code>$C0:BB15</code>～<code>$C0:BC68</code></td><td>OAM用データを計算、<code>$00:0700</code>～<code>$00:0920</code>に書き込み</td></tr>
+	<tr><td><code>$C0:BC6D</code>～<code>$C0:BC93</code></td><td>OAMへデータ(<code>$00:0700</code>～<code>$00:0920</code>)を転送</td></tr>
 </tbody>
 </table>
 
@@ -466,6 +468,9 @@ table {
 	<tr><td><code>$C1:5040</code>～<code>$C1:5075</code></td><td>キャラIDから、キャラIDのキャラがいるか及びキャラ状態の判定</td></tr>
 	<tr><td><code>$C1:5076</code>～<code>$C1:5139</code></td><td>テキストデータから文字ビットマップ呼び出し</td></tr>
 	<tr><td><code>$C1:51FB</code>～<code>$C1:5245</code></td><td>敵位置マス判定処理</td></tr>
+	<tr><td><code>$C1:5AC2</code>～<code>$C1:5B64</code></td><td>味方キャラのOAM下位テーブル用データ獲得</td></tr>
+	<tr><td><code>$C1:5EF5</code>～<code>$C1:5F1C</code></td><td>味方キャラのOAM上位テーブル用データ獲得</td></tr>
+	<tr><td><code>$C1:5F1D</code>～<code>$C1:5F85</code></td><td>味方キャラ以外のOAMデータ獲得</td></tr>
 	<tr><td><code>$C1:5FE0</code>～<code>$C1:60C9</code></td><td>キャラのスプライトデータをWRAM<code>$00:D000</code>～<code>$00:D400</code>にGDMA転送</td></tr>
 	<tr><td><code>$C1:6150</code>～<code>$C1:61A4</code></td><td>戦闘用乱数計算</td></tr>
 	<tr><td><code>$C1:62BF</code>～<code>$C1:62EE</code></td><td>味方キャラIDからカラーパレットデータ開始位置を計算しCGRAMへGDMA転送</td></tr>
@@ -482,6 +487,7 @@ table {
 	<tr><td><code>$C1:835E</code>～<code>$C1:8368</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタに<span class="formula">$0F</span>書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C1:8AD8</code>～<code>$C1:8AFD</code></td><td>戦闘用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
 	<tr><td><code>$C1:8C19</code>～<code>$C1:8C9E</code></td><td><code>$7E:F980</code>～<code>$7E:F99E</code>にロードした技用のカラーパレットをCGRAMに転送</td></tr>
+	<tr><td><code>$C1:8D9C</code>～<code>$C1:8DBF</code></td><td>OAMへデータ<code>$7E:0700</code>～<code>$7E:0920</code>を転送</td></tr>
 	<tr><td><code>$C1:8DC0</code>～<code>$C1:8DFD</code></td><td>WRAMにコピーしたスプライトデータをVRAM転送</td></tr>
 	<tr><td><code>$C1:8E51</code>～<code>$C1:8E5B</code></td><td>行動ポイントのチェック</td></tr>
 	<tr><td><code>$C1:8E5E</code>～<code>$C1:8E7E</code></td><td>順序ポイント計算（敵が行動不能な状態異常（石化、マヒ、眠り）の時）</td></tr>
@@ -605,15 +611,25 @@ table {
 
 <h5>メニュー画面</h5>
 
+
 <table>
 <thead>
 	<tr><th>アドレス</th><th>内容</th></tr>
 </thead>
 <tbody>
 	<tr><td><code>$C2:00F7</code>～<code>$C2:00FA</code></td><td>メニュー画面開いた時の暗転処理</td></tr>
+	<tr><td><code>$C2:04FE</code>～<code>$C2:0525</code></td><td>OAM用の<code>$00:0700</code>～<code>$00:091F</code>の値をリセット</td></tr>
+	<tr><td><code>$C2:0526</code>～<code>$C2:052F</code></td><td><code>[$00:4200]</code>(割り込み有効化レジスタ)判定</td></tr>
+	<tr><td><code>$C2:0782</code>～<code>$C2:07A0</code></td><td>カーソル位置のOAMデータを<code>$00:0700</code>～<code>$00:0703</code>に書き込み</td></tr>
 	<tr><td><code>$C2:08A0</code>～<code>$C2:08A7</code></td><td>メニュー画面用・コマンド判定</td></tr>
 	<tr><td><code>$C2:091E</code>～<code>$C2:0971</code></td><td>隊形・キャラ入れ替えのキャラ選択状態・空欄判定</td></tr>
+	<tr><td><code>$C2:0115</code>～<code>$C2:0121</code></td><td>メニュー画面用カラーパレットNo.<span class="formula">$00</span>のデータを<code>$7E:8C00</code>～に書き込み
 	<tr><td><code>$C2:0BB9</code>～<code>$C2:0C15</code></td><td>メニュー画面用・カーソル位置をAボタンで選択～もう一か所をカーソル位置指定しAボタンで選択して入れ替え</td></tr>
+	<tr><td><code>$C2:3481</code>～<code>$C2:34A7</code></td><td>VRAM転送用 GDMA転送チャネル4設定</td></tr>
+	<tr><td><code>$C2:34AC</code>～<code>$C2:34E4</code></td><td><code>$7E:C000</code>～にコピーされたキャラのスプライトデータを<code>$7E:C800</code>～へコピー</td></tr>
+	<tr><td><code>$C2:34FC</code>～<code>$C2:3526</code></td><td>キャラのカラーパレットデータを<code>$7E:8D00</code>～へコピー</td></tr>
+	<tr><td><code>$C2:3534</code>～<code>$C2:35A8</code></td><td>キャラのスプライトデータを<code>$7E:C000</code>～へコピー</td></tr>
+	<tr><td><code>$C2:35AD</code>～<code>$C2:3712</code></td><td>キャラのOAMデータを<code>$7E:0710</code>～へコピー</td></tr>
 	<tr><td><code>$C2:3CB4</code>～<code>$C2:3CCE</code></td><td>セーブデータからのロード</td></tr>
 	<tr><td><code>$C2:3D4D</code>～<code>$C2:3D98</code></td><td>セーブデータへのセーブ</td></tr>
 	<tr><td><code>$C2:42D9</code>～<code>$C2:43B5</code></td><td>指定テキストを<code>$7E:2000</code>～にロードする</td></tr>
@@ -622,6 +638,11 @@ table {
 	<tr><td><code>$C2:49A6</code>～<code>$C2:49D0</code></td><td>アイテムIDからアイテムデータ開始アドレス計算の準備～アイテムデータ転送</td></tr>
 	<tr><td><code>$C2:4B51</code>～<code>$C2:4B9C</code></td><td>メニュー画面　隊形・キャラ入れ替え</td></tr>
 	<tr><td><code>$C2:4C4D</code>～<code>$C2:4C87</code></td><td>グラフィック転送処理</td></tr>
+	<tr><td><code>$C2:4C88</code>～<code>$C2:4CA0</code></td><td>VRAM転送用 GDMA転送チャネル4実行</td></tr>
+	<tr><td><code>$C2:4D35</code>～<code>$C2:4D54</code></td><td>OAM転送用 GDMA転送チャネル0設定</td></tr>
+	<tr><td><code>$C2:4D55</code>～<code>$C2:4D78</code></td><td>CGRAM転送用 GDMA転送チャネル1設定</td></tr>
+	<tr><td><code>$C2:4DB0</code>～<code>$C2:4DD0</code></td><td><code>[$00:057A]</code>(GDMA転送チャネルに設定がされているか判定用メモリアドレス)に値が入っていた
+ら、対応したGDMA転送チャネルを実行</td></tr>
 	<tr><td><code>$C2:4FE8</code>～<code>$C2:4FEF</code></td><td><code>[$00:4200]</code>に<code>[$00:0579]</code>を書き込んで自動ジョイパッド読み取り機能をONにする（NMI割り込みONは<code>[$00:0579]</code>の値次第）</td></tr>
 	<tr><td><code>$C2:5178</code>～<code>$C2:51E0</code></td><td>メニュー画面用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
 	<tr><td><code>$C2:51F9</code>～<code>$C2:5201</code></td><td>アドレス呼び出し用サブルーチン（<code>A</code>に<span class="formula">$7E</span>セット）</td></tr>
@@ -842,6 +863,7 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:0567</code>～<code>$00:0568</code></td><td>メニュー画面　持ち物欄などでAボタンで何かを選んだ状態で更に他位置を選択</td></tr>
 	<tr><td><code>$00:0569</code>～<code>$00:056A</code></td><td>メニュー画面　装備、持ち物、技、隊形、音声、セーブを選んだ時、それぞれ<span class="formula">$0001</span>～<span class="formula">$0006</span>が入る</td></tr>
 	<tr><td><code>$00:0565</code></td><td>現代編　対戦相手画面<br>（通常<span class="formula">$FF</span>、対戦相手を選ぶと値が入る。ナムキャット<span class="formula">$00</span>、エイジャ<span class="formula">$01</span>、トゥーラ・ハン<span class="formula">$02</span>、森部<span class="formula">$03</span>、モーガン<span class="formula">$04</span>、イヤウケア<span class="formula">$05</span>、オディ・オブライト<span class="formula">$07</span><br>※<code>$00:0566</code>は通常<span class="formula">$FF、それ以外<span class="formula">$00</td></tr>
+	<tr><td><code>$00:057A</code></td><td>メニュー画面・GDMA転送チャネルの設定の有無</td></tr>
 	<tr><td><code>$00:057D～$00:057E</code></td><td>メニュー画面・コントローラ1のボタン状態出力先</td></tr>
 	<tr><td><code>$00:06B9</code></td><td>現代編　1番目に倒した対戦相手ID（1戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
 	<tr><td><code>$00:06BA</code></td><td>現代編　2番目に倒した対戦相手ID（2戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
@@ -850,6 +872,7 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:06BD</code></td><td>現代編　5番目に倒した対戦相手ID（5戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
 	<tr><td><code>$00:06BE</code></td><td>現代編　6番目に倒した対戦相手ID（6戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
 	<tr><td><code>$00:06BF</code></td><td>現代編　倒した対戦相手の人数累積（<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
+	<tr><td><code>$00:0700</code>～<code>$00:0920</code></td><td>OAMへ転送するスプライト用データ</td></tr>
 	<tr><td><code>$00:0A00</code></td><td>プレイ中のシナリオ　<a href="#scID">対応表</a></td></tr>
 	<tr><td><code>$00:0A01</code></td><td>シナリオのクリア状況<br>（8ビットが各シナリオ対応。上の桁から順に中世、原始、ＳＦ、功夫、西部、現代、近未来、幕末）</td></tr>
 	<tr><td><code>$00:0A02～03</code></td><td>現在居るエリアのID<br>（マップに対応した数値、シナリオ毎に異なる）</td></tr>
@@ -998,12 +1021,13 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$7E:2F4E</code>～<code>$7E:2F4f</code></td><td>文字入力画面　入力欄5文字目（2バイト）</td></tr>
 	<tr><td><code>$7E:2F50</code>～<code>$7E:2F51</code></td><td>文字入力画面　入力欄6文字目（2バイト）</td></tr>
 	<tr><td><code>$7E:3800</code>～<code>$7E:39FF</code></td><td>カラーパレットのデータ コピー先</td></tr>
-
 	<tr><td><code>$7E:8000</code>～<code>$7E:81FF</code></td><td>カラーパレットのコピー先アドレス</td></tr>
 	<tr><td><code>$7E:8A00</code>～<code>$7E:8AC6</code></td><td>文字入力画面　文字コード（1文字2バイト、左上から右下へ、横11文字分、縦9文字分）</td></tr>
 	<tr><td><code>$7E:8A00</code>～<code>$7E:8AFF</code></td><td>メニュー画面＞持ち物欄 整頓時アイテムIDコピー用アドレス</td></tr>
 	<tr><td><code>$7E:8B00</code>～<code>$7E:8BFF</code></td><td>メニュー画面＞持ち物欄 整頓時アイテム所持数コピー用アドレス</td></tr>
+	<tr><td><code>$7E:8C00</code>～<code>$7E:8DFF</code></td><td>メニュー画面用カラーパレットのデータ コピー先</td></tr>
 	<tr><td><code>$7E:901D</code></td><td>戦闘開始時に場の属性が決まっているエリアだと属性の値が入る</td></tr>
+	<tr><td><code>$7E:C000</code>～<code>$7E:CE7F</code></td><td>キャラのスプライトデータ コピー先</td></tr>
 </tbody>
 </table>
 
@@ -1271,6 +1295,7 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:03E6</code></td><td>戦闘コマンドにおけるカーソル位置（初期位置<span class="formula">$00</span>、技一覧やアイテム一覧でも）</td></tr>
 	<tr><td><code>$00:0488</code>～<code>$00:04BE</code></td><td>戦闘フィールドマスの計算用アドレス</td></tr>
 	<tr><td><code>$00:04C8</code>～<code>$00:04FF</code></td><td>戦闘フィールドマスの状態（後述）</td></tr>
+	<tr><td><code>$7E:0700</code>～<code>$7E:0920</code></td><td>OAMへ転送するスプライト用データ</td></tr>
 	<tr><td><code>$7E:8000</code>～<code>$7E:8200</code></td><td>カラーパレットのコピー先アドレス</td></tr>
 	<tr><td><code>$7E:9009</code></td><td>技使用時　技データ13　上4ビット：周囲攻撃2、反撃専用4、回復8/下4ビット：技の属性</td></tr>
 	<tr><td><code>$7E:900A</code></td><td>技使用時　技データ22　上4ビット：ダメージフィールド/下4ビット：上4ビットが8以上の時、行動異常の値</td></tr>
