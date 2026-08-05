@@ -110,6 +110,7 @@ table {
 		<li><a href="d5.html">各種データアドレス</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
 		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
 		<li><a href="program1.html">ボタン判定</a></li>
 		<li><a href="memo.html">雑多メモ</a></li>
 	</ul>
@@ -361,7 +362,8 @@ table {
 	<tr><td><code>$C0:0016</code>～<code>$C0:0067</code></td><td>リセット時初期処理　<code>$00:0000</code>～<code>$00:1CFE</code>に初期値設定</td></tr>
 	<tr><td><code>$C0:00FC</code>～<code>$C0:01CB</code></td><td>リセット時初期処理　画像関係（PPU)<code>$00:2100</code>～<code>$00:2133</code>及び<code>$00:4200</code>～<code>$00:420D</code>、<code>$00:4016</code>、<code>$00:4200</code>の初期化</td></tr>
 	<tr><td><code>$C0:0308</code>～<code>$C0:032C</code></td><td>セーブデータからのセーブ用データ解凍（<code>$00:13xx</code>用）</td></tr>
-	<tr><td><code>$C0:0EDF</code>～<code>$C0:0FB0</code></td><td>リセット時初期処理　BGマップ</td></tr>
+	<tr><td><code>$C0:0EDF</code>～<code>$C0:0F7C</code></td><td>リセット時初期処理　BGマップ</td></tr>
+	<tr><td><code>$C0:0F80</code>～<code>$C0:0FB0</code></td><td>BGモードをMode7（背景の回転・拡大・縮小モード）に変更</td></tr>
 	<tr><td><code>$C0:1051</code>～<code>$C0:1069</code></td><td><code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C0:106A</code>～<code>$C0:1074</code></td><td><code>[$00:4200]</code>に<span class="formula">$01</span>を書き込んで自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C0:1A69</code>～<code>$C0:1ADB</code></td><td>マップタイマーのカウントダウン計算</td></tr>
@@ -380,6 +382,8 @@ table {
 	<tr><td><code>$C0:BA16</code>～<code>$C0:BA75</code></td><td>16bit×16bit乗算サブルーチン</td></tr>
 	<tr><td><code>$C0:BB15</code>～<code>$C0:BC68</code></td><td>OAM用データを計算、<code>$00:0700</code>～<code>$00:0920</code>に書き込み</td></tr>
 	<tr><td><code>$C0:BC6D</code>～<code>$C0:BC93</code></td><td>OAMへデータ(<code>$00:0700</code>～<code>$00:0920</code>)を転送</td></tr>
+	<tr><td><code>$C0:F338</code>～<code>$C0:F340</code></td><td>Mode7拡大縮小回転用マトリックスB設定</td></tr>
+	<tr><td><code>$C0:F780</code>～<code>$C0:F7B9</code></td><td>CGRAMへDMA転送（<code>$7E:8020</code>からCGRAMアドレス<code>$0000</code>に<span class="formula">$20</span>バイト、<code>$0100</code>に<span class="formula">$20</span>バイト）</td></tr>
 </tbody>
 </table>
 
@@ -439,6 +443,7 @@ table {
 	<tr><td><code>$C1:248B</code>～<code>$C1:24C5</code></td><td>レベルアップ時の力・速・体・知アップ処理</td></tr>
 	<tr><td><code>$C1:24C8</code>～<code>$C1:253E</code></td><td>レベルアップ時の技習得処理</td></tr>
 	<tr><td><code>$C1:25D7</code>～<code>$C1:2633</code></td><td>戦闘開始時 幕末編のNAMEタイプの敵ステータス処理</td></tr>
+	<tr><td><code>$C1:27D7</code>～<code>$C1:27DF</code></td><td>NMI割り込みの<code>$C1:612F</code>～<code>$C1:613C</code>をループさせる処理</td></tr>
 	<tr><td><code>$C1:2800</code>～<code>$C1:281A</code></td><td>移動または向き変え時の行動ポイント計算用　<span class="formula">$40 - 速/4</span>（※向き変えはこの<span class="formula">1/2</span>で行動ポイント増減）</td></tr>
 	<tr><td><code>$C1:281E</code>～<code>$C1:2833</code></td><td>味方の行動時、行動ポイント<code>[$00:03AF]</code><code>[$00:03AE]</code>増加処理</td></tr>
 	<tr><td><code>$C1:283D</code>～<code>$C1:2856</code></td><td>敵の移動または向き変え時、行動ポイント<code>[$00:03AF]</code><code>[$00:03AE]</code>減少処理</td></tr>
@@ -473,10 +478,12 @@ table {
 	<tr><td><code>$C1:5F1D</code>～<code>$C1:5F85</code></td><td>味方キャラ以外のOAMデータ獲得</td></tr>
 	<tr><td><code>$C1:5FE0</code>～<code>$C1:60C9</code></td><td>キャラのスプライトデータをWRAM<code>$00:D000</code>～<code>$00:D400</code>にGDMA転送</td></tr>
 	<tr><td><code>$C1:6150</code>～<code>$C1:61A4</code></td><td>戦闘用乱数計算</td></tr>
+	<tr><td><code>$C1:612F</code>～<code>$C1:613C</code></td><td>NMIによる割り込み待ち用ループ</td></tr>
 	<tr><td><code>$C1:62BF</code>～<code>$C1:62EE</code></td><td>味方キャラIDからカラーパレットデータ開始位置を計算しCGRAMへGDMA転送</td></tr>
 	<tr><td><code>$C1:63F6</code>～<code>$C1:6725</code></td><td>敵種類の縦・横サイズ書き込み</td></tr>
 	<tr><td><code>$C1:6DCC</code>～<code>$C1:6E12</code></td><td>最終編ラストの7連戦後の画面上のドットがランダムに消えていく演出用計算</td></tr>
 	<tr><td><code>$C1:6F7C</code>～<code>$C1:6FBA</code></td><td>最終編オルステッドルート　おーでぃーおー戦でざき入れ替え判定</td></tr>
+	<tr><td><code>$C1:706A</code>～<code>$C1:70B6</code></td><td>テレポート選択後の背景モザイク処理</td></tr>
 	<tr><td><code>$C1:7202</code>～<code>$C1:7268</code></td><td>技が周囲攻撃かどうか判定（<code>$C1:7236</code>まで敵判定、それ以降は味方判定）
 	<tr><td><code>$C1:77CE</code>～<code>$C1:783A</code></td><td>単発ダメージ/回復量計算</td></tr>
 	<tr><td><code>$C1:7843</code>～<code>$C1:7851</code></td><td>単発ダメージ＋乱数ブレ分</td></tr>
@@ -485,6 +492,7 @@ table {
 	<tr><td><code>$C1:7AED</code>～<code>$C1:7B01</code></td><td>味方キャラが行動可能か判定（状態異常とタメ時間中でないか確認）</td></tr>
 	<tr><td><code>$C1:7BCE</code>～<code>$C1:7F92</code></td><td>最終編ラストバトル　ピュアオディオ出現判定・処理</td></tr>
 	<tr><td><code>$C1:835E</code>～<code>$C1:8368</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタに<span class="formula">$0F</span>書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
+	<tr><td><code>$C1:89E5</code>～<code>$C1:8A25</code></td><td>カラーマス処理　BG3の指定マス色を<span class="formula">$840000</span>で加算処理して色変更</td></tr>
 	<tr><td><code>$C1:8AD8</code>～<code>$C1:8AFD</code></td><td>戦闘用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
 	<tr><td><code>$C1:8C19</code>～<code>$C1:8C9E</code></td><td><code>$7E:F980</code>～<code>$7E:F99E</code>にロードした技用のカラーパレットをCGRAMに転送</td></tr>
 	<tr><td><code>$C1:8D9C</code>～<code>$C1:8DBF</code></td><td>OAMへデータ<code>$7E:0700</code>～<code>$7E:0920</code>を転送</td></tr>
@@ -516,6 +524,7 @@ table {
 	<tr><td><code>$C1:9480</code>～<code>$C1:9533</code></td><td>敵の行動決定（1回目か2回目か判定～2回目処理）</td></tr>
 	<tr><td><code>$C1:9572</code>～<code>$C1:957D</code></td><td>行動ポイント計算（味方がパスまたは味方がYボタン足踏み）</td></tr>
 	<tr><td><code>$C1:96CB</code>～<code>$C1:96EF</code></td><td>行動ポイント計算（味方が移動）</td></tr>
+	<tr><td><code>$C1:9898</code>～<code>$C1:9895</code></td><td>スタートボタンを押してポーズをかけた時、画面の輝度を下げる処理</td></tr>
 	<tr><td><code>$C1:990D</code>～<code>$C1:9927</code></td><td>行動ポイント計算（味方が向き変え）</td></tr>
 	<tr><td><code>$C1:998E</code>～<code>$C1:99A2</code></td><td>戦闘コマンドに何を表示するか判定～文字列呼び出し～表示位置決定～選択可能コマンド判定</td></tr>
 	<tr><td><code>$C1:9D13</code>～<code>$C1:9D86</code></td><td>Xボタンの「ひとつ前の技」関連処理</td></tr>

@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景グラフィックと効果">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景グラフィックと効果">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景グラフィックと効果</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="here"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; スプライトについて</h1>
+<h2>背景グラフィックと効果</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>スーパーファミコンにおけるグラフィックは、背景（BG）とキャラのドット絵（スプライト）に分かれる。<br>
+スプライトについては<a href="sprite.html">スプライトについて</a>でざっと説明したので、先にお読みいただきたい。<br>
+ここでは背景（BGと略す）について大まかに説明する。<br>
+また、背景や画面に関係する効果（モザイク処理や色の加算、ウィンドウの一部をマスクする処理など）も合わせて紹介する。</p>
+
+<div id="captiondata"></div>
+
+<h3>背景について</h3>
+
+<p>背景もスプライトと共通の仕組みの部分が多い。<br>
+背景データをグラフィックデータ用メモリのVRAMに送り、そこから必要な部分をゲーム画面に表示、という意味ではスプライトと大まかな仕組みに変わりはない。<br>
+色情報をCGRAMに送るのも同一。</p>
+
+<p>ただし、スプライトの配置や座標をオブジェクト属性データとしてOAMに転送していたことに対し、背景はBGマップというデータでVRAMに送る、という相違点がある。<br>
+それら含め、背景の設定を紹介する。<br>
+<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/bg/control.md" target="_blank">snes-docs-ja/video/bg/control.md</a>なども参照していただきたい。</p>
+
+<p>背景の設定はI/Oレジスタを通して値を設定する。</p>
+
+<h4>BG制御レジスタ</h4>
+
+<p>レジスタのアドレスは<code>$00:2105</code></p>
+
+<ul>
+	<li>背景の枚数と色数（<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/bg/mode.md" target="_blank">BGモード</a>）</li>
+	<li>背景のタイルサイズ</li>
+</ul>
+
+<p>を決める。<br>
+BGモードはMode0～Mode7の8種類設定できるが、「ライブ・ア・ライブ」では、通常のゲーム画面だと、BGモードにMode1を指定する。<br>
+Mode1は、BG1～BG3の3枚の背景を使用でき、色数は以下のように設定可能。</p>
+
+<ul>
+	<li>BG1：16</li>
+	<li>BG2：16</li>
+	<li>BG3：4</li>
+</ul>
+
+<p>さらにMode1では、BG3優先度という設定ができる。<br>
+通常、背景4枚は、手前からBG1→BG2→BG3という順序におかれる。<br>
+さらに、タイルごとに置く順序の変更も可能。<br>
+BG1のBG優先度はどのタイルも<span class="formula">0</span>、BG2でBG1の上に置きたいタイルだけBG優先度が<span class="formula">1</span>にすることで、BG1が一番下、その上にBG2が置かれる。</p>
+
+<p>BG3優先度は通常<span class="formula">0</span>だが、<span class="formula">1</span>に設定すると、BG3を一番手前に表示できる。<br>
+これを利用して、色数が一番少なくて済む、セリフ（テキスト）ウィンドウをBG3に設定し、一番手前に置いている。</p>
+
+<p>結果、ほとんどの場面で、手前からBG3→BG2→BG1と、本来の設定とは真逆の順番で表示されることになる。</p>
+
+<p>背景のタイルサイズは各BGごとに設定でき、8×8または16×16を指定する。<br>
+「ライブ・ア・ライブ」では、通常のゲーム画面だと、どのBGにも8×8ピクセルを指定する。<br>
+つまり、スプライトの基本タイルサイズ8×8ピクセルと同じである。</p>
+
+<p>BG制御レジスタは<code>$00:2105</code>で、ライブ・ア・ライブではだいたいの場合で<span class="formula">$09</span>(<span class="formula">%0000 1001</span>)を書き込む。<br>
+下3ビットがBGモード（<span class="formula">%001</span>, Mode1）、その上がBG3優先度（<span class="formula">%1</span>, BG3優先）、上4ビットはBG1～4のタイルサイズでどれも<span class="formula">%0</span>（8×8）。</p>
+
+<p>例外として、ゲームを開始し、「スクウェアソフト」のボイスと共にロゴが表示される場面や、ＳＦ編キャプテンスクウェア開始時は、<code>$00:2105</code>に<span class="formula">$0F</span>(<span class="formula">%0000 1111</span>)が入る。<br>
+これはBGモードがMode7であることを表している。<br>
+スーパーファミコンの特徴のひとつにもあげられる、背景の回転・拡大・縮小モードである。<br>
+Mode7のVRAMの構成はMode7以外とはまったく異なる。<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/bg/mode7.md" target="_blank">snes-docs-ja/video/bg/mode7.md</a>などを参照していただきたい。<br>
+この後は基本的にMode1での話になる。</p>
+
+<p>なお、戦闘突入時に三角形の黒い画面がぐるっと回る効果はMode7ではない。<br>
+ウィンドウ（Window）効果の方である。<br>
+後で説明する。</p>
+
+<h4>BGマップ設定</h4>
+
+<p>レジスタのアドレスは<code>$00:2107</code>～<code>$00:210A</code></p>
+
+<p>BG1～BG4それぞれの背景全体のサイズ及び、VRAM内のデータ開始アドレスのデータが入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:2107</code></td><td>BG1</td></tr>
+	<tr><td><code>$00:2108</code></td><td>BG2</td></tr>
+	<tr><td><code>$00:2109</code></td><td>BG3</td></tr>
+	<tr><td><code>$00:210A</code></td><td>BG4</td></tr>
+</tbody>
+</table>
+
+<h5>背景サイズ</h5>
+
+<p>背景全体は、タイル1個分を単位として、横×縦が、<br>
+32×32, 64×32, 32×64, 64×64<br>
+の、いずれかで設定する。<br>
+<code>$00:21??</code>の下2ビットが対応しており、</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>背景サイズ</th><th>レイアウト</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td>32×32</td><td>AA<br>AA </td></tr>
+	<tr><td><span class="formula">%01</span></td><td>64×32</td><td>AB<br>AB</td></tr>
+	<tr><td><span class="formula">%10</span></td><td>32×64</td><td>AA<br>BB</td></tr>
+	<tr><td><span class="formula">%11</span></td><td>64×64</td><td>AB<br>CD</td></tr>
+</tbody>
+</table>
+
+<p>となる。<br>
+レイアウトはVRAM上での構造のこと。<br>
+背景は32×32タイルで<span class="formula">$800</span>バイト分、背景サイズが64×64だったら32×32タイルが4つ分必要となるが、タイルマップアドレスの最初の<span class="formula">$800</span>バイトにAの位置のデータ、<span class="formula">+$800</span>バイトにBの位置のデータ、……というようにデータが並ぶ仕組み。<br>
+もちろん、背景サイズ32×32であれば、最初の<span class="formula">$800</span>バイト分しか必要ない。<br>
+64×32のように横長サイズなら、最初の<span class="formula">$800</span>バイトに左側の32×32タイルデータ、次の<span class="formula">$800</span>バイトに右側の32×32タイルデータ、ということになる。</p>
+
+<p>「ライブ・ア・ライブ」はタイル1個を8×8ピクセルで指定するため、ピクセル単位で考えると、<br>
+256×256ピクセル, 512×256ピクセル, 256×512ピクセル, 512×512ピクセル<br>
+の、どれかになるということである。</p>
+
+<p>実際のスーパーファミコンのゲーム画面は、横256ピクセル×縦224ピクセルだから、どのサイズで設定しても画面からはみ出すことになる。<br>
+だが、実際のゲームでは背景をスクロールして広いマップを表現するから、はみ出すことは問題ではない。<br>
+逆に、狭い部屋などでも上サイズのどれかで指定しなければならないのだが、その場合は部屋の周りを黒色で埋めるなどしている。<br>
+広いマップの場合でも、スクロールを調整して、ほとんどの場合で512×256ピクセルで収めている（常に新たにマップをVRAMに送って更新している）。</p>
+
+<p>戦闘やメニュー画面は背景をスクロールする必要がないので、一番小さい256×256ピクセルで収めている。<br>
+が、メニュー画面については、各シナリオで変わる全体背景に大きめの512×256を使う（繰り返しタイルを並べる都合で）など、BG番号によって変動する場合もある。</p>
+
+<h5>VRAM内のデータ開始アドレス</h5>
+
+<p><code>$00:21??</code>の上6ビットがVRAM内のデータ開始アドレスの値なのだが、実際にはその値に<span class="formula">*$0800</span>をした値がアドレス位置（単位をバイトで考えた場合）。<br>
+例えば、BG1のBGマップ設定が入る<code>$00:2107</code>に<span class="formula">$41</span>(<span class="formula">%0100 0001</span>)を書き込んだとしたら、</p>
+
+<ul>
+	<li>下2ビットは<span class="formula">%01</span>、背景サイズは64×32</li>
+	<li>上6ビットは<span class="formula">%010000 = $10</span>、<span class="formula">$10 * $0800 = $8000</span>だから、VRAMでのBG1のデータ開始アドレスは<span class="formula">$8000</span></li>
+</ul>
+
+<p>と、いうことになる。</p>
+
+<h4>タイルデータ</h4>
+
+<p>タイル1個は8×8ピクセルのデータでできているが、これらタイルのデータはVRAMに送られ、後で述べるBGマップに従い並べられ、カラーパレットから色を決めることになる。<br>
+VRAMのどのアドレスからタイルデータを書き込むか？　は、<code>$00:210A</code>と<code>$00:210B</code>（BGタイルデータアドレス）に書き込む値で決まる。<br>
+<code>$00:210B</code>の下4ビットがBG1の開始アドレス、上4ビットがBG2の開始アドレス。<br>
+<code>$00:210C</code>の下4ビットがBG3の開始アドレス、上4ビットがBG4の開始アドレスである。<br>
+ただし、<span class="formula">$書き込まれた値*2000</span>が実際のVRAMアドレス（単位バイト）なので注意。</p>
+
+<p>例えば、フィールドならだいたい、<code>$00:210B</code>は<span class="formula">$00</span>、<code>$00:210C</code>は<span class="formula">$03</span>である。</p>
+
+<ul>
+	<li>BG1のタイルデータVRAM開始アドレス：<code>$0000</code></li>
+	<li>BG2のタイルデータVRAM開始アドレス：<code>$0000</code></li>
+	<li>BG3のタイルデータVRAM開始アドレス：<code>$6000</code></li>
+</ul>
+
+<p>と、いうことになる。</p>
+
+<p>タイル1個のデータは2バイトで構成されている。<br>
+上で述べたが、ライブ・ア・ライブはほとんどの場合でBGモードがMode1であり、それぞれのBGの色数が、</p>
+
+<ul>
+	<li>BG1：16</li>
+	<li>BG2：16</li>
+	<li>BG3：4</li>
+</ul>
+
+<p>と、なっている。<br>
+BG1とBG2は16色なので、<a href="sprite.html">スプライト</a>の構造と同じと考えて良い。<br>
+つまり、色のデータが1ピクセルあたり4ビットになるから、各ビットに分けてデータを記す、例のわかりにくい方法である。<br>
+8×8ピクセルのデータに32バイト使う方式となる。<br>
+色データに4ビット使うことから、ビット深度(Bit depth)が4bpp(bits per pixel)である、という言い方をする。<br>
+<a href="https://ja.wikipedia.org/wiki/%E8%89%B2%E6%B7%B1%E5%BA%A6" target="_blank">色深度 - Wikipedia</a>も参照していただきたい。</p>
+
+<p>一方、BG3は4色であり、色のデータが1ピクセルあたり2ビットなので、2ビットに分けてデータを記すことになる。<br>
+ビット深度が2bppということになる。<br>
+データ量が半分で済むので、8×8ピクセルのデータに16バイト使う方式となる。</p>
+
+<p>つまり、フィールドだったら、VRAMアドレス<code>$0000</code>～に入るBG1またはBG2のタイルデータ（共用ということになる）は、8×8ピクセルのデータに32バイト使っている。スプライトと同じような感じでデータが入ると考えて良い。<br>
+VRAMアドレス<code>$6000</code>～に入るBG3のデータは、8×8ピクセルのデータに16バイト使っている。</p>
+
+<h4>BGマップ</h4>
+
+<p>背景は32×32タイル（256×256ピクセル）が基本となると先に記した通りだが、そのタイルデータをどのように画面に配置するかのデータがBGマップである。<br>
+スプライトで言うところのOAM（オブジェクト属性）にあたる。<br>
+スプライトなら最大128個のスプライトを座標で指定して好きな位置に並べることができたが、背景の場合は、タイル1個（8×8ピクセル）ずつを順番に並べていくことになる。<br>
+さらに、「ライブ・ア・ライブ」だったらBG1～3の3枚分の背景を作らなければならない。<br>
+（BG3はセリフウィンドウやテキストなので、セリフなどが表示されていない時は、BG1とBG2のみになる）</p>
+
+<p>タイル1個（8×8ピクセル）につき、2バイトのデータで構成されている。<br>
+下の値から順にBit0～とすると</p>
+
+<table>
+<thead>
+	<tr><th>位（Bit）</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit0～9</td><td>タイル番号 (<span class="formula">$000</span>～<span class="formula">3FF</span>)　※タイルのナンバリング</td></tr>
+	<tr><td>Bit10～12</td><td>パレット番号 (<span class="formula">0～7</span>)</td></tr>
+	<tr><td>Bit13</td><td>BG優先度 (<span class="formula">0</span>:低, <span class="formula">1</span>:高)</td></tr>
+	<tr><td>Bit14</td><td>X反転 (<span class="formula">0</span>:反転しない、 <span class="formula">1</span>:水平方向に反転)</td></tr>
+	<tr><td>Bit15</td><td>Y反転 (<span class="formula">0</span>:反転しない、 <span class="formula">1</span>:垂直方向に反転)</td></tr>
+</tbody>
+</table>
+
+<p>例えば、BG1で、BGマップデータが<br>
+<span class="formula">$1424 (%0001 0100 0010 0100)</span><br>
+とする。</p>
+
+<ul>
+	<li>タイル番号：<span class="formula">%00 0010 0100 = $024 ($024 * $20 = アドレス$0480)</span></li>
+	<li>カラーパレット番号：<span class="formula">%101 = $5</span></li>
+	<li>BG優先度：<span class="formula">0</span></li>
+	<li>X反転：<span class="formula">0</span></li>
+	<li>Y反転：<span class="formula">0</span></li>
+</ul>
+
+<p>BG1のBG優先度はどのタイルも<span class="formula">0</span>、BG2でBG1の上に置きたいタイルだけBG優先度が<span class="formula">1</span>にすることで、BG1が一番下、その上にBG2が置かれる。</p>
+
+<p>VRAMのアドレス$0480から<span class="formula">$20</span>バイト分のデータが該当タイルの8×8ピクセルデータであり、カラーパレットNo.5の色を使用する、ということがわかる。<br>
+ちなみにこのデータは近未来編・ちびっこハウスのトイレのあるタイルのデータである。<br>
+VRAMの$0480～のデータは、</p>
+
+<div class="mono">
+F3008860A057A75087178F27A7570F2F<br>
+F3FF988F8F808F80E887D88F8887508F
+</div>
+
+<p>CGRAMのカラーパレットNo.5のデータは、</p>
+
+<div class="mono">
+00003557304A88290625972ED3114F11<br>
+CC0C594F75361A2FC80CA518630D850C
+</div>
+
+<p>これらデータの変換方法は、スプライトと同じなので、筆者がやっつけで作った<a href="https://gist.github.com/hosoboso/3543a470db2fb1f3b5bcbf28d7827ec5" target="_blank">データから画像変換のJavaScript</a>でそのままデータ変換ができる。<br>
+実際にデータに色を塗った結果が下。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bg01.png" class="modal-link">
+		<img src="img/bg01.png" alt="トイレその1" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>はっきり言ってこれだけではわかりにくいと思う。<br>
+この右のタイルと、下側のタイルも処理してみよう。<br>
+ちなみにカラーパレットはいずれもNo.5である。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bg02.png" class="modal-link">
+		<img src="img/bg02.png" alt="トイレその2" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>……結局わからないかもしれないが、これは左側にトイレットペーパーホルダー、下にトイレの便器前のマットが敷いてある、16×16ピクセルのマスなのである（便器の真下あたり）。<br>
+こんな感じで背景を作っているのである。</p>
+
+<p>なお、この狭いトイレのマップも、マップサイズは横512×縦256ピクセルである。<br>
+トイレ以外の部分は黒一色で塗りつぶされている。<br>
+（このマップでいえば、BGマップデータの大半は$2810で埋まっているが、これが8×8ピクセル黒一色のデータになる）<br>
+本作におけるフィールドのマップは、どれほどの広さであっても、基本的に横512×縦256ピクセルで作っているようだ。</p>
+
+
+<h4>BG3のタイルデータ</h4>
+
+<p>16色が使えるBG1とBG2はスプライトと同じ考え方で問題ない、ということがわかった。<br>
+では4色のみのBG3について少し詳しく見てみよう。</p>
+
+<p><a href="sprite.html#01">スプライトのデータの基本</a>で説明したが、画像データはビット毎に分けてデータを記す「ビットプレーン」方式でデータを記録している。<br>
+16色の時は4ビットで1ピクセルのデータを記録できたから（ビット深度が4bpp）、4ビット毎に分けていた。<br>
+BG3は4色（ビット深度が2bpp）、2ビットで1ピクセルのデータを記録できるから（<span class="formula">%00</span>～<span class="formula">%11</span>、つまり<span class="formula">$0</span>～<span class="formula">$3</span>）、2ビット毎に分ければ良い。</p>
+
+<p>16色4ビットは、</p>
+
+<div class="mono">
+bit0 bit1<br>
+bit2 bit3
+</div>
+
+<p>と、データを並べていたが、4色2ビットなら、</p>
+
+<div class="mono">
+bit0 bit1
+</div>
+
+<p>これだけで済むことになる。<br>
+つまり、タイル1個のデータは16バイト（<span class="formula">$10</span>バイト）である。<br>
+後々でアドレス計算の時に注意すべき点のひとつである。</p>
+
+<p>なお、後々でわかるが、セリフウィンドウでウィンドウ背景と文字部分の2色しか使っていない時、「<span class="formula">%01</span>」（ウィンドウ背景）と「<span class="formula">%11</span>」（文字色）しか使っていない。<br>
+例として、8×8ピクセルの横1列分4バイトが、</p>
+
+<div class="mono">
+13131111
+</div>
+
+<p>と、「<span class="formula">%01</span>」（<span class="formula">$1</span>）及び「<span class="formula">%11</span>」（<span class="formula">$3</span>）だけで作られているとしよう。<br>
+2進数表記にすると、</p>
+
+<div class="mono">
+01 11 01 11 01 01 01 01
+</div>
+
+<p>上の桁bit1と、下の桁bit0に分ける。</p>
+
+<ul>
+	<li>bit1：<span class="formula">%0101 0000</span>(<span class="formula">$50</span>)</li>
+	<li>bit0：<span class="formula">%1111 1111</span>(<span class="formula">$FF</span>)</li>
+</ul>
+
+<p>よって、ビットプレーン方式だと、「<span class="formula">$FF50</span>」になることがわかった。<br>
+また、2色に「<span class="formula">%01</span>」と「<span class="formula">%11</span>」しか使っていない場合、必ず「<span class="formula">$FF??</span>」という表記になることもわかる。</p>
+
+<p>4色のタイルデータがどのように記述されているかわかったところで、実際のBG3のデータの見方を説明していく。</p>
+
+<p>ここではフィールドについて取り上げる。<br>
+まず、BG3のBGマップ設定が入る<code>$00:2109</code>だが、ほとんどの場合で<span class="formula">$48</span>(<span class="formula">%0100 1000</span>)が書き込まれるようである。<br>
+下2ビットが<span class="formula">%00</span>だから、BG3の背景サイズはタイル単位で32×32。<br>
+上6ビットは<span class="formula">%010010 = $12</span>、これに<span class="formula">$800</span>を掛け算した<span class="formula">$12*$0800 = $9000</span>が、VRAMでのBG3のBGマップデータ開始アドレスである。</p>
+
+<p>一方、BG3のタイルデータVRAM開始アドレスが記される<code>$00:210C</code>は<span class="formula">$03</span>である。<br>
+<span class="formula">$3*$2000</span>で、BG3のタイルデータVRAM開始アドレスは<span class="formula">$6000</span>となる。</p>
+
+<p>セリフなどが表示されていない場合、BG3はすべて透過されていることになるが、セリフウィンドウなどが表示されている時は該当位置に何らかのデータが入る。<br>
+今回はわかりやすく、セリフウィンドウが画面上部に表示されている時の文字部分だけ拾ってみる。<br>
+アドレスでいうと<span class="formula">$9088</span>から。<br>
+1つのタイルで2バイトのデータであるから2バイト区切りで並べてみると、</p>
+
+<div class="mono">
+2100 2101 2102 2103 2104 2105 2106 2107 2108 2109 210a 210b
+</div>
+
+<p>と、明らかに<span class="formula">1</span>ずつ増加している。</p>
+
+<p>BGマップのデータの見方はBGが何番であっても同じである。</p>
+
+<p><span class="formula">$0021 = %0010 00<span style="font-weight:bold;">01 0000 0000</span></span><br>
+<span class="formula">$0121 = %0010 00<span style="font-weight:bold;">01 0000 0001</span></span><br>
+<span class="formula">$0221 = %0010 00<span style="font-weight:bold;">01 0000 0010</span></span><br>
+<span class="formula">$0321 = %0010 00<span style="font-weight:bold;">01 0000 0011</span></span><br>
+<span class="formula">$0421 = %0010 00<span style="font-weight:bold;">01 0000 0100</span></span><br>
+...<br>
+<span class="formula">$0b21 = %0010 00<span style="font-weight:bold;">01 0000 1011</span></span></p>
+
+<p>パレット番号は<span class="formula">%000</span>、BG優先度は<span class="formula">%1</span>（手前表示）、X反転とY反転はなしで統一されている。</p>
+
+<p>一方値が変わるのは、下10ビット分（上の太字部分）、タイル番号である。<br>
+<span class="formula">%01 0000 0000 = $0100</span>から順にタイルを獲得していくことがわかる。<br>
+これはタイルのナンバリング（<span class="formula">$0100</span>番目のタイル）という意味なので、実際には、</p>
+
+<span class="formula">$0100にタイル1個分のデータ量を掛け算した値 + BG3のタイルデータVRAM開始アドレス$6000</span>
+
+<p>が、タイル開始位置アドレスである。<br>
+BG3のタイル1個分のデータ量は先に記した通り<span class="formula">$10</span>バイトである点に注意。<br>
+よって、計算結果は、</p>
+
+<p><span class="formula">$0100 * $10 + $6000 = $7000</span></p>
+
+<p>これが、VRAMにおける、セリフウィンドウ内の文字位置開始アドレスである。<br>
+ここからタイル1つにつき<span class="formula">$10</span>バイトずつ文字データが入っているはずだ。<br>
+ただしセリフウィンドウの文字は、16×16ピクセル（8×8のタイル4個）で1文字を作っていることを<a href="fontdata.html">文字データ</a>で説明した。<br>
+といっても文字部分は12×12で、余白部分があるのだが、いずれにしても、8×8のタイルを横に並べただけでは、文字の上半分または下半分のデータしか作れない。<br>
+とりあえずは、<code>$7000</code>～の文字データを見てみよう。<br>
+これは近未来編のとあるセリフウィンドウの文字である。</p>
+
+<code>$7000</code>～
+<div class="mono">
+FF00FF00FF11FFFFFF02FF77FF50FF77<br>
+FF00FF00FF00FFF3FFA2FFF2FF83FFF2<br>
+FF00FF00FF38FFC0FF00FF00FFFCFF10<br>
+FF00FF00FF24FF4FFF85FF29FF5FFFC9<br>
+FF00FF00FF00FF70FF00FF00FFF0FF20<br>
+FF00FF00FF0EFF08FF08FF08FF08FF08<br>
+FF00FF00FF20FF2FFF40FF40FFCFFF49<br>
+FF00FF00FF00FFF1FF21FF21FF21FF21<br>
+FF00FF00FF00FF00FF0AFF0AFF00FF00<br>
+FF00FF00FF00FF00FF00FF00FF12FF13<br>
+FF00FF00FF01FF03FF02FF02FF00FF80<br>
+FF00FF00FFF0FF18FF08FF08FF18FF30<br>
+FF00FF00FF00FF00FF00FF00FF00FF00<br>
+FF00FF00FF00FF00FF00FF00FF00FF00
+</div>
+
+<p>以上がセリフ1行分の「文字上半分のみ」のデータになる。<br>
+FFとそれ以外の数値が1バイト置きに並んでいる。<br>
+先ほど説明した通り、ウィンドウ背景と文字部分の2色しか使っていない時、カラーパレットに「<span class="formula">%01</span>」（ウィンドウ背景）と「<span class="formula">%11</span>」（文字色）しか指定しないと、このような文字列ができあがる。<br>
+このデータをカラーパレットに対応した値に変換したい場合、先のようにせっせと手で計算するのは手間であるから、スプライト変換の時に使ったJavaScriptのプログラムを少し変更して、<a href="https://gist.github.com/hosoboso/3543a470db2fb1f3b5bcbf28d7827ec5#file-sprite2-js" target="_blank">ビット深度2bpp用変換プログラム</a>を書いてみた。<br>
+ただ、32バイト分を入れて変換するのは変えていない。<br>
+出力したデータは半分の16バイトで区切って、右横に並べていくようにしていただきたい。<br>
+横に繋げたら、次は<code>$7180</code>～からのデータを下半分としてつなげる。</p>
+
+<code>$7180</code>～
+<div class="mono">
+FF51FF56FF70FF52FF94FFB1FF00FF00<br>
+FF42FFB2FF8FFFA0FF92FF8CFF00FF00<br>
+FF10FF10FFFEFF00FF08FF06FF00FF00<br>
+FF4FFF42FF4FFF4AFF5FFF42FF00FF00<br>
+FF20FF20FF20FF20FF20FF60FF00FF00<br>
+FF08FF08FF08FF00FF00FF00FF00FF00<br>
+FF49FF49FF4FFF48FF40FF40FF00FF00<br>
+FF21FF21FF21FF20FF20FF60FF00FF00<br>
+FF00FF04FF04FF88FF70FF00FF00FF00<br>
+FF0EFF38FF04FF04FF04FF00FF00FF00<br>
+FF40FF40FF80FF00FF00FF00FF00FF00<br>
+FF60FF40FF00FF00FF40FF40FF00FF00<br>
+FF00FF00FF00FF00FF00FF00FF00FF00<br>
+FF00FF00FF00FF00FF00FF00FF00FF00
+</div>
+
+<p>ちなみにこの時のカラーパレットNo.0であるが、</p>
+
+<div class="mono">
+00003967734EA514001C841039673967<br>
+001C396784108410001CE314314E9C67
+</div>
+
+<p>というデータになる。<br>
+こちらは<a href="https://gist.github.com/hosoboso/3543a470db2fb1f3b5bcbf28d7827ec5#file-colorpalette-js" target="_blank">カラーパレットデータをRGBカラー16色に変換</a>のJavaScriptを使えば変換できる。<br>
+といっても実質2色しか使わないので、必要なカラーパレットはNo.1と3のみとなるが。</p>
+
+<p>さて、完成した画像は以下のようになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bg03.png" class="modal-link">
+		<img src="img/bg03.png" alt="藤兵衛「何じゃ？" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>近未来編でアイテム改造を粘ると何度も見ることになる藤兵衛のセリフである。<br>
+文字データは本来縦12ピクセル×横16ピクセルだが、横の4ピクセル分の空白がうまく詰められて、実質12×12ピクセルのデータとして並ぶことがわかる。<br>
+セリフウィンドウ背景と文字だけだと2色のみだが、セリフウィンドウそのものは、ウィンドウの縁取り部分がグラデーションになっていて、3色で構成されている。<br>
+アキラが心を読む時のウィンドウはカラーパレットを変えているのみで3色構成なのは変わらない。</p>
+
+<p>また、<a href="program44.html">戦闘コマンドについて</a>で、戦闘コマンドの文字列データが妙な配置でコピーされていくことを紹介したが、これも、上のようにVRAMにデータが並ぶ都合からである。<br>
+文字フォント画像自体は<span class="formula">0</span>か<span class="formula">1</span>かの2進数（1ビット）で記録することができるが、それを2ビットのデータにする時に、間に「FF」を挟むから、アドレスを1つ飛ばしにして値を記録したり、文字を上半分と下半分に分けて記録するからアドレスの指定が飛んだりするのである。</p>
+
+<p>フィールド上でのセリフウィンドウは3色で構成されているが、戦闘では4色使っている。<br>
+アイテム一覧を開くと、戦闘で使えないアイテムは灰色の文字列、回復アイテムは青色の文字列、攻撃アイテムなら黒色の文字列になる。<br>
+技一覧でも、反撃専用技などは灰色の文字列、回復技は青色の文字列、攻撃技は黒色の文字列になる。<br>
+これに背景色を加えて4色である。</p>
+
+<p>後で説明するが、BG3は他にも、カラーマスという、背景の色味を変更する処理にも関わってくる。</p>
+
+<p>以上がBG3についての説明である。</p>
+
+
+<h3>効果</h3>
+
+<p>背景や画面全体の描画で、本作に使用されている様々な効果の仕組みについてざっと紹介。</p>
+
+<p>背景の回転・拡大・縮小モードにあたる、Mode7については、<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/bg/mode7.md" target="_blank">snes-docs-ja/video/bg/mode7.md</a>や、その他解説サイトなどを参照していただきたい。</p>
+
+<h4>輝度</h4>
+
+<p>画面の明るさが輝度で、<code>$00:2100</code>（ディスプレイ制御レジスタ）で制御する。<br>
+画面の切り替え（戦闘画面からフィールド画面、またはその逆など）で輝度を段階的に調節することにより、画面切り替えを自然に見せる、といった操作は頻繁に行われている。<br>
+戦闘でスタートボタンを押してポーズをかけると少し画面が暗くなるのも、輝度調整で行っている。<br>
+画面全体の明るさを変える仕組みなので、一部分だけの輝度を変えることはできない。</p>
+
+<p><code>$00:2100</code>の下4ビットが輝度の値になり、<span class="formula">%0000</span>～<span class="formula">%1111</span>の間で変更できる。<br>
+<span class="formula">0</span>なら真っ暗（黒）で何も表示されず、<span class="formula">%0001(1)</span>～<span class="formula">%1111(15)</span>の15段階で明るさ調整ができる。数字が大きいほど明るく、通常の明るさは<span class="formula">%1111(15)</span>である。</p>
+
+<p>戦闘中にポーズをかけると、<code>$00:2100</code>に<span class="formula">$08</span>が書き込まれて、輝度が下がる。<br>
+通常の明るさ<span class="formula">%1111(15)</span>から、<span class="formula">%1000（8）</span>に下がるということである。<br>
+この時は段階的切り替えではなく、<span class="formula">15</span>から<span class="formula">8</span>にいきなり変更なので、スタートボタンを押した途端に暗めの画面に変わる。</p>
+
+<h4>カラーマス(Color Math)</h4>
+
+<p>翻訳すると「色の演算」となる通り、色の加算または減算処理のこと。<br>
+カラーパレットで指定した色に、さらに指定した色を被せて、色を変更する処理になる。<br>
+グラフィックソフトで言うところの覆い焼き発光などの処理だと考えれば良い。</p>
+
+<p>本作では、戦闘で敵が攻撃してくる時、一時的に攻撃範囲マスが赤っぽい色合いになる処理など、全体的な色味の調節に使っていることが多い。<br>
+戦闘の攻撃範囲マスの場合でいうと、該当部分のBG1に、BG3で色を<span class="formula">$840000</span>（<span style="background: #840000;color: #FFF">この色</span>）に指定した一色のタイルを加算処理（覆い焼き）で被せる、という処理をしている。<br>
+<span class="formula">$840000</span>という色自体は見ての通り<span style="background: #840000;color: #FFF">くすんだ赤色</span>だが、覆い焼き発光で被せると、背景であるBG1に、赤い色調の色味を与えることが可能となる。</p>
+
+<p>他にはメニュー画面で、選択していない項目の背景が半透明になっていて透けているのも、カラーマス効果である。</p>
+
+<p>I/Oレジスタの<code>$00:2130</code>、<code>$00:2131</code>、<code>$00:2132</code>がカラーマスの設定に関わってくる。</p>
+
+<h4>ウィンドウ効果</h4>
+
+<p>上で少し触れたが、三角形の黒い画面が回転しながら戦闘画面に移行する処理は、背景のMode7による回転効果ではない。<br>
+ウィンドウ（Window）効果というものを使っている。</p>
+
+<p>ウィンドウ効果とは、画面の一部を一時的に隠す（マスクする）ことである。<br>
+一時的に見せなくしている（黒くしている）だけであり、本作のように、あたかも三角形に画面を切り抜いているかのような演出を見えることができる。<br>
+戦闘突入時に主人公を中心として画面が円状に広がるのもウィンドウ効果である（こちらは一瞬なので少しわかりにくいが）。<br>
+また、背景だけでなくスプライトに対しても処理できるので、戦闘突入時には画面全体が回転する三角形に切り抜かれたように見える。</p>
+
+<p>実際には、HDMA転送を利用して、横一列1ピクセル幅のライン毎に、マスクして隠す部分、隠さない部分を指定している。<br>
+とても簡易的な図にすると下のようなイメージである。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bg04.png" class="modal-link">
+		<img src="img/bg04.png" alt="ウィンドウ効果概略" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>黒い横線がマスク部分である。<br>
+（隙間はわかりやすくするために表示しただけで、実際には隙間なく黒のマスクで埋まる）<br>
+黄色い線のように、マスクをどこまでするか、さらにどこからマスクするか、を横一列の座標で決めていくことで、三角形を描くのである。<br>
+この処理を戦闘突入時におそらく50フレーム（50/60秒）行っている。つまり三角形を50回分座標を変えながら描いている。<br>
+60FPSでの処理だから、人間の目だと、とても滑らかに三角形が回転しているように見えるのである。</p>
+
+<h4>モザイク効果</h4>
+
+<p>スーパーファミコンの特徴のひとつとして、画面にモザイクをかけたような効果も可能である。</p>
+
+<p>本作ではいくつかの場面で演出として使われているが、頻繁に見ることになるのは戦闘におけるテレポート時の演出だろう。<br>
+背景のモザイク設定は<code>$00:2106</code>で行い、モザイクがない状態なら<span class="formula">$00</span>が入っている。<br>
+モザイクは背景にしかかけられないため、テレポート時、スプライトのキャラたちはモザイクなしでそのまま飛んでいるが、敵は背景なのでモザイクをかけている。</p>
+
+<p><code>$00:2106</code>は、上4ビットにモザイクのピクセルサイズ、下4ビットにBG4・BG3・BG2・BG1それぞれでモザイクを有効にするかどうかの値を入れるようになっている。<br>
+上4ビットは<span class="formula">%0000</span>～<span class="formula">%1111</span>が入るが、それぞれがモザイクサイズ1×1ピクセル～16×16ピクセルに対応している。<br>
+つまりモザイクのサイズは、必ず正方形で、最大で16×16ピクセルまでとなる。<br>
+ここではモザイクのサイズをN×Nとしておく。</p>
+
+<p>モザイクサイズに従って、N×Nサイズに画面を分割する。<br>
+画面分割初期位置（座標）は、画面を描画中でないなら画面左上隅、描画中なら描画しているラインになる。<br>
+分割したら、正方形の一番左上のピクセル位置の色で、正方形の中を塗りつぶすことにより、モザイクを作る。<br>
+正方形の中の平均的な色を取り出して……というような処理ではない。</p>
+
+<p>テレポート時は20フレーム毎にモザイクのサイズN×Nを<span class="formula">+1</span>して、16×16ピクセルまで増やす、という処理をしている。<br>
+テレポート後は逆に、初期状態でモザイクサイズを16×16ピクセルに指定してから減らしていって、最終的に<code>$00:2106</code>を<span class="formula">$00</span>として正常な状態に戻している。</p>
+
+<h4>ラスタースクロール処理</h4>
+
+<p><a href="https://ja.wikipedia.org/wiki/%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%82%B9%E3%82%AF%E3%83%AD%E3%83%BC%E3%83%AB" target="_blank">ラスタースクロール - Wikipedia</a></p>
+
+<p>近未来編の序盤、物質転送装置に乗った時、モザイク処理の後、画面が波打つように左右に揺れる処理があるが、これがラスタースクロール処理である。<br>
+他には、ＳＦ編のラストバトル前にOD-10がメッセージを送ってくるシーンでも使われている。<br>
+（ドラゴンクエストシリーズの旅の扉の処理、といった方がわかりやすいかもしれない。ファミコンの時代からあるテクニックである）<br>
+スーパーファミコンでは1ドット幅で横1列ずつ画面を描画していくのだが、その描画開始位置を少しずつズラすことで、一部分だけ横にずれたような効果を出す。<br>
+本作の場合は左右に揺れる処理のため、水平スクロール量を設定するレジスタ<code>$00:210D</code>（BG1水平スクロール量）、<code>$00:210F</code>（BG2水平スクロール量）が使われている。<br>
+背景のみを揺らす処理のため、ＳＦ編のラストバトル前での画面を見ると、背景に使っているBG1とBG2は揺れるのだが、右上の部屋の扉はスプライトなので揺れていない。</p>
+
+<!-- <p>次ページでは、<a href="bg2.html">サブルーチン</a>を紹介する。</p> -->
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`captionlist_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<!-- <script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script> -->
+
+<div class="pagelink">
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

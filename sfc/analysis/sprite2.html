@@ -99,6 +99,7 @@ table {
 		<li><a href="d5.html">各種データアドレス</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
 		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
 		<li><a href="program1.html">ボタン判定</a></li>
 		<li><a href="memo.html">雑多メモ</a></li>
 	</ul>
@@ -322,19 +323,29 @@ HDMA(HBlank DMA)という、HBlank（テレビ画面に横1列分のドット絵
 	<tr><td><code>[$00:4303]</code><code>[$00:4302]</code></td><td>データ元アドレス（開始位置）</td></tr>
 	<tr><td><code>[$00:4304]</code></td><td>データ元バンク</td></tr>
 	<tr><td><code>[$00:4306]</code><code>[$00:4305]</code></td><td>転送するデータ量</td></tr>
-	<tr><td><code>[$00:420B]</code></td><td>GDMA(General Direct Memory Access)チャネルレジスタ　(<span class="formula">0</span>=無効, <span class="formula">1</span>=有効)</td></tr>
+	<tr><td><code>[$00:420B]</code></td><td>GDMA(General Direct Memory Access)チャネルレジスタ</td></tr>
 	<tr><td><code>[$00:2117][$00:2116]</code></td><td>転送先 VRAMアドレス</td></tr>
 </tbody>
 </table>
 
-<p>上は、<code>$7E:8000</code>～<code>$7E:9FFF</code>のデータをVRAMに転送する処理になる。<br>
-転送先に<span class="formula">$18</span>（VRAM）、データ元バンクに<span class="formula">$7E</span>、データ元アドレス2バイトに<span class="formula">$8000</span>、転送するデータ量に<span class="formula">$2000</span>を指定して、<code>[$00:420B]</code>に<span class="formula">$01</span>を書き込むとVRAMに転送を行う、という処理を行っている。<br>
-この、<code>[$00:4300]</code>以降に値を指定してVRAMなどに転送、というDMA転送サブルーチンは上の例以外にも多数存在している。</p>
+<p><code>$00:43n?</code>の<span class="formula">n</span>は<span class="formula">0~7</span>の値をとり、それぞれでGDMA（HDMA含む）転送を設定できる。<br>
+上だと、<span class="formula">n=0</span>である。<br>
+つまりGDMA転送は最大8つ設定できる（8チャネル）。</p>
 
-<p>なお、<code>$00:43n0</code>の<span class="formula">n</span>は<span class="formula">0~7</span>の値をとり、上だと<span class="formula">n=0</span>である。<br>
-つまりGDMA転送は8つ設定できる（8チャネル）。<br>
-HDMAと共用で、HDMA転送が最優先、後はチャネル番号が小さいほど優先で転送を行う。<br>
-<code>$00:4300</code>のGDMA/HDMA設定レジスタの説明は長くなるので、下ウェブサイトなどを参照していただきたい。</p>
+<p>上は、<code>$7E:8000</code>～<code>$7E:9FFF</code>のデータをVRAMに転送する処理になる。<br>
+準備として、転送先に<span class="formula">$18</span>（VRAM）、データ元バンクに<span class="formula">$7E</span>、データ元アドレス2バイトに<span class="formula">$8000</span>、転送するデータ量に<span class="formula">$2000</span>を指定しておく。<br>
+つまり、GDMA転送のチャネル0を使用する。</p>
+
+<p><code>[$00:420B]</code>は、GDMAチャネルレジスタで、8ビットの値が下から順にチャネル0～チャネル7に対応している。<br>
+該当チャネルのビットに1を書き込むと、そのチャネルのGDMA転送を行う、という仕組みである。<br>
+チャネル0の転送を行うのなら、<span class="formula">%0000 0001 = $01</span>を<code>[$00:420B]</code>に書き込むと転送開始になる。<br>
+<code><span class="r">$C0/4EDF</span></code>～<code><span class="r">$C0/4EE1</span></code>が、該当部分にあたる。</p>
+
+<p>GDMA転送は高速なので、画像関係の大量のデータ転送は、基本的にGDMA転送を行う。<br>
+この先のサブルーチンでも頻出となる。<br>
+また、複数のGDMAチャネルの設定をしてから、<code>[$00:420B]</code>に複数のチャネルの対応ビットに1を書き込むと、HDMA転送が最優先、後はチャネル番号が小さいほど優先で転送を行う仕組みになっている。</p>
+
+<p><code>$00:4300</code>のGDMA/HDMA設定レジスタの説明は長くなるので、下ウェブサイトなどを参照していただきたい。</p>
 
 <ul>
 	<li><a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a></li>
@@ -342,8 +353,8 @@ HDMAと共用で、HDMA転送が最優先、後はチャネル番号が小さい
 </ul>
 
 <p><code>[$00:2117][$00:2116]</code>には、転送先であるVRAMの開始アドレスを指定する。<br>
-今回は$C0/4DCE～の指定から、VRAMの開始アドレスは<span class="formula">$0000</span>である。<br>
-ここで注意しなければならないのは、VRAMのアドレス指定の時、<span style="font-weight:bold;">アドレスをbyteではなくwordで指定するため注意が必要</span>。<span class="formula">2byte</span>(バイト)で<span class="formula">1word</span>(ワード)になる。<br>
+今回は<code><span class="r">$C0/4DCE</span></code>～の指定から、VRAMの開始アドレスは<span class="formula">$0000</span>である。<br>
+VRAMのアドレス指定の時、<span style="font-weight:bold;">アドレスをbyteではなくwordで指定するため注意が必要</span>。<span class="formula">2byte</span>(バイト)で<span class="formula">1word</span>(ワード)になる。<br>
 今回は<span class="formula">$0000</span>なので、そのままで構わないが、もしバイトに直すのならワードを2倍する必要がある、ということである。</p>
 
 <h4 id="01_2">カラーパレットの呼び出し</h4>
@@ -725,7 +736,7 @@ $C0/BC66 SEP #$20                ;MフラグON　Aレジスタは8bit幅
 $C0/BC68 RTS                     ;サブルーチン戻り
 </pre></div>
 
-<p>細かい説明は省くが、$C0/BB20～$C0/BB6Aで初期値リセット、その後はシナリオ進行などに従って値を書き込んでいるようである。</p>
+<p>細かい説明は省くが、<code><span class="r">$C0/BB20</span></code>～<code><span class="r">$C0/BB6A</span></code>で初期値リセット、その後はシナリオ進行などに従って値を書き込んでいるようである。</p>
 
 <h3 id="02">戦闘でのサブルーチン</h3>
 
@@ -800,11 +811,16 @@ $C1/F319 RTS                     ;サブルーチン戻り
 
 <h4 id="02_1">スプライトのデータ呼び出し</h4>
 
-<p>戦闘中のキャラのスプライト（32×32ピクセル）だが、まずWRAMにキャラのデータをコピーし、そこからVRAMに必要な時に転送、という方法を取っている。<br>
-まず、WRAMへのコピー処理を見てみる。<br>
-WRAMは<code>$7E:0000</code>～<code>$7F:FFFF</code>にミラーリングされているので、ミラーリングからもアクセスできるのだが、WRAMのポート<code>[$00:2180]</code>を経由した方が読み込みが速いため、グラフィックデータなど大量のデータを送る時には<code>[$00:2180]</code>経由でGDMA転送をする、ということらしい。たぶん。</p>
+<p>戦闘中のキャラのスプライト（32×32ピクセル）データだが、まずWRAMにキャラのデータをコピーし、そこからVRAMに必要な時にGDMA転送、という方法を取っている。<br>
+フィールドでのスプライトは、サイズが小さいため（<span class="formula">$80</span>バイト）、キャラの横向きや上向きといった、多くのパターンをまとめてVRAMへ送っておけるが、戦闘中のキャラのスプライトは大きいため（<span class="formula">$200</span>バイト）、1キャラにつきひとつの向きのスプライト（×アニメーション2パターン分）しかVRAMに置く余裕がない。この時点で32×32ピクセルサイズ2体分の容量になる。<br>
+戦闘には最大で味方キャラ4人が参加するので、VRAMには32×32ピクセルサイズ8体分を置くことになる。これで<span class="formula">$1000</span>バイト分を占めることになる。<br>
+別のモーション（倒れた時や攻撃モーションなど）は、その都度WRAMに置いておいたデータをVRAMに転送して処理することになる。</p>
 
-<p>WRAMに転送を行う時は<code>[$00:2181]</code>～<code>[$00:2183]</code>の3バイトに、アクセスするアドレスを設定する。<br>
+<p>WRAMは<code>$7E:0000</code>～<code>$7F:FFFF</code>にミラーリングされているので、ミラーリングからもアクセスできる。<br>
+<code>$??:0000</code>～<code>$??:1FFF</code>の範囲なら、バンク<code>$00</code>～<code>$3F</code>, <code>$80</code>～<code>$BF</code>からもアクセスできる。</p>
+
+<p>まず、WRAMへのコピー処理を見てみる。<br>
+WRAMに転送を行う時は<code>[$00:2181]</code>～<code>[$00:2183]</code>の3バイトに、アクセスするアドレスを設定する。<br>
 WRAMは128KBの容量があるので、アドレスが<code>$000000</code>～<code>$01FFFF</code>と3バイト（24ビット）に渡るためである。<br>
 GDMA転送はn=2を使っている。<br>
 以下は例としておぼろ丸正面向きのデータ転送とする。</p>
@@ -866,7 +882,7 @@ $C1/60C9 JSR $34EA  [$C1:34EA]   ;[$C1:34EA]へジャンプ
 </pre></div>
 
 <p><code><span class="r">$C1/5FE0</span></code>～<code><span class="r">$C1/6072</span></code>はGDMA転送用のアドレス開始位置や転送量の計算になるが、ここでは詳細を省く。<br>
-転送するデータ量は<span class="formula">$20</span>バイトで固定であり、WRAM転送先アドレスは今回は<code>$00D000</code>になっているが、<span class="formula">$20</span>バイトの転送ということは8×8ピクセル、タイル1個分の転送であるから、<code>$00D000</code>以降に次のタイルが次々と転送され、16個分=<span class="formula">$200</span>バイト=512バイト転送されると32×32ピクセルのキャラのスプライトになる。<br>
+転送するデータ量は<span class="formula">$20</span>バイトで固定であり、WRAM転送先アドレスは今回は<code>$00D000</code>になっているが、<span class="formula">$20</span>バイトの転送ということは8×8ピクセル、タイル1個分の転送であるから、<code>$00D000</code>以降に次のタイルが次々と転送され、16個分=<span class="formula">$200</span>バイト=<span class="formula">512</span>バイト転送されると32×32ピクセルのキャラのスプライトになる。<br>
 この後の処理を見てみると、<span class="formula">$20</span>バイトずつ、<code>$00D000</code>～<code>$00D400</code>（合計<span class="formula">$400</span>バイト）に転送されていることから、2体分転送されていることがわかる。<br>
 これが、アニメーション2パターン分にあたる。</p>
 
@@ -1429,7 +1445,7 @@ $C2/4CA0 RTS                     ;サブルーチン戻り
 
 <p>最後に<code><span class="r">$C2/4C92</span></code>で<code>[$00:420B]</code>に<span class="formula">$10 = %0001 0000</span>が書き込まれ、チャネル4のGDMA転送を行う。</p>
 
-<p>つまり、<code>$7E:C800</code>から<span class="formula">$800</span>バイト分を、VRAMアドレス<code>$8800</code>（バイト単位に直した）以降へコピーする、という処理になる。<br>
+<p>つまり、<code>$7E:C800</code>から<span class="formula">$800</span>バイト分を、VRAMアドレス<code>$8800</code>（単位はバイトに直している）以降へコピーする、という処理になる。<br>
 アキラのスプライトデータは<code>$7E:C800</code>～<code>$7E:CE7F</code>に入ったから（説明は端折ったが、他の仲間のデータも入っている）、ちょうどアキラ（＋仲間キャラ）のスプライトデータの範囲をまるごとGDMA転送でVRAMに送る処理だということがわかる。</p>
 
 <p>メニュー画面の処理では、上のように、<code>MVN</code>でGDMA転送チャネル<span class="formula">n</span>（<code>$00:43n0</code>～<code>$00:43n6</code>）の設定を行うことが多いようだ。</p>
@@ -1496,7 +1512,8 @@ $C2/3525 PLP                     ;Pレジスタにスタックからプル
 $C2/3526 RTS                     ;サブルーチン戻り
 </pre></div>
 
-<p>これはアキラの例で、アキラの戦闘用スプライトのカラーパレットは<code>$D6:22A0</code>～<code>$D6:22BF</code>に入っており、<code><span class="r">$C2/3521</span></code>の<code>MVN</code>転送で<code>$7E:8D00</code>～<code>$7E:8D1F</code>へコピーされる。<br>
+<p>以上はアキラの例。<br>
+アキラの戦闘用スプライトのカラーパレットは<code>$D6:22A0</code>～<code>$D6:22BF</code>に入っており、<code><span class="r">$C2/3521</span></code>の<code>MVN</code>転送で<code>$7E:8D00</code>～<code>$7E:8D1F</code>へコピーされる。<br>
 他の仲間キャラも同じサブルーチンで処理が入る。</p>
 
 <div class="code-container"><pre>
@@ -1561,7 +1578,8 @@ $C2/052F JSR $4B00  [$C2:4B00]   ;[$C2:4B00]へジャンプ
 <p>つまり、<code>$7E:8C00</code>から<span class="formula">$0200</span>バイトのデータをCGRAMに転送する、という処理である。<br>
 だが、その後、実際の転送処理までの間に他処理をしている。</p>
 
-<p><code><span class="r">$C2/0529</span></code>で、<code>[$00:4200]</code>(割り込み有効化レジスタ)のネガティブフラグ分岐を行っている。つまり、<code>[$00:4200]</code>の一番上のビットが<span class="formula">1</span>なら<code><span class="r">$C2/053A</span></code>へ、<span class="formula">0</span>なら<code><span class="r">$C2/052F</span></code>→<code>$C2:4B00</code>ということになる。<br>
+<p><code><span class="r">$C2/0529</span></code>で、<code>[$00:4200]</code>(割り込み有効化レジスタ)のネガティブフラグ分岐を行っている。<br>
+つまり、<code>[$00:4200]</code>の一番上のビットが<span class="formula">1</span>なら<code><span class="r">$C2/053A</span></code>へ、<span class="formula">0</span>なら<code><span class="r">$C2/052F</span></code>→<code>$C2:4B00</code>ということになる。<br>
 割り込み有効化レジスタの一番上のビットは「VBlank NMI 有効化フラグ」の値が入る。<br>
 これに<span class="formula">0</span>が入っているとVBlank時、NMIでの割り込みが発生しない（VBlankの間に別処理、だいたいの場合で画像関係の処理をしない）。<br>
 おそらくこの後にVBlankかの判定→NMIで割り込んでCGRAMへの転送、という処理をしている（と思う）。</p>
@@ -1592,7 +1610,8 @@ $C2/4DD0 STA $00420B[$00:420B]   ;Aを[$00:420B](GDMAチャネルレジスタ)�
 よって、この時点で、チャネル1のGDMA転送を行い、CGRAMにカラーパレットのデータが送られたことになる。</p>
 
 <p>なお、<code><span class="r">$C2/4D55</span></code>～<code><span class="r">$C2/052F</span></code>のGDMA転送チャネル1の設定前、<code><span class="r">$C2/4D35</span></code>～<code><span class="r">$C2/4D54</span></code>でGDMA転送チャネル0の転送設定をしており、後述するがそちらはOAMへの転送設定である。<br>
-<code><span class="r">$C2/4D35</span></code>～<code><span class="r">$C2/4D54</span></code>でGDMA転送チャネル0の転送設定をした場合は、<code>[$00:057A]</code>と<span class="formula">$01</span>の論理和を<code>[$00:057A]</code>に書き戻すという処理をするため、上の<code><span class="r">$C2/4DCA</span></code>～<code><span class="r">$C2/4DD0</span></code>で<code>[$00:057A]</code>に<span class="formula">$03</span>（<span class="formula">%0000 0011</span>）が入ることになり、GDMAのチャネル0とチャネル1を実行することになる。</p>
+<code><span class="r">$C2/4D35</span></code>～<code><span class="r">$C2/4D54</span></code>でGDMA転送チャネル0の転送設定をした場合は、<code>[$00:057A]</code>と<span class="formula">$01</span>の論理和を<code>[$00:057A]</code>に書き戻すという処理をする。<br>
+このため、上の<code><span class="r">$C2/4DCA</span></code>～<code><span class="r">$C2/4DD0</span></code>で<code>[$00:057A]</code>に<span class="formula">$03</span>（<span class="formula">%0000 0011</span>）が入ることになり、GDMAのチャネル0とチャネル1を実行することになる。</p>
 
 <p>では、そのOAM転送について、最後に説明する。</p>
 
@@ -1634,7 +1653,8 @@ $C2/0524 PLP                     ;Pレジスタにスタックからプル
 $C2/0525 RTS                     ;サブルーチン戻り
 </pre></div>
 
-<p><code>$00:0700</code>～<code>$00:08FF</code>は、「<span class="formula">FF E0 00 00</span>」と4バイトごとに入り、<code>$00:0900</code>～<code>$00:091F</code>はすべて<span class="formula">$00</span>で埋まる。</p>
+<p><code>$00:0700</code>～<code>$00:08FF</code>は、「<span class="formula">FF E0 00 00</span>」と4バイトごとに入り、<code>$00:0900</code>～<code>$00:091F</code>はすべて<span class="formula">$00</span>で埋まる。<br>
+スプライトは最大128個表示させることができるが、使用しないスプライトは画面外に設置して非表示とするため、X座標に<span class="formula">$FF (255)</span>、Y座標に<span class="formula">$E0 (224)</span>を指定している。これにより、画面右下にはみ出した位置に非表示のスプライトを設置している。</p>
 
 <p>リセット後、まず、味方キャラのスプライトのデータを1人ずつ書き込む。<br>
 下は味方キャラ1人目のデータ（今回は近未来編・アキラ）のデータ。</p>
@@ -1716,7 +1736,8 @@ $C2/3712 RTS                     ;サブルーチン戻り
 </tbody>
 </table>
 
-<p><code>$7E:0710</code>～<code>$7E:0713</code>はOAM下位4バイトで元のデータは<code>$C2:7D2F</code>～<code>$C2:7D32</code>、<code>$7E:0901</code>はOAM上位2ビットに対応で元のデータは<code>$C2:761B</code>、ということがわかる。<br>
+<p><code>$7E:0710</code>～<code>$7E:0713</code>はOAM下位4バイトで元のデータは<code>$C2:7D2F</code>～<code>$C2:7D32</code>。<br>
+<code>$7E:0901</code>はOAM上位2ビットに対応で元のデータは<code>$C2:761B</code>、ということがわかる。<br>
 <code>$7E:0901</code>の論理和は、データが1つのスプライトにつき2ビットだけなので、8ビットの情報を書き込める2バイト分のアドレスに値を書き込む際、他スプライトの情報が既に入っているなら論理和を取らないと前のデータが上書きされて消えてしまうため。</p>
 
 <p>以上の処理を味方全員分行った後、カーソルの情報も追加する。<br>

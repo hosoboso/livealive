@@ -99,6 +99,7 @@ table {
 		<li><a href="d5.html">各種データアドレス</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
 		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
 		<li><a href="program1.html">ボタン判定</a></li>
 		<li><a href="memo.html">雑多メモ</a></li>
 	</ul>
@@ -217,14 +218,15 @@ RPGであればキャラクターのドット絵に使われることでおな�
 	グラフィック用CPUである、S-PPU2の中にあるメモリ領域（らしい）。<br>
 	<span style="font-weight:bold;">アドレスをbyteではなくwordで指定するため注意が必要</span>。<span class="formula">2byte</span>(バイト)で<span class="formula">1word</span>(ワード)になる。</li>
 	<li>OAM: Object Attribute Memory<br>
-	スプライトの配置を記録するメモリ。<br>
+	スプライトの配置・色などの情報を記録するメモリ。<br>
+	そういった配置・色の情報を、Object Attribute（オブジェクト属性）という。<br>
 	<span class="formula">$220(544)</span>バイト。<br>
 	グラフィック用CPUである、S-PPU1の中にあるメモリ領域（らしい）。</li>
 </ul>
 
 <p>となっている。<br>
 上の3種類のメモリは、本体のメモリ領域にアドレスが割り振られておらず、I/Oポート用のアドレスを通さないとデータのやりとりができない。<br>
-グラフィックのデータは量が多い上、逐次更新していかなければならないので、スーパーファミコンのCPUを通さずにデータの読み書きをする、DMA（Direct Memory Access）転送という高速の転送方法を使うのが一般的（らしい）。<br>
+グラフィックのデータは量が多い上、1フレーム1回更新していかなければならないので、スーパーファミコンのCPUを通さずにデータの読み書きをする、DMA（Direct Memory Access）転送という高速の転送方法を使うのが一般的（らしい）。<br>
 詳細はこの先で説明していく。<br>
 サブルーチンは<a href="sprite2.html">次ページ</a>で紹介しているが、まずはこのページの説明からお読みいただきたい。</p>
 
@@ -290,7 +292,13 @@ RPGであればキャラクターのドット絵に使われることでおな�
 
 <p>先に、16×16ピクセルの各ピクセルに4ビット（<span class="formula">$0～$F</span>）の値を割り振る、と記した。<br>
 1ピクセルにつき、4ビットのデータが必要になるので、ドット絵を4枚に分けて、1枚ずつに1～4ビット目の値を記して重ねてデータにしよう。<br>
-というのが、スーパーファミコンにおけるスプライトのデータ記述方法なのである。</p>
+というのが、スーパーファミコンにおけるスプライトのデータ記述方法なのである。<br>
+このようにビット毎に分けてデータを記す方法を「ビットプレーン」という。</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/%E3%83%93%E3%83%83%E3%83%88%E3%83%97%E3%83%AC%E3%83%BC%E3%83%B3" target="_blank">ビットプレーン - Wikipedia</a></p>
+
+<p>また、色データに4ビット使うことから、ビット深度(Bit depth)が4bpp(bits per pixel)である、という言い方をする。<br>
+<a href="https://ja.wikipedia.org/wiki/%E8%89%B2%E6%B7%B1%E5%BA%A6" target="_blank">色深度 - Wikipedia</a>も参照していただきたい。</p>
 
 <p>実例を出した方がわかりやすいので、サンダウンのスプライトで説明する。</p>
 
@@ -673,13 +681,15 @@ No.<span class="formula">$0</span>にも色が入っているが、実際には�
 
 <h3 id="03">OAMについて</h3>
 
-<p>さて、VRAMとCGRAMの説明はしたが、最後にスプライトの配置を記録するメモリOAM（Object Attribute Memory）についてざっくりと説明する。<br>
-OAMは<span class="formula">$220</span>バイトで、アドレス<span class="formula">$0000</span>～<span class="formula">$01FF</span>と、<span class="formula">$0200</span>～<span class="formula">$021F</span>の領域に分かれている。<br>
-スプライト1つ分のデータは、<span class="formula">$0000</span>～<span class="formula">$01FF</span>に4バイト、<span class="formula">$0200</span>～<span class="formula">$021F</span>に2ビットで記録される。<br>
+<p>さて、VRAMとCGRAMの説明はしたが、最後にスプライトの配置などを記録するメモリOAM（Object Attribute Memory）についてざっくりと説明する。<br>
+OAMに記録されるデータはオブジェクト属性（Object Attribute）と呼ばれ、スプライトの座標、どのカラーパレットを使うか、スプライトの反転といった情報をまとめたものである。</p>
+
+<p>OAMは<span class="formula">$220</span>バイトで、アドレス<span class="formula">$0000</span>～<span class="formula">$01FF</span>と、<span class="formula">$0200</span>～<span class="formula">$021F</span>の領域に分かれている。<br>
+スプライト1つ分のオブジェクト属性データは、<span class="formula">$0000</span>～<span class="formula">$01FF</span>に4バイト、<span class="formula">$0200</span>～<span class="formula">$021F</span>に2ビットで記録される。<br>
 2ヶ所に分かれるので、最初の<span class="formula">$0000</span>～<span class="formula">$01FF</span>を下位テーブル（Primary (low) table）、<span class="formula">$0200</span>～<span class="formula">$021F</span>を上位テーブル（Secondary (high) table）と記述し説明しているウェブサイトが多く、ここでも採用させていただく。<br>
 スプライトは最大で128個設置可能。</p>
 
-<p>キャラが動けば表示位置は上書きされて新しくなっていく。<br>
+<p>キャラが動けばオブジェクト属性の座標は上書きされて新しくなっていく。<br>
 <a href="program1.html">ボタン判定</a>にも記したが、スーパーファミコンの画面1枚分を描画する処理の間の空白時間VBlank（1フレームに1回入る）で、VRAMはじめ、CGRAMやOAMのデータを更新している。</p>
 
 <h4>下位テーブル（<span class="formula">$0000</span>～<span class="formula">$01FF</span>）のデータ</h4>
@@ -741,7 +751,7 @@ OAMは<span class="formula">$220</span>バイトで、アドレス<span class="f
 </table>
 
 <p>実際の例を示す。<br>
-さきほどのサンダウンのスプライトが、上位テーブルの2バイトは「<span class="formula">$785D0024</span>」、下位テーブルの2ビットは「<span class="formula">%00</span>」とする。</p>
+さきほどのサンダウンのスプライトのオブジェクト属性が、上位テーブルの2バイトは「<span class="formula">$785D0024</span>」、下位テーブルの2ビットは「<span class="formula">%00</span>」とする。</p>
 
 <ul>
 	<li>X座標：<span class="formula">$78</span>(<span class="formula">120</span>)<br>※下位テーブルbit0は<span class="formula">0</span>なので<span class="formula">$78 = %0111 1000</span>の頭に<span class="formula">0</span>をつける、つまり<span class="formula">$78</span>そのままで問題ない</li>
@@ -774,7 +784,7 @@ OAMは<span class="formula">$220</span>バイトで、アドレス<span class="f
 といっても、右上向きのスプライトを左右反転で左上向きになるし、右下向きのスプライトを左右反転で左下向きになる。<br>
 さらに、技のモーションや、ダメージをくらった時、戦闘不能時などのスプライトもあるから、1キャラあたりのパターン数はけっこうある。</p>
 
-<p>ただ、戦闘中は、スプライトの左右反転を後で述べるOAM（スプライトの配置用メモリ）で制御しており、VRAMに読み込まれるスプライトは必ず右向き固定である。<br>
+<p>ただ、戦闘中は、スプライトの左右反転をオブジェクト属性で制御しており、VRAMに読み込まれるスプライトは必ず右向き固定である。<br>
 VRAMに読み込まれるデータはそのまま、ゲームのROMに入っており、フィールドのスプライトのように左右反転で別途計算されてはいない。</p>
 
 <p>1つのスプライトで、8×8マスサイズのタイルが4×4＝16個必要になるので、最初の32×32ピクセルサイズのキャラは、</p>
