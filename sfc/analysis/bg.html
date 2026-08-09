@@ -61,9 +61,8 @@ code {
 }
 
 #captiondata {
-	border: 1px solid #CCC;
 	padding: .1em;
-	background: #f5f5f5;
+	box-shadow: 2px 2px 5px #bbb;
 }
 
 @media (max-width: 768px) {
@@ -175,7 +174,7 @@ table {
 </div>
 
 <div class="maincontents">
-<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; スプライトについて</h1>
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 背景グラフィックと効果</h1>
 <h2>背景グラフィックと効果</h2>
 
 <div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
@@ -185,6 +184,8 @@ table {
 スプライトについては<a href="sprite.html">スプライトについて</a>でざっと説明したので、先にお読みいただきたい。<br>
 ここでは背景（BGと略す）について大まかに説明する。<br>
 また、背景や画面に関係する効果（モザイク処理や色の加算、ウィンドウの一部をマスクする処理など）も合わせて紹介する。</p>
+
+<p>サブルーチンは<a href="bg1.html">次ページ</a>から紹介していく。</p>
 
 <div id="captiondata"></div>
 
@@ -319,7 +320,7 @@ Mode7のVRAMの構成はMode7以外とはまったく異なる。<a href="https:
 VRAMのどのアドレスからタイルデータを書き込むか？　は、<code>$00:210A</code>と<code>$00:210B</code>（BGタイルデータアドレス）に書き込む値で決まる。<br>
 <code>$00:210B</code>の下4ビットがBG1の開始アドレス、上4ビットがBG2の開始アドレス。<br>
 <code>$00:210C</code>の下4ビットがBG3の開始アドレス、上4ビットがBG4の開始アドレスである。<br>
-ただし、<span class="formula">$書き込まれた値*2000</span>が実際のVRAMアドレス（単位バイト）なので注意。</p>
+ただし、<span class="formula">書き込まれた値 * $2000</span>が実際のVRAMアドレス（単位バイト）なので注意。</p>
 
 <p>例えば、フィールドならだいたい、<code>$00:210B</code>は<span class="formula">$00</span>、<code>$00:210C</code>は<span class="formula">$03</span>である。</p>
 
@@ -370,7 +371,7 @@ VRAMアドレス<code>$6000</code>～に入るBG3のデータは、8×8ピクセ
 	<tr><th>位（Bit）</th><th>内容</th></tr>
 </thead>
 <tbody>
-	<tr><td>Bit0～9</td><td>タイル番号 (<span class="formula">$000</span>～<span class="formula">3FF</span>)　※タイルのナンバリング</td></tr>
+	<tr><td>Bit0～9</td><td>タイル番号 (<span class="formula">$000</span>～<span class="formula">$3FF</span>)　※アドレスではなく、タイルのナンバリング</td></tr>
 	<tr><td>Bit10～12</td><td>パレット番号 (<span class="formula">0～7</span>)</td></tr>
 	<tr><td>Bit13</td><td>BG優先度 (<span class="formula">0</span>:低, <span class="formula">1</span>:高)</td></tr>
 	<tr><td>Bit14</td><td>X反転 (<span class="formula">0</span>:反転しない、 <span class="formula">1</span>:水平方向に反転)</td></tr>
@@ -392,9 +393,9 @@ VRAMアドレス<code>$6000</code>～に入るBG3のデータは、8×8ピクセ
 
 <p>BG1のBG優先度はどのタイルも<span class="formula">0</span>、BG2でBG1の上に置きたいタイルだけBG優先度が<span class="formula">1</span>にすることで、BG1が一番下、その上にBG2が置かれる。</p>
 
-<p>VRAMのアドレス$0480から<span class="formula">$20</span>バイト分のデータが該当タイルの8×8ピクセルデータであり、カラーパレットNo.5の色を使用する、ということがわかる。<br>
+<p>VRAMのアドレス<code>$0480</code>から<span class="formula">$20</span>バイト分のデータが該当タイルの8×8ピクセルデータであり、カラーパレットNo.5の色を使用する、ということがわかる。<br>
 ちなみにこのデータは近未来編・ちびっこハウスのトイレのあるタイルのデータである。<br>
-VRAMの$0480～のデータは、</p>
+VRAMの<code>$0480</code>～のデータは、</p>
 
 <div class="mono">
 F3008860A057A75087178F27A7570F2F<br>
@@ -432,11 +433,10 @@ CC0C594F75361A2FC80CA518630D850C
 
 <p>なお、この狭いトイレのマップも、マップサイズは横512×縦256ピクセルである。<br>
 トイレ以外の部分は黒一色で塗りつぶされている。<br>
-（このマップでいえば、BGマップデータの大半は$2810で埋まっているが、これが8×8ピクセル黒一色のデータになる）<br>
+（このマップでいえば、BGマップデータの大半は<span class="formula">$2810</span>で埋まっているが、これが8×8ピクセル黒一色のデータになる）<br>
 本作におけるフィールドのマップは、どれほどの広さであっても、基本的に横512×縦256ピクセルで作っているようだ。</p>
 
-
-<h4>BG3のタイルデータ</h4>
+<h4><span id="bg3tile">BG3のタイルデータ</span></h4>
 
 <p>16色が使えるBG1とBG2はスプライトと同じ考え方で問題ない、ということがわかった。<br>
 では4色のみのBG3について少し詳しく見てみよう。</p>
@@ -498,7 +498,7 @@ bit0 bit1
 
 <p>セリフなどが表示されていない場合、BG3はすべて透過されていることになるが、セリフウィンドウなどが表示されている時は該当位置に何らかのデータが入る。<br>
 今回はわかりやすく、セリフウィンドウが画面上部に表示されている時の文字部分だけ拾ってみる。<br>
-アドレスでいうと<span class="formula">$9088</span>から。<br>
+アドレスでいうと<code>$9088</code>から。<br>
 1つのタイルで2バイトのデータであるから2バイト区切りで並べてみると、</p>
 
 <div class="mono">
@@ -509,13 +509,14 @@ bit0 bit1
 
 <p>BGマップのデータの見方はBGが何番であっても同じである。</p>
 
-<p><span class="formula">$0021 = %0010 00<span style="font-weight:bold;">01 0000 0000</span></span><br>
-<span class="formula">$0121 = %0010 00<span style="font-weight:bold;">01 0000 0001</span></span><br>
-<span class="formula">$0221 = %0010 00<span style="font-weight:bold;">01 0000 0010</span></span><br>
-<span class="formula">$0321 = %0010 00<span style="font-weight:bold;">01 0000 0011</span></span><br>
-<span class="formula">$0421 = %0010 00<span style="font-weight:bold;">01 0000 0100</span></span><br>
+<p>
+<span class="formula">$2100 = %0010 00<span style="font-weight:bold;">01 0000 0000</span></span><br>
+<span class="formula">$2101 = %0010 00<span style="font-weight:bold;">01 0000 0001</span></span><br>
+<span class="formula">$2102 = %0010 00<span style="font-weight:bold;">01 0000 0010</span></span><br>
+<span class="formula">$2103 = %0010 00<span style="font-weight:bold;">01 0000 0011</span></span><br>
+<span class="formula">$2104 = %0010 00<span style="font-weight:bold;">01 0000 0100</span></span><br>
 ...<br>
-<span class="formula">$0b21 = %0010 00<span style="font-weight:bold;">01 0000 1011</span></span></p>
+<span class="formula">$210b = %0010 00<span style="font-weight:bold;">01 0000 1011</span></span></p>
 
 <p>パレット番号は<span class="formula">%000</span>、BG優先度は<span class="formula">%1</span>（手前表示）、X反転とY反転はなしで統一されている。</p>
 
@@ -538,7 +539,7 @@ BG3のタイル1個分のデータ量は先に記した通り<span class="formul
 とりあえずは、<code>$7000</code>～の文字データを見てみよう。<br>
 これは近未来編のとあるセリフウィンドウの文字である。</p>
 
-<code>$7000</code>～
+<p><code>$7000</code>～</p>
 <div class="mono">
 FF00FF00FF11FFFFFF02FF77FF50FF77<br>
 FF00FF00FF00FFF3FFA2FFF2FF83FFF2<br>
@@ -564,7 +565,7 @@ FFとそれ以外の数値が1バイト置きに並んでいる。<br>
 出力したデータは半分の16バイトで区切って、右横に並べていくようにしていただきたい。<br>
 横に繋げたら、次は<code>$7180</code>～からのデータを下半分としてつなげる。</p>
 
-<code>$7180</code>～
+<p><code>$7180</code>～</p>
 <div class="mono">
 FF51FF56FF70FF52FF94FFB1FF00FF00<br>
 FF42FFB2FF8FFFA0FF92FF8CFF00FF00<br>
@@ -708,12 +709,12 @@ FF00FF00FF00FF00FF00FF00FF00FF00
 （ドラゴンクエストシリーズの旅の扉の処理、といった方がわかりやすいかもしれない。ファミコンの時代からあるテクニックである）<br>
 スーパーファミコンでは1ドット幅で横1列ずつ画面を描画していくのだが、その描画開始位置を少しずつズラすことで、一部分だけ横にずれたような効果を出す。<br>
 本作の場合は左右に揺れる処理のため、水平スクロール量を設定するレジスタ<code>$00:210D</code>（BG1水平スクロール量）、<code>$00:210F</code>（BG2水平スクロール量）が使われている。<br>
-背景のみを揺らす処理のため、ＳＦ編のラストバトル前での画面を見ると、背景に使っているBG1とBG2は揺れるのだが、右上の部屋の扉はスプライトなので揺れていない。</p>
+背景のみを揺らす処理のため、ＳＦ編のラストバトル前での画面を見ると、背景に使っているBG1とBG2は揺れるのだが、画面右上の扉はスプライトなので揺れていない。</p>
 
-<!-- <p>次ページでは、<a href="bg2.html">サブルーチン</a>を紹介する。</p> -->
+<p>次ページから、<a href="bg1.html">サブルーチン</a>を紹介していく。</p>
 
 <script>//リストタイトル静的生成
-document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`captionlist_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
 </script>
 
 <!-- <script>//ソースコード色分け処理
@@ -722,7 +723,7 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 
 <div class="pagelink">
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+	<div id="pagenext"><a href="bg1.html"><span class="button">&#9654;次 サブルーチン</span></a></div>
 </div>
 
 </div>

@@ -181,7 +181,47 @@ table {
 <div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
 まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
 
-<p><a href="sprite.html">前ページ</a>でスプライトについてひととおり説明したので</a>、このページではサブルーチンを紹介する。</p>
+<p><a href="sprite.html">前ページ</a>でスプライトについてひととおり説明したので</a>、このページではサブルーチンを紹介する。<br>
+その前に、画像データ転送に必須となるGDMA(General Direct Memory Access)転送について、一通り説明をしておく。</p>
+
+<h3 id="00">GDMA(General Direct Memory Access)転送</h3>
+
+<p>VRAMをはじめ、カラーパレットがあるCGRAM、スプライトの配置を指定するOAMといったメモリには、I/Oポート用のアドレスを通して通信する、と前ページに記した。<br>
+これらメモリへのデータ転送は、GDMA(General Direct Memory Access)転送という方法を使う。<br>
+GDMA転送は高速なので、画像関係の大量のデータ転送は、基本的にGDMA転送を行う。<br>
+GDMA転送に使用する主なI/Oレジスタは以下。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス（I/Oレジスタ）</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:43n0]</code></td><td>GDMA/HDMA設定レジスタ</td></tr>
+	<tr><td><code>[$00:43n1]</code></td><td>転送先指定 <span class="formula">$04</span>=OAM, <span class="formula">$18</span>=VRAM, <span class="formula">$22</span>=CGRAM, <span class="formula">$80</span>=WRAM</td></tr>
+	<tr><td><code>[$00:43n3]</code><code>[$00:43n2]</code></td><td>データ元アドレス（開始位置）</td></tr>
+	<tr><td><code>[$00:43n4]</code></td><td>データ元バンク</td></tr>
+	<tr><td><code>[$00:43n6]</code><code>[$00:4305]</code></td><td>転送するデータ量</td></tr>
+	<tr><td><code>[$00:420B]</code></td><td>GDMA(General Direct Memory Access)チャネルレジスタ</td></tr>
+	<tr><td><code>[$00:2117][$00:2116]</code></td><td>転送先 VRAMアドレス</td></tr>
+</tbody>
+</table>
+
+<p>VRAMのアドレス指定の時、<span style="font-weight:bold;">アドレスをbyteではなくwordで指定するため注意が必要</span>。<br>
+<span class="formula">2byte</span>(バイト)で<span class="formula">1word</span>(ワード)になる。</p>
+
+<p><code>$00:43n?</code>の<span class="formula">n</span>は<span class="formula">0~7</span>の値をとり、それぞれでGDMA（HDMA含む）転送を設定できる。<br>
+上だと、<span class="formula">n=0</span>である。<br>
+つまりGDMA転送は最大8つ設定できる（8チャネル）。<br>
+HDMA(HBlank DMA)という、HBlank（テレビ画面に横1列分のドット絵を描写してから、次の行への描写へ移る僅かな時間）を利用した転送もあるが、HDMA含め8チャネルを設定できる。<br>
+複数のGDMAチャネルの設定をしてから、<code>[$00:420B]</code>に複数のチャネルの対応ビットに1を書き込むと、HDMA転送が最優先、後はチャネル番号が小さいほど優先で転送を行う仕組みになっている。<br>
+ちなみにGDMAで転送中は、スーファミ自体のCPUは一時停止する（計算を一時停止する）。</p>
+
+<p>GDMA/HDMA設定レジスタの詳細など、詳しくは<br>
+<a href="https://github.com/akatsuki105/snes-docs-ja/tree/main/memory/dma" target="_blank">snes-docs-ja/memory/dma</a><br>
+<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a><br>
+を参照していただきたい。</p>
+
+<p>以降、GDMA転送の知識を前提とした上で、サブルーチンを説明していく。</p>
 
 <ul>
 	<li><a href="#01">フィールドでのサブルーチン</a></li>
@@ -210,7 +250,368 @@ table {
 
 <h4 id="01_1">スプライトのデータ呼び出し</h4>
 
-<p>スプライトのデータ呼び出しのサブルーチンは<code><span class="r">$CE/D47E</span></code>～<code><span class="r">$CE/D89D</span></code>。<br>
+<p>フィールドでは、スプライトのデータを、シナリオ開始時またはセーブデータからロード時に呼び出す。<br>
+フィールドにおけるスプライトのデータはVRAMのアドレス<code>$C000</code>バイト以降に設置される。<br>
+その際、大きく3種類のデータに分かれる。</p>
+
+<ol>
+	<li>VRAMアドレス<code>$C000</code>～<code>$D7FF</code>に転送される、主人公・仲間キャラなどのデータ（縦6×横8キャラ分）</li>
+	<li>VRAMアドレス<code>$E800</code>～<code>$FFFF</code>に転送される、各シナリオのサブキャラ・モブキャラ（縦6×横8キャラ分）</li>
+	<li>VRAMアドレス<code>$C500</code>～<code>$E7FF</code>に100バイトずつ転送される、各シナリオのイベント用グラフィック</li>
+</ol>
+
+<p>1.と2.は、元のデータを<code>$7E:C000</code>～<code>$7E:D7FF</code>へ一度ロードしてから、VRAMにGDMA転送する。<br>
+3.は、<code>$7E:8000</code>～<code>$7E:87FF</code>へ一度ロードしてから、100バイトずつVRAMにGDMA転送する。</p>
+
+<p>全てのサブルーチンを紹介すると膨大な量になるため、主に転送部分を紹介する。<br>
+1.は<code><span class="r">$C0/7051</span></code>～<code><span class="r">$C0/7233</span></code>あたりだが、実際にはデータのロードのため<code><span class="r">$C0/7479</span></code>～<code><span class="r">$C0/7569</span></code>のサブルーチンに何度かジャンプしている。<br>
+処理の最後のあたりが以下。</p>
+
+<div class="code-container"><pre>
+$C0/70B6 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/70B7 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/70B9 LDY #$C100              ;Yに$C100をロード
+$C0/70BC LDX #$F3A0              ;Xに$F3A0をロード
+$C0/70BF LDA #$003F              ;Aに$003Fをロード
+$C0/70C2 MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F3A0 (転送元アドレス)
+;Y: $C100 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F3A0 -> $7E:C100 +$3F
+;
+$C0/70C5 LDX #$F420              ;Xに$F420をロード
+$C0/70C8 LDA #$003F              ;Aに$003Fをロード
+$C0/70CB MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F420 (転送元アドレス)
+;Y: $C140 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F420 -> $7E:C140 +$3F
+;
+$C0/70CE LDX #$F4A0              ;Xに$F4A0をロード
+$C0/70D1 LDA #$003F              ;Aに$003Fをロード
+$C0/70D4 MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F4A0 (転送元アドレス)
+;Y: $C180 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F4A0 -> $7E:C180 +$3F
+;
+$C0/70D7 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/70D9 LDA $000A00[$00:0A00]   ;Aに[$00:0A00]をロード
+$C0/70DD CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/70DF BNE $04    [$70E5]      ;ゼロフラグが立っていないとき[$70E5]
+;ゼロフラグOFF（最終編以外）
+$C0/70E5 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/70E6 LDA #$00                ;Aに$00をロード
+$C0/70E8 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/70EA LSR A                   ;Aを論理右シフト　(/2)
+$C0/70EB CLC                     ;キャリーフラグクリア
+$C0/70EC ADC #$F520              ;A + $F520
+$C0/70EF TAX                     ;Aの値をXレジスタに転送
+$C0/70F0 CLC                     ;キャリーフラグクリア
+$C0/70F1 ADC #$0040              ;A + $0040
+$C0/70F4 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/70F5 LDA #$003F              ;Aに$003Fをロード
+$C0/70F8 MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F8A0 (転送元アドレス)
+;Y: $C1C0 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F8A0 -> $7E:C1C0 +$3F
+;
+$C0/70FB LDY #$C300              ;Yに$C300をロード
+$C0/70FE LDX #$F3E0              ;Xに$F3E0をロード
+$C0/7101 LDA #$003F              ;Aに$003Fをロード
+$C0/7104 MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F3E0 (転送元アドレス)
+;Y: $C300 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F3E0 -> $7E:C300 +$3F
+;
+$C0/7107 LDX #$F460              ;Xに$F460をロード
+$C0/710A LDA #$003F              ;Aに$003Fをロード
+$C0/710D MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F460 (転送元アドレス)
+;Y: $C340 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F460 -> $7E:C340 +$3F
+;
+$C0/7110 LDX #$F4E0              ;Xに$F4E0をロード
+$C0/7113 LDA #$003F              ;Aに$003Fをロード
+$C0/7116 MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F4E0 (転送元アドレス)
+;Y: $C380 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F4E0 -> $7E:C380 +$3F
+;
+$C0/7119 PLX                     ;Xレジスタにスタックからプル
+$C0/711A LDA #$003F              ;Aに$003Fをロード
+$C0/711D MVN CF 7E               ;データ転送
+;
+;A: 3F (転送データサイズ-1)
+;X: $F8E0 (転送元アドレス)
+;Y: $C3C0 (転送先アドレス)
+;オペランド: 転送元バンクCF 転送先バンク7E
+;$CF:F8E0 -> $7E:C3C0 +$3F
+;
+$C0/7120 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/7122 PLB                     ;DBレジスタにスタックからプル
+$C0/7123 LDA #$01                ;Aに$01をロード
+$C0/7125 STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/7128 LDA #$18                ;Aに$18をロード
+$C0/712A STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/712D LDY #$C000              ;Yに$C000をロード
+$C0/7130 STY $4302  [$00:4302]   ;Yを[$00:4303][$00:4302]に書き込み
+$C0/7133 LDA #$7E                ;Aに$7Eをロード
+$C0/7135 STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/7138 LDY #$1800              ;Yに$1800をロード
+$C0/713B STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
+$C0/713E LDY #$6000              ;Yに$6000をロード
+$C0/7141 STY $2116  [$00:2116]   ;Yを[$00:2117][$00:2116]に書き込み
+$C0/7144 LDA #$01                ;Aに$01をロード
+$C0/7146 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$6000
+;[$00:4300]	GDMA/HDMA設定レジスタ	$01
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$C000
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$1800
+;$7E:C000 -> VRAM $6000word($C000byte) +$1800byte
+;
+$C0/7149 LDA $0ACE  [$00:0ACE]   ;Aに[$00:0ACE]をロード
+$C0/714C CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/714E BEQ $03    [$7153]      ;ゼロフラグが立っているとき[$7153]分岐
+$C0/7150 BRL $00E0  [$7233]      ;フラグにかかわりなく常に分岐[$7233]
+$C0/7233 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>これは幕末編のセーブデータをロードした時の処理である。<br>
+<code><span class="r">$C0/70B6</span></code>～<code><span class="r">$C0/711D</span></code>は、MVN転送を利用して、バンク<code>$CF</code>のデータを<code>$7E:C100</code>～<code>$7E:C3BF</code>にロードしている。<br>
+実際にはVRAMへ転送するのは<code>$7E:C000</code>～<code>$7E:D7FF</code>をVRAMアドレス<code>$C000</code>～<code>$D7FF</code>に転送するから、<code>$7E:C100</code>～<code>$7E:C3BF</code>というのは転送するデータの一部分である。<br>
+このサブルーチンの前に、<code>$7E:C000</code>～<code>$7E:D7FF</code>にデータをコピーする処理が行われている。</p>
+
+<p><code><span class="r">$C0/7120</span></code>～<code><span class="r">$C0/7233</span></code>がGDMA転送処理である。ここではGDMAチャネル0を使っている。<br>
+I/Oレジスタに設定した値から、<code>$7E:C000</code>～<code>$7E:D7FF</code>（<span class="formula">$1800</span>バイト）を、VRAMアドレス<span class="formula">$6000</span>word (<span class="formula">$C000</span>byte)を開始位置にして転送する、という意味になる。<br>
+<code>[$00:420B]</code>に<span class="formula">$01</span>を書き込んだ<code><span class="r">$C0/7146</span></code>のタイミングで、VRAMへのGDMA転送が行われる。</p>
+
+<p>上の処理の後、今度は各シナリオのサブキャラ・モブキャラ用のデータをほぼ同じ方法で<code>$7E:C000</code>～<code>$7E:D7FF</code>へコピーする。<br>
+そして下のサブルーチンでVRAM転送する。</p>
+
+<div class="code-container"><pre>
+$C0/72A5 LDY #$C000              ;Yに$C000をロード
+$C0/72A8 STY $4302  [$00:4302]   ;Yを[$00:4303][$00:4302]に書き込み
+$C0/72AB LDA #$7E                ;Aに$7Eをロード
+$C0/72AD STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/72B0 LDY #$1800              ;Yに$1800をロード
+$C0/72B3 STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
+$C0/72B6 LDY #$7400              ;Yに$7400をロード
+$C0/72B9 STY $2116  [$00:2116]   ;Yを[$00:2117][$00:2116]に書き込み
+$C0/72BC LDA #$01                ;Aに$01をロード
+$C0/72BE STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$7400
+;[$00:4300]	GDMA/HDMA設定レジスタ	$01
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$C000
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$1800
+;$7E:C000 -> VRAM $7400word($E800byte) +$1800byte
+;
+$C0/72C1 BRL $009D  [$7361]      ;フラグにかかわりなく常に分岐[$7361]
+$C0/7361 LDA $0A4B  [$00:0A4B]   ;Aに[$00:0A4B]をロード
+$C0/7364 STA $0108  [$00:0108]   ;Aを[$00:0108]に書き込み
+$C0/7367 LDA $0A4D  [$00:0A4D]   ;Aに[$00:0A4D]をロード
+$C0/736A CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/736C BEQ $36    [$73A4]      ;ゼロフラグが立っているとき[$73A4]分岐
+$C0/736E CLC                     ;キャリーフラグクリア
+$C0/736F ADC #$11                ;A + $11
+$C0/7371 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/7373 JSR $75EB  [$C0:75EB]   ;[$C0:75EB]へジャンプ
+</pre></div>
+
+<p>上処理では、<code>$7E:C000</code>～<code>$7E:D7FF</code>（<span class="formula">$1800</span>バイト）を、VRAMアドレス<span class="formula">$7400</span>word (<span class="formula">$E800</span>byte)を開始位置に転送している。<br>
+<code>[$00:2117]</code><code>[$00:2116]</code>の値が先程と変わっているので、VRAMのアドレスが変更された、ということである。</p>
+
+<div class="code-container"><pre>
+$C0/7376 LDY #$8000              ;Yに$8000をロード
+$C0/7379 STY $4302  [$00:4302]   ;Yを[$00:4302]に書き込み
+$C0/737C LDA #$7E                ;Aに$7Eをロード
+$C0/737E STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/7381 LDX #$6280              ;Xに$6280をロード
+$C0/7384 LDA #$0A                ;Aに$0Aをロード
+$C0/7386 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+
+;ループ処理開始
+$C0/7388 STX $2116  [$00:2116]   ;Xを[$00:2117][$00:2116]に書き込み
+$C0/738B LDY #$0100              ;Yに$0100をロード
+$C0/738E STY $4305  [$00:4305]   ;Yを[$00:4305]に書き込み
+$C0/7391 LDA #$01                ;Aに$01をロード
+$C0/7393 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+$C0/7396 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/7398 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/7399 CLC                     ;キャリーフラグクリア
+$C0/739A ADC #$0100              ;A + $0100
+$C0/739D TAX                     ;Aの値をXレジスタに転送
+$C0/739E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/73A0 DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/73A2 BNE $E4    [$7388]      ;ゼロフラグが立っていないとき[$7388]分岐
+;ループ処理ここまで
+
+$C0/73A4 LDA $0A1F  [$00:0A1F]   ;Aに[$00:0A1F]をロード
+$C0/73A7 BEQ $09    [$73B2]      ;ゼロフラグが立っているとき[$73B2]分岐
+$C0/73B2 LDA $0A4E  [$00:0A4E]   ;Aに[$00:0A4E]をロード
+$C0/73B5 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/73B7 BEQ $12    [$73CB]      ;ゼロフラグが立っているとき[$73CB]分岐
+$C0/73B9 CLC                     ;キャリーフラグクリア
+$C0/73BA ADC #$11                ;A + $11
+$C0/73BC STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/73BE JSR $75EB  [$C0:75EB]   ;[$C0:75EB]へジャンプ
+</pre></div>
+
+<p>上が、VRAMアドレス<code>$C500</code>～<code>$E7FF</code>に100バイトずつ転送するループ処理になる。<br>
+ループ処理中の$C0/7393で毎回GDMA転送が行われることになる。<br>
+<code>[$00:0030]</code>に書き込まれた<span class="formula">$0A</span>回（<span class="formula">10</span>回）分ループするので、</p>
+
+<ol>
+	<li><code>$7E:8000</code>から100バイトを、VRAMアドレス開始位置<code>$6280</code>word（<code>$C500</code>byte）にGDMA転送</li>
+	<li><code>$7E:8100</code>から100バイトを、VRAMアドレス開始位置<code>$6380</code>word（<code>$C700</code>byte）にGDMA転送</li>
+	<li><code>$7E:8200</code>から100バイトを、VRAMアドレス開始位置<code>$6480</code>word（<code>$C900</code>byte）にGDMA転送</li>
+	<li><code>$7E:8300</code>から100バイトを、VRAMアドレス開始位置<code>$6580</code>word（<code>$CB00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8400</code>から100バイトを、VRAMアドレス開始位置<code>$6680</code>word（<code>$CD00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8500</code>から100バイトを、VRAMアドレス開始位置<code>$6780</code>word（<code>$CF00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8600</code>から100バイトを、VRAMアドレス開始位置<code>$6880</code>word（<code>$D100</code>byte）にGDMA転送</li>
+	<li><code>$7E:8700</code>から100バイトを、VRAMアドレス開始位置<code>$6980</code>word（<code>$D300</code>byte）にGDMA転送</li>
+	<li><code>$7E:8800</code>から100バイトを、VRAMアドレス開始位置<code>$6A80</code>word（<code>$D500</code>byte）にGDMA転送</li>
+	<li><code>$7E:8900</code>から100バイトを、VRAMアドレス開始位置<code>$6B80</code>word（<code>$D700</code>byte）にGDMA転送</li>
+</ol>
+
+<p>という順に転送している。<br>
+さらに、</p>
+
+<div class="code-container"><pre>
+$C0/73C1 LDA #$04                ;Aに$04をロード
+$C0/73C3 STA $22    [$00:0022]   ;Aを[$00:0022]に書き込み
+$C0/73C5 LDX #$6C00              ;Xに$6C00をロード
+$C0/73C8 JSR $756A  [$C0:756A]   ;[$C0:756A]へジャンプ
+
+$C0/756A LDA $22    [$00:0022]   ;Aに[$00:0022]をロード
+$C0/756C STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/756E LDY #$8000              ;Yに$8000をロード
+$C0/7571 STY $4302  [$00:4302]   ;Yを[$00:4303][$00:4302]に書き込み
+$C0/7574 LDA #$7E                ;Aに$7Eをロード
+$C0/7576 STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+;ループ処理
+$C0/7579 STX $2116  [$00:2116]   ;Xを[$00:2117][$00:2116]に書き込み
+$C0/757C LDY #$0100              ;Yに$0100をロード
+$C0/757F STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
+$C0/7582 LDA #$01                ;Aに$01をロード
+$C0/7584 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み　★GDMA転送
+$C0/7587 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/7589 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/758A CLC                     ;キャリーフラグクリア
+$C0/758B ADC #$0100              ;A + $0100
+$C0/758E TAX                     ;Aの値をXレジスタに転送
+$C0/758F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/7591 STX $2116  [$00:2116]   ;Xを[$00:2117][$00:2116]に書き込み
+$C0/7594 LDY #$0100              ;Yに$0100をロード
+$C0/7597 STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
+$C0/759A LDA #$01                ;Aに$01をロード
+$C0/759C STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み　★GDMA転送
+$C0/759F DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/75A1 BEQ $3E    [$75E1]      ;ゼロフラグが立っているとき[$75E1]分岐
+;ゼロフラグONでループ抜ける
+;ゼロフラグOFF処理
+$C0/75A3 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/75A5 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/75A6 SEC                     ;キャリーフラグON
+$C0/75A7 SBC #$0080              ;A - $0080
+$C0/75AA TAX                     ;Aの値をXレジスタに転送
+$C0/75AB SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/75AD STX $2116  [$00:2116]   ;Xを[$00:2117][$00:2116]に書き込み
+$C0/75B0 LDY #$0100              ;Yに$0100をロード
+$C0/75B3 STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
+$C0/75B6 LDA #$01                ;Aに$01をロード
+$C0/75B8 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み　★GDMA転送
+$C0/75BB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/75BD TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/75BE CLC                     ;キャリーフラグクリア
+$C0/75BF ADC #$0100              ;A + $0100
+$C0/75C2 TAX                     ;Aの値をXレジスタに転送
+$C0/75C3 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/75C5 STX $2116  [$00:2116]   ;Xを[$00:2117][$00:2116]に書き込み
+$C0/75C8 LDY #$0100              ;Yに$0100をロード
+$C0/75CB STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
+$C0/75CE LDA #$01                ;Aに$01をロード
+$C0/75D0 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み　★GDMA転送
+$C0/75D3 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/75D5 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/75D6 CLC                     ;キャリーフラグクリア
+$C0/75D7 ADC #$0080              ;A + $0080
+$C0/75DA TAX                     ;Aの値をXレジスタに転送
+$C0/75DB SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/75DD DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/75DF BNE $98    [$7579]      ;ゼロフラグが立っていないとき[$7579]分岐
+;ループ処理ここまで
+$C0/75E1 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上の処理で、以下のようにGDMA転送される。</p>
+
+<ol>
+	<li><code>$7E:8000</code>から100バイトを、VRAMアドレス開始位置<code>$6C00</code>word（<code>$D800</code>byte）にGDMA転送</li>
+	<li><code>$7E:8100</code>から100バイトを、VRAMアドレス開始位置<code>$6D00</code>word（<code>$DA00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8200</code>から100バイトを、VRAMアドレス開始位置<code>$6C80</code>word（<code>$D900</code>byte）にGDMA転送</li>
+	<li><code>$7E:8300</code>から100バイトを、VRAMアドレス開始位置<code>$6D80</code>word（<code>$DB00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8400</code>から100バイトを、VRAMアドレス開始位置<code>$6E00</code>word（<code>$DC00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8500</code>から100バイトを、VRAMアドレス開始位置<code>$6F00</code>word（<code>$DE00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8600</code>から100バイトを、VRAMアドレス開始位置<code>$6E80</code>word（<code>$DD00</code>byte）にGDMA転送</li>
+	<li><code>$7E:8700</code>から100バイトを、VRAMアドレス開始位置<code>$6F80</code>word（<code>$DF00</code>byte）にGDMA転送</li>
+</ol>
+
+<p>最後に、<code><span class="r">$C0/73DC</span></code>～<code><span class="r">$C0/73E3</span></code>で<code>X</code>に<span class="formula">$7000</span>をロードしてから、再び<code><span class="r">$C0/756A</span></code>～<code><span class="r">$C0/75E1</span></code>の処理が入る。<br>
+転送元は同じまま、転送先だけVRAMアドレス開始位置<code>$7000</code>word（<code>E000</code>byte）に変わる、ということである。</p>
+
+<div class="code-container"><pre>
+$C0/73DC LDA #$04                ;Aに$04をロード
+$C0/73DE STA $22    [$00:0022]   ;Aを[$00:0022]に書き込み
+$C0/73E0 LDX #$7000              ;Xに$7000をロード
+$C0/73E3 JSR $756A  [$C0:756A]   ;[$C0:756A]へジャンプ
+
+$C0/756A LDA $22    [$00:0022]   ;Aに[$00:0022]をロード
+;（中略）
+$C0/75E1 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>つまり、</p>
+
+<ol>
+	<li><code>$7E:8000</code>から100バイトを、VRAMアドレス開始位置<code>$7000</code>word（<code>E000</code>byte）にGDMA転送</li>
+	<li><code>$7E:8100</code>から100バイトを、VRAMアドレス開始位置<code>$7100</code>word（<code>E200</code>byte）にGDMA転送</li>
+	<li><code>$7E:8200</code>から100バイトを、VRAMアドレス開始位置<code>$7080</code>word（<code>E100</code>byte）にGDMA転送</li>
+	<li><code>$7E:8300</code>から100バイトを、VRAMアドレス開始位置<code>$7180</code>word（<code>E300</code>byte）にGDMA転送</li>
+	<li><code>$7E:8400</code>から100バイトを、VRAMアドレス開始位置<code>$7200</code>word（<code>E400</code>byte）にGDMA転送</li>
+	<li><code>$7E:8500</code>から100バイトを、VRAMアドレス開始位置<code>$7300</code>word（<code>E600</code>byte）にGDMA転送</li>
+	<li><code>$7E:8600</code>から100バイトを、VRAMアドレス開始位置<code>$7280</code>word（<code>E500</code>byte）にGDMA転送</li>
+	<li><code>$7E:8700</code>から100バイトを、VRAMアドレス開始位置<code>$7380</code>word（<code>E700</code>byte）にGDMA転送</li>
+</ol>
+
+<p>と、いうことになる。</p>
+
+<p>これでVRAMへの転送のサブルーチンはわかったが、VRAMに転送する前の<code>$7E:C000</code>～<code>$7E:D7FF</code>と<code>$7E:8000</code>～<code>$7E:87FF</code>には、どこの何の値が入っていたのか？<br>
+そのサブルーチンが<code><span class="r">$CE/D47E</span></code>～<code><span class="r">$CE/D89D</span></code>。<br>
 大まかに見ると、スプライトのタイル1つ分、つまり8×8ピクセルサイズの<span class="formula">$20</span>バイト分のデータをループ処理でコピー、を繰り返しているのだが、<a href="sprite.html">前ページ</a>にて述べた通りに左右対称にドットを配置する場合や、後にスプライトを配置する時の都合で途中分岐が多くなっている。<br>
 下はサンダウンの例。</p>
 
@@ -277,85 +678,8 @@ $CE/D89C PLB                     ;DBレジスタにスタックからプル
 $CE/D89D RTL                     ;サブルーチン戻り
 </pre></div>
 
-<p>途中をかなり省略したが、上がサンダウンの<span class="formula">$200</span>バイト分のデータ<code>$CF:074B</code>～<code>$CF:0905</code>を、<code>$7E:8000</code>～<code>$7E:81FE</code>にコピーする処理である（実際には途中で計算処理して値が変わっている場合もある。そのデータがそのままVRAMに送られる）。<br>
-基本は<code><span class="r">$CE/D4B2</span></code>～<code><span class="r">$CE/D4BD</span></code>のループ部分のコピー処理で、<span class="formula">$20</span>バイト毎に分岐処理をしているが、細かい説明は端折る。<br>
-この後、<code>$7E:8200</code>～以降にも他データがコピーされ、VRAMへデータが送られる。</p>
-
-<div class="code-container"><pre>
-$C0/4DC4 LDA #$01                ;Aに$01をロード
-$C0/4DC6 STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
-$C0/4DC9 LDA #$18                ;Aに$18をロード
-$C0/4DCB STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
-$C0/4DCE LDX #$0000              ;Xに$0000をロード
-$C0/4DD1 STX $2116  [$00:2116]   ;Xを[$00:2117][$00:2116]に書き込み
-$C0/4DD4 LDX #$2000              ;Xに$2000をロード
-$C0/4DD7 STX $26    [$00:0026]   ;Xを[$00:0026]に書き込み
-$C0/4DD9 LDA $0120  [$00:0120]   ;Aに[$00:0120]をロード
-$C0/4DDC STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
-$C0/4DDE STZ $22    [$00:0022]   ;[$00:0022]に$00を書き込み
-$C0/4DE0 JSR $4E8A  [$C0:4E8A]   ;[$C0:4E8A]へジャンプ
-;（中略）
-$C0/4ECE LDX #$8000              ;Xに$8000をロード
-$C0/4ED1 STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
-$C0/4ED4 LDA #$7E                ;Aに$7Eをロード
-$C0/4ED6 STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
-$C0/4ED9 LDY #$2000              ;Yに$2000をロード
-$C0/4EDC STY $4305  [$00:4305]   ;Yを[$00:4306][$00:4305]に書き込み
-$C0/4EDF LDA #$01                ;Aに$01をロード
-$C0/4EE1 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
-</pre></div>
-
-<p>VRAMへのデータ転送は上で、書き込み先のアドレスはI/Oレジスタ、つまりVRAMとやりとりをするためのメモリアドレスになる。<br>
-詳しくは<br>
-<a href="https://github.com/akatsuki105/snes-docs-ja/tree/main/memory/dma" target="_blank">snes-docs-ja/memory/dma</a><br>
-<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a><br>
-を参照していただきたいが、GDMA(General Direct Memory Access)転送という方法で、スーパーファミコンのメモリからVRAMへデータを送る。<br>
-HDMA(HBlank DMA)という、HBlank（テレビ画面に横1列分のドット絵を描写してから、次の行への描写へ移る僅かな時間）を利用した転送もあるが、ここで使っているのはそれ以外でも使えるGDMA。<br>
-ちなみにGDMAで転送中は、スーファミ自体のCPUは一時停止する（計算を一時停止する）。</p>
-
-<table>
-<thead>
-	<tr><th>アドレス（I/Oレジスタ）</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>[$00:4300]</code></td><td>GDMA/HDMA設定レジスタ</td></tr>
-	<tr><td><code>[$00:4301]</code></td><td>転送先指定 <span class="formula">$04</span>=OAM, <span class="formula">$18</span>=VRAM, <span class="formula">$22</span>=CGRAM, <span class="formula">$80</span>=WRAM</td></tr>
-	<tr><td><code>[$00:4303]</code><code>[$00:4302]</code></td><td>データ元アドレス（開始位置）</td></tr>
-	<tr><td><code>[$00:4304]</code></td><td>データ元バンク</td></tr>
-	<tr><td><code>[$00:4306]</code><code>[$00:4305]</code></td><td>転送するデータ量</td></tr>
-	<tr><td><code>[$00:420B]</code></td><td>GDMA(General Direct Memory Access)チャネルレジスタ</td></tr>
-	<tr><td><code>[$00:2117][$00:2116]</code></td><td>転送先 VRAMアドレス</td></tr>
-</tbody>
-</table>
-
-<p><code>$00:43n?</code>の<span class="formula">n</span>は<span class="formula">0~7</span>の値をとり、それぞれでGDMA（HDMA含む）転送を設定できる。<br>
-上だと、<span class="formula">n=0</span>である。<br>
-つまりGDMA転送は最大8つ設定できる（8チャネル）。</p>
-
-<p>上は、<code>$7E:8000</code>～<code>$7E:9FFF</code>のデータをVRAMに転送する処理になる。<br>
-準備として、転送先に<span class="formula">$18</span>（VRAM）、データ元バンクに<span class="formula">$7E</span>、データ元アドレス2バイトに<span class="formula">$8000</span>、転送するデータ量に<span class="formula">$2000</span>を指定しておく。<br>
-つまり、GDMA転送のチャネル0を使用する。</p>
-
-<p><code>[$00:420B]</code>は、GDMAチャネルレジスタで、8ビットの値が下から順にチャネル0～チャネル7に対応している。<br>
-該当チャネルのビットに1を書き込むと、そのチャネルのGDMA転送を行う、という仕組みである。<br>
-チャネル0の転送を行うのなら、<span class="formula">%0000 0001 = $01</span>を<code>[$00:420B]</code>に書き込むと転送開始になる。<br>
-<code><span class="r">$C0/4EDF</span></code>～<code><span class="r">$C0/4EE1</span></code>が、該当部分にあたる。</p>
-
-<p>GDMA転送は高速なので、画像関係の大量のデータ転送は、基本的にGDMA転送を行う。<br>
-この先のサブルーチンでも頻出となる。<br>
-また、複数のGDMAチャネルの設定をしてから、<code>[$00:420B]</code>に複数のチャネルの対応ビットに1を書き込むと、HDMA転送が最優先、後はチャネル番号が小さいほど優先で転送を行う仕組みになっている。</p>
-
-<p><code>$00:4300</code>のGDMA/HDMA設定レジスタの説明は長くなるので、下ウェブサイトなどを参照していただきたい。</p>
-
-<ul>
-	<li><a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a></li>
-	<li><a href="https://w.atwiki.jp/snesspec/pages/23.html" target="_blank">DMAとHDMA - SNES Spec - atwiki（アットウィキ）</a></li>
-</ul>
-
-<p><code>[$00:2117][$00:2116]</code>には、転送先であるVRAMの開始アドレスを指定する。<br>
-今回は<code><span class="r">$C0/4DCE</span></code>～の指定から、VRAMの開始アドレスは<span class="formula">$0000</span>である。<br>
-VRAMのアドレス指定の時、<span style="font-weight:bold;">アドレスをbyteではなくwordで指定するため注意が必要</span>。<span class="formula">2byte</span>(バイト)で<span class="formula">1word</span>(ワード)になる。<br>
-今回は<span class="formula">$0000</span>なので、そのままで構わないが、もしバイトに直すのならワードを2倍する必要がある、ということである。</p>
+<p>途中をかなり省略したが、上がサンダウンの<span class="formula">$200</span>バイト分のデータ<code>$CF:074B</code>～<code>$CF:0905</code>を、<code>$7E:8000</code>～<code>$7E:81FE</code>にコピーする処理である（実際には途中で計算処理して値が変わっている場合もある）。<br>
+基本は<code><span class="r">$CE/D4B2</span></code>～<code><span class="r">$CE/D4BD</span></code>のループ部分のコピー処理で、<span class="formula">$20</span>バイト毎に分岐処理をしているが、細かい説明は端折る。</p>
 
 <h4 id="01_2">カラーパレットの呼び出し</h4>
 
