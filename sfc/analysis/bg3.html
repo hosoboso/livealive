@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景グラフィックと効果 &gt; メニュー画面でのサブルーチン">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景グラフィックと効果 &gt; メニュー画面でのサブルーチン">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景グラフィックと効果 &gt; メニュー画面でのサブルーチン</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="here"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="bg.html">背景グラフィックと効果</a> &gt; メニュー画面</h1>
+<h2>背景グラフィックと効果 &gt; メニュー画面</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>先に<a href="bg.html">背景グラフィックと効果</a>に目を通していただきたい。</p>
+
+<p>メニュー画面のグラフィックは、シナリオ選択画面・セーブ・ロード画面やテキスト入力（名前入力など）画面と処理が共通のため、メニュー画面では使わないグラフィックも一部ロードされたりする。<br>
+今回はメニュー画面を開いた時の処理のみ紹介する。</p>
+
+<p>戦闘がBGMode1の時について大まかにまとめると、だいたい以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th rowspan="2">背景</th><th rowspan="2">背景サイズ<br>（横×縦、タイル数）</th><th colspan="2">VRAMアドレス（単位byte）</th></tr>
+	<tr><th>タイルデータ</th><th>BGマップデータ</th></tr>
+</thead>
+<tbody>
+	<tr><td>BG1</td><td>32×32</td><td><code>$4000</code>～<code>$7FFF</code></td><td><code>$E000</code>～<code>$E7FF</code></td></tr>
+	<tr><td>BG2</td><td>64×32</td><td><code>$4000</code>～<code>$7FFF</code></td><td><code>$E800</code>～<code>$F7FF</code></td></tr>
+	<tr><td>BG3</td><td>32×32</td><td><code>$0000</code>～<code>$3FFF</code></td><td><code>$F800</code>～<code>$FFFF</code></td></tr>
+</tbody>
+</table>
+
+<div id="captiondata"></div>
+
+<h3>初期設定・その1</h3>
+
+<p>まずグラフィックのI/Oレジスタ関係初期設定が以下で行われる。</p>
+
+<div class="code-container"><pre>
+$C2/00F1 LDA #$2100              ;Aに$2100をロード
+$C2/00F4 LDX #$6C57              ;Xに$6C57をロード
+$C2/00F7 JSR $05B2  [$C2:05B2]   ;[$C2:05B2]にジャンプ
+
+$C2/05B2 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/05B3 PHD                     ;Dレジスタをスタックへプッシュ
+$C2/05B4 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/05B5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/05B7 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/05B8 PLB                     ;DBレジスタにスタックからプル
+$C2/05B9 LDY $00    [$00:0500]   ;Yに[$00:0500](初期値$0000)をロード
+;ループ処理
+$C2/05BB LDA $C20000,x[$C2:6C57] ;Aに[$C2:6C57+2n]をロード
+$C2/05BF CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C2/05C1 BEQ $0C    [$05CF]      ;ゼロフラグが立っているとき[$05CF]分岐
+$C2/05C3 TAY                     ;Aの値をYレジスタに転送
+$C2/05C4 LDA $C20001,x[$C2:6C58] ;Aに[$C2:6C58+2n]をロード
+$C2/05C8 STA $0000,y[$00:2100]   ;Aを[$0000,y($00:2100~)]に書き込み
+$C2/05CB INX                     ;Xをインクリメント +1
+$C2/05CC INX                     ;Xをインクリメント +1
+$C2/05CD BRA $EC    [$05BB]      ;フラグにかかわりなく常に分岐[$05BB]
+;ループ処理ここまで
+$C2/05CF PLP                     ;Pレジスタにスタックからプル
+$C2/05D0 PLD                     ;Dレジスタにスタックからプル
+$C2/05D1 PLB                     ;DBレジスタにスタックからプル
+$C2/05D2 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ループ処理で、<code><span class="r">$C2/05C8</span></code>にて<code>[$00:2100]</code>以降のI/Oレジスタに値が入るのだが、まとめると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>元アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2100]</code></td><td>INIDISP</td><td>スクリーン初期化</td><td><code>[$C2:6C58]</code></td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>[$00:2115]</code></td><td>VMAINC</td><td>ビデオポート調整</td><td><code>[$C2:6C5A]</code></td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>[$00:2133]</code></td><td>SETINI</td><td>スクリーンモード/ビデオ設定</td><td><code>[$C2:6C5C]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2181]</code></td><td>WMADDL </td><td>WRAMアドレス (下位)</td><td><code>[$C2:6C5E]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2182]</code></td><td>WMADDM </td><td>WRAMアドレス (中位)</td><td><code>[$C2:6C60]</code></td><td><span class="formula">$20</span></td></tr>
+	<tr><td><code>[$00:2183]</code></td><td>WMADDH </td><td>WRAMアドレス (上位)</td><td><code>[$C2:6C62]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+
+<p>ここで<code>[$00:2100]</code>に<span class="formula">$80</span>が入り、輝度が0になるので、メニュー画面に切り替え前の画面が真っ暗な状態になる。</p>
+
+<p>ループの最後にWRAMアドレスが入るのは、この後のWRAM転送用なので、実質上で設定したI/Oレジスタは3種。<br>
+他のレジスタの設定はここよりもかなり後で、先にVRAM転送などが行われる。</p>
+
+<h3>VRAMの初期化＆BG3のBGマップデータ</h3>
+
+<p>以下がVRAMに対しての最初の処理になる。</p>
+
+<div class="code-container"><pre>
+$C2/010C JSR $4C4D  [$C2:4C4D]   ;[$C2:4C4D]へジャンプ
+
+$C2/4C4D PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4C4E PHB                     ;DBレジスタをスタックにプッシュ
+$C2/4C4F PEA $0000               ;オペランドに指定した16bit値をスタックに積み
+$C2/4C52 PLB                     ;DBレジスタにスタックからプル
+$C2/4C53 PLB                     ;DBレジスタにスタックからプル
+$C2/4C54 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/4C56 STZ $2116  [$00:2116]   ;[$00:2117][$00:2116]に$0000を書き込み
+$C2/4C59 LDX #$76FA              ;Xに$76FAをロード
+$C2/4C5C LDY #$4300              ;Yに$4300をロード
+$C2/4C5F LDA #$0007              ;Aに$0007をロード
+$C2/4C62 MVN C2 00               ;データ転送
+;
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $76FA
+;Y:転送先アドレス $4300
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:76FA -&gt; $00:4300 +8バイト　09 18 00 05 00 00 00 00
+;
+$C2/4C65 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4C67 LDA #$80                ;Aに$80をロード
+$C2/4C69 STA $2115  [$00:2115]   ;Aを[$00:2115]に書き込み　VMAINC ビデオポート調整
+$C2/4C6C LDA #$01                ;Aに$01をロード
+$C2/4C6E STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル0
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$0000
+;[$00:4300]	GDMA/HDMA設定レジスタ	$09 fixed
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$0500
+;[$00:4304]	データ元バンク	$00
+;[$00:4306][$00:4305]	転送するデータ量	$0000
+;※$0000が指定されたら、$10000バイトの転送を行う
+;$00:0500 -&gt; VRAM $0000word($0000byte) +$10000byte
+;
+$C2/4C71 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/4C73 LDA #$7C00              ;Aに$7C00をロード
+$C2/4C76 STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み VRAMアドレス※word単位
+$C2/4C79 LDA #$2000              ;Aに$2000をロード
+;ループ処理
+$C2/4C7C STA $2118  [$00:2118]   ;A($2000)を[$00:2119][$00:2118]に書き込み VRAM書き込み
+;[$00:2115]に%1000 0000を書き込んでいるので、
+;$00:2119に書き込んだあと書き込み先VRAMアドレスを+1
+$C2/4C7F INC A                   ;Aをインクリメント +1
+$C2/4C80 CMP #$2400              ;Aと$2400を減算比較（ステータスレジスタ変更のみ）
+$C2/4C83 BNE $F7    [$4C7C]      ;ゼロフラグが立っていないとき[$4C7C]分岐
+;ループ処理ここまで
+$C2/4C85 PLB                     ;DBレジスタにスタックからプル
+$C2/4C86 PLP                     ;Pレジスタにスタックからプル
+$C2/4C87 RTS                     ;サブルーチン戻り
+
+$C2/010F JSR $04FE  [$C2:04FE]   ;[$C2:04FE]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/4C62</span></code>のMVN転送は、<code>$C2:76FA</code>～<code>$C2:7701</code>を<code>$00:4300</code>～<code>$00:4307</code>へコピーする処理なので、GDMAチャネル0の設定を行っている。<br>
+<code>$C2:76FA</code>～<code>$C2:7701</code>を見ると、「<span class="formula">09 18 00 05 00 00 00 00</span>」と数値が入っているため、<code>$00:0500</code>(<span class="formula">$00</span>)の固定値をVRAMアドレス<code>$0000</code>word(<code>$0000</code>byte)を初期アドレスとしてGDMA転送なのだが、<code>[$00:4306]</code><code>[$00:4305]</code>に入る転送するデータ量が「<span class="formula">$0000</span>」である。<br>
+<span class="formula">$0000</span>では何も送らないことになってしまうのだが、仕様として、転送量に<span class="formula">$0000</span>が指定されたら<span class="formula">$10000</span>バイトの転送を行うことになっている。<br>
+（<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a>や<a href="https://w.atwiki.jp/snesspec/pages/276.html#p43X6" target="_blank">IO ポート (メイン)/0x43x0-0x43xA - SNES Spec</a>など参照）<br>
+VRAMは<span class="formula">$10000</span>バイト（<span class="formula">64</span>キロバイト）だから、<code><span class="r">$C2/4C6E</span></code>のGDMA転送は、VRAMすべての領域に<code>$00:0500</code>(<span class="formula">$00</span>)を書き込む、ということであり、いわばVRAMの初期化ということである。</p>
+
+<p>その後、<code><span class="r">$C2/4C7C</span></code>～<code><span class="r">$C2/4C83</span></code>のループ処理で、ポート<code>[$00:2119]</code><code>[$00:2118]</code>を通したVRAMへの書き込みを行っている（<a href="https://w.atwiki.jp/snesspec/pages/248.html" target="_blank">IO ポート (メイン)/0x2118 - SNES Spec</a>）。<br>
+<code><span class="r">$C2/4C69</span></code>で<code>[$00:2115]</code>（VMAINC ビデオポート調整）に<span class="formula">$80</span>(<span class="formula">%1000 0000</span>)を書き込んでおり、<code>[$00:2119]</code><code>[$00:2118]</code>で値を転送するたびに、<code><span class="r">$C2/4C76</span></code>で<code>[$00:2117]</code><code>[$00:2116]</code>で指定したVRAMアドレス<code>$7C00</code>(word単位)をインクリメント(<span class="formula">+1</span>)する、という仕様になっている。<br>
+結果として、VRAMアドレス<code>$7C00</code>word(<code>$F800</code>～<code>$F801</code>バイト)に初期値<span class="formula">$2000</span>を書き込むと、ループ処理により、</p>
+
+<p><code>$7C01</code>word(<code>$F802</code>～<code>$F803</code>バイト)に<span class="formula">$2001</span>を書き込む<br>
+<code>$7C02</code>word(<code>$F804</code>～<code>$F805</code>バイト)に<span class="formula">$2002</span>を書き込む<br>
+……<br>
+<code>$7FFF</code>word(<code>$FFFE</code>～<code>$FFFF</code>バイト)に<span class="formula">$23FF</span>を書き込む</p>
+
+<p>と、VRAMアドレス<code>$F800</code>～<code>$FFFF</code>バイトの値が埋まる。<br>
+まとめると、<code><span class="r">$C2/4C4D</span></code>～<code><span class="r">$C2/4C87</span></code>で、VRAMの初期化＋<code>$F800</code>～<code>$FFFF</code>バイトに初期値書き込み、ということになる。</p>
+
+<p>後でわかるが、VRAMアドレス<code>$F800</code>～<code>$FFFF</code>はBG3のBGマップデータ部分にあたり、上の値がそのままBGマップになる。<br>
+戦闘やフィールドだと、VRAMのタイルデータに従ってBGマップデータを作る、という感じになるのだが、このメニュー画面のBG3については少し変わっており、BGマップデータに合わせてタイルデータの領域に文字のタイルデータを並べる、という方式である。</p>
+
+<h3>メニュー画面の共通部分のグラフィック</h3>
+
+<p>ここからメニュー画面の共通部分のVRAMへの転送処理になる。</p>
+
+<div class="code-container"><pre>
+$C2/0127 LDA $0A00  [$7E:0A00]   ;Aに[$7E:0A01][$7E:0A00]（シナリオID）をロード
+$C2/012A AND #$000F              ;Aと$000Fで論理積
+$C2/012D STA $4D    [$00:054D]   ;Aを[$00:054E][$00:054D]に書き込み
+$C2/012F JSR $44D9  [$C2:44D9]   ;[$C2:44D9]へジャンプ
+
+$C2/44D9 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/44DA REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/44DC LDA $4D    [$00:054D]   ;Aに[$00:054D]（シナリオID）をロード
+$C2/44DE AND #$000F              ;Aと$000Fで論理積
+$C2/44E1 CMP #$0008              ;Aと$0008を減算比較（ステータスレジスタ変更のみ）
+$C2/44E4 BEQ $1B    [$4501]      ;ゼロフラグが立っているとき[$4501]分岐
+;ゼロフラグOFF（最終編以外）
+$C2/44E6 ASL A                   ;Aを算術左シフト *2
+$C2/44E7 CLC                     ;キャリーフラグクリア
+$C2/44E8 ADC $D50000[$D5:0000]   ;A + [$D5:0000]($FC51)
+$C2/44EC TAX                     ;Aの値をXレジスタに転送
+$C2/44ED LDA $D50000,x[$D5:FC5D] ;Aに[$D5:FC5n]をロード シナリオID*2+$FC51
+$C2/44F1 AND #$00FF              ;Aと$00FFで論理積
+$C2/44F4 STA $55    [$00:0555]   ;Aを[$00:0556][$00:0555]に書き込み
+$C2/44F6 LDA $D50001,x[$D5:FC5E] ;Aに[$D5:FC5n+1]をロード
+$C2/44FA AND #$00FF              ;Aと$00FFで論理積
+$C2/44FD STA $59    [$00:0559]   ;Aを[$00:055A][$00:0559]に書き込み
+$C2/44FF BRA $0A    [$450B]      ;フラグにかかわりなく常に分岐[$450B]
+;ゼロフラグON（最終編）
+$C2/4501 LDA #$0001              ;Aに$0001をロード
+$C2/4504 STA $55    [$00:0555]   ;Aを[$00:0556][$00:0555]に書き込み
+$C2/4506 LDA #$00FF              ;Aに$00FFをロード
+$C2/4509 STA $59    [$00:0559]   ;Aを[$00:055A][$00:0559]に書き込み
+;処理合流
+$C2/450B LDA $55    [$00:0555]   ;Aに[$00:0556][$00:0555]をロード
+$C2/450D CLC                     ;キャリーフラグクリア
+$C2/450E ADC $59    [$00:0559]   ;A + [$00:055A][$00:0559]
+$C2/4510 STA $57    [$00:0557]   ;Aを[$00:0558][$00:0557]に書き込み
+$C2/4512 PLP                     ;Pレジスタにスタックからプル
+$C2/4513 RTS                     ;サブルーチン戻り
+
+$C2/0132 JSR $3023  [$C2:3023]   ;[$C2:3023]へジャンプ
+
+$C2/3023 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3024 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3026 LDX #$1FFE              ;Xに$1FFEをロード
+;ループ処理
+$C2/3029 STZ $C000,x             ;[$7E:DFFF][$7E:DFFE]～[$7E:C001][$7E:C000]に$0000を書き込み
+$C2/302C DEX                     ;Xをデクリメント -1
+$C2/302D DEX                     ;Xをデクリメント -1
+$C2/302E BPL $F9    [$3029]      ;ネガティブフラグが立っていないとき[$3029]分岐
+;ループ処理ここまで
+$C2/3030 LDX #$0000              ;Xに$0000をロード
+$C2/3033 TXY                     ;Xレジスタの値をYレジスタに転送
+;ループ処理
+$C2/3034 LDA $CAF300,x           ;Aに[$CA:F301~$CA:FF00][$CA:F300~$CA:FEFF]をロード
+$C2/3038 STA $D000,y             ;Aを[$7E:D001~$7E:DFEF][$7E:D000~$7E:DFEE]に書き込み
+$C2/303B INX                     ;Xをインクリメント +1
+$C2/303C INX                     ;Xをインクリメント +1
+$C2/303D INY                     ;Yをインクリメント +1
+$C2/303E INY                     ;Yをインクリメント +1
+$C2/303F TYA                     ;Yレジスタの値をAレジスタに転送
+$C2/3040 AND #$000F              ;Aと$000Fで論理積
+$C2/3043 BNE $EF    [$3034]      ;ゼロフラグが立っていないとき[$3034]分岐
+;ループ処理ここまで
+;ループ処理
+$C2/3045 LDA $CAF300,x           ;Aに[$CA:FEF9~$CA:FF00][$CA:FEF8~$CA:FEFF]をロード
+$C2/3049 AND #$00FF              ;Aと$00FFで論理積
+$C2/304C STA $D000,y             ;Aを[$7E:DFF1~$7E:DFFF][$7E:DFF0~$7E:DFFE]に書き込み
+$C2/304F INX                     ;Xをインクリメント +1
+$C2/3050 INY                     ;Yをインクリメント +1
+$C2/3051 INY                     ;Yをインクリメント +1
+$C2/3052 TYA                     ;Yレジスタの値をAレジスタに転送
+$C2/3053 AND #$000F              ;Aと$000Fで論理積
+$C2/3056 BNE $ED    [$3045]      ;ゼロフラグが立っていないとき[$3045]分岐
+;ループ処理ここまで
+$C2/3058 CPY #$1000              ;Yと$1000を減算比較（ステータスレジスタ変更のみ）
+$C2/305B BMI $D7    [$3034]      ;ネガティブフラグが立っているとき[$3034]分岐
+;ループ処理ここまで
+$C2/305D LDX #$D2A0              ;Xに$D2A0をロード
+$C2/3060 LDY #$C200              ;Yに$C200をロード
+$C2/3063 LDA #$031F              ;Aに$031Fをロード
+$C2/3066 MVN C2 7E               ;データ転送
+;A:転送データサイズ-1 $031F
+;X:転送元アドレス $D2A0
+;Y:転送先アドレス $C200
+;オペランド:転送元と転送先バンク C2 -&gt; 7E
+;$C2:D2A0 -&gt; $7E:C200 +$031Fバイト
+$C2/3069 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/306A LDX #$73D0              ;Xに$73D0をロード
+$C2/306D LDY #$4300              ;Yに$4300をロード
+$C2/3070 LDA #$0007              ;Aに$0007をロード
+$C2/3073 MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $73D0
+;Y:転送先アドレス $4300
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:73D0 -&gt; $00:4300 +$0007バイト　01 18 00 C0 7E 00 20 C2
+$C2/3076 LDA #$0080              ;Aに$0080をロード
+$C2/3079 STA $2115  [$00:2115]   ;Aを[$00:2116][$00:2115]に書き込み
+$C2/307C LDA #$2000              ;Aに$2000をロード
+$C2/307F STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/3082 LDA #$0001              ;Aに$0001をロード
+$C2/3085 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル0
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$2000
+;[$00:4300]	GDMA/HDMA設定レジスタ	$01
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$C000
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$2000
+;$7E:C000 -&gt; VRAM $2000word($4000byte) +$2000byte
+;
+$C2/3088 PLB                     ;DBレジスタにスタックからプル
+$C2/3089 PLP                     ;Pレジスタにスタックからプル
+$C2/308A RTS                     ;サブルーチン戻り
+
+$C2/0135 JSR $300F  [$C2:300F]   ;[$C2:300F]へジャンプ
+</pre></div>
+
+<p>VRAMに転送したい部分を<code>$7E:C000</code>～<code>$7E:DFFF</code>にコピーし、<code>$7E:C000</code>～<code>$7E:DFFF</code>をVRAMアドレス<code>$4000</code>～<code>$5FFF</code>という手順である。<br>
+転送する元のアドレスは固定値で、まとめてみると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th>VRAM転送先</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$CA:F300</code>～<code>$CA:FEFF</code></td><td><code>$5000</code>～<code>$5FFF</code></td><td>背景画像（<span class="formula">$200</span>バイト毎に8シナリオ分）</td></tr>
+	<tr><td><code>$C2:D2A0</code>～<code>$C2:D5BF</code></td><td><code>$4200</code>～<code>$451F</code></td><td>セリフ吹き出し部分・コマンド枠</td></tr>
+</tbody>
+</table>
+
+<p>メニュー画面の背景画像はシナリオまたは最終編なら最終編主人公で決まるのだが、メニュー画面には全シナリオ分の画像データがここで転送される仕組みになっている。<br>
+メニュー画面内のLISTENING ROOMはページ切り替えで各シナリオの背景を使用するため、全シナリオ分の画像データが必要になる。<br>
+「セリフ吹き出し部分」は、スプライトから出るキャラ名吹き出しのグラフィック。<br>
+「コマンド枠」は、メニュー画面の一番上に水平に並ぶコマンド用の長方形の枠のグラフィックである。</p>
+
+<h3>背景関連スプライト</h3>
+
+<p>次もほぼ固定値のロードである。<br>
+この先はしばらく、背景とはいえ実質スプライトのロードなのだがざっと紹介しておく。<br>
+「ほぼ」なのは、シナリオ毎に異なるカーソル画像を呼び出すため。<br>
+その他、LISTENING ROOMのページ切り替え用の「R」「L」のアイコンなどが以下で呼び出される。</p>
+
+<div class="code-container"><pre>
+$C2/3121 LDX #$DB40              ;Xに$DB40をロード
+$C2/3124 LDY #$C480              ;Yに$C480をロード
+$C2/3127 LDA #$001F              ;Aに$001Fをロード
+$C2/312A MVN C2 7E               ;データ転送
+;A:転送データサイズ-1 $001F
+;X:転送元アドレス $DB40
+;Y:転送先アドレス $C480
+;オペランド:転送元と転送先バンク C2 -&gt; 7E
+;$C2:DB40 -&gt; $7E:C480 +$001Fバイト
+$C2/312D LDY #$C4C0              ;Yに$C4C0をロード
+$C2/3130 LDA #$001F              ;Aに$001Fをロード
+$C2/3133 MVN C2 7E               ;データ転送
+;A:転送データサイズ-1 $001F
+;X:転送元アドレス $DB60
+;Y:転送先アドレス $C4C0
+;オペランド:転送元と転送先バンク C2 -&gt; 7E
+;$C2:DB60 -&gt; $7E:C4C0 +$001Fバイト
+$C2/3136 LDY #$C500              ;Yに$C500をロード
+$C2/3139 LDA #$001F              ;Aに$001Fをロード
+$C2/313C MVN C2 7E               ;データ転送
+;A:転送データサイズ-1 $001F
+;X:転送元アドレス $DB80
+;Y:転送先アドレス $C500
+;オペランド:転送元と転送先バンク C2 -&gt; 7E
+;$C2:DB80 -&gt; $7E:C500 +$001Fバイト
+$C2/313F LDX #$73F8              ;Xに$73F8をロード
+$C2/3142 LDY #$4300              ;Yに$4300をロード
+$C2/3145 LDA #$0007              ;Aに$0007をロード
+$C2/3148 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/3149 MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $73F8
+;Y:転送先アドレス $4300
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:73F8 -&gt; $00:4300 +$0007バイト　01 18 00 C0 7E 00 08 7E
+$C2/314C LDA #$0080              ;Aに$0080をロード
+$C2/314F STA $2115  [$00:2115]   ;Aを[$00:2116][$00:2115]に書き込み
+$C2/3152 LDA #$4000              ;Aに$4000をロード
+$C2/3155 STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/3158 LDA #$0001              ;Aに$0001をロード
+$C2/315B JSR $4C88  [$C2:4C88]   ;[$C2:4C88]へジャンプ
+
+$C2/4C88 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4C89 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4C8B XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C8C LDA $0600  [$00:0600]   ;Aに[$00:0600]をロード
+$C2/4C8F BPL $07    [$4C98]      ;ネガティブフラグが立っていないとき[$4C98]分岐
+$C2/4C91 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C92 STA $00420B[$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル0
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$4000
+;[$00:4300]	GDMA/HDMA設定レジスタ	$01
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$C000
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$0800
+;$7E:C000 -&gt; VRAM $4000word($8000byte) +$0800byte
+;
+$C2/4C96 BRA $07    [$4C9F]      ;フラグにかかわりなく常に分岐[$4C9F]
+$C2/4C9F PLP                     ;Pレジスタにスタックからプル
+$C2/4CA0 RTS                     ;サブルーチン戻り
+
+$C2/315E PLB                     ;DBレジスタにスタックからプル
+$C2/315F PLP                     ;Pレジスタにスタックからプル
+$C2/3160 RTS                     ;サブルーチン戻り
+
+$C2/014A JSR $31D9  [$C2:31D9]   ;[$C2:31D9]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/3121</span></code>より前にも処理が入り、最終的に<code>$7E:C000</code>～<code>$7E:C7FF</code>の800バイトが、VRAMアドレス<code>$8000</code>～<code>$87FF</code>にロードされているのだが、すべてまとめてみると以下のようなアドレスになる。</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th>VRAM転送先</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula"><code>$CF:[$00:0550][$00:054F]</code>*$80+$F520</span>→<code>$7E:C080</code>～<code>$7E:C0BF</code></td><td><code>$8080</code></td><td>各シナリオカーソル</td></tr>
+	<tr><td><span class="formula"><code>$CF:[$00:0550][$00:054F]</code>*$80+$F560</span>→<code>$7E:C280</code>～<code>$7E:C2BF</code></td><td><code>$8280</code></td><td>各シナリオカーソル</td></tr>
+	<tr><td><code>$D6:FD80</code>～<code>$D6:FDFF</code>→<code>$7E:C0C0</code>～<code>$7E:C2FF</code></td><td><code>$80C0</code></td><td>手袋カーソル</td></tr>
+	<tr><td><code>$C2:D8C0</code>～<code>$C2:DB3F</code>→<code>$7E:C140</code>～<code>$7E:C7BF</code></td><td><code>$8140</code></td><td>四角の枠</td></tr>
+	<tr><td><code>$7E:C180</code>～<code>$7E:C19F</code>→<code>$7E:C100</code>～<code>$7E:C11F</code></td><td><code>$8100</code></td><td>四角の枠</td></tr>
+	<tr><td><code>$7E:C1C0</code>～<code>$7E:C1DF</code>→<code>$7E:C120</code>～<code>$7E:C13F</code></td><td><code>$8120</code></td><td>四角の枠</td></tr>
+	<tr><td><code>$7E:C380</code>～<code>$7E:C39F</code>→<code>$7E:C300</code>～<code>$7E:C31F</code></td><td><code>$8300</code></td><td>四角の枠</td></tr>
+	<tr><td><code>$7E:C3C0</code>～<code>$7E:C3DF</code>→<code>$7E:C320</code>～<code>$7E:C33F</code></td><td><code>$8320</code></td><td>四角の枠</td></tr>
+	<tr><td><code>$C2:DB40</code>～<code>$C2:DB9F</code>→<code>$7E:C480</code>～<code>$7E:C51F</code></td><td><code>$8480</code></td><td>斜め向き矢印、「←L」アイコン、「R→」アイコン</td></tr>
+</tbody>
+</table>
+
+<p><a href="bg2.html">背景グラフィックと効果 > 戦闘でのサブルーチン</a>の最後で紹介したが、各シナリオのカーソル画像は、アドレス「<span class="formula">$80 * シナリオID + $F520</span>」で呼び出せる。<br>
+ここまででは省略したが、以下処理で、<code>[$00:054F]</code>にはシナリオIDまたは最終編主人公IDが入る仕組みである（上1バイトの<code>[$00:0550]</code>には<span class="formula">$00</span>が入る）<br>
+よって、上の「<span class="formula"><code>$CF:[$00:0550][$00:054F]</code>*$80+$F520</span>」も各シナリオのカーソル画像の呼び出しにあたる。</p>
+
+<h3>文字画像・吹き出し・ウィンドウ形状などのタイルデータ</h3>
+
+<p>この後は8×8ピクセルサイズの文字画像・吹き出し・ウィンドウ形状などのタイルデータの転送になる。</p>
+
+<div class="code-container"><pre>
+$C2/0127 LDA $0A00  [$7E:0A00]   ;Aに[$7E:0A01][$7E:0A00]（シナリオID）をロード
+$C2/012A AND #$000F              ;Aと$000Fで論理積
+$C2/012D STA $4D    [$00:054D]   ;Aを[$00:054E][$00:054D]に書き込み
+$C2/012F JSR $44D9  [$C2:44D9]   ;[$C2:44D9]へジャンプ
+;
+;（中略）
+;
+$C2/300F PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3010 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3012 LDA $4D    [$00:054D]   ;Aに[$00:054E][$00:054D]をロード
+$C2/3014 CMP #$0008              ;Aと$0008を減算比較（ステータスレジスタ変更のみ）
+$C2/3017 BNE $03    [$301C]      ;ゼロフラグが立っていないとき[$301C]分岐
+;ゼロフラグON（最終編）
+$C2/3019 LDA $0A10  [$7E:0A10]   ;Aに[$7E:0A11][$7E:0A10]（最終編主人公ID）をロード
+;ゼロフラグOFF（最終編以外）
+$C2/301C AND #$0007              ;Aと$0007で論理積
+$C2/301F STA $4F    [$00:054F]   ;Aを[$00:0550][$00:054F]に書き込み
+$C2/3021 PLP                     ;Pレジスタにスタックからプル
+$C2/3022 RTS                     ;サブルーチン戻り
+;
+;（中略）
+;
+$C2/2FBE PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/2FBF REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/2FC1 LDX #$1BFE              ;Xに$1BFEをロード
+;ループ処理
+$C2/2FC4 STZ $C000,x[$7E:DBFE]   ;[$7E:DBFF][$7E:DBFE]～[$7E:C001][$7E:C000]に$0000を書き込み
+$C2/2FC7 DEX                     ;Xをデクリメント -1
+$C2/2FC8 DEX                     ;Xをデクリメント -1
+$C2/2FC9 BPL $F9    [$2FC4]      ;ネガティブフラグが立っていないとき[$2FC4]分岐
+;ループ処理ここまで
+$C2/2FCB LDX #$0000              ;Xに$0000をロード
+$C2/2FCE LDY #$0000              ;Yに$0000をロード
+;ループ処理
+$C2/2FD1 LDA $D4F200,x[$D4:F200] ;Aに[$D4:F201][$D4:F200]～[$D4:013F][$D4:013E]をロード
+$C2/2FD5 STA $C000,y[$7E:C000]   ;Aを[$7E:C001][$7E:C000]～[$7E:DE6F][$7E:DE6E]に書き込み
+$C2/2FD8 INX                     ;Xをインクリメント +1
+$C2/2FD9 INX                     ;Xをインクリメント +1
+$C2/2FDA INY                     ;Yをインクリメント +1
+$C2/2FDB INY                     ;Yをインクリメント +1
+$C2/2FDC TXA                     ;Xレジスタの値をAレジスタに転送
+$C2/2FDD AND #$000F              ;Aと$000Fで論理積
+$C2/2FE0 BNE $EF    [$2FD1]      ;ゼロフラグが立っていないとき[$2FD1]分岐
+;ループ処理ここまで
+$C2/2FE2 TYA                     ;Yレジスタの値をAレジスタに転送
+$C2/2FE3 CLC                     ;キャリーフラグクリア
+$C2/2FE4 ADC #$0010              ;A + $0010
+$C2/2FE7 TAY                     ;Aの値をYレジスタに転送
+$C2/2FE8 CPX #$0F40              ;Xと$0F40を減算比較（ステータスレジスタ変更のみ）
+$C2/2FEB BMI $E4    [$2FD1]      ;ネガティブフラグが立っているとき[$2FD1]分岐
+;ループ処理ここまで
+$C2/2FED LDX #$73C8              ;Xに$73C8をロード
+$C2/2FF0 LDY #$4320              ;Yに$4320をロード
+$C2/2FF3 LDA #$0007              ;Aに$0007をロード
+$C2/2FF6 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/2FF7 MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $73C8
+;Y:転送先アドレス $4320
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:73C8 -&gt; $00:4320 +$0007バイト　01 18 00 C0 7E 00 1C D4
+$C2/2FFA LDA #$0080              ;Aに$0080をロード
+$C2/2FFD STA $2115  [$00:2115]   ;Aを[$00:2116][$00:2115]に書き込み
+$C2/3000 LDA #$3200              ;Aに$3200をロード
+$C2/3003 STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/3006 PLB                     ;DBレジスタにスタックからプル
+$C2/3007 LDA #$0004              ;Aに$0004をロード
+$C2/300A JSR $4C88  [$C2:4C88]   ;[$C2:4C88]へジャンプ
+
+$C2/4C88 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4C89 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4C8B XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C8C LDA $0600  [$7E:0600]   ;Aに[$7E:0600]をロード
+$C2/4C8F BPL $07    [$4C98]      ;ネガティブフラグが立っていないとき[$4C98]分岐
+$C2/4C91 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C92 STA $00420B[$00:420B]   ;Aを[$00:420B]に書き込み
+;GDMA チャネル2
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$3200
+;[$00:4320]	GDMA/HDMA設定レジスタ	$01
+;[$00:4321]	転送先指定	$18=VRAM
+;[$00:4323][$00:4322]	データ元アドレス（開始位置）	$C000
+;[$00:4324]	データ元バンク	$7E
+;[$00:4326][$00:4325]	転送するデータ量	$1C00
+;$7E:C000 -&gt; VRAM $3200word($6400byte) +$1C00byte
+$C2/4C96 BRA $07    [$4C9F]      ;フラグにかかわりなく常に分岐[$4C9F]
+$C2/4C9F PLP                     ;Pレジスタにスタックからプル
+$C2/4CA0 RTS                     ;サブルーチン戻り
+
+$C2/300D PLP                     ;Pレジスタにスタックからプル
+$C2/300E RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上は、<code>[$7E:C000]</code>～<code>[$7E:DBFF]</code>を<span class="formula">$00</span>で埋めて初期化してから、<code>$D4:F200</code>～<code>$D4:FFFF</code>を<code>[$7E:C000]</code>～<code>[$7E:DBEF]</code>にコピーしてVRAMアドレス<code>$6400</code>～<code>$8000</code>にGDMA転送、という処理になる。<br>
+<a href="bg1.html">フィールドでのサブルーチン</a>でも、BG3用に<code>$D4:F200</code>～<code>$D4:FFFF</code>がVRAMの<code>$6200</code>～<code>$6FFF</code>に転送されていた。<br>
+これらは8×8ピクセルサイズの文字画像・吹き出し・ウィンドウ形状などのタイルデータになる。</p>
+
+<p>上処理では転送されていないが<code>$D4:0000</code>～<code>$D4:013F</code>が<code>$7E:DC00</code>～<code>$7E:DE6E</code>にコピーされている。</p>
+
+
+<h3>16×16サイズキャラスプライト</h3>
+
+<p>セーブ画面における主人公の表示用に、フィールドの16×16サイズスプライトの呼び出しがある。</p>
+
+<div class="code-container"><pre>
+$C2/3966 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3968 LDX #$78EE              ;Xに$78EEをロード
+$C2/396B LDY #$4300              ;Yに$4300をロード
+$C2/396E LDA #$0007              ;Aに$0007をロード
+$C2/3971 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/3972 MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $78EE
+;Y:転送先アドレス $4300
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:78EE -&gt; $00:4300 +$0007バイト　01 18 00 E0 7E 00 18 
+$C2/3975 PLB                     ;DBレジスタにスタックからプル
+$C2/3976 LDA #$0080              ;Aに$0080をロード
+$C2/3979 STA $002115[$00:2115]   ;Aを[$00:2116][$00:2115]に書き込み
+$C2/397D LDA #$5200              ;Aに$5200をロード
+$C2/3980 STA $002116[$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/3984 LDA #$0001              ;Aに$0001をロード
+$C2/3987 STA $00420B[$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル0
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$5200
+;[$00:4300]	GDMA/HDMA設定レジスタ	$01
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$E000
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$1800
+;$7E:E000 -&gt; VRAM $5200word($A400byte) +$1800byte
+;
+$C2/398B PLP                     ;Pレジスタにスタックからプル
+$C2/398C RTS                     ;サブルーチン戻り
+
+$C2/03E2 JSR $3230  [$C2:3230]   ;[$C2:3230]へジャンプ
+</pre></div>
+
+<p>上は<code>$7E:E000</code>～<code>$7E:F800</code>をVRAMアドレス<code>$A400</code>～<code>$BBFF</code>へGDMA転送する処理になっている。<br>
+その前に、<code>$7E:E000</code>～<code>$7E:F800</code>に値をコピーする処理が行われているのだが、その処理はフィールド関係のサブルーチンが入っているバンク<code>$CE</code>や<code>$C0</code>のプログラムを使っている（詳細は省略）。<br>
+内容は各シナリオの主人公（＋最終編で功夫編主人公扱いになるユン、レイ、サモ）の、フィールドの16×16サイズスプライトで、セーブ画面における主人公の表示（最終編なら現在のパーティメンバー）に使われる。</p>
+
+<div class="code-container"><pre>
+$C2/3161 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/3162 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3163 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3165 LDX #$7400              ;Xに$7400をロード
+$C2/3168 LDY #$4300              ;Yに$4300をロード
+$C2/316B LDA #$0007              ;Aに$0007をロード
+$C2/316E MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $7400
+;Y:転送先アドレス $4300
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:7400 -&gt; $00:4300 +$0007バイト　01 18 C0 D5 C2 80 01
+$C2/3171 LDA #$0080              ;Aに$0080をロード
+$C2/3174 STA $2115  [$00:2115]   ;Aを[$00:2116][$00:2115]に書き込み
+$C2/3177 LDA #$5E00              ;Aに$5E00をロード
+$C2/317A STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/317D LDA #$0001              ;Aに$0001をロード
+$C2/3180 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル0
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$5E00
+;[$00:4300]	GDMA/HDMA設定レジスタ	$01
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$D5C0
+;[$00:4304]	データ元バンク	$C2
+;[$00:4306][$00:4305]	転送するデータ量	$0180
+;$C2:D5C0 -&gt; VRAM $5E00word($BC00byte) +$0180byte
+;
+$C2/3183 LDA #$0180              ;Aに$0180をロード
+$C2/3186 STA $4305  [$00:4305]   ;Aを[$00:4306][$00:4305]に書き込み
+$C2/3189 LDA #$5F00              ;Aに$5F00をロード
+$C2/318C STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/318F LDA #$0001              ;Aに$0001をロード
+$C2/3192 JSR $4C88  [$C2:4C88]   ;[$C2:4C88]へジャンプ
+
+$C2/4C88 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4C89 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4C8B XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C8C LDA $0600  [$00:0600]   ;Aに[$00:0600]をロード
+$C2/4C8F BPL $07    [$4C98]      ;ネガティブフラグが立っていないとき[$4C98]分岐
+$C2/4C91 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C92 STA $00420B[$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル0
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$5F00
+;[$00:4300]	GDMA/HDMA設定レジスタ	$01
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$D740
+;[$00:4304]	データ元バンク	$C2
+;[$00:4306][$00:4305]	転送するデータ量	$0180
+;$C2:D740 -&gt; VRAM $5F00word($BE00byte) +$0180byte
+;
+$C2/4C96 BRA $07    [$4C9F]      ;フラグにかかわりなく常に分岐[$4C9F]
+$C2/4C9F PLP                     ;Pレジスタにスタックからプル
+$C2/4CA0 RTS                     ;サブルーチン戻り
+
+$C2/3195 PLP                     ;Pレジスタにスタックからプル
+$C2/3196 PLB                     ;DBレジスタにスタックからプル
+$C2/3197 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>さらに、<br>
+<code>$C2:D5C0</code>～<code>$C2:D73F</code>がVRAMアドレス<code>$BC00</code>～<code>$BD7F</code>に転送<br>
+<code>$C2:D740</code>～<code>$C2:D8BF</code>がVRAMアドレス<code>$BE00</code>～<code>$BF7F</code>に転送<br>
+という処理が続く。<br>
+これは装備画面における頭・右・左・体・足・アクセサリ欄の16×16サイズキャラのタイルデータであり、全シナリオで共通。</p>
+
+<p>VRAMアドレス<code>$A400</code>～<code>$BF7F</code>に入るタイルデータを<span class="formula">$200</span>バイト区切りで16×16ピクセル毎に並べると以下のようになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bgsprite.png" class="modal-link">
+		<img src="img/bgsprite.png" alt="16×16サイズキャラのタイルデータ" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>これらはスプライト扱いだから、実際には背景とは関係がない。<br>
+以上、まとめて紹介したが、実際には<code><span class="r">$C2/3161</span></code>の前にBG2のBGマップデータの転送が行われている。</p>
+
+<h3>BG2のBGマップデータ</h3>
+
+<p>メニュー画面のBG2は一番下の背景部分にあたり、BGマップデータは以下サブルーチンで処理される。</p>
+
+<div class="code-container"><pre>
+;（前略）
+$C2/329E LDX #$73D8              ;Xに$73D8をロード
+$C2/32A1 LDY #$4340              ;Yに$4340をロード
+$C2/32A4 LDA #$0007              ;Aに$0007をロード
+$C2/32A7 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/32A8 MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $73D8
+;Y:転送先アドレス $4340
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:73D8 -&gt; $00:4340 +$0007バイト　01 18 00 C0 7E 00 08
+$C2/32AB LDA #$0080              ;Aに$0080をロード
+$C2/32AE STA $2115  [$00:2115]   ;Aを[$00:2116][$00:2115]に書き込み
+$C2/32B1 LDA $06AD  [$00:06AD]   ;Aに[$00:06AE][$00:06AD]をロード
+$C2/32B4 STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/32B7 PLB                     ;DBレジスタにスタックからプル
+$C2/32B8 LDA #$0010              ;Aに$0010をロード
+$C2/32BB JSR $4C88  [$C2:4C88]   ;[$C2:4C88]へジャンプ
+
+$C2/4C88 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4C89 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4C8B XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C8C LDA $0600  [$7E:0600]   ;Aに[$7E:0600]をロード
+$C2/4C8F BPL $07    [$4C98]      ;ネガティブフラグが立っていないとき[$4C98]分岐
+$C2/4C91 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/4C92 STA $00420B[$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル4
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$7400
+;[$00:4340]	GDMA/HDMA設定レジスタ	$01
+;[$00:4341]	転送先指定	$18=VRAM
+;[$00:4343][$00:4342]	データ元アドレス（開始位置）	$C000
+;[$00:4344]	データ元バンク	$7E
+;[$00:4346][$00:4345]	転送するデータ量	$0800
+;$7E:C000 -&gt; VRAM $7400word($E800byte) +$0800byte
+;
+$C2/4C96 BRA $07    [$4C9F]      ;フラグにかかわりなく常に分岐[$4C9F]
+$C2/4C9F PLP                     ;Pレジスタにスタックからプル
+$C2/4CA0 RTS                     ;サブルーチン戻り
+
+$C2/32BE PLP                     ;Pレジスタにスタックからプル
+$C2/32BF RTS                     ;サブルーチン戻り
+
+$C2/03E5 JSR $31BE  [$C2:31BE]   ;[$C2:31BE]へジャンプ
+</pre></div>
+
+
+<p>メニュー画面の背景部分はシナリオ毎に異なる。<br>
+背景をよく見るとわかるとおり、32×32ピクセルの画像を横にずらっと並べている。<br>
+ただし、2行目、4行目……は<span class="formula">16</span>ピクセルズラして並べている。<br>
+簡単な図にすると以下のようになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/menubg2.png" class="modal-link">
+		<img src="img/menubg2.png" alt="BG2マップデータ概略図" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>四角形1つが32×32ピクセルである。<br>
+四角形1つは8×8サイズのタイル16個で構成されていることになり、タイルデータは既にVRAMアドレス<code>$5000</code>～<code>$5FFF</code>に全シナリオ分が転送済みである。<br>
+上図から、BG2のBGマップデータは、タイル16個が規則的にひたすら並ぶということがだいたい推測できる。</p>
+
+<p>サブルーチンは、<code><span class="r">$C2/3230</span></code>～<code><span class="r">$C2/32BF</span></code>でタイル16個のデータを並べ（間に、共通箇所は<code><span class="r">$C2/321B</span></code>～<code><span class="r">$C2/322F</span></code>でコピーする、という処理が挟まる）、最後にGDMA転送という処理になる。<br>
+上では最後の転送部分だけ紹介した。</p>
+
+<p>さらに<a href="sprite2.html">スプライトについて &gt; サブルーチン</a>で紹介した、キャラの32×32サイズスプライトの転送が入る。</p>
+
+<h3>初期設定・その2</h3>
+
+<p>この後でようやく、メニュー画面における各種I/Oポート関係アドレスの初期設定が行われる。<br>
+<a href="sprite2.html#03_2" target="_blank">スプライトのカラーパレット転送処理</a>については既に紹介したが、NMI割り込みでカラーパレットが転送された後の、<code><span class="r">$C2/4DD4</span></code>以降の処理が初期設定にあたる。</p>
+
+<div class="code-container"><pre>
+*** NMI;マスク不可能割り込み
+$00/00F8 JMP $C24DB0[$C2:4DB0]   ;[$C2:4DB0]へジャンプ(レジスタをスタックに積まない)
+;
+;（中略）
+;
+$C2/4DD4 LDA #$00                ;Aに$00をロード
+$C2/4DD6 STA $00057A[$00:057A]   ;Aを[$00:057A]に書き込み
+$C2/4DDA PHX                     ;Xレジスタをスタックにプッシュ
+$C2/4DDB PHY                     ;Yレジスタをスタックへプッシュ
+$C2/4DDC PHB                     ;DBレジスタをスタックにプッシュ
+$C2/4DDD PHD                     ;Dレジスタをスタックへプッシュ
+$C2/4DDE PEA $0500               ;オペランドに指定した16bit値をスタックに積み
+$C2/4DE1 PLD                     ;Dレジスタにスタックからプル
+$C2/4DE2 LDA #$00                ;Aに$00をロード
+$C2/4DE4 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/4DE5 PLB                     ;DBレジスタにスタックからプル
+$C2/4DE6 LDA $7C    [$00:057C]   ;Aに[$00:057C]をロード
+$C2/4DE8 STA $2102  [$00:2102]   ;Aを[$00:2102]に書き込み
+$C2/4DEB LDA #$80                ;Aに$80をロード
+$C2/4DED STA $2103  [$00:2103]   ;Aを[$00:2103]に書き込み
+$C2/4DF0 BIT $75    [$00:0575]   ;Aと[$00:0575]で論理積（ステータスフラグ変更のみ）
+$C2/4DF2 BMI $71    [$4E65]      ;ネガティブフラグが立っているとき[$4E65]分岐
+$C2/4DF4 BIT $02    [$00:0502]   ;Aと[$00:0502]で論理積（ステータスフラグ変更のみ）
+$C2/4DF6 BMI $07    [$4DFF]      ;ネガティブフラグが立っているとき[$4DFF]分岐
+$C2/4DF8 BIT $74    [$00:0574]   ;Aと[$00:0574]で論理積（ステータスフラグ変更のみ）
+$C2/4DFA BMI $34    [$4E30]      ;ネガティブフラグが立っているとき[$4E30]分岐
+$C2/4DFC JMP $4EA7  [$C2:4EA7]   ;[$C2:4EA7]へジャンプ(レジスタをスタックに積まない)
+$C2/4EA7 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4EA9 LDA $77    [$00:0577]   ;Aに[$00:0577]をロード
+$C2/4EAB STA $78    [$00:0578]   ;Aを[$00:0578]に書き込み
+$C2/4EAD BNE $03    [$4EB2]      ;ゼロフラグが立っていないとき[$4EB2]分岐
+
+$C2/4EB2 PEA $0600               ;オペランドに指定した16bit値をスタックに積み
+$C2/4EB5 PLD                     ;Dレジスタにスタックからプル
+$C2/4EB6 ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4EB9 BCC $0A    [$4EC5]      ;キャリーフラグが立っていないとき[$4EC5]分岐
+$C2/4EBB LDA $00    [$00:0600]   ;Aに[$00:0600]をロード
+$C2/4EBD STA $2100  [$00:2100]   ;Aを[$00:2100]に書き込み
+$C2/4EC0 LDA $01    [$00:0601]   ;Aに[$00:0601]をロード
+$C2/4EC2 STA $2106  [$00:2106]   ;Aを[$00:2106]に書き込み
+$C2/4EC5 ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4EC8 BCC $50    [$4F1A]      ;キャリーフラグが立っていないとき[$4F1A]分岐
+$C2/4ECA LDA $02    [$00:0602]   ;Aに[$00:0602]をロード
+$C2/4ECC STA $210D  [$00:210D]   ;Aを[$00:210D]に書き込み
+$C2/4ECF LDA $03    [$00:0603]   ;Aに[$00:0603]をロード
+$C2/4ED1 STA $210D  [$00:210D]   ;Aを[$00:210D]に書き込み
+$C2/4ED4 LDA $04    [$00:0604]   ;Aに[$00:0604]をロード
+$C2/4ED6 STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C2/4ED9 LDA $05    [$00:0605]   ;Aに[$00:0605]をロード
+$C2/4EDB STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C2/4EDE LDA $06    [$00:0606]   ;Aに[$00:0606]をロード
+$C2/4EE0 STA $210F  [$00:210F]   ;Aを[$00:210F]に書き込み
+$C2/4EE3 LDA $07    [$00:0607]   ;Aに[$00:0607]をロード
+$C2/4EE5 STA $210F  [$00:210F]   ;Aを[$00:210F]に書き込み
+$C2/4EE8 LDA $08    [$00:0608]   ;Aに[$00:0608]をロード
+$C2/4EEA STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C2/4EED LDA $09    [$00:0609]   ;Aに[$00:0609]をロード
+$C2/4EEF STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C2/4EF2 LDA $0A    [$00:060A]   ;Aに[$00:060A]をロード
+$C2/4EF4 STA $2111  [$00:2111]   ;Aを[$00:2111]に書き込み
+$C2/4EF7 LDA $0B    [$00:060B]   ;Aに[$00:060B]をロード
+$C2/4EF9 STA $2111  [$00:2111]   ;Aを[$00:2111]に書き込み
+$C2/4EFC LDA $0C    [$00:060C]   ;Aに[$00:060C]をロード
+$C2/4EFE STA $2112  [$00:2112]   ;Aを[$00:2112]に書き込み
+$C2/4F01 LDA $0D    [$00:060D]   ;Aに[$00:060D]をロード
+$C2/4F03 STA $2112  [$00:2112]   ;Aを[$00:2112]に書き込み
+$C2/4F06 LDA $0E    [$00:060E]   ;Aに[$00:060E]をロード
+$C2/4F08 STA $2113  [$00:2113]   ;Aを[$00:2113]に書き込み
+$C2/4F0B LDA $0F    [$00:060F]   ;Aに[$00:060F]をロード
+$C2/4F0D STA $2113  [$00:2113]   ;Aを[$00:2113]に書き込み
+$C2/4F10 LDA $10    [$00:0610]   ;Aに[$00:0610]をロード
+$C2/4F12 STA $2114  [$00:2114]   ;Aを[$00:2114]に書き込み
+$C2/4F15 LDA $11    [$00:0611]   ;Aに[$00:0611]をロード
+$C2/4F17 STA $2114  [$00:2114]   ;Aを[$00:2114]に書き込み
+$C2/4F1A ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4F1D BCC $41    [$4F60]      ;キャリーフラグが立っていないとき[$4F60]分岐
+$C2/4F1F LDA $12    [$00:0612]   ;Aに[$00:0612]をロード
+$C2/4F21 STA $211A  [$00:211A]   ;Aを[$00:211A]に書き込み
+$C2/4F24 LDA $13    [$00:0613]   ;Aに[$00:0613]をロード
+$C2/4F26 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C2/4F29 LDA $14    [$00:0614]   ;Aに[$00:0614]をロード
+$C2/4F2B STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C2/4F2E LDA $15    [$00:0615]   ;Aに[$00:0615]をロード
+$C2/4F30 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C2/4F33 LDA $16    [$00:0616]   ;Aに[$00:0616]をロード
+$C2/4F35 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C2/4F38 LDA $17    [$00:0617]   ;Aに[$00:0617]をロード
+$C2/4F3A STA $211D  [$00:211D]   ;Aを[$00:211D]に書き込み
+$C2/4F3D LDA $18    [$00:0618]   ;Aに[$00:0618]をロード
+$C2/4F3F STA $211D  [$00:211D]   ;Aを[$00:211D]に書き込み
+$C2/4F42 LDA $19    [$00:0619]   ;Aに[$00:0619]をロード
+$C2/4F44 STA $211E  [$00:211E]   ;Aを[$00:211E]に書き込み
+$C2/4F47 LDA $1A    [$00:061A]   ;Aに[$00:061A]をロード
+$C2/4F49 STA $211E  [$00:211E]   ;Aを[$00:211E]に書き込み
+$C2/4F4C LDA $1B    [$00:061B]   ;Aに[$00:061B]をロード
+$C2/4F4E STA $211F  [$00:211F]   ;Aを[$00:211F]に書き込み
+$C2/4F51 LDA $1C    [$00:061C]   ;Aに[$00:061C]をロード
+$C2/4F53 STA $211F  [$00:211F]   ;Aを[$00:211F]に書き込み
+$C2/4F56 LDA $1D    [$00:061D]   ;Aに[$00:061D]をロード
+$C2/4F58 STA $2120  [$00:2120]   ;Aを[$00:2120]に書き込み
+$C2/4F5B LDA $1E    [$00:061E]   ;Aに[$00:061E]をロード
+$C2/4F5D STA $2120  [$00:2120]   ;Aを[$00:2120]に書き込み
+$C2/4F60 ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4F63 BCC $19    [$4F7E]      ;キャリーフラグが立っていないとき[$4F7E]分岐
+$C2/4F65 LDX $1F    [$00:061F]   ;Xに[$00:061F]をロード
+$C2/4F67 STX $2123  [$00:2123]   ;Xを[$00:2123]に書き込み
+$C2/4F6A LDA $21    [$00:0621]   ;Aに[$00:0621]をロード
+$C2/4F6C STA $2125  [$00:2125]   ;Aを[$00:2125]に書き込み
+$C2/4F6F LDX $22    [$00:0622]   ;Xに[$00:0622]をロード
+$C2/4F71 STX $2126  [$00:2126]   ;Xを[$00:2126]に書き込み
+$C2/4F74 LDX $24    [$00:0624]   ;Xに[$00:0624]をロード
+$C2/4F76 STX $2128  [$00:2128]   ;Xを[$00:2128]に書き込み
+$C2/4F79 LDX $26    [$00:0626]   ;Xに[$00:0626]をロード
+$C2/4F7B STX $212A  [$00:212A]   ;Xを[$00:212A]に書き込み
+$C2/4F7E ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4F81 BCC $2A    [$4FAD]      ;キャリーフラグが立っていないとき[$4FAD]分岐
+$C2/4F83 LDX $28    [$00:0628]   ;Xに[$00:0628]をロード
+$C2/4F85 STX $212C  [$00:212C]   ;Xを[$00:212C]に書き込み
+$C2/4F88 LDX $2A    [$00:062A]   ;Xに[$00:062A]をロード
+$C2/4F8A STX $212E  [$00:212E]   ;Xを[$00:212E]に書き込み
+$C2/4F8D LDX $2C    [$00:062C]   ;Xに[$00:062C]をロード
+$C2/4F8F STX $2130  [$00:2130]   ;Xを[$00:2130]に書き込み
+$C2/4F92 LDA $2E    [$00:062E]   ;Aに[$00:062E]をロード
+$C2/4F94 AND #$1F                ;Aと$1Fで論理積
+$C2/4F96 ORA #$20                ;Aと$20で論理和
+$C2/4F98 STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+$C2/4F9B LDA $2F    [$00:062F]   ;Aに[$00:062F]をロード
+$C2/4F9D AND #$1F                ;Aと$1Fで論理積
+$C2/4F9F ORA #$40                ;Aと$40で論理和
+$C2/4FA1 STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+$C2/4FA4 LDA $30    [$00:0630]   ;Aに[$00:0630]をロード
+$C2/4FA6 AND #$1F                ;Aと$1Fで論理積
+$C2/4FA8 ORA #$80                ;Aと$80で論理和
+$C2/4FAA STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+$C2/4FAD ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4FB0 BCC $0A    [$4FBC]      ;キャリーフラグが立っていないとき[$4FBC]分岐
+$C2/4FB2 LDX $31    [$00:0631]   ;Xに[$00:0631]をロード
+$C2/4FB4 STX $4207  [$00:4207]   ;Xを[$00:4207]に書き込み
+$C2/4FB7 LDX $33    [$00:0633]   ;Xに[$00:0633]をロード
+$C2/4FB9 STX $4209  [$00:4209]   ;Xを[$00:4209]に書き込み
+$C2/4FBC ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4FBF ASL $0578  [$00:0578]   ;A[$00:0578]を算術左シフト *2
+$C2/4FC2 BCC $19    [$4FDD]      ;キャリーフラグが立っていないとき[$4FDD]分岐
+$C2/4FC4 LDA $35    [$00:0635]   ;Aに[$00:0635]をロード
+$C2/4FC6 STA $2101  [$00:2101]   ;Aを[$00:2101]に書き込み
+$C2/4FC9 LDA $36    [$00:0636]   ;Aに[$00:0636]をロード
+$C2/4FCB STA $2105  [$00:2105]   ;Aを[$00:2105]に書き込み
+$C2/4FCE LDX $37    [$00:0637]   ;Xに[$00:0637]をロード
+$C2/4FD0 STX $2107  [$00:2107]   ;Xを[$00:2107]に書き込み
+$C2/4FD3 LDX $39    [$00:0639]   ;Xに[$00:0639]をロード
+$C2/4FD5 STX $2109  [$00:2109]   ;Xを[$00:2109]に書き込み
+$C2/4FD8 LDX $3B    [$00:063B]   ;Xに[$00:063B]をロード
+$C2/4FDA STX $210B  [$00:210B]   ;Xを[$00:210B]に書き込み
+$C2/4FDD PEA $0500               ;オペランドに指定した16bit値をスタックに積み
+$C2/4FE0 PLD                     ;Dレジスタにスタックからプル
+$C2/4FE1 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4FE3 LDA $7B    [$00:057B]   ;Aに[$00:057B]をロード
+$C2/4FE5 STA $420C  [$00:420C]   ;Aを[$00:420C]に書き込み
+$C2/4FE8 LDA $79    [$00:0579]   ;Aに[$00:0579]をロード
+$C2/4FEA STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C2/4FED STZ $76    [$00:0576]   ;[$00:0576]に$00を書き込み
+$C2/4FEF JSR $5178  [$C2:5178]   ;[$C2:5178]へジャンプ
+</pre></div>
+
+<p>一覧表にしてみると、以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2100]</code></td><td>INIDISP </td><td>スクリーン初期化</td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>[$00:2106]</code></td><td>MOSAIC </td><td>モザイク表示用サイズ・スクリーン設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:210D]</code></td><td>BG1HOFS</td><td>BG1水平スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td>BG1VOFS</td><td>BG1垂直スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td>BG2HOFS</td><td>BG2水平スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td>BG2VOFS</td><td>BG2垂直スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2111]</code></td><td>BG3HOFS</td><td>BG3水平スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2112]</code></td><td>BG3VOFS</td><td>BG3垂直スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2113]</code></td><td>BG4HOFS</td><td>BG4水平スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2114]</code></td><td>BG4VOFS</td><td>BG4垂直スクロール量</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:211A]</code></td><td>M7SEL</td><td>Mode7初期化</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:211B]</code></td><td>M7A</td><td>Mode7拡大縮小回転用マトリックスA</td><td><span class="formula">$00</span> <span class="formula">$01</span></td></tr>
+	<tr><td><code>[$00:211C]</code></td><td>M7B</td><td>Mode7拡大縮小回転用マトリックスB</td><td><span class="formula">$00</span> <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:211D]</code></td><td>M7C</td><td>Mode7拡大縮小回転用マトリックスC</td><td><span class="formula">$00</span> <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:211E]</code></td><td>M7D</td><td>Mode7拡大縮小回転用マトリックスD</td><td><span class="formula">$00</span> <span class="formula">$01</span></td></tr>
+	<tr><td><code>[$00:211F]</code></td><td>M7X</td><td>Mode7中央位置X</td><td><span class="formula">$00</span> <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2120]</code></td><td>M7Y</td><td>Mode7中央位置Y</td><td><span class="formula">$00</span> <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2123]</code></td><td>W12SEL</td><td>BG1,BG2ウィンドウマスク設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2124]</code></td><td>W34SEL</td><td>BG3,BG4ウィンドウマスク設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2125]</code></td><td>WOBJSEL</td><td>スプライトウィンドウマスク設定</td><td><span class="formula">$30</span></td></tr>
+	<tr><td><code>[$00:2126]</code></td><td>WH0</td><td>ウィンドウ1左座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2127]</code></td><td>WH1</td><td>ウィンドウ1右座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2128]</code></td><td>WH2</td><td>ウィンドウ2左座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2129]</code></td><td>WH3</td><td>ウィンドウ2右座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212A]</code></td><td>WBGLOG</td><td>BGウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212B]</code></td><td>WOBJLOG</td><td>スプライトウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212C]</code></td><td>TM</td><td>メインスクリーン指定</td><td><span class="formula">$17</span></td></tr>
+	<tr><td><code>[$00:212D]</code></td><td>TS</td><td>サブスクリーン指定</td><td><span class="formula">$02</span></td></tr>
+	<tr><td><code>[$00:212E]</code></td><td>TMW</td><td>メインスクリーンウインドウマスク指定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212F]</code></td><td>TSW</td><td>サブスクリーンウインドウマスク指定</td><td><span class="formula">$02</span></td></tr>
+	<tr><td><code>[$00:2130]</code></td><td>CGSWSEL</td><td>カラーマス制御レジスタA 色追加選択</td><td><span class="formula">$12</span></td></tr>
+	<tr><td><code>[$00:2131]</code></td><td>CGADSUB</td><td>カラーマス制御レジスタB 色計算指定</td><td><span class="formula">$45</span></td></tr>
+	<tr><td><code>[$00:2132]</code></td><td>COLDATA</td><td>サブスクリーン固定色のデータ</td><td><span class="formula">$20</span> <span class="formula">$40</span> <span class="formula">$80</span></td></tr>
+	<tr><td><code>[$00:2101]</code></td><td>OBJSEL</td><td>スプライトサイズ・データ領域選択</td><td><span class="formula">$62</span></td></tr>
+	<tr><td><code>[$00:2105]</code></td><td>BGMODE</td><td>BG制御レジスタ（BGMode設定）</td><td><span class="formula">$09</span></td></tr>
+	<tr><td><code>[$00:2107]</code></td><td>BG1SC</td><td>BG1のBGマップ設定</td><td><span class="formula">$70</span></td></tr>
+	<tr><td><code>[$00:2108]</code></td><td>BG2SC</td><td>BG2のBGマップ設定</td><td><span class="formula">$75</span></td></tr>
+	<tr><td><code>[$00:2109]</code></td><td>BG3SC</td><td>BG3のBGマップ設定</td><td><span class="formula">$7C</span></td></tr>
+	<tr><td><code>[$00:210A]</code></td><td>BG4SC</td><td>BG4のBGマップ設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:210B]</code></td><td>BG12NBA</td><td>BG1,BG2キャラクタデータ領域設定</td><td><span class="formula">$22</span></td></tr>
+	<tr><td><code>[$00:210C]</code></td><td>BG34NBA</td><td>BG3,BG4キャラクタデータ領域設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:4207]</code></td><td>HTIMEL</td><td>Hカウントタイマー (下位)</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:4208]</code></td><td>HTIMEH</td><td>Hカウントタイマー (上位)</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:4209]</code></td><td>VTIMEL</td><td>Vカウントタイマー (下位)</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:420A]</code></td><td>VTIMEH</td><td>Vカウントタイマー (上位)</td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+
+<p><code>[$00:2105]</code>のBG制御レジスタ（BGMode設定）はフィールド・戦闘と同じく<span class="formula">$09</span>が入るので、BGモードはMode1である。<br>
+その他、背景関係で重要な設定をまとめてみると以下のようになる。</p>
+
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>背景</th><th>背景サイズ（タイル）</th><th>VRAMでのデータ開始アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2107]</code></td><td>BG1</td><td>32×32</td><td><span class="formula">%011100($1C) * $0800 = $E000</span></td></tr>
+	<tr><td><code>[$00:2108]</code></td><td>BG2</td><td>64×32</td><td><span class="formula">%011101($1D) * $0800 = $E800</span></td></tr>
+	<tr><td><code>[$00:2109]</code></td><td>BG3</td><td>32×32</td><td><span class="formula">%011111($1F) * $0800 = $F800</span></td></tr>
+</tbody>
+</table>
+
+<h5>タイルデータ開始位置</h5>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210B]</code></td><td><span class="formula">$22 = %0010 0010</span></td></tr>
+	<tr><td><code>[$00:210C]</code></td><td><span class="formula">$00 = %0000 0000</span></td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>BG</th><th>VRAM開始アドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td>BG1</td><td><span class="formula">%0010 * $2000 = $4000</span>(byte)</td></tr>
+	<tr><td>BG2</td><td><span class="formula">%0010 * $2000 = $4000</span>(byte)</td></tr>
+	<tr><td>BG3</td><td><span class="formula">%0000 * $2000 = $0000</span>(byte)</td></tr>
+</tbody>
+</table>
+
+<h5>スクリーン指定</h5>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:212C]</code></td><td><span class="formula">$17 = %0001 0111</span></td></tr>
+	<tr><td><code>[$00:212D]</code></td><td><span class="formula">$02 = %0000 0010</span></td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>スクリーン</th><th>Bit</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td rowspan="5">メインスクリーン</td><td>Bit0</td><td>BG1は<span class="formula">1</span>: 有効</td></tr>
+	<tr><td>Bit1</td><td>BG2は<span class="formula">1</span>: 有効</td></tr>
+	<tr><td>Bit2</td><td>BG3は<span class="formula">1</span>: 有効</td></tr>
+	<tr><td>Bit3</td><td>BG4は<span class="formula">0</span>: 無効</td></tr>
+	<tr><td>Bit4</td><td>OBJは<span class="formula">1</span>: 有効</td></tr>
+	<tr><td rowspan="5">サブスクリーン</td><td>Bit0</td><td>BG1は<span class="formula">0</span>: 無効</td></tr>
+	<tr><td>Bit1</td><td>BG2は<span class="formula">1</span>: 有効</td></tr>
+	<tr><td>Bit2</td><td>BG3は<span class="formula">0</span>: 無効</td></tr>
+	<tr><td>Bit3</td><td>BG4は<span class="formula">0</span>: 無効</td></tr>
+	<tr><td>Bit4</td><td>OBJは<span class="formula">0</span>: 無効</td></tr>
+</tbody>
+</table>
+
+<h3>BG1のBGマップデータ（その1）</h3>
+
+<p>以下で紹介するGDMA転送では複数チャネルの転送が行われているが、ここではチャネル3の転送、BG1用BGマップデータの転送について説明する。</p>
+
+<div class="code-container"><pre>
+$C2/4D83 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4D84 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/4D86 LDA #$0008              ;Aに$0008をロード
+$C2/4D89 AND $7A    [$00:057A]   ;Aと[$00:057A]で論理積
+$C2/4D8B BNE $21    [$4DAE]      ;ゼロフラグが立っていないとき[$4DAE]分岐
+$C2/4D8D LDA #$0080              ;Aに$0080をロード
+$C2/4D90 STA $002115[$00:2115]   ;Aを[$00:2116][$00:2115]に書き込み
+$C2/4D94 LDA #$7000              ;Aに$7000をロード
+$C2/4D97 STA $002116[$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/4D9B PHB                     ;DBレジスタをスタックにプッシュ
+$C2/4D9C LDX #$7922              ;Xに$7922をロード
+$C2/4D9F LDY #$4330              ;Yに$4330をロード
+$C2/4DA2 LDA #$0007              ;Aに$0007をロード
+$C2/4DA5 MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $7922
+;Y:転送先アドレス $4330
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:7922 -&gt; $00:4330 +$0007バイト　01 18 00 98 7E 00 07 
+$C2/4DA8 LDA #$0008              ;Aに$0008をロード
+$C2/4DAB TSB $7A    [$00:057A]   ;Aと[$00:057A]で論理和を取り、メモリに書き戻し
+$C2/4DAD PLB                     ;DBレジスタにスタックからプル
+$C2/4DAE PLP                     ;Pレジスタにスタックからプル
+$C2/4DAF RTS                     ;サブルーチン戻り
+
+$C2/0878 JSR $4B22  [$C2:4B22]   ;[$C2:4B22]へジャンプ
+
+$C2/4B22 PHP                     ;ステータスレジスタをスタックへプッシュ
+;（中略）
+*** NMI;マスク不可能割り込み
+$00/00F8 JMP $C24DB0[$C2:4DB0]   ;[$C2:4DB0]へジャンプ(レジスタをスタックに積まない)
+$C2/4DB0 REP #$30                ;Aを16bit幅に変更、X/Yレジスタを16bit幅に変更
+$C2/4DB2 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/4DB3 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4DB4 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4DB6 LDA $004210[$00:4210]   ;Aに[$00:4210]をロード
+$C2/4DBA LDA #$00                ;Aに$00をロード
+$C2/4DBC STA $00420C[$00:420C]   ;Aを[$00:420C]に書き込み
+$C2/4DC0 STA $002102[$00:2102]   ;Aを[$00:2102]に書き込み
+$C2/4DC4 LDA #$80                ;Aに$80をロード
+$C2/4DC6 STA $002103[$00:2103]   ;Aを[$00:2103]に書き込み
+$C2/4DCA LDA $00057A[$00:057A]   ;Aに[$00:057A]($0B = %0000 1011)をロード
+$C2/4DCE BEQ $0A    [$4DDA]      ;ゼロフラグが立っているとき[$4DDA]分岐
+$C2/4DD0 STA $00420B[$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル3
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$7000
+;[$00:4330]	GDMA/HDMA設定レジスタ	$01
+;[$00:4331]	転送先指定	$18=VRAM
+;[$00:4333][$00:4332]	データ元アドレス（開始位置）	$9800
+;[$00:4334]	データ元バンク	$7E
+;[$00:4336][$00:4335]	転送するデータ量	$0700
+;$7E:9800 -&gt; VRAM $7000word($E000byte) +$0700byte
+</pre></div>
+
+
+<p><code>$7E:9800</code>～<code>$7E:9EFF</code>をVRAMアドレス<code>$E000</code>～<code>$E6FF</code>に転送しており、VRAMアドレスから、BG1のBGマップデータを転送していることがわかる。<br>
+メニュー画面を開いた時点でのBG1は、コマンド用の枠と、キャラ名が書かれる吹き出し部分しか表示されず、他の部分は透過される。<br>
+BGマップデータとしては透過部分は<span class="formula">$0000</span>である。<br>
+よってメニュー画面をひらいた時のBG1のBGマップの大半は<span class="formula">$00</span>で埋まっている。<br>
+8×8ピクセルタイルを1マスとして考えると下図のようになり、味方キャラの人数と配置により吹き出し部分の位置は変わるが、以下のような配置になっている。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/menubg3.png" class="modal-link">
+		<img src="img/menubg3.png" alt="BG1のBGマップ" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+
+<p>上図で青色部分のコマンドの枠と、赤色のキャラ名吹き出し以外は透過部分にあたる。<br>
+その他には何らかの値が入ることになるが、BG1のBGマップデータは2回に分けて転送され、最初の転送では上図の赤色部分、つまり吹き出し部分が転送される。<br>
+大まかには、</p>
+
+<ol>
+	<li>メニュー画面のセリフ吹き出し形状のBGマップデータ（<code>$C2:7438</code>～<code>$C2:7453</code>）を<code>$00:0655</code>～<code>$00:066F</code>にコピー（<code><span class="r">$C2/32CB</span></code>～<code><span class="r">$C2/3334</span></code>, <code><span class="r">$C2/3370</span></code>～<code><span class="r">$C2/338D</span></code>）</li>
+	<li><code>$00:0655</code>～<code>$00:066F</code>を<code>$7E:9800</code>～<code>$7E:9EFF</code>のキャラ位置にセット（<code><span class="r">$C2/33A1</span></code>～<code><span class="r">$C2/33EC</span></code>）</li>
+	<li><code>$7E:9800</code>～<code>$7E:9EFF</code>をVRAMアドレス<code>$E000</code>～<code>$E6FF</code>に転送（BG1用BGマップデータ）</li>
+</ol>
+
+<p>と、いう手順になる。<br>
+<code>$7E:9800</code>～<code>$7E:9EFF</code>の中で、吹き出し部分にあたる位置は<code>$7E:9A00</code>～であり、それ以前のコマンド枠部分はすべて<span class="formula">$00</span>で埋まった状態である。<br>
+サブルーチンの詳細は省略する。</p>
+
+<h3>BG3のタイルデータ（その1）</h3>
+
+<p>この後、吹き出しの中の文字列、つまりBG3のタイルデータをGDMA転送する。<br>
+ここでも転送されるのは吹き出しの中の文字列であり、コマンド用の文字列はまだ転送されない。</p>
+
+<p>BG3のBGマップデータはかなり前（初期化のタイミング）で送信されており、先に説明した通りに、BGマップデータに合わせてBG3のタイルデータ領域<code>$0000</code>～<code>$3FFF</code>にタイルデータ、つまり文字データを転送する方式である。</p>
+
+<div class="code-container"><pre>
+$C2/4D07 PHB                     ;DBレジスタをスタックにプッシュ
+$C2/4D08 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4D09 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4D0B LDA #$04                ;Aに$04をロード
+$C2/4D0D AND $7A    [$00:057A]   ;Aと[$00:057A]で論理積
+$C2/4D0F BNE $21    [$4D32]      ;ゼロフラグが立っていないとき[$4D32]分岐
+$C2/4D11 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/4D13 LDX #$7932              ;Xに$7932をロード
+$C2/4D16 LDY #$4320              ;Yに$4320をロード
+$C2/4D19 LDA #$0007              ;Aに$0007をロード
+$C2/4D1C MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $7932
+;Y:転送先アドレス $4320
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:7932 -&gt; $00:4320 +$0007バイト　00 19 C0 A5 7E 60 14
+$C2/4D1F LDA $C2793A[$C2:793A]   ;Aに[$C2:793B][$C2:793A]をロード
+$C2/4D23 STA $2116  [$00:2116]   ;A(05C0)を[$00:2117][$00:2116]に書き込み
+$C2/4D26 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4D28 LDA #$84                ;Aに$84(1000 0100)をロード
+$C2/4D2A STA $2115  [$00:2115]   ;Aを[$00:2115]に書き込み
+$C2/4D2D LDA #$04                ;Aに$04をロード
+$C2/4D2F STA $057A  [$00:057A]   ;Aを[$00:057A]に書き込み
+$C2/4D32 PLP                     ;Pレジスタにスタックからプル
+$C2/4D33 PLB                     ;DBレジスタにスタックからプル
+$C2/4D34 RTS                     ;サブルーチン戻り
+;
+;（中略）
+*** NMI;マスク不可能割り込み
+$00/00F8 JMP $C24DB0[$C2:4DB0]   ;[$C2:4DB0]へジャンプ(レジスタをスタックに積まない)
+$C2/4DB0 REP #$30                ;Aを16bit幅に変更、X/Yレジスタを16bit幅に変更
+$C2/4DB2 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/4DB3 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4DB4 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4DB6 LDA $004210[$00:4210]   ;Aに[$00:4210]をロード
+$C2/4DBA LDA #$00                ;Aに$00をロード
+$C2/4DBC STA $00420C[$00:420C]   ;Aを[$00:420C]に書き込み
+$C2/4DC0 STA $002102[$00:2102]   ;Aを[$00:2102]に書き込み
+$C2/4DC4 LDA #$80                ;Aに$80をロード
+$C2/4DC6 STA $002103[$00:2103]   ;Aを[$00:2103]に書き込み
+$C2/4DCA LDA $00057A[$00:057A]   ;Aに[$00:057A]をロード
+$C2/4DCE BEQ $0A    [$4DDA]      ;ゼロフラグが立っているとき[$4DDA]分岐
+$C2/4DD0 STA $00420B[$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;GDMA チャネル2
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$05C0
+;[$00:4320]	GDMA/HDMA設定レジスタ	$01
+;[$00:4321]	転送先指定	$19=VRAM（VRAMデータ書き込み(上位アドレス)）
+;[$00:4323][$00:4322]	データ元アドレス（開始位置）	$A5C0
+;[$00:4324]	データ元バンク	$7E
+;[$00:4326][$00:4325]	転送するデータ量	$1460
+;$7E:A5C0 -&gt; VRAM $05C0word($0B80byte) +$1460byte 
+</pre></div>
+
+<p>転送元は<code>$7E:A5C0</code>～<code>$7E:BA1F</code>になるが、この時点で送るデータは味方キャラの名前1～4キャラ分（パーティメンバー数により可変）であり、実際には一番上に配置されたキャラの名前のタイルデータが<code>$7E:A8CO</code>～あたりから入るようになっていて、<code>$7E:A5C0</code>～<code>$7E:BA1F</code>のほとんどの値は<span class="formula">$00</span>で埋まっている。</p>
+
+<p>キャラの名前のロードだが、まず、シナリオ別キャラデータ<span class="formula">$34</span>～<span class="formula">$3F</span>に入っているキャラ名を<code>$7E:2000</code>～にロードする。<br>
+例として、近未来編でアキラの名前を呼び出すサブルーチンは以下になる。</p>
+
+<div class="code-container"><pre>
+$C2/3713 LDA $0691  [$7E:0691]   ;Aに[$7E:0691]をロード
+;（中略）
+$C2/373D LDA $0A10,x[$7E:0A10]   ;Aに[$7E:0A10]（シナリオ主人公ID $06=アキラ）をロード
+$C2/3740 AND #$000F              ;Aと$000Fで論理積
+$C2/3743 JSR $44C9  [$C2:44C9]   ;[$C2:44C9]へジャンプ
+
+$C2/44C9 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/44CA REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/44CC PHX                     ;Xレジスタをスタックにプッシュ
+$C2/44CD AND #$001F              ;Aと$001Fで論理積
+$C2/44D0 ASL A                   ;Aを算術左シフト *2
+$C2/44D1 TAX                     ;Aの値をXレジスタに転送
+$C2/44D2 LDA $C27627,x[$C2:7633] ;Aに[$C27627+$06*2 = $C2:7633]をロード = $0EB4
+;[$C2:7627,x+1][$C2:7627,x]に該当キャラのシナリオ別キャラデータ$34のアドレスが入っている
+$C2/44D6 PLX                     ;Xレジスタにスタックからプル
+$C2/44D7 PLP                     ;Pレジスタにスタックからプル
+$C2/44D8 RTS                     ;サブルーチン戻り
+
+$C2/3746 STA $27    [$00:0527]   ;A($0EB4)を[$00:0528][$00:0527]に書き込み
+$C2/3748 LDA #$0000              ;Aに$0000をロード
+$C2/374B STA $29    [$00:0529]   ;Aを[$00:0529]に書き込み
+$C2/374D LDA #$000C              ;Aに$000Cをロード
+$C2/3750 STA $2B    [$00:052B]   ;Aを[$00:052B]に書き込み
+$C2/3752 JSR $4386  [$C2:4386]   ;[$C2:4386]へジャンプ
+
+$C2/4386 LDX $00    [$00:0500]   ;Xに[$00:0500]をロード
+$C2/4388 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4389 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/438B LDY $00    [$00:0500]   ;Yに[$00:0500]をロード
+;ループ処理
+$C2/438D LDA [$27],y[$00:0EB4]   ;Aに[$00:0EB4]をロード
+;(※[$00:0528][$00:0527]に入れた値がアドレスになる）
+$C2/438F INY                     ;Yをインクリメント +1
+$C2/4390 AND #$00FF              ;Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;ゼロフラグが立っているとき[$43B7]分岐
+;ゼロフラグOFF（空白ではない）
+$C2/4395 CMP #$0020              ;Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;ネガティブフラグが立っていないとき[$43A9]分岐
+;ネガティブフラグOFF（漢字ではない）
+$C2/43A9 STA $2000,x[$7E:2000]   ;Aを[$7E:2000,x]に書き込み
+$C2/43AC INX                     ;Xをインクリメント +1
+$C2/43AD INX                     ;Xをインクリメント +1
+$C2/43AE CPX #$01FE              ;Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;ネガティブフラグが立っていないとき[$43B7]分岐
+$C2/43B3 CPX $2B    [$00:052B]   ;Xと[$00:052B]を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;ネガティブフラグが立っているとき[$438D]分岐
+;ループここまで
+$C2/43B7 STZ $2000,x[$7E:2006]   ;[$7E:200x]に$00を書き込み
+$C2/43BA PLP                     ;Pレジスタにスタックからプル
+$C2/43BB RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>文字データについては<a href="fontdata.html">文字データ</a>も参照。<br>
+漢字は2バイト、それ以外は1バイトなので、<code>$7E:2000</code>～にデータを書き込む際に上のループ処理のように分岐が発生する。<br>
+<code>$7E:2000</code>～の文字データはこの後、</p>
+
+<ul>
+	<li><code><span class="r">$C2/2DCB</span></code>～<code><span class="r">$C2/2E6B</span></code>　<code>$7E:2000</code>～から<code>$00:05xx</code>～にコピー</li>
+	<li><code><span class="r">$C2/2F16</span></code>～<code><span class="r">$C2/2FA4</span></code>　<code>$00:05xx</code>～のデータをタイルデータの配置に合わせて分割、<code>$7E:A5C0</code>～<code>$7E:BA1F</code>にコピー</li>
+</ul>
+
+<p>というような感じで、全キャラ分処理していく。<br>
+これで吹き出し＆キャラクター名のタイルデータとBGマップが、VRAMに配置される。</p>
+
+<h3>BG1のBGマップデータ＆BG3のタイルデータ（その2）</h3>
+
+<p>コマンドの枠についてだが、転送処理は吹き出しと同じ<code><span class="r">$C2/4D83</span></code>～<code><span class="r">$C2/4DAF</span></code>、<code><span class="r">$C2/4DB0</span></code>～<code><span class="r">$C2/4DD0</span></code>を使う。<br>
+<code>$7E:9800</code>～<code>$7E:9EFF</code>の中で、コマンドの枠部分は<code>$7E:9880</code>～<code>$7E:993F</code>に当たるのだが、</p>
+
+<ol>
+	<li>メニュー画面のコマンドの枠のBGマップデータ（<code>$C2:7498</code>～<code>$C2:74AF</code>）を<code>$00:0655</code>～<code>$00:066F</code>にコピー（<code><span class="r">$C2/32CB</span></code>～<code><span class="r">$C2/3334</span></code>）</li>
+	<li><code>$00:0655</code>～<code>$00:066F</code>を<code>$7E:9800</code>～<code>$7E:9EFF</code>のコマンドの枠位置にセット（<code><span class="r">$C2/33A1</span></code>～<code><span class="r">$C2/33EC</span></code>）</li>
+	<li><code>$7E:9800</code>～<code>$7E:9EFF</code>をVRAMアドレス<code>$E000</code>～<code>$E6FF</code>に転送（BG1用BGマップ）</li>
+</ol>
+
+<p>となっている。<br>
+ただし、<code><span class="r">$C2/4DD0</span></code>の転送後に処理が続いて、コマンド内部の文字列も転送する、という違いがある。</p>
+
+<div class="code-container"><pre>
+*** NMI;マスク不可能割り込み
+$00/00F8 JMP $C24DB0[$C2:4DB0]   ;[$C2:4DB0]へジャンプ(レジスタをスタックに積まない)
+$C2/4DB0 REP #$30                ;Aを16bit幅に変更、X/Yレジスタを16bit幅に変更
+$C2/4DB2 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/4DB3 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4DB4 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4DB6 LDA $004210[$00:4210]   ;Aに[$00:4210]をロード
+$C2/4DBA LDA #$00                ;Aに$00をロード
+$C2/4DBC STA $00420C[$00:420C]   ;Aを[$00:420C]に書き込み
+$C2/4DC0 STA $002102[$00:2102]   ;Aを[$00:2102]に書き込み
+$C2/4DC4 LDA #$80                ;Aに$80をロード
+$C2/4DC6 STA $002103[$00:2103]   ;Aを[$00:2103]に書き込み
+$C2/4DCA LDA $00057A[$00:057A]   ;Aに[$00:057A]をロード
+$C2/4DCE BEQ $0A    [$4DDA]      ;ゼロフラグが立っているとき[$4DDA]分岐
+$C2/4DD0 STA $00420B[$00:420B]   ;A(08)を[$00:420B]に書き込み
+;
+;コマンドの枠部分のタイルデータ
+;GDMA チャネル3
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$7000
+;[$00:4330]	GDMA/HDMA設定レジスタ	$01
+;[$00:4331]	転送先指定	$18=VRAM
+;[$00:4333][$00:4332]	データ元アドレス（開始位置）	$9800
+;[$00:4334]	データ元バンク	$7E
+;[$00:4336][$00:4335]	転送するデータ量	$0700
+;$7E:9800 -&gt; VRAM $7000word($E000byte) +$0700byte 
+;
+$C2/4DD4 LDA #$00                ;Aに$00をロード
+$C2/4DD6 STA $00057A[$00:057A]   ;Aを[$00:057A]に書き込み
+$C2/4DDA PHX                     ;Xレジスタをスタックにプッシュ
+$C2/4DDB PHY                     ;Yレジスタをスタックへプッシュ
+$C2/4DDC PHB                     ;DBレジスタをスタックにプッシュ
+$C2/4DDD PHD                     ;Dレジスタをスタックへプッシュ
+$C2/4DDE PEA $0500               ;オペランドに指定した16bit値をスタックに積み
+$C2/4DE1 PLD                     ;Dレジスタにスタックからプル
+$C2/4DE2 LDA #$00                ;Aに$00をロード
+$C2/4DE4 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/4DE5 PLB                     ;DBレジスタにスタックからプル
+$C2/4DE6 LDA $7C    [$00:057C]   ;Aに[$00:057C]をロード
+$C2/4DE8 STA $2102  [$00:2102]   ;Aを[$00:2102]に書き込み
+$C2/4DEB LDA #$80                ;Aに$80をロード
+$C2/4DED STA $2103  [$00:2103]   ;Aを[$00:2103]に書き込み
+$C2/4DF0 BIT $75    [$00:0575]   ;Aと[$00:0575]で論理積（ステータスフラグ変更のみ）
+$C2/4DF2 BMI $71    [$4E65]      ;ネガティブフラグが立っているとき[$4E65]分岐
+$C2/4DF4 BIT $02    [$00:0502]   ;Aと[$00:0502]で論理積（ステータスフラグ変更のみ）
+$C2/4DF6 BMI $07    [$4DFF]      ;ネガティブフラグが立っているとき[$4DFF]分岐
+$C2/4DFF REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/4E01 LDX #$791A              ;Xに$791Aをロード
+$C2/4E04 LDY #$4320              ;Yに$4320をロード
+$C2/4E07 LDA #$0007              ;Aに$0007をロード
+$C2/4E0A MVN C2 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $791A
+;Y:転送先アドレス $4320
+;オペランド:転送元と転送先バンク C2 -&gt; 00
+;$C2:791A -&gt; $00:4320 +$0007バイト　00 19 00 A0 7E 80 01
+$C2/4E0D LDA $063F  [$00:063F]   ;Aに[$00:063F]をロード
+$C2/4E10 STA $4325  [$00:4325]   ;Aを[$00:4326][$00:4325]に書き込み
+$C2/4E13 LDA $063D  [$00:063D]   ;Aに[$00:063D]をロード
+$C2/4E16 STA $2116  [$00:2116]   ;Aを[$00:2117][$00:2116]に書き込み
+$C2/4E19 CLC                     ;キャリーフラグクリア
+$C2/4E1A ADC #$A000              ;A + $A000
+$C2/4E1D STA $4322  [$00:4322]   ;Aを[$00:4323][$00:4322]に書き込み
+$C2/4E20 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4E22 LDA #$84                ;Aに$84をロード
+$C2/4E24 STA $2115  [$00:2115]   ;Aを[$00:2115]に書き込み
+$C2/4E27 STZ $02    [$00:0502]   ;[$00:0502]に$00を書き込み
+$C2/4E29 LDA #$04                ;Aに$04をロード
+$C2/4E2B STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;コマンドの枠部分の文字列BGマップ
+;GDMA チャネル2
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$0200
+;[$00:4320]	GDMA/HDMA設定レジスタ	$01
+;[$00:4321]	転送先指定	$19=VRAM（VRAMデータ書き込み(上位アドレス)）
+;[$00:4323][$00:4322]	データ元アドレス（開始位置）	$A200
+;[$00:4324]	データ元バンク	$7E
+;[$00:4326][$00:4325]	転送するデータ量	$0240
+;$7E:A200 -&gt; VRAM $0200word($0400byte) +$0240byte
+;
+$C2/4E2E BRA $77    [$4EA7]      ;フラグにかかわりなく常に分岐[$4EA7]
+$C2/4EA7 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4EA9 LDA $77    [$00:0577]   ;Aに[$00:0577]をロード
+$C2/4EAB STA $78    [$00:0578]   ;Aを[$00:0578]に書き込み
+$C2/4EAD BNE $03    [$4EB2]      ;ゼロフラグが立っていないとき[$4EB2]分岐
+$C2/4EAF JMP $4FDD  [$C2:4FDD]   ;[$C2:4FDD]へジャンプ(レジスタをスタックに積まない)
+$C2/4FDD PEA $0500               ;オペランドに指定した16bit値をスタックに積み
+$C2/4FE0 PLD                     ;Dレジスタにスタックからプル
+$C2/4FE1 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/4FE3 LDA $7B    [$00:057B]   ;Aに[$00:057B]をロード
+$C2/4FE5 STA $420C  [$00:420C]   ;Aを[$00:420C]に書き込み
+$C2/4FE8 LDA $79    [$00:0579]   ;Aに[$00:0579]をロード
+$C2/4FEA STA $4200  [$00:4200]   ;Aを[$00:4200]に書き込み
+$C2/4FED STZ $76    [$00:0576]   ;[$00:0576]に$00を書き込み
+$C2/4FEF JSR $5178  [$C2:5178]   ;[$C2:5178]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/4E2B</span></code>で転送する<code>$7E:A200</code>～<code>$7E:A43F</code>がコマンドの枠部分の文字列のBG3用BGマップデータにあたる。<br>
+<code>$C2:9380</code>～<code>$C2:A69F</code>に、メニュー画面関係のテキストデータが入っており、<code>$C2:9380</code>～<code>$C2:9396</code>に「装備　持ち物　技　隊形　セーブ」、<code>$C2:94CA</code>～<code>$C2:94CD</code>に「音声」というコマンド用文字列があるので、まずそれらをロードする。<br>
+（「音声」だけ別箇所なのは「ステレオ　モノラル」という、「音声」選択時の選択がさらにあるからのようだ）</p>
+
+<p>テキスト呼び出しは以下になり、先のキャラ名呼び出しの<code><span class="r">$C2/4386</span></code>～の処理が使われている。</p>
+
+<div class="code-container"><pre>
+$C2/42F8 JMP $4386  [$C2:4386]   ;[$C2:4386]へジャンプ(レジスタをスタックに積まない)
+$C2/4386 LDX $00    [$00:0500]   ;Xに[$00:0500]をロード
+$C2/4388 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/4389 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/438B LDY $00    [$00:0500]   ;Yに[$00:0501][$00:0500]をロード
+;ループ処理
+$C2/438D LDA [$27],y[$C2:9380]   ;Aに[$C2:9381][$C2:9380]～をロード　※コマンド用文字列開始位置
+$C2/438F INY                     ;Yをインクリメント +1
+$C2/4390 AND #$00FF              ;Aと$00FFで論理積
+$C2/4393 BEQ $22    [$43B7]      ;ゼロフラグが立っているとき[$43B7]分岐
+;ネガティブフラグOFF（空白ではない）
+$C2/4395 CMP #$0020              ;Aと$0020を減算比較（ステータスレジスタ変更のみ）
+$C2/4398 BPL $0F    [$43A9]      ;ネガティブフラグが立っていないとき[$43A9]分岐
+;ネガティブフラグON（漢字）
+$C2/439A CMP #$001D              ;Aと$001Dを減算比較（ステータスレジスタ変更のみ）
+$C2/439D BMI $1D    [$43BC]      ;ネガティブフラグが立っているとき[$43BC]分岐
+;ネガティブフラグOFF（1E列の漢字）
+$C2/439F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/43A1 AND #$03                ;Aと$03で論理積
+$C2/43A3 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/43A4 LDA [$27],y[$C2:9381]   ;Aに[$C2:9382][$C2:9381]～をロード
+$C2/43A6 INY                     ;Yをインクリメント +1
+$C2/43A7 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/43A9 STA $2000,x[$7E:2000]   ;Aを[$7E:2000～]に書き込み
+$C2/43AC INX                     ;Xをインクリメント +1
+$C2/43AD INX                     ;Xをインクリメント +1
+$C2/43AE CPX #$01FE              ;Xと$01FEを減算比較（ステータスレジスタ変更のみ）
+$C2/43B1 BPL $04    [$43B7]      ;ネガティブフラグが立っていないとき[$43B7]分岐
+$C2/43B3 CPX $2B    [$00:052B]   ;Xと[$00:052B]を減算比較（ステータスレジスタ変更のみ）
+$C2/43B5 BMI $D6    [$438D]      ;ネガティブフラグが立っているとき[$438D]分岐
+;ループ処理ここまで
+$C2/43B7 STZ $2000,x[$7E:2004]   ;[$7E:200n]に$00を書き込み
+$C2/43BA PLP                     ;Pレジスタにスタックからプル
+$C2/43BB RTS                     ;サブルーチン戻り
+
+$C2/3686 JSR $2DCB  [$C2:2DCB]   ;[$C2:2DCB]へジャンプ
+</pre></div>
+
+<p>後の処理もほぼ同一なので省略。</p>
+
+<p>以上で、メニュー画面開始時のBG関係処理はほぼ説明できた。<br>
+もちろん、コマンドにより呼び出すデータなど別途サブルーチンがあるが、ひとまずここまでとする。</p>
+
+<p>ここまでで説明していないのは、コマンド枠の半透明処理である。<br>
+選択していないコマンド枠のみ半透明っぽい処理になっているのはHDMA転送とカラーマス関係の処理になるので、別途説明する。</p>
+
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="bg1.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
