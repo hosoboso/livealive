@@ -92,14 +92,12 @@ table {
 <nav class="droplinetabs">
 <ul>
 <li class="other"><a href="index.html">TOP</a></li>
-<li class="here"><button type="button">データ一覧</button>
+<li class="other"><button type="button">データ一覧</button>
 	<ul>
 		<li><a href="datamap.html">データマップ</a></li>
 		<li><a href="flag.html">フラグ</a></li>
 		<li><a href="d5.html">各種データアドレス</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
-		<li><a href="sprite.html">スプライト</a></li>
-		<li><a href="bg.html">背景グラフィックと効果</a></li>
 		<li><a href="program1.html">ボタン判定</a></li>
 		<li><a href="memo.html">雑多メモ</a></li>
 	</ul>
@@ -170,6 +168,18 @@ table {
 		<li><a href="program35.html">セーブ・ロード</a></li>
 	</ul>
 </li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+	</ul>
+</li>
 </ul>
 </nav>
 </div>
@@ -181,45 +191,8 @@ table {
 <div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
 まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
 
-<p><a href="sprite.html">前ページ</a>でスプライトについてひととおり説明したので</a>、このページではサブルーチンを紹介する。<br>
-その前に、画像データ転送に必須となるGDMA(General Direct Memory Access)転送について、一通り説明をしておく。</p>
-
-<h3 id="00">GDMA(General Direct Memory Access)転送</h3>
-
-<p>VRAMをはじめ、カラーパレットがあるCGRAM、スプライトの配置を指定するOAMといったメモリには、I/Oポート用のアドレスを通して通信する、と前ページに記した。<br>
-これらメモリへのデータ転送は、GDMA(General Direct Memory Access)転送という方法を使う。<br>
-GDMA転送は高速なので、画像関係の大量のデータ転送は、基本的にGDMA転送を行う。<br>
-GDMA転送に使用する主なI/Oレジスタは以下。</p>
-
-<table>
-<thead>
-	<tr><th>アドレス（I/Oレジスタ）</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>[$00:43n0]</code></td><td>GDMA/HDMA設定レジスタ</td></tr>
-	<tr><td><code>[$00:43n1]</code></td><td>転送先指定 <span class="formula">$04</span>=OAM, <span class="formula">$18</span>=VRAM, <span class="formula">$22</span>=CGRAM, <span class="formula">$80</span>=WRAM</td></tr>
-	<tr><td><code>[$00:43n3]</code><code>[$00:43n2]</code></td><td>データ元アドレス（開始位置）</td></tr>
-	<tr><td><code>[$00:43n4]</code></td><td>データ元バンク</td></tr>
-	<tr><td><code>[$00:43n6]</code><code>[$00:4305]</code></td><td>転送するデータ量</td></tr>
-	<tr><td><code>[$00:420B]</code></td><td>GDMA(General Direct Memory Access)チャネルレジスタ</td></tr>
-	<tr><td><code>[$00:2117][$00:2116]</code></td><td>転送先 VRAMアドレス</td></tr>
-</tbody>
-</table>
-
-<p>VRAMのアドレス指定の時、<span style="font-weight:bold;">アドレスをbyteではなくwordで指定するため注意が必要</span>。<br>
-<span class="formula">2byte</span>(バイト)で<span class="formula">1word</span>(ワード)になる。</p>
-
-<p><code>$00:43n?</code>の<span class="formula">n</span>は<span class="formula">0~7</span>の値をとり、それぞれでGDMA（HDMA含む）転送を設定できる。<br>
-上だと、<span class="formula">n=0</span>である。<br>
-つまりGDMA転送は最大8つ設定できる（8チャネル）。<br>
-HDMA(HBlank DMA)という、HBlank（テレビ画面に横1列分のドット絵を描写してから、次の行への描写へ移る僅かな時間）を利用した転送もあるが、HDMA含め8チャネルを設定できる。<br>
-複数のGDMAチャネルの設定をしてから、<code>[$00:420B]</code>に複数のチャネルの対応ビットに1を書き込むと、HDMA転送が最優先、後はチャネル番号が小さいほど優先で転送を行う仕組みになっている。<br>
-ちなみにGDMAで転送中は、スーファミ自体のCPUは一時停止する（計算を一時停止する）。</p>
-
-<p>GDMA/HDMA設定レジスタの詳細など、詳しくは<br>
-<a href="https://github.com/akatsuki105/snes-docs-ja/tree/main/memory/dma" target="_blank">snes-docs-ja/memory/dma</a><br>
-<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/memory/dma/ioreg.md" target="_blank">snes-docs-ja/memory/dma/ioreg.md</a><br>
-を参照していただきたい。</p>
+<p><a href="sprite.html">前ページ</a>でスプライトについてひととおり説明したので、このページではサブルーチンを紹介する。<br>
+その前に、<a href="graphic.html#gdma">グラフィックについて &gt; GDMA転送</a>の説明をお読みいただきたい。</p>
 
 <p>以降、GDMA転送の知識を前提とした上で、サブルーチンを説明していく。</p>
 
@@ -1127,7 +1100,7 @@ $C1/F319 RTS                     ;サブルーチン戻り
 </tbody>
 </table>
 
-<p>※<span class="formula">n=4, 5</span>のWindow座標関係は<a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/video/window.md" target="_blank">snes-docs-ja/video/window.md</a>を参照されたし。スプライト関係ではないので、ここでは詳細を省く。</p>
+<p>※<span class="formula">n=4, 5</span>のWindow座標関係は、カラーマス効果用のHDMA転送設定になる。スプライト関係ではないので、ここでは詳細を省く。</p>
 
 <p><code>[$00:43n1]</code>に入れる値で転送先を指定するから、戦闘中は、<span class="formula">n=0</span>はVRAM、<span class="formula">n=1</span>はCGRAM（カラーパレット）、<span class="formula">n=2</span>はWRAM、<span class="formula">n=3</span>はOAM（スプライト配置）、とチャネルを予め分けておいていることがわかる。<br>
 また、<span class="formula">n</span>が小さいほど転送の優先順位が高い。<br>
@@ -2136,6 +2109,7 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 <div class="pagelink">
 	<div id="pageprev"><a href="sprite.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="bg.html"><span class="button">&#9654;次 背景</span></a></div>
 </div>
 
 </div>
