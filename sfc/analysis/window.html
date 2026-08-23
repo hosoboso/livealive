@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ウィンドウ効果">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ウィンドウ効果">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ウィンドウ効果</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ウィンドウ効果</h1>
+<h2>ウィンドウ効果</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ウィンドウ効果は、<a href="colormath.html">前ページのカラーマスの説明</a>とも関係するので先にお読みいただきたい。<br>
+前ページで説明した、メニュー画面で選択していないコマンドウィンドウが半透明になっているのは、ウィンドウ効果＋カラーマス効果ということだからである。<br>
+つまり、</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/window01.png" class="modal-link">
+		<img src="img/window01.png" alt="メニュー画面のウィンドウ効果" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>上図で黄色をかけた範囲は「ウィンドウの外側」、黄色ではない範囲は「ウィンドウの内側」と設定し、「ウィンドウの外側」のBG1（コマンドウィンドウ）・BG3（コマンド文字列）にだけハーフカラーマス効果を適用して、半透明にする、という方法を使っていた。</p>
+
+<p>ウィンドウの外側・内側については、前ページでも説明したとおり、ウィンドウ座標を決定するレジスタ<code>[$00:2126]</code>～<code>[$00:2129]</code>に値（<span class="formula">$00</span>～<span class="formula">$FF</span>）を書き込んで設定する。</p>
+
+<table>
+<thead>
+	<tr><th>レジスタ</th><th>名前</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2126]</code></td><td>WH0</td><td>ウィンドウ1左座標設定</td><td><span class="formula">$00</span>～<span class="formula">$FF</span></td></tr>
+	<tr><td><code>[$00:2127]</code></td><td>WH1</td><td>ウィンドウ1右座標設定</td><td><span class="formula">$00</span>～<span class="formula">$FF</span></td></tr>
+	<tr><td><code>[$00:2128]</code></td><td>WH2</td><td>ウィンドウ2左座標設定</td><td><span class="formula">$00</span>～<span class="formula">$FF</span></td></tr>
+	<tr><td><code>[$00:2129]</code></td><td>WH3</td><td>ウィンドウ2右座標設定</td><td><span class="formula">$00</span>～<span class="formula">$FF</span></td></tr>
+</tbody>
+</table>
+
+<p>左座標に設定した数値から、右座標に設定した数値の間が、「ウィンドウの内側」である。それ以外は「ウィンドウの外側」になる。<br>
+左座標と右座標がどちらも<span class="formula">$00</span>なら、全領域を「ウィンドウの外側」として扱う。</p>
+
+<p>ウィンドウ1とウィンドウ2は最終的に統合して表示する。<br>
+（カラーマスで使う、メインスクリーンとサブスクリーンとは別の話である。サブスクリーンは主にカラーマス表示のために使う）<br>
+ウィンドウ1とウィンドウ2の統合方法は<code>[$00:212A]</code>と<code>[$00:212B]</code>の値で決まるが、とりあえずこの話は横に置いておく。</p>
+
+<p>ゲーム画面は横256ピクセル×縦224ピクセルだが、一番左の位置をX座標の原点<span class="formula">0</span>として、画面一番右のドットが<span class="formula">$FF = 255</span>となる。<br>
+このため、ウィンドウの内側の幅は、単純に<span class="formula">「ウィンドウ1右座標」-「ウィンドウ1左座標」</span>ではなく、この値に<span class="formula">+1</span>した値がウィンドウの内側の幅になる。</p>
+
+<p>BG1～4やスプライト（OBJ）、カラーマス用サブスクリーン（下表のMATH）にウィンドウ1・ウィンドウ2を使うかどうかは、<code>[$00:2123]</code>～<code>[$00:2125]</code>（Windowマスク設定）の値で決まる。</p>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th><code>[$00:2123]</code></th><th><code>[$00:2124]</code></th><th><code>[$00:2125]</code></th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>0-1</td><td>BG1</td><td>BG3</td><td>OBJ</td><td>ウィンドウ1領域<br>(<span class="formula">%00</span>=無効, <span class="formula">%10</span>=内側, <span class="formula">%11</span>=外側)</td></tr>
+	<tr><td>2-3</td><td>BG1</td><td>BG3</td><td>OBJ</td><td>ウィンドウ2領域<br>(<span class="formula">%00</span>=無効, <span class="formula">%10</span>=内側, <span class="formula">%11</span>=外側)</td></tr>
+	<tr><td>4-5</td><td>BG2</td><td>BG4</td><td>MATH</td><td>ウィンドウ1領域<br>(<span class="formula">%00</span>=無効, <span class="formula">%10</span>=内側, <span class="formula">%11</span>=外側)</td></tr>
+	<tr><td>6-7</td><td>BG2</td><td>BG4</td><td>MATH</td><td>ウィンドウ2領域<br>(<span class="formula">%00</span>=無効, <span class="formula">%10</span>=内側, <span class="formula">%11</span>=外側)</td></tr>
+</tbody>
+</table>
+
+<p>メニュー画面では、初期設定で、<code>[$00:2123]</code>～<code>[$00:2124]</code>は<span class="formula">$00</span>、<code>[$00:2125]</code>に<span class="formula">$30</span> (<span class="formula">%0011 0000</span>) が指定されていた。<br>
+つまり、カラーマス用サブスクリーンのウィンドウ1領域だけ「外側」の指示がある。外側にカラーマス効果を適用しろという意味で、これにより先の図のようにウィンドウ座標で外側に指定した領域だけハーフカラーマスの半透明効果がかかる仕組みである。</p>
+
+<p>さらに、<code>[$00:212E]</code>と<code>[$00:212F]</code>（ウィンドウ領域無効化）に値を設定することで、ウィンドウ領域内の表示無効化といったことまでできる。</p>
+
+<p>メニュー画面の場合、メニュー画面を開いた時点では、<code>[$00:2126]</code>～<code>[$00:2129]</code>すべてに<span class="formula">$00</span>を設定していた。<br>
+つまりゲーム画面全領域がウィンドウの外側という扱いである。<br>
+これだけだと、ゲーム画面の一部分だけウィンドウ幅を変えることができないが、前ページのカラーマス処理の時のように、HDMA転送で1行スキャンラインを描いた直後にウィンドウ座標を書き換えることで、1列ずつウィンドウ幅を変えることができる。<br>
+ウィンドウ幅の変更と、領域内の可視状態などの変更を組み合わせて、戦闘突入時の三角形が回転しながら画面が暗くなる効果などが作り出せる。</p>
+
+
+<h3>戦闘突入時の三角形ウィンドウマスク処理</h3>
+
+<p>では、実際に、戦闘突入時の画面処理について見てみよう。</p>
+
+<div class="code-container"><pre>
+$C0/D190 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/D192 LDA #$FF                ;Aに$FFをロード
+$C0/D194 STZ $2126  [$00:2126]   ;[$00:2126]に$00を書き込み
+$C0/D197 STA $2127  [$00:2127]   ;Aを[$00:2127]に書き込み
+$C0/D19A LDA $0145  [$00:0145]   ;Aに[$00:0145]をロード
+$C0/D19D ORA #$33                ;Aと$33で論理和
+$C0/D19F STA $0145  [$00:0145]   ;Aを[$00:0145]に書き込み
+$C0/D1A2 STA $2123  [$00:2123]   ;Aを[$00:2123]に書き込み
+$C0/D1A5 STA $0146  [$00:0146]   ;Aを[$00:0146]に書き込み
+$C0/D1A8 STA $2124  [$00:2124]   ;Aを[$00:2124]に書き込み
+$C0/D1AB STA $0147  [$00:0147]   ;Aを[$00:0147]に書き込み
+$C0/D1AE STA $2125  [$00:2125]   ;Aを[$00:2125]に書き込み
+$C0/D1B1 LDA $0148  [$00:0148]   ;Aに[$00:0148]をロード
+$C0/D1B4 AND #$F0                ;Aと$F0で論理積
+$C0/D1B6 STA $0148  [$00:0148]   ;Aを[$00:0148]に書き込み
+$C0/D1B9 STA $212A  [$00:212A]   ;Aを[$00:212A]に書き込み
+$C0/D1BC LDA $0149  [$00:0149]   ;Aに[$00:0149]をロード
+$C0/D1BF STA $212B  [$00:212B]   ;Aを[$00:212B]に書き込み
+$C0/D1C2 LDA $0140  [$00:0140]   ;Aに[$00:0140]をロード
+$C0/D1C5 ORA #$04                ;Aと$04で論理和
+$C0/D1C7 AND $30    [$00:0030]   ;Aと[$00:0030]で論理積
+$C0/D1C9 ORA $0142  [$00:0142]   ;Aと[$00:0142]で論理和
+$C0/D1CC STA $0142  [$00:0142]   ;Aを[$00:0142]に書き込み
+$C0/D1CF STA $212E  [$00:212E]   ;Aを[$00:212E]に書き込み
+$C0/D1D2 LDA $0141  [$00:0141]   ;Aに[$00:0141]をロード
+$C0/D1D5 AND $30    [$00:0030]   ;Aと[$00:0030]で論理積
+$C0/D1D7 ORA $0143  [$00:0143]   ;Aと[$00:0143]で論理和
+$C0/D1DA STA $0143  [$00:0143]   ;Aを[$00:0143]に書き込み
+$C0/D1DD STA $212F  [$00:212F]   ;Aを[$00:212F]に書き込み
+$C0/D1E0 JSL $CEDAC1[$CE:DAC1]   ;[$CE:DAC1]へジャンプ
+
+$CE/DAC1 JSR $DAC5  [$CE:DAC5]   ;[$CE:DAC5]へジャンプ
+
+$CE/DAC5 LDA #$41                ;Aに$41をロード
+$CE/DAC7 STA $4370  [$00:4370]   ;Aを[$00:4370]に書き込み
+$CE/DACA LDA #$26                ;Aに$26をロード
+$CE/DACC STA $4371  [$00:4371]   ;Aを[$00:4371]に書き込み
+$CE/DACF LDX #$3C00              ;Xに$3C00をロード
+$CE/DAD2 STX $4372  [$00:4372]   ;Xを[$00:4373][$00:4372]に書き込み
+$CE/DAD5 LDA #$7F                ;Aに$7Fをロード
+$CE/DAD7 STA $4374  [$00:4374]   ;Aを[$00:4374]に書き込み
+$CE/DADA STA $4377  [$00:4377]   ;Aを[$00:4377]に書き込み
+$CE/DADD PHB                     ;DBレジスタをスタックにプッシュ
+$CE/DADE LDA #$7F                ;Aに$7Fをロード
+$CE/DAE0 PHA                     ;Aレジスタをスタックにプッシュ
+$CE/DAE1 PLB                     ;DBレジスタにスタックからプル
+$CE/DAE2 LDX #$3C00              ;Xに$3C00をロード
+$CE/DAE5 LDA #$F0                ;Aに$F0をロード
+$CE/DAE7 STA $0000,x[$7F:3C00]   ;Aを[$7F:3C00]に書き込み
+$CE/DAEA LDA #$F0                ;Aに$F0をロード
+$CE/DAEC STA $0003,x[$7F:3C03]   ;Aを[$7F:3C03]に書き込み
+$CE/DAEF STZ $0006,x[$7F:3C06]   ;[$7F:3C06]に$00を書き込み
+$CE/DAF2 PLB                     ;DBレジスタにスタックからプル
+$CE/DAF3 LDA $014F  [$00:014F]   ;Aに[$00:014F]をロード
+$CE/DAF6 ORA #$80                ;Aと$80で論理和
+$CE/DAF8 STA $014F  [$00:014F]   ;Aを[$00:014F]に書き込み
+$CE/DAFB STZ $01FA  [$00:01FA]   ;[$00:01FA]に$00を書き込み
+$CE/DAFE RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上がウィンドウ関連および、HDMA転送（チャネル7）の初期設定部分にあたる。<br>
+整理すると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>I/Oアドレス</th><th>名前</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2126]</code></td><td>WH0 </td><td>ウィンドウ1左座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2127]</code></td><td>WH1 </td><td>ウィンドウ1右座標設定</td><td><span class="formula">$FF</span></td></tr>
+	<tr><td><code>[$00:2123]</code></td><td>W12SEL</td><td>BG1,BG2ウィンドウマスク設定</td><td><span class="formula">$33</span> (<span class="formula">%0011 0011</span>)</td></tr>
+	<tr><td><code>[$00:2124]</code></td><td>W34SEL</td><td>BG3,BG4ウィンドウマスク設定</td><td><span class="formula">$33</span> (<span class="formula">%0011 0011</span>)</td></tr>
+	<tr><td><code>[$00:2125]</code></td><td>WOBJSEL</td><td>スプライトウィンドウマスク設定</td><td><span class="formula">$33</span> (<span class="formula">%0011 0011</span>)</td></tr>
+	<tr><td><code>[$00:212A]</code></td><td>WBGLOG</td><td>BGウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212B]</code></td><td>WOBJLOG</td><td>スプライトウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212E]</code></td><td>TMW</td><td>メインスクリーンウインドウマスク指定</td><td><span class="formula">$17</span> (<span class="formula">%0001 0111</span>)</td></tr>
+	<tr><td><code>[$00:212F]</code></td><td>TSW</td><td>サブスクリーンウインドウマスク指定</td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>ウィンドウ座標の設定<code>[$00:2126]</code><code>[$00:2127]</code>から、X座標<span class="formula">$00</span>～<span class="formula">$FF</span>、つまり画面全体が内側扱いである。<br>
+ウィンドウマスク設定で、ウィンドウ1領域のBG1～BG4、スプライト、サブスクリーンすべてに「外側」の指定があるので、ウィンドウの外側にこの後指定する何かしらの処理を行うことになる。初期設定では画面全体が内側扱いだから、何の変化もない。<br>
+<code>[$00:212E]</code>のメインスクリーンウインドウマスク指定は、BG1・BG2・BG3・OBJが指定されており、実質、背景・スプライトすべてにマスク指定がかかっている（BG4はBGmode1だと非表示なので）。<br>
+すべてにマスクをかけるということは、「ウィンドウの外側には何も表示しない」つまり「黒一色になる」ということである。<br>
+（メニュー画面のハーフカラーマスの時は、背景のBG2は表示、BG1とBG3は半透明だから、真っ暗にはならなかったのである）<br>
+これが、戦闘開始時、三角形に切り取った外側だけが黒一色の画面になる仕組みである。</p>
+
+<table>
+<thead>
+	<tr><th>HDMA チャネル7<br>I/Oアドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4370]</code></td><td>GDMA / HDMA設定レジスタ</td><td><span class="formula">$41</span></td></tr>
+	<tr><td><code>[$00:4371]</code></td><td>転送先指定</td><td><span class="formula">$26</span>=ウィンドウ1左座標設定</td></tr>
+	<tr><td><code>[$00:4373]</code><code>[$00:4372]</code></td><td>データ元アドレス（開始位置）</td><td><span class="formula">$3C00</span></td></tr>
+	<tr><td><code>[$00:4374]</code></td><td>データ元バンク</td><td><span class="formula">$7F</span></td></tr>
+	<tr><td><code>[$00:4377]</code></td><td>HDMA間接アドレスバンクバイト</td><td><span class="formula">$7F</span></td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$7F:3C00]</code></td><td><span class="formula">$F0</span></td></tr>
+	<tr><td><code>[$7F:3C03]</code></td><td><span class="formula">$F0</span></td></tr>
+	<tr><td><code>[$7F:3C06]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>HDMA転送はチャネル7を指定している。<br>
+GDMA / HDMA設定レジスタに<span class="formula">$41</span>(<span class="formula">%0100 0001</span>)を指定しているため、</p>
+
+<ul>
+	<li>指定レジスタアドレスと、指定レジスタアドレス<span class="formula">+1</span>に対し、転送1回につき1度書き込みを行う</li>
+	<li>HDMAテーブルは、間接テーブルモード</li>
+</ul>
+
+<p>ということになる。<br>
+また、<code>[$00:4371]</code>の転送先が<span class="formula">$26</span>だから、メニュー画面の時と同じように、<code>[$00:2126]</code>（ウィンドウ1左座標）と<code>[$00:2127]</code>（ウィンドウ1右座標）をスキャンライン毎に書き換えていくHDMA転送だということもわかる。<br>
+<code>[$00:2126]</code><code>[$00:2127]</code>に転送するHDMAテーブルは、<code>[$00:4372]</code>以降の設定から、<code>$7F:3C00</code>から開始になっている。<br>
+基本的には、メニュー画面の時のように、HDMAテーブルの値を3バイトずつ区切って見ていけば良いのであるが、間接テーブルモードというモードが選択されているので、HDMAテーブルの読み方がメニュー画面の時とは変わる。<br>
+「<code>$7F:3C00</code>以降に、最初にテーブルとして読み込む位置のアドレスが書かれている」のである。バンクは<code>[$00:4377]</code>で指定していて<span class="formula">$7F</span>である。<br>
+また、上の処理で、<code>[$7F:3C00]</code>、<code>[$7F:3C03]</code>、<code>[$7F:3C06]</code>には値がそれぞれはいっている。<br>
+3バイト区切りで整理してみると、<span class="formula">a～d</span>は任意の16進数の数値として、</p>
+
+<ul>
+	<li><code>[$7F:3C00]</code>: <span class="formula">$F0</span></li>
+	<li><code>[$7F:3C01]</code>: <span class="formula">aa</span>（まだ書き込まれていないが、テーブル読み込みアドレスの下1バイト）</li>
+	<li><code>[$7F:3C02]</code>: <span class="formula">bb</span>（まだ書き込まれていないが、テーブル読み込みアドレスの上1バイト）</li>
+</ul>
+
+<ul>
+	<li><code>[$7F:3C03]</code>: <span class="formula">$F0</span></li>
+	<li><code>[$7F:3C04]</code>: <span class="formula">cc</span>（まだ書き込まれていないが、テーブル読み込みアドレスの下1バイト）</li>
+	<li><code>[$7F:3C05]</code>: <span class="formula">dd</span>（まだ書き込まれていないが、テーブル読み込みアドレスの上1バイト）</li>
+</ul>
+
+<ul>
+	<li><code>[$7F:3C06]</code>: <span class="formula">$00</span>（ここでHDMA転送を終了）</li>
+</ul>
+
+<p>HDMAテーブルは、</p>
+
+<ol>
+	<li><code>$7F:bbaa</code>から<span class="formula">$F0 (240)</span>ピクセル分</li>
+	<li><code>$7F:ddcc</code>から<span class="formula">$F0 (240)</span>ピクセル分</li>
+</ol>
+
+<p>を処理して終了、と読み取れば良い。<br>
+間接テーブルモードの場合は<code>[$00:2126]</code>と<code>[$00:2127]</code>の2バイトに入れる値が<code>$7F:bbaa</code>以降に並ぶことになる。</p>
+
+<p>つまり、HDMA転送前に、<code>[$7F:3C01]</code>と<code>[$7F:3C02]</code>、<code>[$7F:3C04]</code>と<code>[$7F:3C05]</code>、さらに、HDMAテーブル指定先に<code>[$00:2126]</code><code>[$00:2127]</code>の値を書き込む処理が入るはずだ。<br>
+実際の処理を見ると、まずHDMAテーブル指定先の値の書き込みを行い、<code>[$7F:3C01]</code>～<code>[$7F:3C05]</code>に値を入れた直後にHDMA転送をしている。<br>
+先に、<code>[$7F:3C01]</code>～<code>[$7F:3C05]</code>に値を入れてHDMA転送の部分を見てみる。</p>
+
+<div class="code-container"><pre>
+$C0/D33C LDX #$00E0              ;Xに$00E0をロード
+$C0/D33F STX $22    [$00:0022]   ;Xを[$00:0023][$00:0022]に書き込み
+$C0/D341 LDA $01FA  [$00:01FA]   ;Aに[$00:01FA]をロード
+$C0/D344 BEQ $08    [$D34E]      ;ゼロフラグが立っているとき[$D34E]分岐
+$C0/D34E LDA #$01                ;Aに$01をロード
+$C0/D350 STA $01FA  [$00:01FA]   ;Aを[$00:01FA]に書き込み
+$C0/D353 LDX #$3E40              ;Xに$3E40をロード
+$C0/D356 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/D357 LDA #$7F                ;Aに$7Fをロード
+$C0/D359 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/D35A PLB                     ;DBレジスタにスタックからプル
+$C0/D35B REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/D35D LDY #$3C00              ;Yに$3C00をロード
+$C0/D360 TXA                     ;Xレジスタの値($3E40)をAレジスタに転送
+$C0/D361 STA $0001,y[$7F:3C01]   ;Aを[$7F:3C02][$7F:3C01]に書き込み
+$C0/D364 CLC                     ;キャリーフラグクリア
+$C0/D365 ADC $22    [$00:0022]   ;A($3E40) + [$00:0023][$00:0022]($00E0)
+$C0/D367 STA $0004,y[$7F:3C04]   ;Aを[$7F:3C05][$7F:3C04]に書き込み
+$C0/D36A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/D36C PLB                     ;DBレジスタにスタックからプル
+$C0/D36D RTS                     ;サブルーチン戻り
+
+$C0/BFE4 LDA $014F  [$00:014F]   ;Aに[$00:014F]($80)をロード
+$C0/BFE7 STA $420C  [$00:420C]   ;Aを[$00:420C]に書き込み
+;HDMA チャネル7転送開始
+$C0/BFEA LDX $01F2  [$00:01F2]   ;Xに[$00:01F2]をロード
+$C0/BFED CPX #$0001              ;Xと$0001を減算比較（ステータスレジスタ変更のみ）
+$C0/BFF0 BEQ $33    [$C025]      ;ゼロフラグが立っているとき[$C025]分岐
+$C0/BFF2 LDA $01F0  [$00:01F0]   ;Aに[$00:01F0]をロード
+$C0/BFF5 INC A                   ;Aをインクリメント +1
+$C0/BFF6 INC A                   ;Aをインクリメント +1
+$C0/BFF7 INC A                   ;Aをインクリメント +1
+$C0/BFF8 CMP #$48                ;Aと$48を減算比較（ステータスレジスタ変更のみ）
+$C0/BFFA BCC $03    [$BFFF]      ;キャリーフラグが立っていないとき[$BFFF]分岐
+$C0/BFFF STA $01F0  [$00:01F0]   ;Aを[$00:01F0]に書き込み
+$C0/C002 JSR $D297  [$C0:D297]   ;[$C0:D297]へジャンプ
+</pre></div>
+
+<p><code>[$7F:3C02]</code><code>[$7F:3C01]</code><span class="formula"> = $3E40</span><br>
+<code>[$7F:3C05]</code><code>[$7F:3C04]</code><span class="formula"> = $3F20</span></p>
+<p>と書き込んでからHDMA転送を行っている。<br>
+つまり、</p>
+
+<p>HDMAテーブルは、</p>
+<ol>
+	<li><code>$7F:3E40</code>から<span class="formula">$F0 (240)</span>バイト</li>
+	<li><code>$7F:3F20</code>から<span class="formula">$F0 (240)</span>バイト</li>
+</ol>
+<p>を処理して終了</p>
+
+<p>と、いうことになる。<br>
+1回目の指示で120ピクセル分、2回目の指示で120ピクセル分、合計で240ピクセル分のHDMA転送処理になる。<br>
+ただ、ゲーム画面のY軸（縦幅）は224ピクセルだから、上の指示では指定がオーバーしている。<br>
+実際には224ピクセル、一番下のラインまでしか処理しない。<br>
+また、実質、<code>$7F:3E40</code>～<code>$7F:3F1F</code>、<code>$7F:3F20</code>～<code>$7F:3FFF</code>と連続したアドレスの値の転送になる。</p>
+
+<p>では、<code>$7F:3E40</code>～に値を書き込む処理はどうなっているのか。<br>
+実は、先のHDMA転送設定の最後<code><span class="r">$CE/DAFE</span></code>の続きから、処理が始まっている。</p>
+
+<div class="code-container"><pre>
+$CE/DAC4 RTL                     ;サブルーチン戻り
+
+$C0/D1E4 RTS                     ;サブルーチン戻り
+
+$C0/BF6F JSL $CED906[$CE:D906]   ;[$CE:D906]へジャンプ
+
+$CE/D906 JSR $DB04  [$CE:DB04]   ;[$CE:DB04]へジャンプ
+
+$CE/DB04 LDY #$000E              ;Yに$000Eをロード
+$CE/DB07 LDA $01FA  [$00:01FA]   ;Aに[$00:01FA]をロード
+$CE/DB0A BEQ $05    [$DB11]      ;ゼロフラグが立っているとき[$DB11]分岐
+$CE/DB11 LDX #$3E40              ;Xに$3E40をロード
+$CE/DB14 STX $20    [$00:0020]   ;Xを[$00:0020]に書き込み
+$CE/DB16 PHB                     ;DBレジスタをスタックにプッシュ
+$CE/DB17 LDA #$7F                ;Aに$7Fをロード
+$CE/DB19 PHA                     ;Aレジスタをスタックにプッシュ
+$CE/DB1A PLB                     ;DBレジスタにスタックからプル
+$CE/DB1B REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+
+;ループ処理
+$CE/DB1D LDA #$00FF              ;Aに$00FFをロード
+$CE/DB20 STA $0000,x[$7F:3E40]   ;Aを[$7F:3E41][$7F:3E40](+$20)に書き込み
+$CE/DB23 STA $0002,x[$7F:3E42]   ;Aを[$7F:3E43][$7F:3E42](+$20)に書き込み
+$CE/DB26 STA $0004,x[$7F:3E44]   ;Aを[$7F:3E45][$7F:3E44](+$20)に書き込み
+$CE/DB29 STA $0006,x[$7F:3E46]   ;Aを[$7F:3E47][$7F:3E46](+$20)に書き込み
+$CE/DB2C STA $0008,x[$7F:3E48]   ;Aを[$7F:3E49][$7F:3E48](+$20)に書き込み
+$CE/DB2F STA $000A,x[$7F:3E4A]   ;Aを[$7F:3E4B][$7F:3E4A](+$20)に書き込み
+$CE/DB32 STA $000C,x[$7F:3E4C]   ;Aを[$7F:3E4D][$7F:3E4C](+$20)に書き込み
+$CE/DB35 STA $000E,x[$7F:3E4E]   ;Aを[$7F:3E4F][$7F:3E4E](+$20)に書き込み
+$CE/DB38 STA $0010,x[$7F:3E50]   ;Aを[$7F:3E51][$7F:3E50](+$20)に書き込み
+$CE/DB3B STA $0012,x[$7F:3E52]   ;Aを[$7F:3E53][$7F:3E52](+$20)に書き込み
+$CE/DB3E STA $0014,x[$7F:3E54]   ;Aを[$7F:3E55][$7F:3E54](+$20)に書き込み
+$CE/DB41 STA $0016,x[$7F:3E56]   ;Aを[$7F:3E57][$7F:3E56](+$20)に書き込み
+$CE/DB44 STA $0018,x[$7F:3E58]   ;Aを[$7F:3E59][$7F:3E58](+$20)に書き込み
+$CE/DB47 STA $001A,x[$7F:3E5A]   ;Aを[$7F:3E5B][$7F:3E5A](+$20)に書き込み
+$CE/DB4A STA $001C,x[$7F:3E5C]   ;Aを[$7F:3E5D][$7F:3E5C](+$20)に書き込み
+$CE/DB4D STA $001E,x[$7F:3E5E]   ;Aを[$7F:3E5F][$7F:3E5E](+$20)に書き込み
+$CE/DB50 TXA                     ;Xレジスタの値をAレジスタに転送
+$CE/DB51 CLC                     ;キャリーフラグクリア
+$CE/DB52 ADC #$0020              ;A + $0020
+$CE/DB55 TAX                     ;Aの値をXレジスタに転送
+$CE/DB56 DEY                     ;Yをデクリメント -1
+$CE/DB57 BNE $C4    [$DB1D]      ;ゼロフラグが立っていないとき[$DB1D]分岐
+;ループ処理ここまで
+
+$CE/DB59 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/DB5B PLB                     ;DBレジスタにスタックからプル
+$CE/DB5C RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上のループ処理で、<code>[$7F:3E40]</code><code>[$7F:3E41]</code>から順に、2バイトずつ<span class="formula">$00FF</span>を書き込んでいる。<br>
+1回のループで<span class="formula">$20</span>バイト分を書き込み、ループ回数は<code>Y</code>に入った<span class="formula">$000E</span>だから、最終的に<code>[$7F:3FFF]</code><code>[$7F:3FFE]</code>まで<span class="formula">$00FF</span>で埋まる。<br>
+つまり<span class="formula">$200</span>バイト分書き込んだことになる。<br>
+ちょうどHDMA転送する224ピクセル分にあたる。<br>
+ただ、これでは<code>[$00:2127]</code><code>[$00:2126]</code>に送るデータがすべて<span class="formula">$00FF</span>であり、ウィンドウ右座標が<span class="formula">$00</span>で左座標が<span class="formula">$FF</span>のままであるから、何の変化はない。<br>
+要するにこれは初期値の設定になる。</p>
+
+<p>この後に計算値が入っていくのだが、その計算が少々ややこしい。<br>
+要するに、ウィンドウ外と中の境界で正三角形を描くように、座標を計算して上書きしている。<br>
+<code><span class="r">$CE/DBA9</span></code>のLDA $C0BC94,xで呼び出す2バイト区切りの値が座標計算用の係数になっているようである（<code>$C0:BC94</code>～<code>$C0:BD1F</code>）。<br>
+サブルーチンについては省くが、最終的に<code>[$7F:3E40]</code>～<code>[$7F:3FFE]</code>を16バイト（<span class="formula">$10</span>バイト）区切りで記すと以下のようになる。<br>
+これがHDMA転送前の値である。</p>
+
+<div class="mono">
+03 C6 03 C8 03 C9 03 CB 03 CD 03 CE 03 D0 03 D2<br>
+03 D4 03 D5 03 D7 03 D9 03 DB 03 DC 03 DE 03 E0<br>
+03 E2 03 E3 03 E5 03 E7 03 E9 03 EA 03 EC 03 EE<br>
+03 EF 03 F1 03 F3 03 F5 03 F6 03 F8 03 FA 03 FC<br>
+03 FD 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF 03 FF<br>
+03 FD 03 FC 03 FA 03 F8 03 F6 03 F5 03 F3 03 F1<br>
+03 EF 03 EE 03 EC 03 EA 03 E9 03 E7 03 E5 03 E3<br>
+03 E2 03 E0 03 DE 03 DC 03 DB 03 D9 03 D7 03 D5<br>
+03 D4 03 D2 03 D0 03 CE 03 CD 03 CB 03 C9 03 C8<br>
+03 C6 03 C4 03 C2 03 C1 03 BF 03 BD 03 BB 03 BA<br>
+03 B8 03 B6 03 B4 03 B3 03 B1 03 AF 03 AE 03 AC<br>
+</div>
+
+<p>HDMAで1スキャンライン書き込むと2バイトのデータを<code>[$00:2127]</code><code>[$00:2126]</code>に書き込み、それをY軸一番下まで処理するから、</p>
+
+<p>1スキャンライン目：<code>[$7F:3E40]</code>(<span class="formula">$03</span>)<code>[$7F:3E41]</code>(<span class="formula">$C6</span>)→<code>[$00:2126]</code><code>[$00:2127]</code><br>
+2スキャンライン目：<code>[$7F:3E42]</code>(<span class="formula">$03</span>)<code>[$7F:3E43]</code>(<span class="formula">$C8</span>)→<code>[$00:2126]</code><code>[$00:2127]</code><br>
+3スキャンライン目：<code>[$7F:3E44]</code>(<span class="formula">$03</span>)<code>[$7F:3E45]</code>(<span class="formula">$C9</span>)→<code>[$00:2126]</code><code>[$00:2127]</code><br>
+……<br>
+224スキャンライン目：<code>[$7F:3FFE]</code>(<span class="formula">$03</span>)<code>[$7F:3FFF]</code>(<span class="formula">$AC</span>)→<code>[$00:2126]</code><code>[$00:2127]</code></p>
+
+<p>と、いうことになる。<br>
+1スキャンライン目だったら、X座標<span class="formula">$03</span>～<span class="formula">$C6</span>の間がウィンドウ内部扱いだから、戦闘直前の画像がそのまま表示されるが、X座標<span class="formula">$00</span>～<span class="formula">$02</span>及びX座標<span class="formula">$C7</span>～<span class="formula">$FF</span>はウィンドウの外扱いで、非表示、つまり真っ黒に塗りつぶし状態になる、ということである。<br>
+実際に上の指示どおりに横256×縦224マスのエクセル方眼紙を塗りつぶしてみたら、以下のようになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/sankaku01.png" class="modal-link">
+		<img src="img/sankaku01.png" alt="三角形マスキングの図" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>目が痛くなりそうで申し訳ない。筆者も塗りつぶしながら目が痛くなったが、左隅の3マス分と、右上側、右下側が黒で塗りつぶされた形状になる。<br>
+正三角形の右側が尖った状態の「&#x25B7;」の形状の一部であることがおわかりいただけるだろうか。<br>
+これが戦闘開始直後に、最初にHDMA転送で送られるウィンドウマスク処理である。<br>
+ここから、<code>$7F:3D??</code>～にHDMAテーブルを転送してHDMA転送でウィンドウマスク処理、を繰り返すことで、三角形の形状を少しずつ回しながら小さくしていき、最後に画面全体を黒くして、フィールド画面から戦闘画面へと切り替えるのである。</p>
+
+<p>なお、三角形マスキング用の1画面分の描画は50回行われている。<br>
+つまり50フレーム、1秒に満たない程度である。<br>
+その後暗転して、次はアイリスイン（主人公を起点に円状に画面が広がる）で戦闘画面が表示される。<br>
+このアイリスイン処理も、HDMA転送でのウィンドウマスク処理になる。<br>
+アイリスイン処理は、1画面分の描画24回分で、三角形の回転の半分程度の時間でしかなく、プレイヤーもあまりアイリスイン処理を気にしてはいないのではなかろうか。</p>
+
+<h3>戦闘画面表示前のアイリスイン処理</h3>
+
+<p>戦闘開始直後、<code><span class="r">$C1/F2D1</span></code>～<code><span class="r">$C1/F319</span></code>にて、以下のようにGDMA関係のI/Oアドレスに値が書き込まれる、とこれまでにも紹介した。<br>
+アイリスイン処理は、以下におけるチャネル4のHDMA設定を使う。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th><span class="formula">n</span></th><th><span class="formula">0</span></th><th><span class="formula">1</span></th><th><span class="formula">2</span></th><th><span class="formula">3</span></th><th><span class="formula">4</span></th><th><span class="formula">5</span></th><th><span class="formula">7</span></th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:43n0</code></td><td>GDMA / HDMA<br>設定レジスタ</td><td><span class="formula">$01</span></td><td><span class="formula">$00</span></td><td>-</td><td><span class="formula">$00</span></td><td><span class="formula">$41</span></td><td><span class="formula">$01</span></td><td><span class="formula">$09</span></td></tr>
+	<tr><td rowspan="2"><code>$00:43n1</code></td><td>値</td><td><span class="formula">$18</span></td><td><span class="formula">$22</span></td><td><span class="formula">$80</span></td><td><span class="formula">$04</span></td><td><span class="formula">$26</span></td><td><span class="formula">$26</span></td><td><span class="formula">$18</span></td></tr>
+	<tr><td>転送先</td><td>VRAM</td><td>CGRAM</td><td>WRAM</td><td>OAM</td><td>Window<br>座標1L</td><td>Window<br>座標1L</td><td>VRAM</td></tr>
+	<tr><td><code>$00:43n2~3</code></td><td>データ元アドレス</td><td>-</td><td>-</td><td>-</td><td>-</td><td><span class="formula">$A700</span></td><td><span class="formula">$E9FD</span></td><td>-</td></tr>
+	<tr><td><code>$00:43n4</code></td><td>データ元バンク</td><td>-</td><td>-</td><td>-</td><td>-</td><td><span class="formula">$7E</span></td><td><span class="formula">$C1</span></td><td>-</td></tr>
+	<tr><td><code>$00:43n7</code></td><td>間接HDMA<br>アドレス</td><td>-</td><td>-</td><td>-</td><td>-</td><td><span class="formula">$7E</span></td><td><span class="formula">$C1</span></td><td>-</td></tr>
+</tbody>
+</table>
+
+
+<p>GDMA / HDMA設定レジスタに<span class="formula">$41</span>(<span class="formula">%0100 0001</span>)を指定しているため、</p>
+
+<ul>
+	<li>指定レジスタアドレスと、指定レジスタアドレス<span class="formula">+1</span>に対し、転送1回につき1度書き込みを行う</li>
+	<li>HDMAテーブルは、間接テーブルモード</li>
+</ul>
+
+<p>と、先ほどの戦闘突入時の三角形処理と同じである。<br>
+ただ、<code>[$00:4343]</code><code>[$00:4342]</code>の値はこの後更新されるため、HDMAテーブルのアドレス位置は上の値ではない。</p>
+
+<p>また、ウィンドウ関連のI/Oアドレスの値も確認しなければならない。<br>
+<a href="bg2.html" target="_blank">背景グラフィックと効果 &gt; 戦闘でのサブルーチン</a>で、初期設定を紹介している。<br>
+<code><span class="r">$C1/F338</span></code>～<code><span class="r">$C1/F3AA</span></code>が該当部分で、この時点ではウインドウ関係の値は以下のようになっている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:212E]</code></td><td>TMW</td><td>メインスクリーンウインドウマスク指定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212F]</code></td><td>TSW</td><td>サブスクリーンウインドウマスク指定</td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>初期設定の時点では、BGやスプライトなどに一切マスクがかかっていない。<br>
+アイリスイン処理の前に、各種設定が行われる。</p>
+
+<div class="code-container"><pre>
+$C1/8771 LDX #$9EC8              ;Xに$9EC8をロード
+$C1/8774 STX $4342  [$00:4342]   ;Xを[$00:4343][$00:4342]に書き込み
+$C1/8777 LDA $F2    [$00:03F2]   ;Aに[$00:03F2]をロード
+$C1/8779 ORA #$10                ;Aと$10で論理和
+$C1/877B STA $F2    [$00:03F2]   ;Aを[$00:03F2]に書き込み
+$C1/877D STA $420C  [$00:420C]   ;Aを[$00:420C]に書き込み
+$C1/8780 LDA #$33                ;Aに$33をロード
+$C1/8782 STA $2123  [$00:2123]   ;Aを[$00:2123]に書き込み
+$C1/8785 STA $2124  [$00:2124]   ;Aを[$00:2124]に書き込み
+$C1/8788 LDA #$03                ;Aに$03をロード
+$C1/878A STA $2125  [$00:2125]   ;Aを[$00:2125]に書き込み
+$C1/878D LDA #$1F                ;Aに$1Fをロード
+$C1/878F STA $212E  [$00:212E]   ;Aを[$00:212E]に書き込み
+$C1/8792 RTS                     ;サブルーチン戻り
+
+$C1/835B JSR $6145  [$C1:6145]   ;[$C1:6145]へジャンプ
+</pre></div>
+
+<p>上の時点で、以下のように値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>I/Oアドレス</th><th>名前</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4343]</code></td><td>A1T4H</td><td>DMA転送元A1テーブルアドレス上位</td><td><span class="formula">$C8</span></td></tr>
+	<tr><td><code>[$00:4342]</code></td><td>A1T4L</td><td>DMA転送元A1テーブルアドレス下位</td><td><span class="formula">$9E</span></td></tr>
+	<tr><td><code>[$00:2123]</code></td><td>W12SEL</td><td>BG1,BG2ウィンドウマスク設定</td><td><span class="formula">$33</span> (<span class="formula">%0011 0011</span>)</td></tr>
+	<tr><td><code>[$00:2124]</code></td><td>W34SEL</td><td>BG3,BG4ウィンドウマスク設定</td><td><span class="formula">$33</span> (<span class="formula">%0011 0011</span>)</td></tr>
+	<tr><td><code>[$00:2125]</code></td><td>WOBJSEL</td><td>スプライトウィンドウマスク設定</td><td><span class="formula">$03</span> (<span class="formula">%0000 0011</span>)</td></tr>
+	<tr><td><code>[$00:212A]</code></td><td>WBGLOG</td><td>BGウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212B]</code></td><td>WOBJLOG</td><td>スプライトウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212E]</code></td><td>TMW</td><td>メインスクリーンウインドウマスク指定</td><td><span class="formula">$1F</span> (<span class="formula">%0001 1111</span>)</td></tr>
+	<tr><td><code>[$00:212F]</code></td><td>TSW</td><td>サブスクリーンウインドウマスク指定</td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p><code>[$00:4343]</code><code>[$00:4342]</code>がここで更新されているため、<code>$7E:9EC8</code>以降に、HDMAテーブルのアドレス位置が書かれているはずだ。</p>
+
+<p>なお、<code><span class="r">$C1/877D</span></code>で<code>[$00:420C]</code>で<span class="formula">$10</span>が書き込まれており、ここで一度HDMA送信をしている。<br>
+ただ、この送信は通常戦闘だと、スキャンラインの222～224番目、つまり画面下の2ピクセル分のラインにHDMA転送しているだけで、実質画面に何かの変化はない（はず）。</p>
+
+<p>ウィンドウマスク関係の設定は、細かい数値の違いがあるものの、戦闘前の三角形マスキングとだいたい同じ。<br>
+BG1～BG4、スプライトすべてウィンドウの外側マスクであるし、メインスクリーンも、BG1～BG4、スプライトすべてマスクする設定である。<br>
+このため、ウィンドウの外側はBGもスプライトもすべてマスクされ、真っ黒になる。</p>
+
+<p>HDMAテーブルが書かれる<code>$7E:9EC8</code>～なのだが、実は上のサブルーチンの少し前に処理がある。</p>
+
+<div class="code-container"><pre>
+$C1/82FA LDA #$F0                ;Aに$F0をロード
+$C1/82FC STA $7E9EC8[$7E:9EC8]   ;Aを[$7E:9EC8]に書き込み
+$C1/8300 STA $7E9ECB[$7E:9ECB]   ;Aを[$7E:9ECB]に書き込み
+$C1/8304 LDA #$00                ;Aに$00をロード
+$C1/8306 STA $7E9ECE[$7E:9ECE]   ;Aを[$7E:9ECE]に書き込み
+$C1/830A LDA #$04                ;Aに$04をロード
+$C1/830C STA $7E9EC9[$7E:9EC9]   ;Aを[$7E:9EC9]に書き込み
+$C1/8310 LDA #$E4                ;Aに$E4をロード
+$C1/8312 STA $7E9ECC[$7E:9ECC]   ;Aを[$7E:9ECC]に書き込み
+$C1/8316 LDA #$9D                ;Aに$9Dをロード
+$C1/8318 STA $7E9ECA[$7E:9ECA]   ;Aを[$7E:9ECA]に書き込み
+$C1/831C STA $7E9ECD[$7E:9ECD]   ;Aを[$7E:9ECD]に書き込み
+$C1/8320 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上から、以下のように値が入った。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$7E:9EC8]</code></td><td><span class="formula">$F0</span></td></tr>
+	<tr><td><code>[$7E:9EC9]</code></td><td><span class="formula">$04</span></td></tr>
+	<tr><td><code>[$7E:9ECA]</code></td><td><span class="formula">$9D</span></td></tr>
+	<tr><td><code>[$7E:9ECB]</code></td><td><span class="formula">$F0</span></td></tr>
+	<tr><td><code>[$7E:9ECC]</code></td><td><span class="formula">$E4</span></td></tr>
+	<tr><td><code>[$7E:9ECD]</code></td><td><span class="formula">$9D</span></td></tr>
+	<tr><td><code>[$7E:9ECE]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>バンクは<span class="formula">$7E</span>と指定されたままなので、HDMAテーブルは、</p>
+
+<ul>
+	<li><code>$7E:9D04</code>から<span class="formula">$F0 (240)</span>ピクセル分</li>
+	<li><code>$7E:9DE4</code>から<span class="formula">$F0 (240)</span>ピクセル分</li>
+</ul>
+
+<p>で終了、となる。<br>
+ただ、224スキャンライン目までHDMA転送する都合で、実際には後半は<code>$7E:9DE4</code>～<code>$7E:9EC3</code>までの転送で終了になる。</p>
+
+<p>この後から、<code>$7E:9D04</code>～に値を入れる処理が入る。</p>
+
+<div class="code-container"><pre>
+$C1/834B JSR $60E8  [$C1:60E8]   ;[$C1:60E8]へジャンプ
+
+$C1/60E8 LDA #$01                ;Aに$01をロード
+$C1/60EA STA $92    [$00:0392]   ;Aを[$00:0392]に書き込み
+$C1/60EC LDA #$0F                ;Aに$0Fをロード
+$C1/60EE STA $91    [$00:0391]   ;Aを[$00:0391]に書き込み
+$C1/60F0 LDA #$01                ;Aに$01をロード
+$C1/60F2 STA $93    [$00:0393]   ;Aを[$00:0393]に書き込み
+$C1/60F4 STA $94    [$00:0394]   ;Aを[$00:0394]に書き込み
+$C1/60F6 RTS                     ;サブルーチン戻り
+
+$C1/834E LDA #$0F                ;Aに$0Fをロード
+$C1/8350 STA $92    [$00:0392]   ;Aを[$00:0392]に書き込み
+$C1/8352 JSR $845E  [$C1:845E]   ;[$C1:845E]へジャンプ
+
+$C1/845E LDX #$00FF              ;Xに$00FFをロード
+$C1/8461 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/8463 TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/8464 LDX #$9B00              ;Xに$9B00をロード
+;ループ処理
+$C1/8467 STA $7E0000,x           ;Aを[$7E:9B01][$7E:9B00]～[$7E:9CC3][$7E:9CC2]に書き込み
+$C1/846B INX                     ;Xをインクリメント +1
+$C1/846C INX                     ;Xをインクリメント +1
+$C1/846D CPX #$9CC4              ;Xと$9CC4を減算比較（ステータスレジスタ変更のみ）
+$C1/8470 BNE $F5    [$8467]      ;ゼロフラグが立っていないとき[$8467]分岐
+;ループ処理ここまで
+$C1/8472 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/8474 RTS                     ;サブルーチン戻り
+
+$C1/8355 JSR $8475  [$C1:8475]   ;[$C1:8475]へジャンプ
+
+$C1/8475 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/8477 LDX #$9B00              ;Xに$9B00をロード
+;ループ処理
+$C1/847A LDA $7E0000,x           ;Aに[$7E:9B01][$7E:9B00]～[$7E:9CC3][$7E:9CC2]をロード
+$C1/847E STA $7E0200,x           ;Aを[$7E:9D01][$7E:9D00]～[$7E:9EC3][$7E:9EC2]に書き込み
+$C1/8482 INX                     ;Xをインクリメント +1
+$C1/8483 INX                     ;Xをインクリメント +1
+$C1/8484 CPX #$9CC4              ;Xと$9CC4を減算比較（ステータスレジスタ変更のみ）
+$C1/8487 BNE $F1    [$847A]      ;ゼロフラグが立っていないとき[$847A]分岐
+;ループ処理ここまで
+$C1/8489 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/848B RTS                     ;サブルーチン戻り
+
+$C1/8358 JSR $8771  [$C1:8771]   ;[$C1:8771]へジャンプ
+;$C1/8771～$C1/8792のI/Oアドレス設定へ
+</pre></div>
+
+<p>これが初回設定で、<code>[$7E:9B01]</code><code>[$7E:9B00]</code>～<code>[$7E:9CC3]</code><code>[$7E:9CC2]</code>を<span class="formula">$00FF</span>で埋めた後、<code>[$7E:9D01]</code><code>[$7E:9D00]</code>～<code>[$7E:9EC3]</code><code>[$7E:9EC2]</code>にコピーしている。<br>
+HDMA転送開始アドレスの<code>$7E:9D04</code>は<span class="formula">$FF</span>、<code>$7E:9D05</code>は<span class="formula">$00</span>、……と続くから、実質、<code>[$00:2126]</code><code>[$00:2127]</code>を<span class="formula">$FF00</span>ですべて揃えるだけである。<br>
+ウィンドウ左隅の座標を<span class="formula">$FF</span>、右隅を<span class="formula">$00</span>とするのは幅が負の値となり明らかにおかしいが、このように幅が負または<span class="formula">0</span>に設定された時は、すべてウィンドウ外とする扱いである。<br>
+これにより、画面内はすべてウィンドウ外、つまり全体がマスクされた状態で隠されるため、戦闘開始直後、つまり三角形のウィンドウ効果後は画面が真っ暗になった状態である。</p>
+
+<p>ここから、<code>[$7E:9D01]</code><code>[$7E:9D00]</code>～<code>[$7E:9EC3]</code><code>[$7E:9EC2]</code>に計算値を入れていくことで、アイリスイン効果を出して、主人公キャラの位置を中心に円状に画面を広げていく。<br>
+上の初期値設定のサブルーチンのジャンプ処理をざっとまとめると、</p>
+
+<div class="mono">
+$C1/8352<br>
+┣$C1/845E～$C1/8474<br>
+$C1/8355<br>
+┣$C1/8475～$C1/848B<br>
+$C1/8358<br>
+</div>
+
+<p>こんな手順である。<br>
+だが、HDMA転送準備2回目からはサブルーチンが変わる。</p>
+
+<div class="mono">
+┣$C1/845E～$C1/8474<br>
+$C1/8378<br>
+┃┣$C1/83A5～$C1/83AF<br>
+┃┃┣$C1/46C9（乗算時間稼ぎ）<br>
+┃┣$C1/83B2～$C1/83BC<br>
+┃┃┣$C1/46C9（乗算時間稼ぎ）<br>
+┃┣$C1/83BF～$C1/83CF<br>
+┃┃┣$C1/46C8～$C1/46C9（乗算時間稼ぎ）<br>
+┃┗$C1/83D2～$C1/8458<br>
+$C1/837B<br>
+（省略）<br>
+$C1/837E～$C1/838C<br>
+┣$C1/8475～$C1/848B<br>
+</div>
+
+<p>だいたい上のようになっている。<br>
+<code><span class="r">$C1/83D2</span></code>～<code><span class="r">$C1/8458</span></code>は、アイリスイン部分のみ<code>[$7E:9B01]</code><code>[$7E:9B00]</code>～<code>[$7E:9CC3]</code><code>[$7E:9CC2]</code>を上書き、という処理にあたる。</p>
+
+<p>つまり<code><span class="r">$C1/83A5</span></code>～<code><span class="r">$C1/8458</span></code>で、アイリスインする部分のウィンドウ幅を計算＋<code>[$7E:9B01]</code><code>[$7E:9B00]</code>～<code>[$7E:9CC3]</code><code>[$7E:9CC2]</code>に上書きという作業を行っているが、詳細は省く。<br>
+円の形状にアイリスインするよう計算するための係数が、<code><span class="r">$C1/83F5</span></code>の命令<code>LDA $CAFF00,x</code>で、<code>$CA:FF00</code>～<code>$CA:FFFF</code>のいずれかになる。<br>
+戦闘中、技によっては円の形状にカラーマスでエフェクトをかけることがあるが、おそらくそのあたりも<code>$CA:FF00</code>～<code>$CA:FFFF</code>の係数で座標計算をしている（ようである）。</p>
+
+<p>以降はマスク部分がなくなるまでアイリスインして、戦闘画面表示となり、HDMA 4チャネルの転送が終了する。</p>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="bg3.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
