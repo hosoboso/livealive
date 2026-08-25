@@ -192,6 +192,7 @@ table {
 		<li><a href="bg3.html">背景(メニュー画面)</a></li>
 		<li><a href="colormath.html">カラーマス</a></li>
 		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
 	</ul>
 </li>
 </ul>
@@ -435,7 +436,9 @@ table {
 	<tr><td><code>$C0:BA12</code>～<code>$C0:BA75</code></td><td>16bit×16bit乗算サブルーチン</td></tr>
 	<tr><td><code>$C0:BB15</code>～<code>$C0:BC68</code></td><td>OAM用データを計算、<code>$00:0700</code>～<code>$00:0920</code>に書き込み</td></tr>
 	<tr><td><code>$C0:BC6D</code>～<code>$C0:BC93</code></td><td>OAMへデータ(<code>$00:0700</code>～<code>$00:0920</code>)を転送</td></tr>
+	<tr><td><code>$C0:BE00</code>～<code>$C0:BF14</code></td><td>モザイク処理 モザイクサイズを徐々に小さくする、かつ、輝度を上げる</td></tr>
 	<tr><td><code>$C0:BFE4</code>～<code>$C0:C002</code></td><td>戦闘開始時 三角形ウィンドウマスク処理のHDMA転送7チャネル転送</td></tr>
+	<tr><td><code>$C0:C02A</code>～<code>$C0:C098</code></td><td>モザイク処理 モザイクサイズを徐々に大きくする、かつ、輝度を下げる</td></tr>
 	<tr><td><code>$C0:D190</code>～<code>$C0:D1E4</code></td><td>戦闘開始時 三角形ウィンドウマスク処理のI/Oアドレス設定</td></tr>
 	<tr><td><code>$C0:D33C</code>～<code>$C0:D36D</code></td><td>戦闘開始時 三角形ウィンドウマスク処理のHDMAテーブル・間接テーブルモードのアドレス書き込み</td></tr>
 	<tr><td><code>$C0:F338</code>～<code>$C0:F340</code></td><td>Mode7拡大縮小回転用マトリックスB設定</td></tr>
@@ -500,6 +503,7 @@ table {
 	<tr><td><code>$C1:2451</code>～<code>$C1:2476</code></td><td>レベルアップ時のHPアップ処理</td></tr>
 	<tr><td><code>$C1:248B</code>～<code>$C1:24C5</code></td><td>レベルアップ時の力・速・体・知アップ処理</td></tr>
 	<tr><td><code>$C1:24C8</code>～<code>$C1:253E</code></td><td>レベルアップ時の技習得処理</td></tr>
+	<tr><td><code>$C1:25A8</code>～<code>$C1:25BC</code></td><td>「逃げる」選択時　幕末編処理分岐（NAMEの敵用）</td></tr>
 	<tr><td><code>$C1:25D7</code>～<code>$C1:2633</code></td><td>戦闘開始時 幕末編のNAMEタイプの敵ステータス処理</td></tr>
 	<tr><td><code>$C1:27D7</code>～<code>$C1:27DF</code></td><td>NMI割り込みの<code>$C1:612F</code>～<code>$C1:613C</code>をループさせる処理</td></tr>
 	<tr><td><code>$C1:2800</code>～<code>$C1:281A</code></td><td>移動または向き変え時の行動ポイント計算用　<span class="formula">$40 - 速/4</span>（※向き変えはこの<span class="formula">1/2</span>で行動ポイント増減）</td></tr>
@@ -540,7 +544,7 @@ table {
 	<tr><td><code>$C1:5EF5</code>～<code>$C1:5F1C</code></td><td>味方キャラのOAM上位テーブル用データ獲得</td></tr>
 	<tr><td><code>$C1:5F1D</code>～<code>$C1:5F85</code></td><td>味方キャラ以外のOAMデータ獲得</td></tr>
 	<tr><td><code>$C1:5FE0</code>～<code>$C1:60C9</code></td><td>キャラのスプライトデータをWRAM<code>$00:D000</code>～<code>$00:D400</code>にGDMA転送</td></tr>
-	<tr><td><code>$C1:612F</code>～<code>$C1:613C</code></td><td>HDMA転送＆NMIによる割り込み待ち用ループ</td></tr>
+	<tr><td><code>$C1:612F</code>～<code>$C1:6144</code></td><td>HDMA転送＆NMIによる割り込み待ち用ループ</td></tr>
 	<tr><td><code>$C1:6145</code>～<code>$C1:614D</code></td><td>VBlankフラグ判定ループ(<code>[$00:4212]</code> 上1ビット判定）～NMI割り込み</td></tr>
 	<tr><td><code>$C1:6150</code>～<code>$C1:61A4</code></td><td>戦闘用乱数計算</td></tr>
 	<tr><td><code>$C1:62EF</code>～<code>$C1:6325</code></td><td>敵種類nのカラーパレットをCGRAMへGDMA転送（ピュアオディオは処理スキップ）</td></tr>
@@ -565,7 +569,7 @@ table {
 	<tr><td><code>$C1:6B70</code>～<code>$C1:6CAB</code></td><td>敵タイルデータを<code>[$7E:2000]</code>～にロード</td></tr>
 	<tr><td><code>$C1:6DCC</code>～<code>$C1:6E12</code></td><td>最終編ラストの7連戦後の画面上のドットがランダムに消えていく演出用計算</td></tr>
 	<tr><td><code>$C1:6F7C</code>～<code>$C1:6FBA</code></td><td>最終編オルステッドルート　おーでぃーおー戦でざき入れ替え判定</td></tr>
-	<tr><td><code>$C1:706A</code>～<code>$C1:70B6</code></td><td>テレポート選択後の背景モザイク処理</td></tr>
+	<tr><td><code>$C1:7046</code>～<code>$C1:70B9</code></td><td>テレポートコマンド実行時　画像処理（モザイク処理など）</td></tr>
 	<tr><td><code>$C1:7202</code>～<code>$C1:7268</code></td><td>技が周囲攻撃かどうか判定（<code>$C1:7236</code>まで敵判定、それ以降は味方判定）</td></tr>
 	<tr><td><code>$C1:77CE</code>～<code>$C1:783A</code></td><td>単発ダメージ/回復量計算</td></tr>
 	<tr><td><code>$C1:7843</code>～<code>$C1:7851</code></td><td>単発ダメージ＋乱数ブレ分</td></tr>
@@ -574,6 +578,7 @@ table {
 	<tr><td><code>$C1:7AED</code>～<code>$C1:7B01</code></td><td>味方キャラが行動可能か判定（状態異常とタメ時間中でないか確認）</td></tr>
 	<tr><td><code>$C1:7BCE</code>～<code>$C1:7F92</code></td><td>最終編ラストバトル　ピュアオディオ出現判定・処理</td></tr>
 	<tr><td><code>$C1:835E</code>～<code>$C1:8368</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタに<span class="formula">$0F</span>書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
+	<tr><td><code>$C1:85C4</code>～<code>$C1:85EA</code></td><td>HDMA転送処理＋戦闘中タイマーを<span class="formula">-1</span>、65C816用レジスタをスタックから出して<code>RTI</code>（割込みから復帰し、中断していた処理を再開）</td></tr>
 	<tr><td><code>$C1:8702</code>～<code>$C1:8713</code></td><td>HDMAチャネル5を停止（技使用中にHDMAチャネル4など使用時）</td></tr>
 	<tr><td><code>$C1:8913</code>～<code>$C1:894E</code></td><td>ウィンドウ用カラーパレット転送（4色分）</td></tr>
 	<tr><td><code>$C1:89E5</code>～<code>$C1:8A25</code></td><td>CGRAM転送＋カラーマス処理　BG3の指定マス色を<span class="formula">$840000</span>で加算処理して色変更</td></tr>
@@ -615,6 +620,7 @@ table {
 	<tr><td><code>$C1:9898</code>～<code>$C1:9895</code></td><td>スタートボタンを押してポーズをかけた時、画面の輝度を下げる処理</td></tr>
 	<tr><td><code>$C1:990D</code>～<code>$C1:9927</code></td><td>行動ポイント計算（味方が向き変え）</td></tr>
 	<tr><td><code>$C1:998E</code>～<code>$C1:99A2</code></td><td>戦闘コマンドに何を表示するか判定～文字列呼び出し～表示位置決定～選択可能コマンド判定</td></tr>
+	<tr><td><code>$C1:99F6</code>～<code>$C1:9AB7</code></td><td>「逃げる」「テレポート」「ハルマゲドン」コマンド選択時処理　<code>[$00:047E]</code><code>[$00:03FC]</code>に<span class="formula">$FF</span>書き込み、<code>[$00:0362]</code>に<span class="formula">$00</span>書き込み</td></tr>
 	<tr><td><code>$C1:9D13</code>～<code>$C1:9D86</code></td><td>Xボタンの「ひとつ前の技」関連処理</td></tr>
 	<tr><td><code>$C1:9EFA</code>～<code>$C1:9F51</code></td><td>味方の行動順決定（<code>[$00:035B]</code><code>[$00:035A]</code>を更新）</td></tr>
 	<tr><td><code>$C1:9F5A</code>～<code>$C1:9F75</code></td><td>味方キャラ戦闘状態確認</td></tr>
@@ -1448,6 +1454,7 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:036C</code></td><td>ステータス復元用計算値(Yで<span class="formula">$40</span>、向き変えで<span class="formula">$20</span>）</td></tr>
 	<tr><td><code>$00:036D</code></td><td>ステータス復元用計算値(技使用中<span class="formula">$10</span>)</td></tr>
 	<tr><td><code>$00:03E6</code></td><td>戦闘コマンドにおけるカーソル位置（初期位置<span class="formula">$00</span>、技一覧やアイテム一覧でも）</td></tr>
+	<tr><td><code>$00:047E</code></td><td>初期値<span class="formula">$00</span>、「逃げる」または「テレポート」選択時<span class="formula">$FF</span></td></tr>
 	<tr><td><code>$00:0488</code>～<code>$00:04BE</code></td><td>戦闘フィールドマスの計算用アドレス</td></tr>
 	<tr><td><code>$00:04C8</code>～<code>$00:04FF</code></td><td>戦闘フィールドマスの状態（後述）</td></tr>
 	<tr><td><code>$7E:0700</code>～<code>$7E:0920</code></td><td>OAMへ転送するスプライト用データ</td></tr>
