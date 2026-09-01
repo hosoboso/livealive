@@ -177,6 +177,7 @@ table {
 		<li><a href="bg2.html">背景(戦闘)</a></li>
 		<li><a href="bg3.html">背景(メニュー画面)</a></li>
 		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
 		<li><a href="window.html">ウィンドウ効果</a></li>
 		<li><a href="mosaic.html">モザイク処理</a></li>
 	</ul>
@@ -218,9 +219,9 @@ table {
 <p>メニュー画面の半透明効果はどのように行っているのか。<br>
 まず、メニュー画面のI/Oレジスタ設定を改めて確認する。<br>
 重要なのはカラーマス関係のレジスタである。<br>
-<a href="bg3.html">前ページ</a>の、<code><span class="r">$C2/4F8F</span></code>で設定された、<code>[$00:2130]</code>と<code>[$00:2131]</code>の値がそれぞれ<span class="formula">$12</span>と<span class="formula">$45</span>となっており、詳しく見てみると以下のようになる。</p>
+<a href="bg3.html">前ページ</a>の、<code><span class="r">$C2/4F8F</span></code>で設定された、<code>[$00:2130]</code>, <code>[$00:2131]</code>, <code>[$00:2131]</code>の値がそれぞれ<span class="formula">$12</span>, <span class="formula">$45</span>, <span class="formula">$E0</span>となっており、詳しく見てみると以下のようになる。</p>
 
-<h5><code>[$00:2130]</code></h5>
+<h5><code>[$00:2130]</code>(ColorMath制御レジスタ 色追加選択)</h5>
 <p><span class="formula">$12 = %0001 0010</span></p>
 
 <table>
@@ -236,7 +237,7 @@ table {
 </tbody>
 </table>
 
-<h5><code>[$00:2131]</code></h5>
+<h5><code>[$00:2131]</code>(ColorMath制御レジスタ 色計算指定)</h5>
 <p><span class="formula">$45 = %0100 0101</span></p>
 
 <table>
@@ -252,6 +253,24 @@ table {
 	<tr><td>Bit5</td><td><span class="formula">0</span></td><td>背景 (Backdrop)でカラーマスを有効/無効化するか</td></tr>
 	<tr><td>Bit6</td><td><span class="formula">1</span></td><td>ハーフカラーマス(<span class="formula">0</span>=ハーフカラー未使用, <span class="formula">1</span>=結果を2で割る)</td></tr>
 	<tr><td>Bit7</td><td><span class="formula">0</span></td><td>カラーマス加算/減算(0=加算; Main+Sub, 1=減算; Main-Sub)</td></tr>
+</tbody>
+</table>
+
+<h5><code>[$00:2132]</code>(ColorMath制御レジスタ 固定色のデータ)</h5>
+<p><span class="formula">$E0 = %1110 0000</span></p>
+
+<p>※<code>[$00:2130]</code>のBit1が<span class="formula">1</span>の時は固定色が使われないため、今回は関係なし。<br>
+<a href="colormath2.html">固定色については次ページで説明しているので</a>参照していただきたい。</p>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit7</td><td><span class="formula">1</span></td><td>青（B）を設定 (<span class="formula">%0</span>=設定しない, <span class="formula">%1</span>=設定する)</td></tr>
+	<tr><td>Bit6</td><td><span class="formula">1</span></td><td>緑（G）を設定 (<span class="formula">%0</span>=設定しない, <span class="formula">%1</span>=設定する)</td></tr>
+	<tr><td>Bit5</td><td><span class="formula">1</span></td><td>赤（R）を設定 (<span class="formula">%0</span>=設定しない, <span class="formula">%1</span>=設定する)</td></tr>
+	<tr><td>Bit0～4</td><td><span class="formula">00000</span></td><td>輝度 (<span class="formula">%00000</span>～<span class="formula">%11111</span>)</td></tr>
 </tbody>
 </table>
 
@@ -702,7 +721,8 @@ $C1/8713 RTS                     ;サブルーチン戻り
 <p><span class="formula">$FF0000</span>を加算処理した方は色が赤かつ明るくなりすぎていることがわかるかと思う。元々の色もわからなくなってしまう。<br>
 <span class="formula">$840000</span>を加算した方が、元の色がわかる程度で赤っぽくするにはちょうど良いくらいなのである。</p>
 
-<p>以上、カラーマスについてざっと説明した。</p>
+<p>以上、カラーマスについてざっと説明した。<br>
+<a href="colormath2.html">次ページ</a>で、カラーマスの派生として、サブスクリーンを使わず、「固定色」という色の層（スクリーン）を利用した色の処理について説明する。</p>
 
 <!-- <script>//リストタイトル静的生成
 document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
@@ -715,7 +735,7 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 <div class="pagelink">
 	<div id="pageprev"><a href="bg3.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-	<div id="pagenext"><a href="window.html"><span class="button">&#9654;次 ウィンドウ効果</span></a></div>
+	<div id="pagenext"><a href="colormath2.html"><span class="button">&#9654;次 固定色</span></a></div>
 </div>
 
 </div>

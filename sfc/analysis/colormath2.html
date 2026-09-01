@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 固定色処理">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 固定色処理">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 固定色処理</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 固定色処理</h1>
+<h2>固定色処理</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="colormath.html">前ページ</a>のカラーマス関係の処理の例として、もうひとつ、I/Oレジスタアドレス<code>[$00:2132]</code>で設定できる固定色の効果を紹介する。</p>
+
+<p>ＳＦ編では、コンピュータ端末などを調べた時、背景を暗めにして、緑色の文字のテキスト（カタカナと英数字のみ）を表示する場面がある。<br>
+昔のコンピュータのディスプレイ表示を再現した演出になるが、この時、背景にあたるBG1とBG2、キャラのスプライト（OBJ）を暗めにし、テキストのBG3のみ通常の緑色の文字を表示、という画面効果はどのように作られているのか？<br>
+その答えが「固定色（Backdrop Color）」である。<br>
+背景色という名称で説明されているウェブサイトもあるようだが、BG（背景）と用語が混ざってしまうので、他ウェブサイト様での説明も参考に「固定色」という名称で説明していく。<br>
+固定色は<code>[$00:2130]</code>のBit1が<span class="formula">0</span>（サブスクリーンが無効化）の状態でなければ有効化されないため、<a href="colormath.html">カラーマス</a>の効果では使われていない。</p>
+
+<p>固定色の効果だが、画面上のRGBの色（というよりもRGBそれぞれの輝度）を別の色に変更する、というものである。<br>
+スーパーファミコンにおける色については、<a href="sprite.html#02">スプライトについて &gt; 色のデータとCGRAM</a>で触れたが、青（B）・緑（G）・赤（R）の3色をどれだけ混ぜるかという度合いで色を作っている。<br>
+BGR555フォーマットを使っているため、各色について5ビットの明るさが設定できる（<span class="formula">%00000</span>～<span class="formula">%11111</span>）。<br>
+本作では、スプライトであっても背景であっても、色は2バイト（16ビット）で以下のように設定する。<br>
+例えば色が<span class="formula">$01FA</span>（<span style="color: #fff;background: #D67B00">この色</span>）と設定されていたら、</p>
+
+<p><span class="formula">$01FA = %0 00000 01111 11010</span></p>
+
+<table>
+<thead>
+	<tr><th>色</th><th>-</th><th>B（青）</th><th>G（緑）</th><th>R（青）</th></tr>
+</thead>
+<tbody>
+	<tr class="formula"><td>Bit</td><td>0</td><td>00000</td><td>01111</td><td>11010</td></tr>
+</tbody>
+</table>
+
+<p>というように、青（B）・緑（G）・赤（R）それぞれ5ビットの数値で色を作っている。<br>
+この元々の5ビットの数値を、<code>[$00:2132]</code>に書き込む値によって加算または減算して変化させることが可能なのが固定色の効果である。<br>
+カラーマスの場合は、BGやOBJをサブスクリーンに設定してカラーマスとして重ねて色を変えていたが、固定色の場合は「固定色」という層を重ねて色を変える、というような考え方でだいたいあっている。<br>
+ただ、サブスクリーン＋カラーマスと、固定色を同時に使うことはできない（らしい）。<br>
+このため、サブスクリーンが無効化されていないと固定色は効果を発揮しない。<br>
+本作ではほとんどの場合で、戦闘とメニュー画面ではカラーマス、フィールドでは固定色で色効果を出しているようである。</p>
+
+<p>固定色を加算するか減算するかは、カラーマスと同様に、<code>[$00:2131]</code>のBit7で決める。<br>
+3色を同時に暗めな色に変更すれば（減算処理で値を減らせば）、指定したBGやスプライトが暗めになる、という仕組みである。<br>
+逆に、色を加算して、明るめにしたり、赤だけ値を上げたり、といった処理も可能である。<br>
+ただ、輝度を加算・減算するので、全体的に明るくなったり暗くなってしまう。<br>
+回想シーンで全体をセピア色にしたいという場合、元の画面を単純に黄色めにするだけでは画面全体が明るく（または暗く）かつ黄色くなってしまうので、固定色処理は向いていない。<br>
+本作で回想シーンのセピア色に変更する場合、カラーパレットそのものを変えている。</p>
+
+<p>なお、<a href="https://w.atwiki.jp/sm4wiki_mix/pages/54.html" target="_blank">HDMA入門 - マリオ４改造 @wiki - atwiki（アットウィキ）</a>の「スクリーンあれこれ」以降が、日本語で読める固定色のわかりやすい解説になるので、合わせて参考にしていただきたい。</p>
+
+
+<h3>I/Oレジスタ</h3>
+
+<p>まず、フィールドにおけるI/Oレジスタの設定から説明する必要がある。<br>
+<a href="bg1.html">背景グラフィックと効果 &gt; フィールドでのサブルーチン</a>でも説明したが、グラフィックのI/Oレジスタ関係初期設定は、シナリオ開始時、またはセーブデータから再開時は<code><span class="r">$C0/0DF6</span></code>から、マップ切り替え時は途中で合流して<code><span class="r">$C0/0E1A</span></code>から<code><span class="r">$C0/0ED7</span></code>までで設定される。<br>
+この処理の最中に、<code>$00:0A04</code>の値で分岐する箇所がある。</p>
+
+<p>では、<code>$00:0A04</code>とは何だろうか？<br>
+これは<code>[$00:2132]</code>に関係する値なので、<code>[$00:2132]</code>について合わせて説明する。<br>
+どのシナリオでも、まず、以下処理で<code>[$00:2132]</code>の初期化が行われる。</p>
+
+<div class="code-container"><pre>
+$C0/0EAB LDA #$E0                ;Aに$E0をロード
+$C0/0EAD STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+</pre></div>
+
+<p>つまり<code>[$00:2132]</code>の初期値は<span class="formula">$E0</span>である。</p>
+
+<p>その後、以下の<code><span class="r">$C0/302B</span></code>～の処理が入り、<code>[$00:0A04]</code>～<code>[$00:0A07]</code>の値が決まるのだが、<code><span class="r">$C0/302B</span></code>の時点での<code>Y</code>の値でシナリオ毎に何が書き込まれるか決まる。<br>
+ＳＦ編なら<span class="formula">Y:0232</span>だし、幕末編なら<span class="formula">Y:0201</span>、近未来編なら<span class="formula">Y:0253</span>……と変わってくる。<br>
+（<code><span class="r">$C0/302B</span></code>～の処理が入るタイミングはシナリオにより多少異なる。例えば近未来編だとアキラの幼少時の回想のタイミング）<br>
+下はＳＦ編の場合である。</p>
+
+<div class="code-container"><pre>
+$C0/302B LDA $8E00,y[$7F:9032]   ;Aに[$7F:9032]($83)をロード
+$C0/302E STA $000A04[$00:0A04]   ;Aを[$00:0A04]に書き込み
+$C0/3032 LDA $8E01,y[$7F:9033]   ;Aに[$7F:9033]($16)をロード
+$C0/3035 STA $000A05[$00:0A05]   ;Aを[$00:0A05]に書き込み
+$C0/3039 LDA $8E02,y[$7F:9034]   ;Aに[$7F:9034]($16)をロード
+$C0/303C STA $000A06[$00:0A06]   ;Aを[$00:0A06]に書き込み
+$C0/3040 LDA $8E03,y[$7F:9035]   ;Aに[$7F:9035]($16)をロード
+$C0/3043 STA $000A07[$00:0A07]   ;Aを[$00:0A07]に書き込み
+$C0/3047 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/3048 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/3049 LDA #$00                ;Aに$00をロード
+$C0/304B PHA                     ;Aレジスタをスタックにプッシュ
+$C0/304C PLB                     ;DBレジスタにスタックからプル
+$C0/304D JSR $4104  [$C0:4104]   ;[$C0:4104]へジャンプ
+</pre></div>
+
+<p><code>[$00:0A04]</code>～<code>[$00:0A07]</code>に入る値は<code>$7F:90??</code>～であり、この値は上処理よりもさらに前の処理で決まるが省略。また、<code>$7F:90??</code>～はシナリオ毎に固定である。<br>
+何はともあれ重要なのは、<code>[$00:0A04]</code>～<code>[$00:0A07]</code>はカラーマス関係のI/Oポートアドレスに関する値で、シナリオ毎に異なる値が入る、ということである。<br>
+<code>[$00:0A04]</code>は、シナリオ開始時に、ＳＦ編以外<span class="formula">$00</span>、ＳＦ編は<span class="formula">$83</span>が書き込まれる。<br>
+<code>[$00:0A04]</code>に<span class="formula">$00</span>以外の数値が入る時は、固定色を使って画面の色を変更する時のみ、と見て良いようであるが、シナリオ開始のタイミングで<span class="formula">$00</span>以外が入るのはおそらくＳＦ編だけである。</p>
+
+<p><code>[$00:0A04]</code>に<span class="formula">$00</span>以外の数値が入っている場合、この後にグラフィックのI/Oレジスタ関係初期設定が行われた時に、固定色使用時の分岐が入ることになる。</p>
+
+<div class="code-container"><pre>
+$C0/0E77 LDA $0A04  [$00:0A04]   ;Aに[$00:0A04](ＳＦ編なら$83、他シナリオは$00)をロード
+$C0/0E7A BNE $3D    [$0EB9]      ;ゼロフラグが立っていないとき[$0EB9]分岐
+;ゼロフラグOFF（固定色使用）
+$C0/0EB9 STA $2131  [$00:2131]   ;Aを[$00:2131](ColorMath制御レジスタ 色計算指定)に書き込み
+$C0/0EBC STZ $2130  [$00:2130]   ;[$00:2130](ColorMath制御レジスタ 色追加選択)に$00を書き込み
+$C0/0EBF LDA $0A05  [$00:0A05]   ;Aに[$00:0A05]($16)をロード
+$C0/0EC2 ORA #$80                ;Aと$80で論理和
+$C0/0EC4 STA $2132  [$00:2132]   ;Aを[$00:2132](ColorMath制御レジスタ 固定色のデータ)に書き込み
+$C0/0EC7 LDA $0A06  [$00:0A06]   ;Aに[$00:0A06]($16)をロード
+$C0/0ECA ORA #$40                ;Aと$40で論理和
+$C0/0ECC STA $2132  [$00:2132]   ;Aを[$00:2132](ColorMath制御レジスタ 固定色のデータ)に書き込み
+$C0/0ECF LDA $0A07  [$00:0A07]   ;Aに[$00:0A07]($16)をロード
+$C0/0ED2 ORA #$20                ;Aと$20で論理和
+$C0/0ED4 STA $2132  [$00:2132]   ;Aを[$00:2132](ColorMath制御レジスタ 固定色のデータ)に書き込み
+;処理合流
+$C0/0ED7 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/0E7A</span></code>のゼロフラグ判定で分岐が起こり、<code>[$00:0A04]</code>に00が入っているＳＦ編以外のシナリオだと、<code>[$00:2130]</code>～<code>[$00:2132]</code>は、以下のように初期値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2131]</code></td><td>CGADSUB</td><td>カラーマス制御レジスタB 色計算指定</td><td><code>[$00:0144]</code></td></tr>
+	<tr><td><code>[$00:2130]</code></td><td>CGSWSEL</td><td>カラーマス制御レジスタA 色追加選択</td><td><span class="formula">$30</span></td></tr>
+	<tr><td><code>[$00:2132]</code></td><td>COLDATA</td><td>サブスクリーン固定色のデータ</td><td><span class="formula">$E0</span></td></tr>
+</tbody>
+</table>
+
+<p>一方、ＳＦ編だと<code><span class="r">$C0/0EB9</span></code>～<code><span class="r">$C0/0ED4</span></code>の処理により、以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2131]</code></td><td>CGADSUB</td><td>カラーマス制御レジスタB 色計算指定</td><td><span class="formula">$83</span></td></tr>
+	<tr><td><code>[$00:2130]</code></td><td>CGSWSEL</td><td>カラーマス制御レジスタA 色追加選択</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2132]</code></td><td>COLDATA</td><td>サブスクリーン固定色のデータ</td><td><span class="formula">$96</span> <span class="formula">$56</span> <span class="formula">$36</span></td></tr>
+</tbody>
+</table>
+
+<p>ＳＦ編だと、<code>[$00:0A04]</code>～<code>[$00:0A07]</code>の値が以下のように処理されることがわかる。</p>
+
+<ul>
+	<li><code>[$00:0A04]</code>→<code>[$00:2131]</code></li>
+	<li><span class="formula"><code>[$00:0A05]</code> | $80</span>→ <code>[$00:2132]</code>（1回目）</li>
+	<li><span class="formula"><code>[$00:0A06]</code> | $40</span>→ <code>[$00:2132]</code>（2回目）</li>
+	<li><span class="formula"><code>[$00:0A07]</code> | $20</span>→ <code>[$00:2132]</code>（3回目）</li>
+</ul>
+
+<p>＊<span class="formula">|</span>はビット論理和演算子</p>
+
+<p>以上がSF編シナリオ開始時での初期値で、この状態で最初の画面が表示される。地球を背景にして、「－　スペース・ドッグ　ＴＳＱ－０５　－」で始まる緑色の文字テキストが表示される場面である。<br>
+この時点から、固定色を利用し、背景をやや暗めにして、緑色の文字を表示する処理が開始されている。<br>
+ＳＦ編では明るさを表現するために同じように固定色で調整を行っている場面が多々ある。<br>
+例えば、終盤（船長室でのイベント中）から、船内全体が停電で薄暗くなる演出があるが、これはカラーパレットを変えたのではなく、同じく固定色の効果を使っている。<br>
+他シナリオだと、最終編の時のダンジョンで徐々に暗くなる演出も、この固定色の効果になる。</p>
+
+<p>また、<code>[$00:2132]</code>が3回連続で書き込まれていることもポイント。<br>
+<code>[$00:2132]</code>の設定方法は後で記す通り、特殊なのである。</p>
+
+<p>では、<code>[$00:2130]</code>～<code>[$00:2132]</code>についてもう少し詳しく見てみよう。<br>
+<code>[$00:2130]</code>, <code>[$00:2131]</code>についてはこれまでも説明したことがあるが、あらためて説明をする。</p>
+
+
+<h5><code>[$00:2130]</code>(ColorMath制御レジスタ 色追加選択)</h5>
+<p><span class="formula">$00 = %0000 0000</span></p>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit0</td><td>0</td><td>256色のBG用ダイレクトカラーモード<br>(<span class="formula">0</span>=パレットを使う, <span class="formula">1</span>=ダイレクトカラー)</td></tr>
+	<tr><td>Bit1</td><td>0</td><td>サブスクリーン BG/OBJ 有効化<br>(<span class="formula">0</span>=未使用/Backdrop only, <span class="formula">1</span>=使用/Backdrop+BG+OBJ)</td></tr>
+	<tr><td>Bit2-3</td><td>00</td><td>（未使用ビット）</td></tr>
+	<tr><td>Bit4-5</td><td>00</td><td>カラーマス有効化<br>(<span class="formula">0</span>=常に使用, <span class="formula">1</span>=ウインドウの外側の色のみ, <span class="formula">2</span>=ウインドウの内側の色のみ, <span class="formula">3</span>=使用しない)</td></tr>
+	<tr><td>Bit6-7</td><td>00</td><td>計算前の黒にクリッピングする色<br>(<span class="formula">3</span>=常に使用, <span class="formula">2</span>=ウインドウの内側の色のみ, <span class="formula">1</span>=ウインドウの外側の色のみ, <span class="formula">0</span>=なし)</td></tr>
+</tbody>
+</table>
+
+<h5><code>[$00:2131]</code>(ColorMath制御レジスタ 色計算指定)</h5>
+<p><span class="formula">$83 = %1000 0011</span></p>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit0</td><td>1</td><td>BG1でカラーマスを有効/無効化するか</td></tr>
+	<tr><td>Bit1</td><td>1</td><td>BG2でカラーマスを有効/無効化するか</td></tr>
+	<tr><td>Bit2</td><td>0</td><td>BG3でカラーマスを有効/無効化するか</td></tr>
+	<tr><td>Bit3</td><td>0</td><td>BG4でカラーマスを有効/無効化するか</td></tr>
+	<tr><td>Bit4</td><td>0</td><td>OBJでカラーマスを有効/無効化するか</td></tr>
+	<tr><td>Bit5</td><td>0</td><td>Backdropでカラーマスを有効/無効化するか</td></tr>
+	<tr><td>Bit6</td><td>0</td><td>ハーフカラーマス(<span class="formula">0</span>=ハーフカラー未使用, <span class="formula">1</span>=結果を2で割る)</td></tr>
+	<tr><td>Bit7</td><td>1</td><td>カラーマス加算/減算(0=加算; Main+Sub, 1=減算; Main-Sub)</td></tr>
+</tbody>
+</table>
+
+
+<h5><code>[$00:2132]</code>(ColorMath制御レジスタ 固定色のデータ)</h5>
+
+<p><span class="formula">$96 = %1001 0110</span><br>
+<span class="formula">$56 = %0101 0110</span><br>
+<span class="formula">$36 = %0011 0110</span></p>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit7</td><td>青（B）を設定 (<span class="formula">%0</span>=設定しない, <span class="formula">%1</span>=設定する)</td></tr>
+	<tr><td>Bit6</td><td>緑（G）を設定 (<span class="formula">%0</span>=設定しない, <span class="formula">%1</span>=設定する)</td></tr>
+	<tr><td>Bit5</td><td>赤（R）を設定 (<span class="formula">%0</span>=設定しない, <span class="formula">%1</span>=設定する)</td></tr>
+	<tr><td>Bit0～4</td><td>輝度 (<span class="formula">%00000</span>～<span class="formula">%11111</span>)</td></tr>
+</tbody>
+</table>
+
+
+<p>まず<code>[$00:2130]</code>, <code>[$00:2131]</code>だけまとめると、<code>[$00:2130]</code>のBit1は<span class="formula">0</span>だから、サブスクリーンを使わず、固定色が有効化される。<br>
+<code>[$00:2131]</code>で、カラーマスを有効にしているのはBG1とBG2であり、テキストが表示されるBG3は対象外である。<br>
+また、Bit7でカラーマス処理は色を減算する設定になっている。<br>
+前ページでは加算する処理の話をしたが、色を加算する時は明るくなることに対し、減算は色が暗くなる。</p>
+
+<p>そして固定色を指定する<code>[$00:2132]</code>だが、指定方法を見ると、上3ビットはそれぞれ青・緑・赤のいずれかの色について固定色を設定するかどうか、そして指定した場合、下5ビットで固定色の輝度を変えることになる。<br>
+という仕組みのため、青・緑・赤を同時に変えたい時は、</p>
+
+<ul>
+	<li>Bit7を<span class="formula">1</span>に、Bit6とBit5を<span class="formula">0</span>にして青を指定してから、Bit0～4に青用の固定色輝度<span class="formula">%00000</span>～<span class="formula">%11111</span>を指定</li>
+	<li>Bit6を<span class="formula">1</span>に、Bit7とBit5を<span class="formula">0</span>にして緑を指定してから、Bit0～4に緑用の固定色輝度<span class="formula">%00000</span>～<span class="formula">%11111</span>を指定</li>
+	<li>Bit5を<span class="formula">1</span>に、Bit7とBit6を<span class="formula">0</span>にして赤を指定してから、Bit0～4に赤用の固定色輝度<span class="formula">%00000</span>～<span class="formula">%11111</span>を指定</li>
+</ul>
+
+<p>というように、3回、<code>[$00:2132]</code>に値を書き込む必要がある。<br>
+3回別々に処理をするため、厳密に言えば、例えば青色の固定色の処理をしてから緑色の固定色の処理をするまでは、画面の青色要素だけが輝度処理された状態となるのだが、連続してサブルーチンで処理する場合、一瞬で終わるため、「青色部分だけ色が変わった」などと人間の目で認識できたりはしない。</p>
+
+<p>シナリオ開始時初期値は、<span class="formula">$E0</span>(<span class="formula">%1110 0000</span>)であり、これは固定色が黒一色塗りつぶしであることを意味しているのだが、画面が真っ暗になるということではなく、透明な背景という扱いになるらしい。<br>
+つまり、<span class="formula">$E0</span>が書き込まれている時、固定色は実質無効化、何の意味も成さない。</p>
+
+<h3>固定色減算で画面の輝度を下げる</h3>
+
+<p>さて、ＳＦ編の場合、初期値の後に以下処理で新たに<code>[$00:2132]</code>に値が設定され、ＳＦ編が開始になっている。</p>
+
+<div class="code-container"><pre>
+$C0/0EBF LDA $0A05  [$00:0A05]   ;Aに[$00:0A05]($16)をロード
+$C0/0EC2 ORA #$80                ;Aと$80で論理和
+$C0/0EC4 STA $2132  [$00:2132]   ;Aを[$00:2132](ColorMath制御レジスタ 固定色のデータ)に書き込み
+$C0/0EC7 LDA $0A06  [$00:0A06]   ;Aに[$00:0A06]($16)をロード
+$C0/0ECA ORA #$40                ;Aと$40で論理和
+$C0/0ECC STA $2132  [$00:2132]   ;Aを[$00:2132](ColorMath制御レジスタ 固定色のデータ)に書き込み
+$C0/0ECF LDA $0A07  [$00:0A07]   ;Aに[$00:0A07]($16)をロード
+$C0/0ED2 ORA #$20                ;Aと$20で論理和
+$C0/0ED4 STA $2132  [$00:2132]   ;Aを[$00:2132](ColorMath制御レジスタ 固定色のデータ)に書き込み
+</pre></div>
+
+<p>この処理は、</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0A05]</code>(青用輝度) | $80</span>→ <code>[$00:2132]</code>（1回目）</li>
+	<li><span class="formula"><code>[$00:0A06]</code>(緑用輝度) | $40</span>→ <code>[$00:2132]</code>（2回目）</li>
+	<li><span class="formula"><code>[$00:0A07]</code>(赤用輝度) | $20</span>→ <code>[$00:2132]</code>（3回目）</li>
+</ul>
+
+<p>このように、固定色の色別<code>[$00:2132]</code>書き込み処理だったということがわかる。<br>
+<span class="formula">$80</span>, <span class="formula">$40</span>, <span class="formula">$20</span>と論理和を取って書き込むことで、各色の輝度に対応させているのである。<br>
+<code>[$00:0A05]</code>～<code>[$00:0A07]</code>がすべて<span class="formula">$16</span>(<span class="formula">%0001 0110</span>)だから、青・緑・赤すべての色の輝度を<span class="formula">%10110</span>下げる（減算する）という意味である。<br>
+この色の減算が有効なのはBG1とBG2だけであるから、BG1とBG2の輝度を<span class="formula">%10110</span>(<span class="formula">$16</span>)下げ、テキスト表示のBG3だけ輝度はそのまま表示、ということになる。<br>
+輝度は<span class="formula">%00000</span>～<span class="formula">%11111</span>（<span class="formula">$00</span>～<span class="formula">$1F</span>）の32段階だから、<span class="formula">$16</span>(<span class="formula">22</span>)下げるということはかなり明るさを下げるということになる。<br>
+（色の減算で負になるようなら単純に黒にする）<br>
+これが、オープニングにおける、地球を背景にして、「－　スペース・ドッグ　ＴＳＱ－０５　－」……が表示された時の処理である。</p>
+
+<p>ＳＦ編を進めると、コンピュータ端末を調べた時などに、背景の輝度が下がって緑色の文字のテキストだけ輝度を下げずに表示される。<br>
+この時は、BG1とBG2だけでなく、キャラのスプライトも輝度が下がる。<br>
+<code>[$00:2131]</code>で、BG1とBG2だけカラーマス指定だが、ＳＦ編オープニングでコギトエルゴスム号が宇宙を航行しているシーンの直後に、以下のように<code>[$00:2131]</code>の値の更新が行われる。</p>
+
+<div class="code-container"><pre>
+$C0/302B LDA $8E00,y[$7F:9085]   ;Aに[$7F:9085]($93)をロード
+$C0/302E STA $000A04[$00:0A04]   ;Aを[$00:0A04]に書き込み
+$C0/3032 LDA $8E01,y[$7F:9086]   ;Aに[$7F:9086]($08)をロード
+$C0/3035 STA $000A05[$00:0A05]   ;Aを[$00:0A05]に書き込み
+$C0/3039 LDA $8E02,y[$7F:9087]   ;Aに[$7F:9087]($08)をロード
+$C0/303C STA $000A06[$00:0A06]   ;Aを[$00:0A06]に書き込み
+$C0/3040 LDA $8E03,y[$7F:9088]   ;Aに[$7F:9088]($08)をロード
+$C0/3043 STA $000A07[$00:0A07]   ;Aを[$00:0A07]に書き込み
+$C0/3047 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/3048 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/3049 LDA #$00                ;Aに$00をロード
+$C0/304B PHA                     ;Aレジスタをスタックにプッシュ
+$C0/304C PLB                     ;DBレジスタにスタックからプル
+$C0/304D JSR $4104  [$C0:4104]   ;[$C0:4104]へジャンプ
+</pre></div>
+
+<p><code>[$00:0A04]</code>～<code>[$00:0A07]</code>に入る値が、<code>[$7F:9085]</code>～<code>[$7F:9088]</code>に変更され、以下のように値が更新される。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0A04]</code></td><td><span class="formula">$93</span></td></tr>
+	<tr><td><code>[$00:0A05]</code></td><td><span class="formula">$08</span></td></tr>
+	<tr><td><code>[$00:0A06]</code></td><td><span class="formula">$08</span></td></tr>
+	<tr><td><code>[$00:0A07]</code></td><td><span class="formula">$08</span></td></tr>
+</tbody>
+</table>
+
+<div class="code-container"><pre>
+$C0/0E66 LDA $0A48  [$00:0A48]   ;Aに[$00:0A48]をロード
+$C0/0E69 BNE $1D    [$0E88]      ;ゼロフラグが立っていないとき[$0E88]分岐
+$C0/0E6B LDA $0140  [$00:0140]   ;Aに[$00:0140]をロード
+$C0/0E6E STA $212C  [$00:212C]   ;Aを[$00:212C]に書き込み
+$C0/0E71 LDA $0141  [$00:0141]   ;Aに[$00:0141]をロード
+$C0/0E74 STA $212D  [$00:212D]   ;Aを[$00:212D]に書き込み
+$C0/0E77 LDA $0A04  [$00:0A04]   ;Aに[$00:0A04]($93)をロード
+$C0/0E7A BNE $3D    [$0EB9]      ;ゼロフラグが立っていないとき[$0EB9]分岐
+$C0/0EB9 STA $2131  [$00:2131]   ;Aを[$00:2131]に書き込み
+$C0/0EBC STZ $2130  [$00:2130]   ;[$00:2130]に$00を書き込み
+$C0/0EBF LDA $0A05  [$00:0A05]   ;Aに[$00:0A05]($08)をロード
+$C0/0EC2 ORA #$80                ;Aと$80で論理和
+$C0/0EC4 STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+$C0/0EC7 LDA $0A06  [$00:0A06]   ;Aに[$00:0A06]($08)をロード
+$C0/0ECA ORA #$40                ;Aと$40で論理和
+$C0/0ECC STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+$C0/0ECF LDA $0A07  [$00:0A07]   ;Aに[$00:0A07]($08)をロード
+$C0/0ED2 ORA #$20                ;Aと$20で論理和
+$C0/0ED4 STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+$C0/0ED7 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>最終的に、上処理で<code>[$00:2130]</code>～<code>[$00:2132]</code>も更新される。<br>
+<code>[$00:2130]</code>に<span class="formula">$93 = %1001 0011</span>が書き込まれたため、BG1, BG2, OBJ（スプライト）でカラーマスが有効化されたことになり、以降はおそらくＳＦ編エンディングまで、<code>[$00:2130]</code>には<span class="formula">$93</span>が入ったままである。<br>
+これで、コンピュータを調べた時などに、BG1, BG2, OBJは固定色の減算処理で暗くなり、BG3のテキストだけ通常の色（緑色）で表示される、という処理が行われることになる。<br>
+明るさ調整のために固定色を使う場合、青・緑・赤すべての色の輝度を同じ値だけ上下させることになる。</p>
+
+<p><code>[$00:0A05]</code>～<code>[$00:0A07]</code>は先に述べた通り、<code>[$00:2132]</code>の青・緑・赤の輝度の値が入ることになるので、明るさが変わる時に値が更新される。<br>
+コンピュータを調べた時などは、徐々に画面を暗くして文字表示するが、輝度減算分を<span class="formula">$00</span>から<span class="formula">$17</span>まで1フレームに1回増やして画面を滑らかに暗くしているようである。<br>
+（<code><span class="r">$C0/D001</span></code>～<code><span class="r">$C0/D0CA</span></code>あたりが処理になるが省略）</p>
+
+<p>先にあげた、<br>
+<span class="formula">$01FA = %0 00000 01111 11010</span><br>
+このBGR555フォーマットの色（<span style="color: #fff;background: #D67B00">この色</span>）の輝度を各色で<span class="formula">$17</span> = <span class="formula">%10111</span>下げる場合、</p>
+
+<ul>
+	<li>B: <span class="formula">%00000 - %10111</span> 負の値なので<span class="formula">%00000</span></li>
+	<li>G: <span class="formula">%01111 - %10111</span> 負の値なので<span class="formula">%00000</span></li>
+	<li>R: <span class="formula">%11010 - %10111 = %00011</span></li>
+</ul>
+
+<p><span class="formula">%0 00000 00000 00011 = $0003</span></p>
+
+<p>24ビットカラーだと<span class="formula">$180000</span>（<span style="color: #fff;background: #180000">この色</span>）で、やや赤いがほぼ黒である。<br>
+よほど明るめの色でないと、真っ黒になるくらいまで、明るさが下がることがわかる。<br>
+とはいえコギトエルゴスム号は壁や床が白く明るめなので、輝度をかなり下げても背景はそこそこ見えるようになっている（そのあたりは計算して輝度を下げていると思われる）。</p>
+
+<h3>固定色加算で色を変える</h3>
+
+<p>戦闘においては「マザーイメージ」使用時のように、画面全体を赤っぽくする処理があるが、こちらはBG3を赤一色で塗りつぶし＋カラーマス色加算処理で赤くしており、固定色での処理ではない。<br>
+技による色の処理は基本的にBG3に色を付けて、カラーマスで色加算、としているようである。<br>
+このため、BG3でカラーマス加算をしている時、BG3にテキストを表示していない。</p>
+
+<p>一方、フィールドの場合はBG3でセリフウィンドウなどの表示をすることが多いため、状況にもよるが画面全体の輝度・色味を変える場合は固定色で処理することが多いようである。<br>
+ＳＦ編では青・緑・赤すべての色の輝度を変更しているが、原始編エンディングの最後で、画面全体がピンクっぽくなる場面では、固定色加算を使っている。<br>
+元の画面が暗めなので（夜の洞窟、かつ、黒一色部分が多い）、色加算で画面を多少明るくしても演出として問題はない。<br>
+（もしこの場面が元々全体的に明るめだったら、カラーパレットで処理していたのではないか、と思う）</p>
+
+<p>原始編エンディングでは、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0A04]</code></td><td><span class="formula">$03</span></td></tr>
+	<tr><td><code>[$00:0A05]</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>[$00:0A06]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:0A07]</code></td><td><span class="formula">$06</span></td></tr>
+</tbody>
+</table>
+
+<p>というように設定され、<code>[$00:2131]</code>に<span class="formula">$03</span>、<code>[$00:2132]</code>には青・緑・赤の輝度（5ビット）にそれぞれ<span class="formula">$01</span>, <span class="formula">$00</span>, <span class="formula">$06</span>が入る。<br>
+つまり、元の色味から、青の度合いを<span class="formula">+$01</span>、赤の度合いを<span class="formula">+$06</span>する。<br>
+例えば元が夜の洞窟の壁などに使われる色・<span class="formula">$398C = %0 01110 01100 01100</span>（<span style="color: #fff;background: #636373">この色</span>）だったら、</p>
+
+<ul>
+	<li>B: <span class="formula">%01110 + %00001 = %01111</span></li>
+	<li>G: <span class="formula">%01100 + %00000 = %01100</span></li>
+	<li>R: <span class="formula">%01100 + %00110 = %10010</span></li>
+</ul>
+
+<p><span class="formula">%0 01111 01100 10010 = $3D92</span></p>
+
+<p>24ビットカラーだと<span class="formula">$94637B</span>（<span style="color: #fff;background: #94637B">この色</span>）であり、かなりピンクっぽくなることがわかる。</p>
+
+<p>以上が固定色の大まかな説明である。<br>
+固定色を決める<code>[$00:2132]</code>も、HDMA転送を使うことにより、1スキャンラインずつ値を変えて色のグラデーションを作るといったことも可能であるようだが、本作で使われているかどうかまでは未確認。<br>
+ゲームのタイトル画面の空の背景などはグラデーション効果で作っているかのようだが、実際にはこの画面では横に流れる雲の移動を多重スクロールさせるためにHDMA転送を使っており、背景色は単純に色別にタイルを並べて作っているだけのようだ。</p>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="bg3.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="window.html"><span class="button">&#9654;次 ウィンドウ効果</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
