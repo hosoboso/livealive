@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スクロール">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スクロール">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スクロール</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; スクロール</h1>
+<h2>スクロール</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここではゲーム画面における背景（BG）のスクロール（画面の上下左右移動）について説明する。<br>
+ゲーム画面を見ているとわかるとおり、背景やスプライトを必要に応じて動かしているが、広いマップを移動する場合、操作キャラ（のスプライト）は中央付近に設置して足踏みのモーションをさせ、背景だけスクロールさせることでマップ移動を表現することはよくある。<br>
+スプライトの座標はOAMで決めるが、背景は32×32タイル（256×256ピクセル）を1単位として、本作ではマップによるが大半は64×32タイルをBGマップに従い作成し、その中で256×224ピクセルが実際にゲーム画面として表示されている。</p>
+
+<p>ここではフィールドにおける背景スクロールについて説明する。<br>
+本作においては、画面のスクロールは実質、フィールドマップにおける背景のスクロールしかない。<br>
+メニュー画面や戦闘画面では背景はスクロールしない（動かない）からである。<br>
+（厳密には、戦闘だと敵キャラが背景扱いだから動くのだが、それぞれの敵のタイルがBGマップで座標指定して動くだけでスクロールは関係ない）</p>
+
+<p>また、本作は基本的にBGMode1で、フィールドだとBG1・BG2に背景、BG3にセリフウィンドウなどを表示する。<br>
+よって、ここではBG1・BG2の背景のスクロールの話をメインに説明していく。<br>
+だいたいの場合で、画面手前からBG3→BG2→スプライト→BG1と重ねていくことなどは、<a href="bg1.html">背景グラフィックと効果 &gt; フィールドでのサブルーチン</a>で説明したので参照していただきたい。</p>
+
+<p>通常はBG1とBG2を同量だけスクロールさせるが、背景ごとにスクロール量を変えることで距離感（遠近感）を出している場面も幾つかある。<br>
+当コンテンツでは多重スクロールという名称で説明をする。<br>
+詳細は<a href="#scr01">多重スクロール</a>の項目で説明している。</p>
+
+<p>背景のスクロールの値はI/Oポートアドレス<code>$00:210D</code>～<code>$00:2114</code>で決めている。<br>
+なお、BGMode7（画面の回転などが可能なモード）だと異なる値の設定になるが、今回は通常のゲームプレイ画面、BGMode1での話とする。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名前</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:210D</code></td><td>BG1HOFS</td><td>BG1水平スクロール量</td></tr>
+	<tr><td><code>$00:210E</code></td><td>BG1VOFS</td><td>BG1垂直スクロール量</td></tr>
+	<tr><td><code>$00:210F</code></td><td>BG2HOFS</td><td>BG2水平スクロール量</td></tr>
+	<tr><td><code>$00:2110</code></td><td>BG2VOFS</td><td>BG2垂直スクロール量</td></tr>
+	<tr><td><code>$00:2111</code></td><td>BG3HOFS</td><td>BG3水平スクロール量</td></tr>
+	<tr><td><code>$00:2112</code></td><td>BG3VOFS</td><td>BG3垂直スクロール量</td></tr>
+	<tr><td><code>$00:2113</code></td><td>BG4HOFS</td><td>BG4水平スクロール量</td></tr>
+	<tr><td><code>$00:2114</code></td><td>BG4VOFS</td><td>BG4垂直スクロール量</td></tr>
+</tbody>
+</table>
+
+<p>この「スクロール量」というのは、「そのマップに入った地点からどれくらいスクロールしたか」という意味のスクロール量である。<br>
+そのマップに扉から入ったとしたら、扉から右に1マス（16ピクセル）移動すれば水平スクロール量が16になるし、さらに右に1マス移動したら水平スクロール量が32になる。<br>
+そのマップに入る他の方法として、扉とは別の場所に階段があったとして、階段から出入りしたら階段位置を基準としてスクロール量を設定する。<br>
+というように、基準が少々ややこしい。</p>
+
+<p>フィールドにおける移動だと、<code>$00:210D</code>～<code>$00:2110</code>のBG1・BG2のスクロール量を操作して背景を動かすことになる。<br>
+本作はフィールドで、斜め移動はできないから、水平・垂直スクロール量が同時に変動することは多分ない（はず）。<br>
+イベントなどでも斜めに背景が移動することはなかったはず。<br>
+左右に移動すれば水平スクロール量が変動するし、上下に移動すれば垂直スクロール量が変動する。</p>
+
+<p>このスクロール量の設定が少々厄介である。<br>
+上の8種のアドレスは、2度書き込みをして、2バイト（16ビット）の値を設定する必要がある。<br>
+ただし実際に使われるのは、1回目に書き込んだ8ビットと、2回目に書き込んだ下2ビットの合計10ビット（<span class="formula">$000</span>～<span class="formula">$3FF</span>、10進数なら<span class="formula">0～1023</span>）。<br>
+1回目に書き込んだ8ビットは下位8ビット、2回目は上位2ビット、と読むことになる。</p>
+
+<p>以上のように数値を書き込む都合で、水平方向なら右、垂直方向なら下が正の方向になり、<span class="formula">0</span>から増加していくことになるのだが、逆の場合は<span class="formula">1023</span>から減少していくことになる。</p>
+
+<p>フィールド移動時は以下サブルーチンで<code>$00:210D</code>～<code>$00:2110</code>のBG1・BG2のスクロール量を書き換える。</p>
+
+<div class="code-container"><pre>
+$C0/53C0 LDA $0166  [$00:0166]   ;Aに[$00:0166]をロード
+$C0/53C3 BNE $57    [$541C]      ;ゼロフラグが立っていないとき[$541C]分岐
+$C0/53C5 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/53C7 LDA $0A38  [$00:0A38]   ;Aに[$00:0A39][$00:0A38]をロード
+$C0/53CA LSR A                   ;Aを論理右シフト　(/2)
+$C0/53CB LSR A                   ;Aを論理右シフト　(/2)
+$C0/53CC LSR A                   ;Aを論理右シフト　(/2)
+$C0/53CD LSR A                   ;Aを論理右シフト　(/2)
+$C0/53CE STA $30    [$00:0030]   ;Aを[$00:0031][$00:0030]に書き込み
+$C0/53D0 LDA $0A3C  [$00:0A3C]   ;Aに[$00:0A3D][$00:0A3C]をロード
+$C0/53D3 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53D4 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53D5 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53D6 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53D7 DEC A                   ;Aをデクリメント -1
+$C0/53D8 STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み
+$C0/53DA LDA $0A3A  [$00:0A3A]   ;Aに[$00:0A3B][$00:0A3A]をロード
+$C0/53DD LSR A                   ;Aを論理右シフト　(/2)
+$C0/53DE LSR A                   ;Aを論理右シフト　(/2)
+$C0/53DF LSR A                   ;Aを論理右シフト　(/2)
+$C0/53E0 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53E1 STA $34    [$00:0034]   ;Aを[$00:0035][$00:0034]に書き込み
+$C0/53E3 LDA $0A3E  [$00:0A3E]   ;Aに[$00:0A3F][$00:0A3E]をロード
+$C0/53E6 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53E7 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53E8 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53E9 LSR A                   ;Aを論理右シフト　(/2)
+$C0/53EA DEC A                   ;Aをデクリメント -1
+$C0/53EB STA $36    [$00:0036]   ;Aを[$00:0037][$00:0036]に書き込み
+$C0/53ED SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/53EF LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/53F1 STA $210D  [$00:210D]   ;Aを[$00:210D]に書き込み
+$C0/53F4 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/53F6 STA $210D  [$00:210D]   ;Aを[$00:210D]に書き込み
+$C0/53F9 LDA $32    [$00:0032]   ;Aに[$00:0032]をロード
+$C0/53FB STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/53FE LDA $33    [$00:0033]   ;Aに[$00:0033]をロード
+$C0/5400 STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/5403 LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/5405 STA $210F  [$00:210F]   ;Aを[$00:210F]に書き込み
+$C0/5408 LDA $35    [$00:0035]   ;Aに[$00:0035]をロード
+$C0/540A STA $210F  [$00:210F]   ;Aを[$00:210F]に書き込み
+$C0/540D LDA $36    [$00:0036]   ;Aに[$00:0036]をロード
+$C0/540F STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C0/5412 LDA $37    [$00:0037]   ;Aに[$00:0037]をロード
+$C0/5414 STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C0/5417 LDA #$01                ;Aに$01をロード
+$C0/5419 STA $0166  [$00:0166]   ;Aを[$00:0166]に書き込み
+$C0/541C RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上を整理してみると、</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0A39]</code><code>[$00:0A38]</code>/$10 = <code>[$00:0031]</code><code>[$00:0030]</code></span> → <code>[$00:210D]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3D]</code><code>[$00:0A3C]</code>/$10 - 1 = <code>[$00:0033]</code><code>[$00:0032]</code></span> → <code>[$00:210E]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code>/$10 = <code>[$00:0035]</code><code>[$00:0034]</code></span> → <code>[$00:210F]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3F]</code><code>[$00:0A3E]</code>/$10 - 1 = <code>[$00:0037]</code><code>[$00:0036]</code></span> → <code>[$00:2110]</code>2度書き</li>
+</ul>
+
+<p>であるから、<code>[$00:0A38]</code>～<code>[$00:0A3F]</code>が2バイト区切りでBG1水平スクロール量・BG1垂直スクロール量・BG2水平スクロール量・BG2垂直スクロール量の計算に関わる数値だということがわかる。<br>
+では、<code>[$00:0A38]</code>～<code>[$00:0A3F]</code>はいったい何なのか。<br>
+マップ切り替え時、以下のような処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/4F80 LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード
+$C0/4F83 BNE $0B    [$4F90]      ;ゼロフラグが立っていないとき[$4F90]分岐
+$C0/4F85 LDX #$0000              ;Xに$0000をロード
+$C0/4F88 STX $0A38  [$00:0A38]   ;Xを[$00:0A39][$00:0A38]に書き込み
+$C0/4F8B STX $0A3C  [$00:0A3C]   ;Xを[$00:0A3D][$00:0A3C]に書き込み
+$C0/4F8E BRA $30    [$4FC0]      ;フラグにかかわりなく常に分岐[$4FC0]
+$C0/4FC0 LDA $0117  [$00:0117]   ;Aに[$00:0117]をロード
+$C0/4FC3 BNE $13    [$4FD8]      ;ゼロフラグが立っていないとき[$4FD8]分岐
+$C0/4FC5 LDA $0116  [$00:0116]   ;Aに[$00:0116]をロード
+$C0/4FC8 BNE $19    [$4FE3]      ;ゼロフラグが立っていないとき[$4FE3]分岐
+$C0/4FCA LDX $0A38  [$00:0A38]   ;Xに[$00:0A39][$00:0A38]をロード
+$C0/4FCD STX $0A3A  [$00:0A3A]   ;Xを[$00:0A3B][$00:0A3A]に書き込み
+$C0/4FD0 LDX $0A3C  [$00:0A3C]   ;Xに[$00:0A3D][$00:0A3C]をロード
+$C0/4FD3 STX $0A3E  [$00:0A3E]   ;Xを[$00:0A3F][$00:0A3E]に書き込み
+$C0/4FD6 BRA $5E    [$5036]      ;フラグにかかわりなく常に分岐[$5036]
+$C0/5036 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/4F85</span></code>～<code><span class="r">$C0/4F8B</span></code>で<code>[$00:0A39]</code><code>[$00:0A38]</code>, <code>[$00:0A3D]</code><code>[$00:0A3C]</code>に<span class="formula">$0000</span>が書き込まれる。<br>
+さらに、<code>[$00:0117]</code>と<code>[$00:0116]</code>の値次第だが、<code><span class="r">$C0/4FCA</span></code>～<code><span class="r">$C0/4FD3</span></code>で<code>[$00:0A3B]</code><code>[$00:0A3A]</code>, <code>[$00:0A3F]</code><code>[$00:0A3E]</code>にも<span class="formula">$0000</span>が書き込まれる。<br>
+（<code>[$00:0117]</code>と<code>[$00:0116]</code>に<span class="formula">$00</span>以外が入っていて、別処理になる場合は後で紹介するが、背景が多重スクロールする場合である）</p>
+
+<p>以上から、マップ切り替え直後の<code>[$00:210D]</code>～<code>[$00:2110]</code>の値は、以下のようになる。<br>
+2度書きだから2バイト分（16ビット）の値である。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210D]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td><span class="formula">$FFFF</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td><span class="formula">$FFFF</span></td></tr>
+</tbody>
+</table>
+
+<p>といっても、実際には先程書いた通りに16ビットの中で下10ビットしか使わないため、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210D]</code></td><td>BG1水平スクロール量</td><td><span class="formula">$000</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td>BG1垂直スクロール量</td><td><span class="formula">$3FF</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td>BG2水平スクロール量</td><td><span class="formula">$000</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td>BG2垂直スクロール量</td><td><span class="formula">$3FF</span></td></tr>
+</tbody>
+</table>
+
+<p>これがマップ切り替え直後の初期値である。<br>
+では、この状況で右にダッシュ移動してみるとどうなるか。<br>
+（ここではおぼろ丸以外のキャラの通常Bダッシュとする）</p>
+
+<div class="code-container"><pre>
+$C0/0CAC LDA $0167  [$00:0167]   ;Aに[$00:0167]をロード
+$C0/0CAF REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/0CB1 LSR A                   ;Aを論理右シフト　(/2)
+$C0/0CB2 STA $30    [$00:0030]   ;Aを[$00:0031][$00:0030]に書き込み
+$C0/0CB4 BCS $09    [$0CBF]      ;キャリーフラグが立っているとき[$0CBF]分岐
+$C0/0CBF LDA $01AE  [$00:01AE]   ;Aに[$00:01AF][$00:01AE] (マップ上移動速度)をロード
+$C0/0CC2 STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み
+$C0/0CC4 LSR A                   ;Aを論理右シフト　(/2)
+$C0/0CC5 STA $34    [$00:0034]   ;Aを[$00:0035][$00:0034]に書き込み
+$C0/0CC7 LSR $30    [$00:0030]   ;[$00:0031][$00:0030]を論理右シフト　(/2)
+$C0/0CC9 BCS $46    [$0D11]      ;キャリーフラグが立っているとき[$0D11]分岐
+$C0/0D11 LDX #$0A20              ;Xに$0A20をロード
+$C0/0D14 STX $30    [$00:0030]   ;Xを[$00:0031][$00:0030]に書き込み
+$C0/0D16 LDX #$0A38              ;Xに$0A38をロード
+$C0/0D19 LDY #$0A40              ;Yに$0A40をロード
+$C0/0D1C LDA $0000,y[$00:0A40]   ;Aに[$00:0A41][$00:0A40]をロード
+$C0/0D1F CLC                     ;キャリーフラグクリア
+$C0/0D20 ADC $32    [$00:0032]   ;A + [$00:0033][$00:0032]
+$C0/0D22 STA $0000,y[$00:0A40]   ;Aを[$00:0A41][$00:0A40]に書き込み
+$C0/0D25 LDA $00,x  [$00:0A38]   ;Aに[$00:0A39][$00:0A38]をロード
+$C0/0D27 CLC                     ;キャリーフラグクリア
+$C0/0D28 ADC $32    [$00:0032]   ;A + [$00:0033][$00:0032]
+$C0/0D2A STA $00,x  [$00:0A38]   ;Aを[$00:0A39][$00:0A38]に書き込み
+$C0/0D2C INX                     ;Xをインクリメント +1
+$C0/0D2D INX                     ;Xをインクリメント +1
+$C0/0D2E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/0D30 LDA $0117  [$00:0117]   ;Aに[$00:0117]をロード
+$C0/0D33 BNE $35    [$0D6A]      ;ゼロフラグが立っていないとき[$0D6A]分岐
+$C0/0D35 LDA $0116  [$00:0116]   ;Aに[$00:0116]をロード
+$C0/0D38 BEQ $25    [$0D5F]      ;ゼロフラグが立っているとき[$0D5F]分岐
+$C0/0D5F REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/0D61 LDA $00,x  [$00:0A3A]   ;Aに[$00:0A3B][$00:0A3A]をロード
+$C0/0D63 CLC                     ;キャリーフラグクリア
+$C0/0D64 ADC $32    [$00:0032]   ;A + [$00:0033][$00:0032]
+$C0/0D66 STA $00,x  [$00:0A3A]   ;Aを[$00:0A3B][$00:0A3A]に書き込み
+$C0/0D68 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/0D6A LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード
+$C0/0D6D BEQ $53    [$0DC2]      ;ゼロフラグが立っているとき[$0DC2]分岐
+$C0/0DC2 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ポイントは<code><span class="r">$C0/0CBF</span></code>でロードされる<code>[$00:01AF]</code><code>[$00:01AE]</code>で、<code>[$00:01A9]</code><code>[$00:01A8]</code>と同値なのだが、マップ上移動速度による値が入る。<br>
+2バイト値だが、上1バイト（<code>[$00:01A9]</code>）は<span class="formula">$00</span>なので実質下1バイトの<code>[$00:01AE]</code>の値しか使わない。</p>
+
+<table>
+<thead>
+	<tr><th><code>[$00:01AE]</code></th><th>状態</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>移動しない</td></tr>
+	<tr><td><span class="formula">$10</span></td><td>通常歩行</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>ダッシュ（おぼろ丸以外主人公時）</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>ダッシュ（おぼろ丸主人公時）</td></tr>
+</tbody>
+</table>
+
+<p>というように値が入る。<br>
+ダッシュ時は以下の処理で値が入っている。</p>
+
+<div class="code-container"><pre>
+$C0/08A0 LDX #$0020              ;Xに$0020をロード
+$C0/08A3 BRA $03    [$08A8]      ;フラグにかかわりなく常に分岐[$08A8]
+$C0/08A8 STX $01A8  [$00:01A8]   ;Xを[$00:01A9][$00:01A8]に書き込み
+$C0/08AB STX $01AE  [$00:01AE]   ;Xを[$00:01AF][$00:01AE]に書き込み
+</pre></div>
+
+<p>ダッシュの時の値<span class="formula">$0020</span>は、<code><span class="r">$C0/0CC2</span></code>で、<code>[$00:01AF]</code><code>[$00:01AE]</code>→<code>[$00:0033]</code><code>[$00:0032]</code>にコピーされる。<br>
+さらに、<code><span class="r">$C0/0D25</span></code>～<code><span class="r">$C0/0D2A</span></code>で、</p>
+
+<p><span class="formula"><code>[$00:0A39]</code><code>[$00:0A38]</code> = <code>[$00:0A39]</code><code>[$00:0A38]</code> + <code>[$00:0033]</code><code>[$00:0032]</code> ($0020)</span></p>
+
+<p>と、元の<code>[$00:0A39]</code><code>[$00:0A38]</code>に<span class="formula">$0020</span>（ダッシュ時の値）を加算する。<br>
+<code><span class="r">$C0/0D61</span></code>～<code><span class="r">$C0/0D66</span></code>で、</p>
+
+<p><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code> = <code>[$00:0A3B]</code><code>[$00:0A3A]</code> + <code>[$00:0033]</code><code>[$00:0032]</code> ($0020)</span></p>
+
+<p>と、こちらも<span class="formula">$0020</span>（ダッシュ時の値）を加算する。<br>
+実質、<code>[$00:0A38]</code>と<code>[$00:0A3A]</code>の値だけが変動したことになり、他の値は変化しない。<br>
+横（右）、つまり水平方向にだけ移動したからであり、垂直方向には変化がないからである。</p>
+
+<p>以上が1フレームでの処理である。<br>
+<code>[$00:210D]</code>～<code>[$00:2110]</code>はどうなるのか。</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0A39]</code><code>[$00:0A38]</code>($0020)/$10 = <$0002</span> → <code>[$00:210D]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3D]</code><code>[$00:0A3C]</code>($0000)/$10 - 1 = $FFFF</span> → <code>[$00:210E]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code>($0020)/$10 = $0000</span> → <code>[$00:210F]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3F]</code><code>[$00:0A3E]</code>($0000)/$10 - 1 = $FFFF</span> → <code>[$00:2110]</code>2度書き</li>
+</ul>
+
+<p>よって、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210D]</code></td><td>BG1水平スクロール量</td><td><span class="formula">$002</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td>BG1垂直スクロール量</td><td><span class="formula">$3FF</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td>BG2水平スクロール量</td><td><span class="formula">$002</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td>BG2垂直スクロール量</td><td><span class="formula">$3FF</span></td></tr>
+</tbody>
+</table>
+
+<p>BG1とBG2の水平スクロール量が<span class="formula">+2</span>された。垂直方向には移動していないので値は変わらない。<br>
+おぼろ丸以外のダッシュだと、1フレームで2ピクセル背景が動く、ということである。<br>
+つまり、</p>
+
+<table>
+<thead>
+	<tr><th><code>[$00:01AE]</code></th><th>状態</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>移動しない</td></tr>
+	<tr><td><span class="formula">$10</span></td><td>通常歩行</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>ダッシュ（おぼろ丸以外主人公時）</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>ダッシュ（おぼろ丸主人公時）</td></tr>
+</tbody>
+</table>
+
+<p><code>[$00:01AE]</code>に入る値は、上1桁が1フレームで移動可能なピクセル数ということである。<br>
+1マスが16ピクセルだから、通常歩行だと1マス移動に16フレーム、ダッシュ（おぼろ丸以外）だと8フレーム、おぼろ丸ダッシュだと4フレーム、ということである。<br>
+同時に、背景のスクロール量でもある。</p>
+
+<p>ゲームでは、十字キーで移動した場合、最低でも1マス移動するので、1マスのダッシュ移動なら、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210D]</code></td><td>BG1水平スクロール量</td><td><span class="formula">$010</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td>BG1垂直スクロール量</td><td><span class="formula">$3FF</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td>BG2水平スクロール量</td><td><span class="formula">$010</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td>BG2垂直スクロール量</td><td><span class="formula">$3FF</span></td></tr>
+</tbody>
+</table>
+
+<p>となるまで毎フレーム<span class="formula">+2</span>され、8フレーム経過すると<code>[$00:210D]</code>と<code>[$00:210F]</code>が<span class="formula">$010</span>まで増えて移動終了となる。<br>
+これが基本的なスクロール量設定の仕組みである。</p>
+
+<p>また、上の結果だと、BG1とBG2のスクロール量は同一である。<br>
+最初に述べた通り、大半のマップは画面手前からBG3→BG2→スプライト→BG1と重ねる。<br>
+BG1が一番下で、キャラの手前に設置したい壁や樹木などはBG2に置き、間にキャラのスプライトを挟んで、一番手前にセリフウィンドウなどのBG3、というのが一般的である。<br>
+このため、キャラが移動した時、通常、BG1とBG2はスクロール量が同じである。<br>
+BG1とBG2でスクロール量が異なったら、キャラのみならず、壁や樹木も移動しているように見えてしまうはずだ。</p>
+
+<h3 id="scr01">多重スクロール</h3>
+
+<p>実際には、本作において、BG1とBG2でスクロール量を変えて距離感（遠近感）を出しているマップが幾つかある。<br>
+わかりやすいのは、高い場所で遠景が見渡せる場所である。<br>
+キャラを操作可能なマップなら、功夫編の大志山山頂、中世・最終編のルクレチア城テラス、勇者の山山小屋マップや山頂、魔王山山頂などが該当する。<br>
+これらのマップでは、BG1に実際にキャラが移動するマップを置き、BG2はその後ろ（一番下）に置いて遠景とし、BG2はBG1よりスクロール量を少なくすることで、BG2が遠くにあることが表現できる。<br>
+このように、背景ごとにスクロール量を変えて距離感（遠近感）を演出する方法はレトロゲームにおいて多重スクロールと呼ばれることが多いようだが、きちんとした専門用語かは筆者にはわからない。とりあえず本コンテンツでは多重スクロールとしておく。</p>
+
+<p>多重スクロールを使っているマップのほとんどは、諸々の事情でBG2のサイズを大きめに設定しているようである（64×64タイル）。<br>
+BGマップ設定のサブルーチン<code><span class="r">$C0/0FB1</span></code>～<code><span class="r">$C0/1007</span></code>で、BG1のBGマップ設定<code>[$00:2107]</code>と、BG2のBGマップ設定<code>[$00:2108]</code>が書き込まれているが、この時、<code>[$00:0114]</code>の値がBG1のマップサイズ、<code>[$00:0116]</code>の値がBG2のマップサイズに関わってくる（詳細は<a href="bg1.html">背景グラフィックと効果 &gt; フィールドでのサブルーチン</a>）。<br>
+<code>[$00:0116]</code>の値は多重スクロールのマップかどうかの判定値でもある。</p>
+
+<p>なお、同じBGの中であっても、HDMA転送を利用することで、複数箇所のスクロール量を変更することもできる。<br>
+その例がＳＦ編ラストバトル前にOD-10が語りかけてきた時のラスタースクロール効果だったり、ゲームのタイトル画面で雲の速度を少しずつ変える効果だったりするのだが、HDMA転送を使ったスクロールについては次ページとする。<br>
+ここでは、BG1とBG2でスクロール量を変える場合の多重スクロールの例として、ルクレチア城テラスの場合を紹介する。</p>
+
+<p>まず、ルクレチア城テラスに入った時のマップ切り替え処理を見てみる。<br>
+つまり、<code><span class="r">$C0/4F80</span></code>～の処理である。<br>
+多重スクロールがないマップでは、<code>[$00:0A38]</code>～<code>[$00:0A3F]</code>が<span class="formula">$00</span>で初期化されていた。<br>
+だが、ルクレチア城テラスだと以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C0/4F80 LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード
+$C0/4F83 BNE $0B    [$4F90]      ;ゼロフラグが立っていないとき[$4F90]分岐
+$C0/4F85 LDX #$0000              ;Xに$0000をロード
+$C0/4F88 STX $0A38  [$00:0A38]   ;Xを[$00:0A39][$00:0A38]に書き込み
+$C0/4F8B STX $0A3C  [$00:0A3C]   ;Xを[$00:0A3D][$00:0A3C]に書き込み
+$C0/4F8E BRA $30    [$4FC0]      ;フラグにかかわりなく常に分岐[$4FC0]
+$C0/4FC0 LDA $0117  [$00:0117]   ;Aに[$00:0117]($00)をロード
+$C0/4FC3 BNE $13    [$4FD8]      ;ゼロフラグが立っていないとき[$4FD8]分岐
+$C0/4FC5 LDA $0116  [$00:0116]   ;Aに[$00:0116]($03)をロード
+$C0/4FC8 BNE $19    [$4FE3]      ;ゼロフラグが立っていないとき[$4FE3]分岐
+;ゼロフラグOFF
+$C0/4FE3 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/4FE5 LDA $0128  [$00:0128]   ;Aに[$00:0128](00)をロード
+$C0/4FE8 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/4FEA STZ $32    [$00:0032]   ;[$00:0032]に$00を書き込み
+$C0/4FEC LDA $012A  [$00:012A]   ;Aに[$00:012A](00)をロード
+$C0/4FEF STA $33    [$00:0033]   ;Aを[$00:0033]に書き込み
+$C0/4FF1 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/4FF3 LDA $0A40  [$00:0A40]   ;Aに[$00:0A41][$00:0A40](0C00)をロード
+$C0/4FF6 SEC                     ;キャリーフラグON
+$C0/4FF7 SBC $30    [$00:0030]   ;A(0C00) - [$00:0031][$00:0030](0000)
+$C0/4FF9 LSR A                   ;Aを論理右シフト　(/2)
+$C0/4FFA STA $30    [$00:0030]   ;A(0600)を[$00:0031][$00:0030]に書き込み
+$C0/4FFC LDA $0A42  [$00:0A42]   ;Aに[$00:0A43][$00:0A42](0700)をロード
+$C0/4FFF SEC                     ;キャリーフラグON
+$C0/5000 SBC $32    [$00:0032]   ;A(0700) - [$00:0033][$00:0032](0000)
+$C0/5002 LSR A                   ;Aを論理右シフト　(/2)
+$C0/5003 STA $32    [$00:0032]   ;A(0380)を[$00:0033][$00:0032]に書き込み
+$C0/5005 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/5007 LDA $0116  [$00:0116]   ;Aに[$00:0116]をロード
+$C0/500A CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/500C BEQ $10    [$501E]      ;ゼロフラグが立っているとき[$501E]分岐
+$C0/500E CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/5010 BEQ $19    [$502B]      ;ゼロフラグが立っているとき[$502B]分岐
+$C0/5012 LDX $30    [$00:0030]   ;Xに[$00:0031][$00:0030]($0600)をロード
+$C0/5014 STX $0A3A  [$00:0A3A]   ;Xを[$00:0A3B][$00:0A3A]に書き込み
+$C0/5017 LDX $32    [$00:0032]   ;Xに[$00:0033][$00:0032]($0380)をロード
+$C0/5019 STX $0A3E  [$00:0A3E]   ;Xを[$00:0A3F][$00:0A3E]に書き込み
+$C0/501C BRA $18    [$5036]      ;フラグにかかわりなく常に分岐[$5036]
+;処理合流
+$C0/5036 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>多重スクロールするマップでは、<code>[$00:0116]</code>に<span class="formula">$00</span>以外、おそらく<span class="formula">$01</span>～<span class="formula">$03</span>、だいたいの場合で<span class="formula">$03</span>が入るようである（通常は<span class="formula">$00</span>）。<br>
+このため、多重スクロールするマップだと<code><span class="r">$C0/4FC8</span></code>でゼロフラグが立たずに、<code><span class="r">$C0/4FE3</span></code>に処理が進む。<br>
+<code><span class="r">$C0/4FC8</span></code>までは共通なので、<code>[$00:0A39]</code>, <code>[$00:0A38]</code>, <code>[$00:0A3D]</code>, <code>[$00:0A3C]</code>に<span class="formula">$00</span>が書き込まれることは変わらない。<br>
+つまり、後で処理されるBG1水平スクロール量<code>[$00:210D]</code>と、BG1垂直スクロール量<code>[$00:210E]</code>の初期値は、他のマップと変わらない。</p>
+
+<p>その後の処理を追ってみると、</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code> = (<code>[$00:0A41]</code><code>[$00:0A40]</code>-<code>[$00:0128]</code>*$100)/2</span></li>
+	<li><span class="formula"><code>[$00:0A3F]</code><code>[$00:0A3E]</code> = (<code>[$00:0A43]</code><code>[$00:0A42]</code>-<code>[$00:012A]</code>*$100)/2</span></li>
+</ul>
+
+<p>となっている。<br>
+つまり、BG2水平スクロール量<code>[$00:210F]</code>を決める<code>[$00:0A3B]</code><code>[$00:0A3A]</code>、BG2垂直スクロール量<code>[$00:2110]</code>を決める<code>[$00:0A3F]</code><code>[$00:0A3E]</code>の計算方法が異なる。<br>
+多重スクロールのマップだと、BG2は一番下で、BG1よりスクロール量を少なく設定する都合から、座標位置を合わせる都合で計算方法が変わるようである。</p>
+
+<p>なお、<code>[$00:0A41]</code><code>[$00:0A40]</code>と<code>[$00:0A43]</code><code>[$00:0A42]</code>は、スクロール量計算に必要な、マップに入った位置に対する相対座標ではなく、背景（BG）の一定の位置を原点にした相対座標のようである。<br>
+そこからマップ開始位置（おそらく<code>[$00:0128]</code>と<code>[$00:012A]</code>）を引いて、スクロール量が半分だから<span class="formula">2</span>で割る、というような計算だと思われる。</p>
+
+<p>結果として上のように、<span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code> = $0600</span>, <span class="formula"><code>[$00:0A3F]</code><code>[$00:0A3E]</code> = $0380</span>と設定されたため、ルクレチア城テラスに入った時のスクロール量は以下のようになる。</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0A39]</code><code>[$00:0A38]</code>/$10 = $0000/$10</span> → <code>[$00:210D]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3D]</code><code>[$00:0A3C]</code>/$10 - 1 = $0000/$10 - 1</span> → <code>[$00:210E]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code>/$10 = $0600/$10</span> → <code>[$00:210F]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3F]</code><code>[$00:0A3E]</code>/$10 - 1 = $0380/$10 - 1</span> → <code>[$00:2110]</code>2度書き</li>
+</ul>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210D]</code></td><td>BG1水平スクロール量</td><td><span class="formula">$000</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td>BG1垂直スクロール量</td><td><span class="formula">$3FF</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td>BG2水平スクロール量</td><td><span class="formula">$060</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td>BG2垂直スクロール量</td><td><span class="formula">$037</span></td></tr>
+</tbody>
+</table>
+
+<p>ということが、<code><span class="r">$C0/53C0</span></code>～<code><span class="r">$C0/541C</span></code>の処理で決まる。<br>
+このように、多重スクロールなしのマップとはBG2スクロール量がまったく変わる。</p>
+
+<p>さて、ここで右にダッシュ移動するとどうなるか。<br>
+多重スクロールなしのマップなら、BG1水平スクロール量とBG2水平スクロール量が同じ量だけ増加するが、多重スクロールありだと増加量が変わるはずだ。</p>
+
+<div class="code-container"><pre>
+$C0/0CAC LDA $0167  [$00:0167]   ;Aに[$00:0167]をロード
+$C0/0CAF REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/0CB1 LSR A                   ;Aを論理右シフト　(/2)
+$C0/0CB2 STA $30    [$00:0030]   ;Aを[$00:0031][$00:0030]に書き込み
+$C0/0CB4 BCS $09    [$0CBF]      ;キャリーフラグが立っているとき[$0CBF]分岐
+$C0/0CBF LDA $01AE  [$00:01AE]   ;Aに[$00:01AF][$00:01AE]($0020)をロード
+$C0/0CC2 STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み
+$C0/0CC4 LSR A                   ;Aを論理右シフト　(/2)
+$C0/0CC5 STA $34    [$00:0034]   ;Aを[$00:0035][$00:0034](0010)に書き込み
+$C0/0CC7 LSR $30    [$00:0030]   ;[$00:0031][$00:0030]を論理右シフト　(/2)
+$C0/0CC9 BCS $46    [$0D11]      ;キャリーフラグが立っているとき[$0D11]分岐
+$C0/0D11 LDX #$0A20              ;Xに$0A20をロード
+$C0/0D14 STX $30    [$00:0030]   ;Xを[$00:0031][$00:0030]に書き込み
+$C0/0D16 LDX #$0A38              ;Xに$0A38をロード
+$C0/0D19 LDY #$0A40              ;Yに$0A40をロード
+$C0/0D1C LDA $0000,y[$00:0A40]   ;Aに[$00:0A41][$00:0A40](0C00)をロード
+$C0/0D1F CLC                     ;キャリーフラグクリア
+$C0/0D20 ADC $32    [$00:0032]   ;A + [$00:0033][$00:0032](0020)
+$C0/0D22 STA $0000,y[$00:0A40]   ;Aを[$00:0A41][$00:0A40]に書き込み
+$C0/0D25 LDA $00,x  [$00:0A38]   ;Aに[$00:0A39][$00:0A38]をロード
+$C0/0D27 CLC                     ;キャリーフラグクリア
+$C0/0D28 ADC $32    [$00:0032]   ;A + [$00:0033][$00:0032](0020)
+$C0/0D2A STA $00,x  [$00:0A38]   ;Aを[$00:0A39][$00:0A38]に書き込み
+$C0/0D2C INX                     ;Xをインクリメント +1
+$C0/0D2D INX                     ;Xをインクリメント +1
+$C0/0D2E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/0D30 LDA $0117  [$00:0117]   ;Aに[$00:0117]をロード
+$C0/0D33 BNE $35    [$0D6A]      ;ゼロフラグが立っていないとき[$0D6A]分岐
+$C0/0D35 LDA $0116  [$00:0116]   ;Aに[$00:0116]をロード
+$C0/0D38 BEQ $25    [$0D5F]      ;ゼロフラグが立っているとき[$0D5F]分岐
+;ゼロフラグOFF（多重スクロールマップ）
+$C0/0D3A CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C0/0D3C BEQ $14    [$0D52]      ;ゼロフラグが立っているとき[$0D52]分岐
+;ゼロフラグON
+$C0/0D52 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/0D54 LDA $00,x  [$00:0A3A]   ;Aに[$00:0A3B][$00:0A3A]をロード
+$C0/0D56 CLC                     ;キャリーフラグクリア
+$C0/0D57 ADC $34    [$00:0034]   ;A + [$00:0035][$00:0034](0010)
+$C0/0D59 STA $00,x  [$00:0A3A]   ;Aを[$00:0A3B][$00:0A3A]に書き込み
+$C0/0D5B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/0D5D BRA $0B    [$0D6A]      ;フラグにかかわりなく常に分岐[$0D6A]
+$C0/0D6A LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード
+$C0/0D6D BEQ $53    [$0DC2]      ;ゼロフラグが立っているとき[$0DC2]分岐
+$C0/0DC2 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>先に述べた通り、<code><span class="r">$C0/0CBF</span></code>で呼び出す<code>[$00:01AF]</code><code>[$00:01AE]</code>は移動速度によって変動する値であり、おぼろ丸以外のダッシュなら<span class="formula">$0020</span>である。<br>
+この値は<code>[$00:0033]</code><code>[$00:0032]</code>にコピーされるのだが、さらに、<code><span class="r">$C0/0CC5</span></code>にて、<span class="formula">÷2</span>された値が<code>[$00:0035]</code><code>[$00:0034]</code>に入る。<br>
+おぼろ丸以外のダッシュの時、</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0033]</code><code>[$00:0032]</code> = $0020</span></li>
+	<li><span class="formula"><code>[$00:0035]</code><code>[$00:0034]</code> = $0010</span></li>
+</ul>
+
+<p>ということである。<br>
+その後の処理を追っていくと、BG1のスクロール量の計算<code><span class="r">$C0/0D25</span></code>～<code><span class="r">$C0/0D2A</span></code>は通常マップと変わらず、<code>[$00:0A39]</code><code>[$00:0A38]</code>を+<span class="formula">$0020</span>している。<br>
+その後は<code><span class="r">$C0/0D35</span></code>により<code>[$00:0116]</code>の値で分岐する。つまり多重スクロールのマップかどうかで分岐し、<code>[$00:0116]</code>が<span class="formula">$03</span>の時は、</p>
+
+<p><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code> = <code>[$00:0A3B]</code><code>[$00:0A3A]</code> + <code>[$00:0035]</code><code>[$00:0034]</code> ($0010)</span></p>
+
+<p>BG2のスクロール量を決める<code>[$00:0A3B]</code><code>[$00:0A3A]</code>は、BG1の半分である<span class="formula">$0010</span>しか加算されない。<br>
+つまり、</p>
+
+<p><code>[$00:0116]</code>が<span class="formula">$03</span>に設定されたマップでは、BG2のスクロール量をBG1の<span class="formula">1/2</span>とする。</p>
+
+<p>ということがわかる。<br>
+これはルクレチア城テラスだけではなく、勇者の山や魔王山山頂、功夫編の大志山山頂でも同一である。<br>
+左右移動だけでなく上下移動でもスクロール量の半減は変わらない。</p>
+
+<p>以上で、<code>[$00:0A39]</code><code>[$00:0A38]</code>は<span class="formula">+$0020</span>、<code>[$00:0A3B]</code><code>[$00:0A3A]</code>は<span class="formula">+$0010</span>された。<br>
+後は、<code><span class="r">$C0/53C0</span></code>～<code><span class="r">$C0/541C</span></code>の処理で、<code>[$00:210D]</code>～<code>[$00:2110]</code>を更新し画面をスクロールする。<br>
+先に述べたが、<code><span class="r">$C0/53C0</span></code>～<code><span class="r">$C0/541C</span></code>の処理をまとめると、</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0A39]</code><code>[$00:0A38]</code>/$10 = <code>[$00:0031]</code><code>[$00:0030]</code></span> → <code>[$00:210D]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3D]</code><code>[$00:0A3C]</code>/$10 - 1 = <code>[$00:0033]</code><code>[$00:0032]</code></span> → <code>[$00:210E]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code>/$10 = <code>[$00:0035]</code><code>[$00:0034]</code></span> → <code>[$00:210F]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3F]</code><code>[$00:0A3E]</code>/$10 - 1 = <code>[$00:0037]</code><code>[$00:0036]</code></span> → <code>[$00:2110]</code>2度書き</li>
+</ul>
+
+<p>このようになっていた。<br>
+よって、BG1水平スクロール量<code>[$00:210D]</code>は通常のダッシュ同様、1フレームで<span class="formula">+2</span>である。<br>
+だが、BG2水平スクロール量<code>[$00:210F]</code>は、増加量が半分となる。つまり1フレームで<span class="formula">+1</span>となる。<br>
+これが、多重スクロールでBG毎にスクロール量を変動させる仕組みである。</p>
+
+<p>ところで、通常歩行だと、スクロール量はダッシュの半分である。<br>
+歩行の場合、<code>[$00:0A39]</code><code>[$00:0A38]</code>は<span class="formula">+$0010</span>、<code>[$00:0A3B]</code><code>[$00:0A3A]</code>は<span class="formula">+$0005</span>となる。</p>
+
+<ul>
+	<li>BG2水平スクロール量<span class="formula"><code>[$00:210F]</code> = <code>[$00:0A3B]</code><code>[$00:0A3A]</code>/$10</span></li>
+	<li>BG2垂直スクロール量<span class="formula"><code>[$00:2110]</code> = <code>[$00:0A3F]</code><code>[$00:0A3E]</code>/$10 - 1</span></li>
+</ul>
+
+<p>だから、元の値によっては、<span class="formula">+$0005</span>されてもBG2のスクロール量が変化しないフレームがある。<br>
+もっと具体的にいえば、多重スクロールマップでの歩行時、BG1スクロール量は1フレームで<span class="formula">+1</span>だが、BG2スクロール量は<span style="font-weight:bold;">2フレームで<span class="formula">+1</span></span>である。2フレームに1回しかスクロールしない、ということになる。</p>
+
+<p>なお、多重スクロールするマップは、画面手前から、</p>
+
+<p>BG3→スプライト→BG1→BG2（遠景）</p>
+
+<p>という順に画面を構成している。<br>
+多重スクロールしないマップでは、</p>
+
+<p>BG3→BG2（樹木や壁など）→スプライト→BG1</p>
+
+<p>としていたが、多重スクロールするマップで、スプライト（キャラ）の前に樹木などを置きたい時はどうするのか？<br>
+この場合は、</p>
+
+<p>BG3→BG1（優先度1）→スプライト→BG2（遠景）</p>
+
+<p>という方法で、該当部分のBG1タイルのみ、スプライト手前に設置している。<br>
+ルクレチア城テラスなら、手すりの部分が該当する。</p>
+
+<h3>余談</h3>
+
+<p><code><span class="r">$C0/0CAC</span></code>～<code><span class="r">$C0/0DC2</span></code>の処理は途中で、多重スクロールのマップかどうかを<code>[$00:0116]</code>の値で判断し分岐する。<br>
+<code><span class="r">$C0/0CAC</span></code>～<code><span class="r">$C0/0DC2</span></code>のサブルーチン全体を見ると、<code>[$00:0116]</code>に入る値は<span class="formula">$00</span>か<span class="formula">$03</span>ということではなく、<span class="formula">$01</span>や<span class="formula">$02</span>も入ることがわかる。<br>
+途中から処理を記すと、</p>
+
+<div class="code-container"><pre>
+$C0/0D3A CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C0/0D3C BEQ $14    [$0D52]      ;ゼロフラグが立っているとき[$0D52]分岐
+;ゼロフラグOFF（[$00:0116]が$00でも$03でもない）
+$C0/0D3E CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/0D40 BEQ $09    [$0D4B]      ;ゼロフラグが立っているとき[$0D4B]分岐
+;ゼロフラグOFF（[$00:0116]が$00でも$03でも$01でもない）
+$C0/0D42 LDA $0167  [$00:0167]   ;Aに[$00:0167]をロード
+$C0/0D45 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/0D47 BCC $21    [$0D6A]      ;キャリーフラグが立っていないとき[$0D6A]分岐
+$C0/0D49 BRA $07    [$0D52]      ;フラグにかかわりなく常に分岐[$0D52]
+;$C0/0D40でゼロフラグON（[$00:0116]が$01）
+$C0/0D4B LDA $0167  [$00:0167]   ;Aに[$00:0167]をロード
+$C0/0D4E CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/0D50 BCS $18    [$0D6A]      ;キャリーフラグが立っているとき[$0D6A]分岐
+$C0/0D52 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/0D54 LDA $00,x  [$00:0A3A]   ;Aに[$00:0A3A]をロード
+</pre></div>
+
+<p><span class="formula">$02</span>が入るのは西部編オープニングなどで、荒野を馬にのったサンダウンが駆けていくシーン。<br>
+BG1が1フレームに2ピクセル、BG2が1フレームに1ピクセルずつマイナスされて左移動していくため、多重スクロールの仕組みとしてはルクレチア城テラスなどと変わらない。<br>
+ここが特殊な処理扱いなのは左右でループするマップだからであろう。<br>
+イベント関連で多重スクロールが使われているシーンは多く、<span class="formula">$01</span>や<span class="formula">$02</span>で処理しているようである（未確認）。</p>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="window.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<!-- <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

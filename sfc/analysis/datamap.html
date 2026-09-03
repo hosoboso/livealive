@@ -194,6 +194,7 @@ table {
 		<li><a href="colormath2.html">固定色</a></li>
 		<li><a href="window.html">ウィンドウ効果</a></li>
 		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
 	</ul>
 </li>
 </ul>
@@ -395,6 +396,7 @@ table {
 	<tr><td><code>$C0:0016</code>～<code>$C0:0067</code></td><td>リセット時初期処理　<code>$00:0000</code>～<code>$00:1CFE</code>に初期値設定</td></tr>
 	<tr><td><code>$C0:00FC</code>～<code>$C0:01CB</code></td><td>リセット時初期処理　画像関係（PPU)<code>$00:2100</code>～<code>$00:2133</code>及び<code>$00:4200</code>～<code>$00:420D</code>、<code>$00:4016</code>、<code>$00:4200</code>の初期化</td></tr>
 	<tr><td><code>$C0:0308</code>～<code>$C0:032C</code></td><td>セーブデータからのセーブ用データ解凍（<code>$00:13xx</code>用）</td></tr>
+	<tr><td><code>$C0:0CAC</code>～<code>$C0:0DC2</code></td><td>マップ上移動速度<code>[$00:01AE]</code>から<code>[$00:0A38]</code>～<code>[$00:0A3F]</code>計算（BG1・BG2の水平/垂直スクロール量用）</td></tr>
 	<tr><td><code>$C0:0E1A</code>～<code>$C0:0ED7</code></td><td>マップ切り替え時などにウィンドウ関係のI/Oレジスタ<code>$00:21??</code>に初期値書き込み</td></tr>
 	<tr><td><code>$C0:0EDF</code>～<code>$C0:0F7C</code></td><td>リセット時初期処理　BGマップ</td></tr>
 	<tr><td><code>$C0:0F80</code>～<code>$C0:0FB0</code></td><td>BGモードをMode7（背景の回転・拡大・縮小モード）に変更</td></tr>
@@ -412,9 +414,10 @@ table {
 	<tr><td><code>$C0:4A4B</code>～<code>$C0:4B6D</code></td><td>バンク<code>$7F</code>のアドレス<code>$2800</code>→<code>$3800</code>コピー、<code>$7F:2000～2FFF</code>を<code>$00</code>で初期化</td></tr>
 	<tr><td><code>$C0:4D17</code>～<code>$C0:4D9C</code></td><td>バンク<code>$DE</code>からバンク<code>$7E</code>にタイル（画像）のデータコピー</td></tr>
 	<tr><td><code>$C0:4D9F</code>～<code>$C0:4EE1</code></td><td>スプライトのデータをVRAMへGDMA転送</td></tr>
+	<tr><td><code>$C0:4F80</code>～<code>$C0:5036</code></td><td>マップ切り替え時<code>[$00:0A38]</code>～<code>[$00:0A3F]</code>に初期値書き込み（BG1・BG2の水平/垂直スクロール量用）</td></tr>
 	<tr><td><code>$C0:5043</code>～<code>$C0:5333</code></td><td>BG1, BG2の1画面分BGマップデータを<code>$7E:C000</code>～<code>$7E:C6FF</code>、<code>$7E:D000</code>～<code>$7E:D6FF</code>にコピー</td></tr>
 	<tr><td><code>$C0:5337</code>～<code>$C0:53BF</code></td><td>BG1, BG2の1画面分BGマップデータ（各<span class="formula">$700</span>バイト）をVRAM転送</td></tr>
-	<tr><td><code>$C0:53C0</code>～<code>$C0:541C</code></td><td>背景スクロール量設定</td></tr>
+	<tr><td><code>$C0:53C0</code>～<code>$C0:541C</code></td><td>BG1・BG2の水平/垂直スクロール量更新</td></tr>
 	<tr><td><code>$C0:6F47</code>～<code>$C0:6F4E</code></td><td>16bitでスタックの値をダイレクトページレジスタに転送＋8bitでスタックの値をダイレクトページレジスタに転送</td></tr>
 	<tr><td><code>$C0:6FC0</code>～<code>$C0:7023</code></td><td><code>7E:F800</code>～を<code>7E:EC00</code>～にMVN転送</td></tr>
 	<tr><td><code>$C0:70B6</code>～<code>$C0:7233</code></td><td>MVN転送 <code>$CF:xxxx</code>→<code>$7E:C100</code>～<code>$7E:C3BF</code>の後、<br><code>$7E:C000</code>～<code>$7E:D7FF</code>（<span class="formula">$1800</span>バイト）を、VRAMアドレス<code>$6000</code>word (<code>$C000</code>byte)を開始位置にしてGDMA転送</td></tr>
@@ -1003,14 +1006,18 @@ table {
 	<tr><td><code>$00:0070</code></td><td>通常は<span class="formula">$00</span>、デモ画面は<span class="formula">$01</span>以上（変動）</td></tr>
 	<tr><td><code>$00:0107</code></td><td>ランダムエンカウント時　危険度</td></tr>
 	<tr><td><code>$00:010B</code>～<code>$00:01FF</code></td><td>（※スタック領域。<code>PHX</code>や<code>PHY</code>などのニーモニックで値を一時的に記録するアドレス。詳細：<a href="https://donkeyhacks.zouri.jp/databank/65C816/stack.html" target="_blank">65C816のスタック</a>）</td></tr>
+	<tr><td><code>$00:0114</code></td><td>BG1のサイズ決定値</td></tr>
+	<tr><td><code>$00:0116</code></td><td>BG2のサイズ決定値　兼　背景（BG2）が多重スクロールするマップでは<span class="formula">$01</span>～<span class="formula">$03</span>, それ以外は<span class="formula">$00</span></td></tr>
 	<tr><td><code>$00:011F</code></td><td>ランダムエンカウント時　エリア危険度</td></tr>
+	<tr><td><code>$00:0134</code></td><td>BG1タイルマップアドレスとサイズ<code>[$00:2107]</code>の下2ビット（マップサイズ）の値</td></tr>
+	<tr><td><code>$00:0135</code></td><td>BG2タイルマップアドレスとサイズ<code>[$00:2108]</code>の下2ビット（マップサイズ）の値</td></tr>
 	<tr><td><code>$00:013D</code></td><td>アイテム取得や使用時、該当アイテムのアイテムIDが入る</td></tr>
 	<tr><td><code>$00:014A～4C</code></td><td>最終編 時のダンジョンの鐘の鳴った回数</td></tr>
 	<tr><td><code>$00:0160</code></td><td>場面チェンジのエフェクト<br><span class="formula">$00</span>=黒にフェードアウト/<span class="formula">$02</span>=白にフェードアウト/<span class="formula">$04</span>=モザイク/<span class="formula">$05</span>=丸囲み/<span class="formula">$06</span>=三角囲み（戦闘突入時）</td></tr>
 	<tr><td><code>$00:01A0</code>～<code>$00:01A3</code></td><td>味方キャラ1～4の移動時の状態？</td></tr>
 	<tr><td><code>$00:01A4</code>～<code>$00:01A8</code></td><td>味方キャラ1～4の移動時の状態？</td></tr>
 	<tr><td><code>$00:01A9</code></td><td>マップ上移動速度　<span class="formula">$10</span>:通常歩き　<span class="formula">$20</span>:ダッシュ　<span class="formula">$40</span>:おぼろ丸のダッシュ</td></tr>
-	<tr><td><code>$00:01AE</code></td><td><code>$00:01A9</code>と同値？</td></tr>
+	<tr><td><code>$00:01AE</code></td><td><code>$00:01A9</code>と同値</td></tr>
 	<tr><td><code>$00:01B0</code></td><td>ポゴが匂いを嗅いで、匂いに触れた時に出ている吹き出しの中身<!-- 　0C魔王　0D肉　0Eざき　骸骨12 --></td></tr>
 	<tr><td><code>$00:01BB</code></td><td>ランダムエンカウント時　危険度合計値</td></tr>
 	<tr><td><code>$00:01C0</code>～</td><td>セリフ関係（テキスト呼び出し、吹き出し形状など）</td></tr>
@@ -1073,22 +1080,13 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:0A36</code></td><td>キャラ3　向き　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
 	<tr><td><code>$00:0A37</code></td><td>キャラ4　向き　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
 
-	<tr><td><code>$00:0A38</code></td><td>キャラ1　出入り口(0,0)との相対距離の移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A39</code></td><td>キャラ1　出入り口(0,0)との相対距離のX座標（マス目）　左方向は<span class="formula">$FF</span>～、右方向は<span class="formula">$01</span>～</td></tr>
-	<tr><td><code>$00:0A3A</code></td><td>キャラ2　出入り口(0,0)との相対距離の移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A3B</code></td><td>キャラ2　出入り口(0,0)との相対距離のX座標（マス目）</td></tr>
-	<tr><td><code>$00:0A3C</code></td><td>キャラ3　出入り口(0,0)との相対距離の移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A3D</code></td><td>キャラ3　出入り口(0,0)との相対距離のX座標（マス目）</td></tr>
-	<tr><td><code>$00:0A3E</code></td><td>キャラ4　出入り口(0,0)との相対距離の移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A3F</code></td><td>キャラ4　出入り口(0,0)との相対距離のX座標（マス目）</td></tr>
-	<tr><td><code>$00:0A40</code></td><td>キャラ1　出入り口(0,0)との相対距離の移動中のY座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A41</code></td><td>キャラ1　出入り口(0,0)との相対距離のY座標（マス目）　上方向は<span class="formula">$FF</span>～、下方向は<span class="formula">$01</span>～</td></tr>
-	<tr><td><code>$00:0A42</code></td><td>キャラ2　出入り口(0,0)との相対距離の移動中のY座標マスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A43</code></td><td>キャラ2　出入り口(0,0)との相対距離のY座標（マス目）</td></tr>
-	<tr><td><code>$00:0A44</code></td><td>キャラ3　出入り口(0,0)との相対距離の移動中のY座標マスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A45</code></td><td>キャラ3　出入り口(0,0)との相対距離のY座標（マス目）</td></tr>
-	<tr><td><code>$00:0A46</code></td><td>キャラ4　出入り口(0,0)との相対距離の移動中のY座標マスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A47</code></td><td>キャラ4　出入り口(0,0)との相対距離のY座標（マス目）</td></tr>
+	<tr><td><code>$00:0A38</code>～<code>$00:0A39</code></td><td><code>[$00:210D]</code>（BG1水平スクロール量）計算用の値（2バイト）</td></tr>
+	<tr><td><code>$00:0A3A</code>～<code>$00:0A3B</code></td><td><code>[$00:210E]</code>（BG1垂直スクロール量）計算用の値（2バイト）</td></tr>
+	<tr><td><code>$00:0A3C</code>～<code>$00:0A3D</code></td><td><code>[$00:210F]</code>（BG2水平スクロール量）計算用の値（2バイト）</td></tr>
+	<tr><td><code>$00:0A3E</code>～<code>$00:0A3F</code></td><td><code>[$00:2110]</code>（BG2垂直スクロール量）計算用の値（2バイト）</td></tr>
+	<tr><td><code>$00:0A40</code>～<code>$00:0A41</code></td><td><code>[$00:210F]</code>（BG2水平スクロール量）多重スクロール時　計算用の値（2バイト）</td></tr>
+	<tr><td><code>$00:0A42</code>～<code>$00:0A43</code></td><td><code>[$00:2110]</code>（BG2垂直スクロール量）多重スクロール時　計算用の値（2バイト）</td></tr>
+
 	<tr><td><code>$00:0A53</code></td><td>1人目のキャラの向き？　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
 	<tr><td><code>$00:0A54</code></td><td>1人目のキャラの座標？状態？</td></tr>
 	<tr><td><code>$00:0A55</code></td><td>1人目のキャラに対する2人目のキャラの相対距離？（移動中<span class="formula">$00</span>　ダッシュ<span class="formula">$04</span>　停止<span class="formula">$80</span>　向き変えで値変わる）</td></tr>
