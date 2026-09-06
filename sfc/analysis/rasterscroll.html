@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ラスタースクロール">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ラスタースクロール">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ラスタースクロール</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ラスタースクロール</h1>
+<h2>ラスタースクロール</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ラスタースクロールは、カラーマスやマスク処理などと同じく、HDMA転送を使ったウィンドウ処理のひとつである。<br>
+名前の通りスクロール処理も絡むため、<a href="scroll.html">スクロール</a>を先にお読みいただきたい。</p>
+
+<p>ラスタースクロールは画面が波打つように左右に揺れる処理のことで（縦方向にも揺らせることは可能）、近未来編の序盤、物質転送装置に乗った時や、ＳＦ編のラストバトル前で使われている。<br>
+仕組みとしては、画面を描画する時、1スキャンライン毎にHDMA転送で描画開始位置（スクロール位置）を変化させる、というものである。<br>
+スーパーファミコンは横方向に1スキャンラインずつ描画していく都合で、左右に揺らす処理は縦方向に揺らす処理よりも簡単に実装できる、らしい。<br>
+うねうねしている形はいわゆる「サイン (sine) 波形」とか「正弦波形」と呼ばれるものである。<br>
+高校数学で習う、三角関数の<span class="formula">y = sin x</span>のグラフの図とか、周波数の正弦波の形である。<br>
+<a href="https://ja.wikipedia.org/wiki/%E6%AD%A3%E5%BC%A6%E6%B3%A2" target="_blank">正弦波 - Wikipedia</a></p>
+
+<p>※このページを読んでいる方は多分、ある程度の数学の知識があると思うので、三角関数とは何かという根本的な説明は省く。<br>
+<a href="https://ja.wikipedia.org/wiki/%E4%B8%89%E8%A7%92%E9%96%A2%E6%95%B0" target="_blank">三角関数 - Wikipedia</a></p>
+
+<p>筆者が表計算ソフトで適当に作ってみた<span class="formula">y = sin x</span>のグラフが以下で、</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/rasterscroll01.png" class="modal-link">
+		<img src="img/rasterscroll01.png" alt="y = sin x" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>ラスタースクロールは元画像（背景グラフィック）がグラフのように開始ピクセルが変わるので全体が歪む感じである。<br>
+本作の処理を見る限り、実際には、<span class="formula">y = a sin (bx)</span> のように定数を設定して、うねうね（振れ幅）の高さ<span class="formula">a</span>、うねうねの周期<span class="formula">b</span>を徐々に変化させる処理を行っている。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/rasterscroll02.png" class="modal-link">
+		<img src="img/rasterscroll02.png" alt="ラスタースクロール図解" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>画像の横幅自体は変化しないが、書き始める位置がわずかずつ変わるからうねっているように見える。<br>
+左右に揺れる都合で、本来表示する横幅256ピクセル分の外側（右または左）が映ってしまうが、本作の場合、外側をマスクし真っ黒にして外側を表示しないようにしている。<br>
+戦闘開始時の三角形がぐるぐる回って暗くなる時やアイリスイン・アイリスアウト時の、ウィンドウ処理で外側をマスクして真っ暗にする処理と似たようなものである。</p>
+
+<p>本作でのラスタースクロールはいずれもフィールド上で、背景のBG1, BG2に対してのみ行っている。<br>
+セリフを表示するBG3には使用しない。<br>
+また、OBJ（スプライト）にも使用しない。背景のスクロール量を変化させるという処理の都合で、スプライトにはラスタースクロールがかからない。</p>
+
+<p>大まかな流れを見てみると、ラスタースクロール中の画面1枚分の表示（1フレーム分）は以下のように処理している。</p>
+
+<ol>
+	<li>BG1とBG2をウィンドウ2に表示、ウィンドウ外側マスク</li>
+	<li>BG1とBG2のスキャンライン全ての水平スクロール量を、三角関数表から計算し、<code>$7F:4000</code>～<code>$7F:41BF</code>にコピー</li>
+	<li>ウィンドウ2の<code>[$00:210D]</code>(BG1水平スクロール)と<code>[$00:210F]</code>BG2水平スクロール量224スキャンライン分<code>$7F:4000</code>～<code>$7F:41BF</code>をHDMA転送</li>
+	<li>ウィンドウ1（スプライトとBG3）とウィンドウ2（ラスタースクロールしたBG1とBG2）を合成してゲーム画面完成</li>
+</ol>
+
+<p>以下、ＳＦ編ラストバトル前のラスタースクロールのサブルーチンを紹介する。仕組み自体は近未来編でのラスタースクロールと変わらないはず。<br>
+HDMA転送の設定は以下になる。</p>
+
+<div class="code-container"><pre>
+$C0/D721 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/D723 BIT #$F3                ;Aと$F3で論理積（ステータスフラグ変更のみ）
+$C0/D725 BEQ $6B    [$D792]      ;ゼロフラグが立っているとき[$D792]分岐
+$C0/D727 LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード
+$C0/D72A BNE $1A    [$D746]      ;ゼロフラグが立っていないとき[$D746]分岐
+$C0/D72C LDA #$41                ;Aに$41をロード
+$C0/D72E STA $4330  [$00:4330]   ;Aを[$00:4330]に書き込み
+$C0/D731 LDA #$28                ;Aに$28をロード
+$C0/D733 STA $4331  [$00:4331]   ;Aを[$00:4331]に書き込み
+$C0/D736 LDA #$7F                ;Aに$7Fをロード
+$C0/D738 STA $4334  [$00:4334]   ;Aを[$00:4334]に書き込み
+$C0/D73B STA $4337  [$00:4337]   ;Aを[$00:4337]に書き込み
+;
+;[$00:4330]	GDMA / HDMA設定レジスタ	$41 間接テーブルモード 2レジスタ1書き込み 
+;[$00:4331]	転送先指定	$28=WH2 ウィンドウ2左座標設定
+;[$00:4333][$00:4332]	データ元アドレス（開始位置）	→$C0/DA2Dで、$3C30か$3C20セット
+;[$00:4334]	データ元バンク	$7F
+;[$00:4337]	HDMA間接アドレスバンクバイト	$7F
+;
+$C0/D73E LDA $014F  [$00:014F]   ;Aに[$00:014F]をロード
+$C0/D741 ORA #$08                ;Aと$08で論理和
+$C0/D743 STA $014F  [$00:014F]   ;Aを[$00:014F]に書き込み
+$C0/D746 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/D748 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/D74A BEQ $20    [$D76C]      ;ゼロフラグが立っているとき[$D76C]分岐
+$C0/D74C LDA #$42                ;Aに$42をロード
+$C0/D74E STA $4340  [$00:4340]   ;Aを[$00:4340]に書き込み
+$C0/D751 LDA #$0D                ;Aに$0Dをロード
+$C0/D753 STA $4341  [$00:4341]   ;Aを[$00:4341]に書き込み
+$C0/D756 LDX #$3C60              ;Xに$3C60をロード
+$C0/D759 STX $4342  [$00:4342]   ;Xを[$00:4343][$00:4342]に書き込み
+$C0/D75C LDA #$7F                ;Aに$7Fをロード
+$C0/D75E STA $4344  [$00:4344]   ;Aを[$00:4344]に書き込み
+$C0/D761 STA $4347  [$00:4347]   ;Aを[$00:4347]に書き込み
+;
+;[$00:4340]	GDMA / HDMA設定レジスタ	$42 間接テーブルモード 1レジスタ2書き込み
+;[$00:4341]	転送先指定	$0D=BG1HOFS BG1水平スクロール量
+;[$00:4343][$00:4342]	データ元アドレス（開始位置）	$3C60
+;[$00:4344]	データ元バンク	$7F
+;[$00:4347]	HDMA間接アドレスバンクバイト	$7F
+;
+$C0/D764 LDA $014F  [$00:014F]   ;Aに[$00:014F]をロード
+$C0/D767 ORA #$10                ;Aと$10で論理和
+$C0/D769 STA $014F  [$00:014F]   ;Aを[$00:014F]に書き込み
+$C0/D76C LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/D76E BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C0/D770 BEQ $20    [$D792]      ;ゼロフラグが立っているとき[$D792]分岐
+$C0/D772 LDA #$42                ;Aに$42をロード
+$C0/D774 STA $4350  [$00:4350]   ;Aを[$00:4350]に書き込み
+$C0/D777 LDA #$0F                ;Aに$0Fをロード
+$C0/D779 STA $4351  [$00:4351]   ;Aを[$00:4351]に書き込み
+$C0/D77C LDX #$3C60              ;Xに$3C60をロード
+$C0/D77F STX $4352  [$00:4352]   ;Xを[$00:4352]に書き込み
+$C0/D782 LDA #$7F                ;Aに$7Fをロード
+$C0/D784 STA $4354  [$00:4354]   ;Aを[$00:4354]に書き込み
+$C0/D787 STA $4357  [$00:4357]   ;Aを[$00:4357]に書き込み
+;
+;[$00:4350]	GDMA / HDMA設定レジスタ	$42 間接テーブルモード 1レジスタ2書き込み
+;[$00:4351]	転送先指定	$0F=BG2HOFS BG2水平スクロール量
+;[$00:4353][$00:4352]	データ元アドレス（開始位置）	$3C60
+;[$00:4354]	データ元バンク	$7F
+;[$00:4357]	HDMA間接アドレスバンクバイト	$7F
+;
+$C0/D78A LDA $014F  [$00:014F]   ;Aに[$00:014F]をロード
+$C0/D78D ORA #$20                ;Aと$20で論理和
+$C0/D78F STA $014F  [$00:014F]   ;Aを[$00:014F]に書き込み
+$C0/D792 LDA $0156  [$00:0156]   ;Aに[$00:0156]をロード
+$C0/D795 BIT #$F3                ;Aと$F3で論理積（ステータスフラグ変更のみ）
+$C0/D797 BEQ $2B    [$D7C4]      ;ゼロフラグが立っているとき[$D7C4]分岐
+$C0/D7C4 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/D7C6 STZ $31    [$00:0031]   ;[$00:0031]に$00を書き込み
+$C0/D7C8 LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード
+$C0/D7CB BNE $28    [$D7F5]      ;ゼロフラグが立っていないとき[$D7F5]分岐
+$C0/D7CD LDA $0156  [$00:0156]   ;Aに[$00:0156]をロード
+$C0/D7D0 BEQ $11    [$D7E3]      ;ゼロフラグが立っているとき[$D7E3]分岐
+$C0/D7E3 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/D7E5 BEQ $0E    [$D7F5]      ;ゼロフラグが立っているとき[$D7F5]分岐
+$C0/D7E7 LDA $0145  [$00:0145]   ;Aに[$00:0145]をロード
+$C0/D7EA AND #$33                ;Aと$33で論理積
+$C0/D7EC ORA #$CC                ;Aと$CCで論理和
+$C0/D7EE STA $0145  [$00:0145]   ;Aを[$00:0145]に書き込み
+$C0/D7F1 LDA #$03                ;Aに$03をロード
+$C0/D7F3 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/D7F5 LDA $0140  [$00:0140]   ;Aに[$00:0140]をロード
+$C0/D7F8 ORA #$04                ;Aと$04で論理和
+$C0/D7FA AND $30    [$00:0030]   ;Aと[$00:0030]で論理積
+$C0/D7FC EOR #$FF                ;Aと$FFで排他的論理和XOR
+$C0/D7FE AND $0142  [$00:0142]   ;Aと[$00:0142]で論理積
+$C0/D801 STA $0142  [$00:0142]   ;Aを[$00:0142]に書き込み
+$C0/D804 LDA $0141  [$00:0141]   ;Aに[$00:0141]をロード
+$C0/D807 AND $30    [$00:0030]   ;Aと[$00:0030]で論理積
+$C0/D809 EOR #$FF                ;Aと$FFで排他的論理和XOR
+$C0/D80B AND $0143  [$00:0143]   ;Aと[$00:0143]で論理積
+$C0/D80E STA $0143  [$00:0143]   ;Aを[$00:0143]に書き込み
+$C0/D811 LDA $0140  [$00:0140]   ;Aに[$00:0140]をロード
+$C0/D814 ORA #$04                ;Aと$04で論理和
+$C0/D816 AND $31    [$00:0031]   ;Aと[$00:0031]で論理積
+$C0/D818 ORA $0142  [$00:0142]   ;Aと[$00:0142]で論理和
+$C0/D81B STA $0142  [$00:0142]   ;Aを[$00:0142]に書き込み
+$C0/D81E LDA $0141  [$00:0141]   ;Aに[$00:0141]をロード
+$C0/D821 AND $31    [$00:0031]   ;Aと[$00:0031]で論理積
+$C0/D823 ORA $0143  [$00:0143]   ;Aと[$00:0143]で論理和
+$C0/D826 STA $0143  [$00:0143]   ;Aを[$00:0143]に書き込み
+$C0/D829 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>HDMAチャネル3, 4, 5が設定されており、どれもラスタースクロールで使われる。<br>
+順に見ていく。</p>
+
+<h5>HDMAチャネル3</h5>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th><th>詳細</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4330]</code></td><td>GDMA / HDMA設定レジスタ</td><td><span class="formula">$41</span></td><td>間接テーブルモード 2レジスタ1書き込み </td></tr>
+	<tr><td><code>[$00:4331]</code></td><td>転送先指定</td><td><span class="formula">$28</span>=WH2</td><td>ウィンドウ2左座標<code>[$00:2128]</code>設定</td></tr>
+	<tr><td><code>[$00:4333]</code><code>[$00:4332]</code></td><td>データ元アドレス（開始位置）</td><td>-</td><td>※<code><span class="r">$C0/DA2D</span></code>で、<span class="formula">$3C30</span>か<span class="formula">$3C20</span>セット</td></tr>
+	<tr><td><code>[$00:4334]</code></td><td>データ元バンク</td><td><span class="formula">$7F</span></td><td>　</td></tr>
+	<tr><td><code>[$00:4337]</code></td><td>HDMA間接アドレスバンクバイト</td><td><span class="formula">$7F</span></td><td>　</td></tr>
+</tbody>
+</table>
+
+<p><code>[$00:4330]</code>に<span class="formula">$41</span>が書き込まれているので、HDMA設定は間接テーブルモード、2レジスタ1書き込みである。<br>
+先に述べたが、ラスタースクロールするBG1とBG2は、ウィンドウ2に表示する。<br>
+本作では必要がない限り、各BGとスプライトはウィンドウ1に表示して重ねているようだが、ラスタースクロールではBG1とBG2だけウィンドウ2に表示させて処理をしている。<br>
+<code>[$00:4331]</code>の転送先は<code>[$00:2128]</code>（ウィンドウ2左座標）だが、2レジスタ1書き込みであることから、実際には<code>[$00:2128]</code><code>[$00:2129]</code>の値の転送である。<br>
+つまり、ウィンドウ2左座標<code>[$00:2128]</code>・ウィンドウ2右座標<code>[$00:2129]</code>に同時に値を送っている。<br>
+ウィンドウ2の内側・外側位置を決定するためのHDMA転送であることがわかる。</p>
+
+<p>なお、通常のフィールドではウィンドウ2を使っていない。マップ切り替え時に、ウィンドウ2左座標<code>[$00:2128]</code>もウィンドウ2右座標<code>[$00:2129]</code>も<span class="formula">$00</span>が入っており、ウィンドウ2を使うとしたら、ウィンドウ2全体が「ウィンドウの外側」扱いである。</p>
+
+<p>HDMA設定は間接テーブルモードだが、間接テーブルモードでのアドレスの読み方は<a href="window.html">ウィンドウ効果</a>にあるので参照していただきたい。<br>
+HDMAテーブルが書き込まれているアドレスなのだが、<code>[$00:4337]</code>からバンクは<span class="formula">$7F</span>とわかるが、上処理にはアドレスの<code>[$00:4333]</code><code>[$00:4332]</code>が指定されていない。<br>
+というのは、後の処理でわかる通り、<code>[$00:4333]</code><code>[$00:4332]</code>には状況により<span class="formula">$3C30</span>か<span class="formula">$3C20</span>が入るのである。<br>
+HDMAテーブルは<code>$7F:3C20</code>からか、<code>$7F:3C30</code>からのどちらかである。</p>
+
+<h5>HDMAチャネル4</h5>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th><th>詳細</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4340]</code></td><td>GDMA / HDMA設定レジスタ</td><td><span class="formula">$42</span></td><td>間接テーブルモード 1レジスタ2書き込み</td></tr>
+	<tr><td><code>[$00:4341]</code></td><td>転送先指定</td><td><span class="formula">$0D</span>=BG1HOFS</td><td>BG1水平スクロール量</td></tr>
+	<tr><td><code>[$00:4343]</code><code>[$00:4342]</code></td><td>データ元アドレス（開始位置）</td><td><span class="formula">$3C60</span></td><td>　</td></tr>
+	<tr><td><code>[$00:4344]</code></td><td>データ元バンク</td><td><span class="formula">$7F</span></td><td>　</td></tr>
+	<tr><td><code>[$00:4347]</code></td><td>HDMA間接アドレスバンクバイト</td><td><span class="formula">$7F</span></td><td>　</td></tr>
+</tbody>
+</table>
+
+<p>HDMAチャネル4はBG1水平スクロール量<code>[$00:210D]</code>へのHDMA転送であるが、スクロール量は2度書き込みして10ビットの値を設定しなければならない。<br>
+このため、<code>[$00:4340]</code>で1レジスタ2書き込みの設定がされている。<br>
+間接テーブルモードで、バンクは<span class="formula">$7F</span>、アドレスが<code>$7F:3C60</code>と指定されているので、<code>$7F:3C60</code>～をみてみる。</p>
+
+<div class="mono">
+<code>$7F:3C60</code>～<br>
+F0 00 40 F0 E0 40 00 FF 00 00 FF 00 55 55 55 55
+</div>
+
+<p>3バイトで区切ると、</p>
+
+<p><code>$7F:4000</code>から<span class="formula">$F0(240)</span>ピクセル分<br>
+<code>$7F:40E0</code>から<span class="formula">$F0(240)</span>ピクセル分</p>
+
+<p>の転送処理だということがわかる。</p>
+
+<h5>HDMAチャネル5</h5>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th><th>値</th><th>詳細</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4350]</code></td><td>GDMA / HDMA設定レジスタ</td><td><span class="formula">$42</span></td><td>間接テーブルモード 1レジスタ2書き込み</td></tr>
+	<tr><td><code>[$00:4351]</code></td><td>転送先指定</td><td><span class="formula">$0F</span>=BG2HOFS</td><td>BG2水平スクロール量</td></tr>
+	<tr><td><code>[$00:4353]</code><code>[$00:4352]</code></td><td>データ元アドレス（開始位置）</td><td><span class="formula">$3C60</span></td><td>　</td></tr>
+	<tr><td><code>[$00:4354]</code></td><td>データ元バンク</td><td><span class="formula">$7F</span></td><td>　</td></tr>
+	<tr><td><code>[$00:4357]</code></td><td>HDMA間接アドレスバンクバイト</td><td><span class="formula">$7F</span></td><td>　</td></tr>
+</tbody>
+</table>
+
+<p>HDMAチャネル4と設定が異なるのは、<code>[$00:4351]</code>の転送先がBG2水平スクロール量<code>[$00:210F]</code>に変わることだけ。<br>
+転送するデータも、</p>
+
+<p><code>$7F:4000</code>から<span class="formula">$F0(240)</span>ピクセル分<br>
+<code>$7F:40E0</code>から<span class="formula">$F0(240)</span>ピクセル分</p>
+
+<p>である。<br>
+これは当然といえば当然で、BG1とBG2はいずれも同じ位置に表示される背景であり、多重スクロールのマップでない限り、スクロール量は同一でなければならない。<br>
+サブルーチンを見る限り、「多重スクロールのマップではない」という前提でのラスタースクロール設定のようである。<br>
+本作でラスタースクロールが使われる、近未来編の壽商会の地下1階や、ＳＦ編のリフレッシュルームは多重スクロールのマップではないので、このサブルーチンで特に問題は起こらない。<br>
+ゲーム制作時点で「多重スクロールのマップではラスタースクロールはなし」と決めてから演出を考えていったのかもしれない、ということがサブルーチンから読み取れる。</p>
+
+<p>以上から、ラスタースクロール時、</p>
+
+<p><code>$7F:4000</code>から<span class="formula">$F0(240)</span>ピクセル分<br>
+<code>$7F:40E0</code>から<span class="formula">$F0(240)</span>ピクセル分</p>
+
+<p>は、<code>$7F:4000</code>～<code>$7F:41BF</code>にあたり、2バイトずつ、BG1水平スクロール量<code>[$00:210D]</code>・BG2水平スクロール量<code>[$00:210F]</code>に書き込まれていくことがわかる。<br>
+<code>$7F:4000</code>～<code>$7F:41BF</code>は1フレーム毎に更新されているが、では<code>$7F:4000</code>～<code>$7F:41BF</code>はどのような値になるのか。<br>
+辿ってみると、</p>
+
+<div class="code-container"><pre>
+$C0/D6B3 PHX                     ;Xレジスタをスタックにプッシュ
+$C0/D6B4 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/D6B5 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/D6B6 LDX #$BC96              ;Xに$BC96をロード
+$C0/D6B9 LDY #$5402              ;Yに$5402をロード
+$C0/D6BC LDA #$0023              ;Aに$0023をロード
+$C0/D6BF MVN C0 7F               ;データ転送
+;A:転送データサイズ-1 $0023
+;X:転送元アドレス $BC96
+;Y:転送先アドレス $5402
+;オペランド:転送元と転送先バンク C0 -> 7F
+;$C0:BC96 -> $7F:5402 +$0023バイト
+$C0/D6BF MVN C0 7F               ;データ転送
+$C0/D6C2 STZ $5400  [$7F:5400]   ;[$7F:5401][$7F:5400]に$00を書き込み
+$C0/D6C5 STZ $5448  [$7F:5448]   ;[$7F:5449][$7F:5448]に$00を書き込み
+$C0/D6C8 LDX #$5402              ;Xに$5402をロード
+$C0/D6CB LDY #$5446              ;Yに$5446をロード
+$C0/D6CE LDA #$0011              ;Aに$0011をロード
+$C0/D6D1 STA $20    [$00:0020]   ;Aを[$00:0021][$00:0020]に書き込み
+$C0/D6D3 LDA $0000,x[$7F:5402]   ;Aに[$7F:5403][$7F:5402]をロード
+$C0/D6D6 STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み
+$C0/D6D8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/D6DA PHB                     ;DBレジスタをスタックにプッシュ
+$C0/D6DB LDA #$00                ;Aに$00をロード
+$C0/D6DD PHA                     ;Aレジスタをスタックにプッシュ
+$C0/D6DE PLB                     ;DBレジスタにスタックからプル
+$C0/D6DF JSR $BA16  [$C0:BA16]   ;[$C0:BA16]へジャンプ
+</pre></div>
+
+<p>まず、この処理で、<code>$C0:BC96</code>～<code>$C0:BCB9</code>が<code>$7F:5402</code>～<code>$7F:5425</code>に書き込まれる（<span class="formula">$24</span>バイト）。</p>
+
+<div class="mono">
+<code>$C0:BC96</code>～<code>$C0:BCB9</code><br>
+16 00 2C 00 42 00 58 00 6C 00 80 00 93 00 A5 00<br>
+B5 00 C4 00 D2 00 DE 00 E8 00 F1 00 F7 00 FC 00<br>
+FF 00 00 01
+</div>
+
+<p>一見、何だかよくわからない文字列であるが、これは正接（<span class="formula">sin</span>）の三角関数表である。<br>
+2バイト値で、<span class="formula">$0016</span>, <span class="formula">$002C</span>, <span class="formula">$0042</span>,……<span class="formula">$00FF</span>, <span class="formula">$0100</span>となる。<br>
+<code>[$7F:5401]</code><code>[$7F:5400]</code>が<span class="formula">$0000</span>だから、初期値に<span class="formula">$0000</span>を加えてグラフを書いてみると以下のようになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/rasterscroll03.png" class="modal-link">
+		<img src="img/rasterscroll03.png" alt="正接三角関数" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>サイン波形の半分っぽい形になった。<br>
+このままだと最大値が<span class="formula">$0100</span>（<span class="formula">256</span>）なので、画面の横幅のピクセル数と同一である。<br>
+いきなりこの量だけ画面を揺らしたりはせず、上の値に一定の数値を掛け算することで画面の揺れ量を調整する。<br>
+例えば<span class="formula">0.1</span>倍にすれば最大部分で<span class="formula">25</span>ピクセルだけ画面をズラすことができる、という理屈である。</p>
+
+<p>以上から、<code>$C0:BC96</code>～<code>$C0:BCB9</code>は三角関数表（<span class="formula">sin x</span>）であるということがわかった。<br>
+ちなみに、実際には<code>$C0:BC94</code>, <code>$C0:BC95</code>に<span class="formula">$00</span>が入っているため、<code>$C0:BC94</code>～<code>$C0:BCB9</code>が<span class="formula">0～90</span>度までの三角関数表（<span class="formula">sin x</span>）である。<br>
+また、<code>$C0:BCBA</code>～<code>$C0:BCDC</code>には<code>$C0:BC96</code>～<code>$C0:BCB9</code>を逆転した値が入っているから、<code>$C0:BC96</code>～<code>$C0:BCDC</code>は0～180度（ラジアンで<span class="formula">0～&#x3c0;</span>）、5度区切りで180度分の三角関数表（<span class="formula">sin x</span>）ということになる。</p>
+
+<div class="box-title">余談 三角関数表について</div>
+<div class="commentbox">
+<p><code>$C0:BC96</code>～<code>$C0:BCB9</code>が正接（<span class="formula">sin</span>）の三角関数表なのだが、実際の三角関数の答えときちんと一致するものなのだろうか。<br>
+という話を記しておく。<br>
+<code>$C0:BC96</code>～<code>$C0:BCB9</code>は、<span class="formula">0～90</span>度（ラジアンなら<span class="formula">0～&#x3c0;/2</span>）分の正接（<span class="formula">sin</span>）の三角関数表になるのだが、1度ずつの値ではなく、18等分している。つまり5度ずつの値である。<br>
+<span class="formula">sin00&#xb0;</span>, <span class="formula">sin05&#xb0;</span>, ……という値は関数電卓や表計算ソフトなどで求められるが、ここでは古風に、実際の三角関数表で見てみよう。検索すれば出てくる。</p>
+
+<p><a href="https://www.math.s.chiba-u.ac.jp/~yasuda/sysKOU/cit-H20/trig-table.pdf" target="_blank">三角関数表</a>（PDFファイル）</p>
+
+<p>また、最小値を<span class="formula">$00</span>、最大値を<span class="formula">$FF</span>（10進数<span class="formula">256</span>）としている。三角関数の値は直角三角形の角度から「対辺/斜辺」のように割り算して割合を求めるから、<span class="formula">0～1</span>の値であり、<code>$C0:BC96</code>～<code>$C0:BCB9</code>と合わせるのなら<span class="formula">256</span>倍しなければならない。<br>
+5度刻みで三角関数表のsinの値を転載させていただくと以下のようになる。<br>
+これに256を掛けたのが3列目の値であり（小数点以下第2位四捨五入）、4列目は<code>$C0:BC96</code>～<code>$C0:BCB9</code>を10進数にした値。</p>
+
+<table>
+<thead>
+	<tr><th>角度</th><th>sin</th><th>×256</th><th><code>$C0:BC96</code>～</th></tr>
+</thead>
+<tbody class="formula">
+	<tr><td>00&#xb0;</td><td>0.0000</td><td>0</td><td>0</td></tr>
+	<tr><td>05&#xb0;</td><td>0.0872</td><td>22.3</td><td>22</td></tr>
+	<tr><td>10&#xb0;</td><td>0.1736</td><td>44.4</td><td>44</td></tr>
+	<tr><td>15&#xb0;</td><td>0.2588</td><td>66.3</td><td>66</td></tr>
+	<tr><td>20&#xb0;</td><td>0.3420</td><td>87.6</td><td>88</td></tr>
+	<tr><td>25&#xb0;</td><td>0.4226</td><td>108.2</td><td>108</td></tr>
+	<tr><td>30&#xb0;</td><td>0.5000</td><td>128.0</td><td>128</td></tr>
+	<tr><td>35&#xb0;</td><td>0.5736</td><td>146.8</td><td>147</td></tr>
+	<tr><td>40&#xb0;</td><td>0.6428</td><td>164.6</td><td>165</td></tr>
+	<tr><td>45&#xb0;</td><td>0.7071</td><td>181.0</td><td>181</td></tr>
+	<tr><td>50&#xb0;</td><td>0.7660</td><td>196.1</td><td>196</td></tr>
+	<tr><td>55&#xb0;</td><td>0.8192</td><td>209.7</td><td>210</td></tr>
+	<tr><td>60&#xb0;</td><td>0.8660</td><td>221.7</td><td>222</td></tr>
+	<tr><td>65&#xb0;</td><td>0.9063</td><td>232.0</td><td>232</td></tr>
+	<tr><td>70&#xb0;</td><td>0.9397</td><td>240.6</td><td>241</td></tr>
+	<tr><td>75&#xb0;</td><td>0.9659</td><td>247.3</td><td>247</td></tr>
+	<tr><td>80&#xb0;</td><td>0.9848</td><td>252.1</td><td>252</td></tr>
+	<tr><td>85&#xb0;</td><td>0.9962</td><td>255.0</td><td>255</td></tr>
+	<tr><td>90&#xb0;</td><td>1.0000</td><td>256</td><td>256</td></tr>
+</tbody>
+</table>
+
+<p>この通り、三角関数表の値を小数点以下で四捨五入すると<code>$C0:BC96</code>～<code>$C0:BCB9</code>の値とぴったり一致しており、きちんと三角関数で計算された値だったことがはっきりした。</p>
+
+<p>なお、現代のプログラミング言語であれば、標準ライブラリで数学関数を呼び出したり、組み込み関数（例えばJavaScriptなら<span class="formula">Math.sin(x)</span>）で簡単に三角関数が計算できるから、わざわざ三角関数表をプログラムの中に書き込んでおく必要はない。<br>
+だが、スーパーファミコンのアセンブリ言語（65C816）は、三角関数どころか掛け算や割り算の命令もない（乗算・除算のやり方はこれまでにも説明しているので省く）。<br>
+よって、三角関数で滑らかな曲線の計算をするといった場合は、三角関数表を埋め込んでおく必要があったのである。<br>
+（何かしらの物体を投げて落下する、という場合は放物線、<span class="formula">y = a(x - p)<sup>2</sup> + q</span>で座標計算できるから、三角関数のように表は必要ない……と思う）</p>
+</div>
+
+<p>ということで<code>$7F:5400</code>～<code>$7F:5425</code>はサイン波形の半分の値が入ることになる。残りの半分は形を左右反転すれば良いし、波形が幾つも続くなら<code>$7F:5400</code>～<code>$7F:5425</code>を元にコピーしていけば良い。<br>
+結果、<code>$7F:5400</code>～<code>$7F:548F</code>にサイン波形の元となる90バイトのデータが書き込まれ（処理省略）、</p>
+
+<div class="code-container"><pre>
+$C0/D65E LDA $00,x  [$00:0250]   ;Aに[$00:0250]をロード
+$C0/D660 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/D662 LDA $08,x  [$00:0258]   ;Aに[$00:0258]をロード
+$C0/D664 STA $22    [$00:0022]   ;Aを[$00:0022]に書き込み
+$C0/D666 LDA $3B    [$00:003B]   ;Aに[$00:003B]をロード
+;ループ処理
+$C0/D668 AND #$00FF              ;Aと$00FFで論理積
+$C0/D66B CMP #$0002              ;Aと$0002を減算比較（ステータスレジスタ変更のみ）
+$C0/D66E BNE $05    [$D675]      ;ゼロフラグが立っていないとき[$D675]分岐
+$C0/D675 LDA $0A3A  [$00:0A3A]   ;Aに[$00:0A3A]をロード
+$C0/D678 LSR A                   ;Aを論理右シフト　(/2)
+$C0/D679 LSR A                   ;Aを論理右シフト　(/2)
+$C0/D67A LSR A                   ;Aを論理右シフト　(/2)
+$C0/D67B LSR A                   ;Aを論理右シフト　(/2)
+$C0/D67C STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み
+$C0/D67E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/D680 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/D681 LDA #$7F                ;Aに$7Fをロード
+$C0/D683 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/D684 PLB                     ;DBレジスタにスタックからプル
+$C0/D685 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/D687 LDA #$00E0              ;Aに$00E0をロード
+$C0/D68A STA $26    [$00:0026]   ;Aを[$00:0026]に書き込み
+$C0/D68C LDA $21    [$00:0021]   ;Aに[$00:0021]をロード
+$C0/D68E AND #$00FF              ;Aと$00FFで論理積
+$C0/D691 ASL A                   ;Aを算術左シフト *2
+$C0/D692 TAX                     ;Aの値をXレジスタに転送
+$C0/D693 LDA $5400,x[$7F:5400]   ;Aに[$7F:5401][$7F:5400]をロード
+$C0/D696 CLC                     ;キャリーフラグクリア
+$C0/D697 ADC $24    [$00:0024]   ;A + [$00:0024]
+$C0/D699 STA $0000,y[$7F:4000]   ;Aを[$7F:4001][$7F:4000]～[$7F:41BF][$7F:41BE]に書き込み
+$C0/D69C LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/D69E CLC                     ;キャリーフラグクリア
+$C0/D69F ADC $22    [$00:0022]   ;A + [$00:0022]
+$C0/D6A1 CMP #$4800              ;Aと$4800を減算比較（ステータスレジスタ変更のみ）
+$C0/D6A4 BCC $03    [$D6A9]      ;キャリーフラグが立っていないとき[$D6A9]分岐
+$C0/D6A6 SBC #$4800              ;A - $4800
+$C0/D6A9 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/D6AB INY                     ;Yをインクリメント +1
+$C0/D6AC INY                     ;Yをインクリメント +1
+$C0/D6AD DEC $26    [$00:0026]   ;[$00:0026]をデクリメント -1
+$C0/D6AF BNE $DB    [$D68C]      ;ゼロフラグが立っていないとき[$D68C]分岐
+;ループ処理ここまで
+$C0/D6B1 PLB                     ;DBレジスタにスタックからプル
+$C0/D6B2 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>$7F:5400</code>～<code>$7F:548F</code>からさらに<code>$7F:4000</code>～<code>$7F:41BE</code>にコピーされ、<code>$7F:4000</code>～<code>$7F:41BE</code>がHDMA転送に使われることになるようである。<br>
+<code><span class="r">$C0/D6B3</span></code>～<code><span class="r">$C0/D6DF</span></code>の処理だけでは毎回三角関数表をコピーするだけだから、同じ形状のサイン波形にしかならないが、<code><span class="r">$C0/D404</span></code>～<code><span class="r">$C0/D485</span></code>、<code><span class="r">$C0/D4F4</span></code>～<code><span class="r">$C0/D54E</span></code>、<code><span class="r">$C0/D54F</span></code>～<code><span class="r">$C0/D5AD</span></code>あたりの処理で係数を毎フレーム計算し直しているようである。詳細省略。</p>
+
+<div class="code-container"><pre>
+$C0/D9DC LDA $0154  [$00:0154]   ;Aに[$00:0154]をロード
+$C0/D9DF ORA $0156  [$00:0156]   ;Aと[$00:0156]で論理和
+$C0/D9E2 BNE $03    [$D9E7]      ;ゼロフラグが立っていないとき[$D9E7]分岐
+$C0/D9E7 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/D9E9 LDA $0142  [$00:0142]   ;Aに[$00:0142](03 0000 0011)をロード
+$C0/D9EC STA $212E  [$00:212E]   ;Aを[$00:212E]に書き込み メインスクリーンウインドウマスク BG1/BG2ウインドウマスク
+$C0/D9EF LDA $0143  [$00:0143]   ;Aに[$00:0143](00)をロード
+$C0/D9F2 STA $212F  [$00:212F]   ;Aを[$00:212F]に書き込み サブスクリーンウインドウマスク
+$C0/D9F5 LDA $0145  [$00:0145]   ;Aに[$00:0145](CC 1100 1100)をロード
+$C0/D9F8 STA $2123  [$00:2123]   ;Aを[$00:2123]に書き込み BG1,BG2ウィンドウマスク設定
+$C0/D9FB LDA $0146  [$00:0146]   ;Aに[$00:0146](00)をロード
+$C0/D9FE STA $2124  [$00:2124]   ;Aを[$00:2124]に書き込み BG3,BG4ウィンドウマスク設定
+$C0/DA01 LDA $0147  [$00:0147]   ;Aに[$00:0147](00)をロード
+$C0/DA04 STA $2125  [$00:2125]   ;Aを[$00:2125]に書き込み スプライトウィンドウマスク設定
+$C0/DA07 LDX $01FE  [$00:01FE]   ;Xに[$00:01FF][$00:01FE](FF00)をロード
+$C0/DA0A STX $2128  [$00:2128]   ;Xを[$00:2129][$00:2128]に書き込み ウィンドウ2右・左座標設定
+$C0/DA0D LDA $0148  [$00:0148]   ;Aに[$00:0148](00)をロード
+$C0/DA10 STA $212A  [$00:212A]   ;Aを[$00:212A]に書き込み BGウインドウマスクロジック設定
+$C0/DA13 LDA $0149  [$00:0149]   ;Aに[$00:0149](00)をロード
+$C0/DA16 STA $212B  [$00:212B]   ;Aを[$00:212B]に書き込み スプライトウインドウマスクロジック設定
+$C0/DA19 LDA $014F  [$00:014F]   ;Aに[$00:014F]をロード
+$C0/DA1C BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C0/DA1E BEQ $10    [$DA30]      ;ゼロフラグが立っているとき[$DA30]分岐
+$C0/DA20 LDA $01FB  [$00:01FB]   ;Aに[$00:01FB]をロード
+$C0/DA23 BNE $05    [$DA2A]      ;ゼロフラグが立っていないとき[$DA2A]分岐
+;ゼロフラグON
+$C0/DA25 LDX #$3C20              ;Xに$3C20をロード
+$C0/DA28 BRA $03    [$DA2D]      ;フラグにかかわりなく常に分岐[$DA2D]
+;ゼロフラグOFF
+$C0/DA2A LDX #$3C30              ;Xに$3C30をロード
+$C0/DA2D STX $4332  [$00:4332]   ;Xを[$00:4333][$00:4332]に書き込み
+$C0/DA30 LDA $014F  [$00:014F]   ;Aに[$00:014F]をロード
+$C0/DA33 BIT #$10                ;Aと$10で論理積（ステータスフラグ変更のみ）
+$C0/DA35 BEQ $25    [$DA5C]      ;ゼロフラグが立っているとき[$DA5C]分岐
+$C0/DA37 LDA $01FB  [$00:01FB]   ;Aに[$00:01FB]をロード
+$C0/DA3A BNE $05    [$DA41]      ;ゼロフラグが立っていないとき[$DA41]分岐
+;ゼロフラグON
+$C0/DA3C LDX #$4000              ;Xに$4000をロード
+$C0/DA3F BRA $03    [$DA44]      ;フラグにかかわりなく常に分岐[$DA44]
+;ゼロフラグOFF
+$C0/DA41 LDX #$4380              ;Xに$4380をロード
+$C0/DA44 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/DA45 LDA #$7F                ;Aに$7Fをロード
+$C0/DA47 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/DA48 PLB                     ;DBレジスタにスタックからプル
+$C0/DA49 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/DA4B TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/DA4C LDX #$3C60              ;Xに$3C60をロード
+$C0/DA4F STA $0001,x[$7F:3C61]   ;Aを[$7F:3C62][$7F:3C61]に書き込み
+$C0/DA52 CLC                     ;キャリーフラグクリア
+$C0/DA53 ADC #$00E0              ;A + $00E0
+$C0/DA56 STA $0004,x[$7F:3C64]   ;Aを[$7F:3C65][$7F:3C64]に書き込み
+$C0/DA59 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/DA5B PLB                     ;DBレジスタにスタックからプル
+$C0/DA5C LDA $014F  [$00:014F]   ;Aに[$00:014F](38 = 0011 1000)をロード 
+$C0/DA5F STA $420C  [$00:420C]   ;Aを[$00:420C]に書き込み HDMAチャネル3,4,5を実行
+$C0/DA62 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/DA64 LDA $0A38  [$00:0A38]   ;Aに[$00:0A39][$00:0A38]をロード
+$C0/DA67 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA68 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA69 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA6A LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA6B CLC                     ;キャリーフラグクリア
+$C0/DA6C ADC $0158  [$00:0158]   ;A + [$00:0159][$00:0158]
+$C0/DA6F STA $30    [$00:0030]   ;Aを[$00:0031][$00:0030]に書き込み
+$C0/DA71 LDA $0A3C  [$00:0A3C]   ;Aに[$00:0A3D][$00:0A3C]をロード
+$C0/DA74 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA75 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA76 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA77 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA78 CLC                     ;キャリーフラグクリア
+$C0/DA79 ADC $015C  [$00:015C]   ;A + [$00:015D][$00:015C]
+$C0/DA7C DEC A                   ;Aをデクリメント -1
+$C0/DA7D STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み
+$C0/DA7F LDA $0A3A  [$00:0A3A]   ;Aに[$00:0A3B][$00:0A3A]をロード
+$C0/DA82 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA83 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA84 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA85 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA86 CLC                     ;キャリーフラグクリア
+$C0/DA87 ADC $015A  [$00:015A]   ;A + [$00:015B][$00:015A]
+$C0/DA8A STA $34    [$00:0034]   ;Aを[$00:0035][$00:0034]に書き込み
+$C0/DA8C LDA $0A3E  [$00:0A3E]   ;Aに[$00:0A3F][$00:0A3E]をロード
+$C0/DA8F LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA90 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA91 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA92 LSR A                   ;Aを論理右シフト　(/2)
+$C0/DA93 CLC                     ;キャリーフラグクリア
+$C0/DA94 ADC $015E  [$00:015E]   ;A + [$00:015F][$00:015E]
+$C0/DA97 DEC A                   ;Aをデクリメント -1
+$C0/DA98 STA $36    [$00:0036]   ;Aを[$00:0037][$00:0036]に書き込み
+$C0/DA9A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/DA9C LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/DA9E STA $210D  [$00:210D]   ;Aを[$00:210D]に書き込み
+$C0/DAA1 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/DAA3 STA $210D  [$00:210D]   ;Aを[$00:210D]に書き込み
+$C0/DAA6 LDA $32    [$00:0032]   ;Aに[$00:0032]をロード
+$C0/DAA8 STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/DAAB LDA $33    [$00:0033]   ;Aに[$00:0033]をロード
+$C0/DAAD STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/DAB0 LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/DAB2 STA $210F  [$00:210F]   ;Aを[$00:210F]に書き込み
+$C0/DAB5 LDA $35    [$00:0035]   ;Aに[$00:0035]をロード
+$C0/DAB7 STA $210F  [$00:210F]   ;Aを[$00:210F]に書き込み
+$C0/DABA LDA $36    [$00:0036]   ;Aに[$00:0036]をロード
+$C0/DABC STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C0/DABF LDA $37    [$00:0037]   ;Aに[$00:0037]をロード
+$C0/DAC1 STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C0/DAC4 LDA #$01                ;Aに$01をロード
+$C0/DAC6 STA $0166  [$00:0166]   ;Aを[$00:0166]に書き込み
+$C0/DAC9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここがHDMA転送の前準備＋HDMA転送開始処理である。<br>
+最初はHDMA転送前のI/Oレジスタへの書き込みである。まとめると以下のとおり。</p>
+
+<table>
+<thead>
+	<tr><th>I/Oレジスタ</th><th>内容</th><th>値</th><th></th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:212E]</code></td><td>メインスクリーンウインドウマスク</td><td><code>[$00:0142]</code>(<span class="formula">$03</span>)</td></tr>
+	<tr><td><code>[$00:212F]</code></td><td>サブスクリーンウインドウマスク</td><td><code>[$00:0143]</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td><code>[$00:2123]</code></td><td>BG1,BG2ウィンドウマスク設定</td><td><code>[$00:0145]</code>(<span class="formula">$CC</span>)</td></tr>
+	<tr><td><code>[$00:2124]</code></td><td>BG3,BG4ウィンドウマスク設定</td><td><code>[$00:0146]</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td><code>[$00:2125]</code></td><td>スプライトウィンドウマスク設定</td><td><code>[$00:0147]</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td><code>[$00:2129]</code><code>[$00:2128]</code></td><td>ウィンドウ2右・左座標設定</td><td><code>[$00:01FF]</code><code>[$00:01FE]</code>(<span class="formula">$FF00</span>)</td></tr>
+	<tr><td><code>[$00:212A]</code></td><td>BGウインドウマスクロジック設定</td><td><code>[$00:0148]</code>(<span class="formula">$00</span>)</td></tr>
+	<tr><td><code>[$00:212B]</code></td><td>スプライトウインドウマスクロジック設定</td><td><code>[$00:0149]</code>(<span class="formula">$00</span>)</td></tr>
+</tbody>
+</table>
+
+<p>メインスクリーンのBG1・BG2のみウインドウマスクがON。<br>
+BG1,BG2ウィンドウマスクはどちらも「ウィンドウ2有効・外側をマスク」「ウィンドウ1無効」である。</p>
+
+<ul>
+	<li><code>[$00:2128]</code>（ウィンドウ2右座標）: <span class="formula">$00</span></li>
+	<li><code>[$00:2129]</code>（ウィンドウ2左座標）: <span class="formula">$FF</span></li>
+</ul>
+
+<p>だから、ウィンドウ2の<span class="formula">$00</span>～<span class="formula">$FF</span>、つまりすべてが内側扱いであり、このタイミングだとマスクされている部分は画面外である。<br>
+<code>[$00:212A]</code><code>[$00:212B]</code>は、ウィンドウ1とウィンドウ2をどう合成するかという設定になるのだが、たぶん、例えば「BG1のウィンドウ1とウィンドウ2をどう合成するか」の意味なので、ウィンドウ1とウィンドウ2のどちらかしか使っていない場合、たぶん意味はない（あくまでもたぶん）</p>
+
+<p><code><span class="r">$C0/DA20</span></code>～<code><span class="r">$C0/DA2D</span></code>で、HDMA転送チャネル3の、決定していなかった<code>[$00:4333]</code><code>[$00:4332]</code>の値が書き込まれる。<br>
+処理を見ると<code>[$00:01FB]</code>が<span class="formula">$00</span>なら<span class="formula">$3C30</span>、<code>[$00:01FB]</code>が<span class="formula">$01</span>なら<span class="formula">$3C20</span>が書き込まれている。</p>
+
+<p><code><span class="r">$C0/DA5F</span></code>でHDMA転送チャネル3～5の転送が開始になっている。</p>
+
+<div class="code-container"><pre>
+$C0/DA5C LDA $014F  [$00:014F]   ;Aに[$00:014F](38 = 0011 1000)をロード 
+$C0/DA5F STA $420C  [$00:420C]   ;Aを[$00:420C]に書き込み HDMAチャネル3,4,5を実行
+</pre></div>
+
+<p>HDMA転送をまとめると、</p>
+
+<ol>
+	<li>描画開始</li>
+	<li>HDMA転送チャネル3でアドレス<span class="formula">$3C30</span>が指定された時、スキャンライン0書き込み</li>
+	<li>HDMA転送チャネル4と5がスキャンライン0～111書き込み</li>
+	<li>HDMA転送チャネル3でアドレス<span class="formula">$3C20</span>が指定された時、スキャンライン112書き込み</li>
+	<li>HDMA転送チャネル4と5がスキャンライン112～223書き込み</li>
+	<li>描画終了</li>
+</ol>
+
+<p>と、いうような順序のようである。</p>
+
+<p>その後から<code><span class="r">$C0/DA64</span></code>～<code><span class="r">$C0/DAC9</span></code>の処理が入るが、<a href="scroll.html">スクロール</a>における<code><span class="r">$C0/53C0</span></code>～<code><span class="r">$C0/541C</span></code>の処理に似ている。<br>
+ただし<code>[$00:0158]</code>～<code>[$00:015F]</code>の加算がある。<br>
+<code>[$00:0158]</code>～<code>[$00:015F]</code>が実際のスクロール量で、そこに計算値を加算している、と見て良いようである。</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0A39]</code><code>[$00:0A38]</code>/$10 + <code>[$00:0159]</code><code>[$00:0158]</code> = <code>[$00:0031]</code><code>[$00:0030]</code></span> → <code>[$00:210D]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3D]</code><code>[$00:0A3C]</code>/$10 + <code>[$00:015D]</code><code>[$00:015C]</code> - 1 = <code>[$00:0033]</code><code>[$00:0032]</code></span> → <code>[$00:210E]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3B]</code><code>[$00:0A3A]</code>/$10 + <code>[$00:015B]</code><code>[$00:015A]</code> = <code>[$00:0035]</code><code>[$00:0034]</code></span> → <code>[$00:210F]</code>2度書き</li>
+	<li><span class="formula"><code>[$00:0A3F]</code><code>[$00:0A3E]</code>/$10 + <code>[$00:015F]</code><code>[$00:015E]</code> - 1 = <code>[$00:0037]</code><code>[$00:0036]</code></span> → <code>[$00:2110]</code>2度書き</li>
+</ul>
+
+<p>BG1水平スクロール量・BG1垂直スクロール量・BG2水平スクロール量・BG2垂直スクロール量の更新なのだが、ここは実質、スクロール量のリセットである。<br>
+というのは、毎フレーム、必ず以下の値（2バイト）が2度書きで入るからである。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210D]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td><span class="formula">$FFFF</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td><span class="formula">$FFFF</span></td></tr>
+</tbody>
+</table>
+
+<p>この後に画面が更新され、HDMA転送で毎スキャンライン水平スクロール量がずれる。</p>
+
+<p>以上が大まかな仕組みである。</p>
+
+<h3>おまけ</h3>
+
+<p>1フレーム毎に更新される<code>$7F:4000</code>～<code>$7F:41BF</code>だが、揺れだした初期あたりの値を取り出してみると以下のような感じである（16バイト区切り）。</p>
+
+<div class="mono">
+01 00 01 00 00 00 00 00 00 00 FF FF FE FF FE FF<br>
+FD FF FD FF FC FF FC FF FB FF FB FF FB FF FA FF<br>
+FA FF FA FF FA FF FA FF FA FF FA FF FB FF FB FF<br>
+FB FF FC FF FC FF FD FF FD FF FE FF FE FF FF FF<br>
+00 00 00 00 00 00 01 00 01 00 02 00 03 00 03 00<br>
+04 00 04 00 05 00 05 00 05 00 06 00 06 00 06 00<br>
+06 00 06 00 06 00 06 00 06 00 05 00 05 00 04 00<br>
+04 00 04 00 03 00 02 00 02 00 01 00 01 00 00 00<br>
+00 00 FF FF FF FF FE FF FE FF FD FF FC FF FC FF<br>
+FC FF FB FF FB FF FA FF FA FF FA FF FA FF FA FF<br>
+FA FF FA FF FA FF FB FF FB FF FC FF FC FF FC FF<br>
+FD FF FD FF FE FF FF FF FF FF 00 00 00 00 01 00<br>
+01 00 02 00 02 00 03 00 03 00 04 00 04 00 05 00<br>
+05 00 05 00 06 00 06 00 06 00 06 00 06 00 06 00<br>
+06 00 05 00 05 00 05 00 04 00 04 00 03 00 03 00<br>
+02 00 02 00 01 00 00 00 00 00 00 00 FF FF FE FF<br>
+FE FF FD FF FD FF FC FF FC FF FB FF FB FF FB FF<br>
+FA FF FA FF FA FF FA FF FA FF FA FF FA FF FB FF<br>
+FB FF FB FF FC FF FC FF FC FF FD FF FE FF FE FF<br>
+FF FF FF FF 00 00 00 00 01 00 01 00 02 00 03 00<br>
+03 00 04 00 04 00 04 00 05 00 05 00 06 00 06 00<br>
+06 00 06 00 06 00 06 00 06 00 06 00 05 00 05 00<br>
+04 00 04 00 04 00 03 00 03 00 02 00 01 00 01 00<br>
+00 00 00 00 FF FF FF FF FE FF FE FF FD FF FC FF<br>
+FC FF FC FF FB FF FB FF FB FF FA FF FA FF FA FF<br>
+FA FF FA FF FA FF FA FF FB FF FB FF FB FF FC FF<br>
+FC FF FD FF FD FF FE FF FE FF FF FF 00 00 00 00<br>
+00 00 01 00 02 00 02 00 03 00 03 00 04 00 04 00
+</div>
+
+<p>2バイト区切りで、符号付き16ビット整数から10進数に変換すると、スクロール量がわかりやすくなる。<br>
+プラスの値なら右にずれるし、マイナスの値なら左にずれる。</p>
+
+<table>
+<thead>
+	<tr><th>ライン</th><th>符号付き<br>16ビット整数</th><th>10進数</th></tr>
+</thead>
+<tbody>
+	<tr><td>000</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>001</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>002</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>003</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>004</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>005</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>006</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>007</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>008</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>009</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>010</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>011</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>012</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>013</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>014</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>015</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>016</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>017</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>018</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>019</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>020</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>021</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>022</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>023</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>024</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>025</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>026</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>027</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>028</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>029</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>030</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>031</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>032</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>033</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>034</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>035</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>036</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>037</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>038</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>039</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>040</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>041</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>042</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>043</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>044</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>045</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>046</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>047</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>048</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>049</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>050</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>051</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>052</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>053</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>054</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>055</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>056</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>057</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>058</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>059</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>060</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>061</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>062</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>063</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>064</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>065</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>066</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>067</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>068</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>069</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>070</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>071</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>072</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>073</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>074</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>075</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>076</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>077</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>078</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>079</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>080</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>081</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>082</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>083</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>084</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>085</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>086</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>087</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>088</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>089</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>090</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>091</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>092</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>093</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>094</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>095</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>096</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>097</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>098</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>099</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>100</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>101</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>102</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>103</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>104</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>105</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>106</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>107</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>108</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>109</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>110</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>111</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>112</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>113</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>114</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>115</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>116</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>117</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>118</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>119</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>120</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>121</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>122</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>123</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>124</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>125</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>126</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>127</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>128</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>129</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>130</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>131</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>132</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>133</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>134</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>135</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>136</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>137</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>138</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>139</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>140</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>141</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>142</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>143</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>144</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>145</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>146</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>147</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>148</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>149</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>150</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>151</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>152</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>153</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>154</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>155</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>156</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>157</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>158</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>159</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>160</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>161</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>162</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>163</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>164</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>165</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>166</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>167</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>168</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>169</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>170</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>171</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>172</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>173</td><td><span class="formula">$0006</span></td><td><span class="formula">6</span></td></tr>
+	<tr><td>174</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>175</td><td><span class="formula">$0005</span></td><td><span class="formula">5</span></td></tr>
+	<tr><td>176</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>177</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>178</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>179</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>180</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>181</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>182</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>183</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>184</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>185</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>186</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>187</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>188</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>189</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>190</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>191</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>192</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>193</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>194</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>195</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>196</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>197</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>198</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>199</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>200</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>201</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>202</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>203</td><td><span class="formula">$FFFA</span></td><td><span class="formula">-6</span></td></tr>
+	<tr><td>204</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>205</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>206</td><td><span class="formula">$FFFB</span></td><td><span class="formula">-5</span></td></tr>
+	<tr><td>207</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>208</td><td><span class="formula">$FFFC</span></td><td><span class="formula">-4</span></td></tr>
+	<tr><td>209</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>210</td><td><span class="formula">$FFFD</span></td><td><span class="formula">-3</span></td></tr>
+	<tr><td>211</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>212</td><td><span class="formula">$FFFE</span></td><td><span class="formula">-2</span></td></tr>
+	<tr><td>213</td><td><span class="formula">$FFFF</span></td><td><span class="formula">-1</span></td></tr>
+	<tr><td>214</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>215</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>216</td><td><span class="formula">$0000</span></td><td><span class="formula">0</span></td></tr>
+	<tr><td>217</td><td><span class="formula">$0001</span></td><td><span class="formula">1</span></td></tr>
+	<tr><td>218</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>219</td><td><span class="formula">$0002</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td>220</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>221</td><td><span class="formula">$0003</span></td><td><span class="formula">3</span></td></tr>
+	<tr><td>222</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td>223</td><td><span class="formula">$0004</span></td><td><span class="formula">4</span></td></tr>
+</tbody>
+</table>
+
+<p>試しにエクセル方眼紙でそれっぽい図にしてみたが、うねうねの再現こそできたものの数値は縮小されて読めなくなってしまった。ご了承いただきたい。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/rasterscroll04.png" class="modal-link">
+		<img src="img/rasterscroll04.png" alt="ラスタースクロール　方眼紙" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="window.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+ <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
