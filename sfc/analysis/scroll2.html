@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; HDMA転送による多重スクロール">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; HDMA転送による多重スクロール">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; HDMA転送による多重スクロール</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; HDMA転送による多重スクロール</h1>
+<h2>HDMA転送による多重スクロール</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>先に<a href="scroll.html">スクロール</a>をお読みいただきたい。<br>
+スクロールの解説の中で、<a href="scroll.html#scr01">多重スクロール</a>について説明した。<br>
+多重スクロールでは、BG1とBG2でスクロール量を変えることで多重スクロールさせる、という方法を紹介したが、ここでは「同じBGの中で、一部のスキャンラインのスクロール量をHDMA転送で変えることで多重スクロールを表現する」という場面の処理を紹介する。<br>
+本作では、タイトル画面や、エンディングで朝日をバックに皆が走ってくるシーンで雲が多重スクロールしている（大きく近い位置の雲ほど速くスクロールする）。</p>
+
+<p>ここではタイトル画面の多重スクロール処理を紹介する。<br>
+中世編の魔王山の山頂からの景色をバックに「LIVE A LIVE」のロゴと「&#xa9;1994 SQUARE」の文字が表示される場面である。<br>
+この画面では空の雲が横にスクロールしていくが、雲によってスクロールのスピードが変わる。</p>
+
+<p>デモ画面において何のボタンも押さずに待っていると、最終的に「Welcome to LIVE A LIVE」と「LIVE A LIVE」のロゴが表示され、画面上から下にスクロールし、タイトル画面となる。<br>
+それとは別に、デモ画面で何かのボタンを押した時も、画面上から下にスクロールするのはスキップされ、直接タイトル画面となる。<br>
+ここではひとまず、タイトル画面のみ取り上げる。<br>
+（ちなみに、「Welcome to LIVE A LIVE」の表示時、「LIVE A LIVE」部分だけ横拡大処理が入るのはBGMode7を使っている。スーパーファミコンの特徴の拡大・縮小・回転機能のひとつであり、本作において少ないMode7の使用箇所のひとつである）</p>
+
+<p>画面上から下にスクロールする都合で、ここではBGサイズが縦長（縦64タイル×横32タイル）であり、タイトル画面に表示されるのは下部にあたる。<br>
+画面構成は他の多くのシーンと同じくBGMode1で、BG1・BG2・BG3・スプライトが使用可能。<br>
+実際には、画面一番手前から順に、</p>
+
+<table>
+<thead>
+	<tr><th>画面</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>スプライト</td><td>「LIVE A LIVE」のロゴと「&#xa9;1994 SQUARE」の文字</td></tr>
+	<tr><td>BG1</td><td>雲と魔王山の崖</td></tr>
+	<tr><td>BG2</td><td>森・山・空（一番下の背景）</td></tr>
+</tbody>
+</table>
+
+<p>このように表示しており、BG3は使っていない。<br>
+BG1が多重スクロールを担当していて、一番下の魔王山部分は固定だが、雲は3層に分けて左方向に多重スクロールさせている。<br>
+ざっと図を書くと下のようになる。スプライト部分（ロゴなど）は省略。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/hdmasc01.png" class="modal-link">
+		<img src="img/hdmasc01.png" alt="タイトル画面の多重スクロール構造" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>スキャンラインは4層に分けており、雲がないスキャンライン137以降はスクロールしない。137以降に魔王山の崖などが表示されているため、スクロールさせたら崖まで動いてしまう。<br>
+スキャンライン0～136は、雲のサイズにより3層に分かれていて、</p>
+
+<table>
+<thead>
+	<tr><th>スキャンライン</th><th>スクロール速度</th></tr>
+</thead>
+<tbody>
+	<tr><td>0～72</td><td>4ピクセル/8フレーム</td></tr>
+	<tr><td>73～104</td><td>2ピクセル/8フレーム</td></tr>
+	<tr><td>105～136</td><td>1ピクセル/8フレーム</td></tr>
+</tbody>
+</table>
+
+<p>と設定されている。<br>
+空の上の方に表示されている大きな雲ほどスクロール速度が高く、地平線（山の近く）の小さい雲ほどスクロール速度が低い、ということである。</p>
+
+<p><a href="scroll.html#scr02">無限ループとスクロール</a>で説明したが、BGはスクロールで無限ループする。<br>
+例えば、128フレームのスクロール、ほぼ2秒くらい（128/60秒）経過すると以下のようになる。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/hdmasc02.png" class="modal-link">
+		<img src="img/hdmasc02.png" alt="タイトル画面を多重スクロールさせる" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>スキャンライン0～72は左に64ピクセル、スキャンライン73～104は左に32ピクセル、スキャンライン105～136は左に16ピクセル移動する。<br>
+移動してゲーム画面の外にはみ出した分は、あたかも画面右からそのまま出てきたかのように見える（無限ループのように見える）。</p>
+
+<p>以上から、BG1水平スクロール量BG1HOFS<code>[$00:210D]</code>を、スキャンライン毎にズラしていく処理をHDMA転送でやっているのだろう、ということがだいたい察せられる。<br>
+実際の処理を見てみよう。</p>
+
+<h3>初期設定</h3>
+
+<p>これまでもI/Oレジスタアドレスの初期設定サブルーチンを紹介してきたが、タイトル画面の初期設定は、フィールドでのサブルーチンにあたるバンク<span class="formula">$C0</span>のサブルーチンを使っているものの、通常のプレイにおける<a href="bg1.html">フィールドでのサブルーチン</a>の初期設定<code><span class="r">$C0/0DF6</span></code>～<code><span class="r">$C0/0ED7</span></code>ではない。</p>
+
+<div class="code-container"><pre>
+$C0/0EDF LDA #$8F                ;Aに$8Fをロード
+$C0/0EE1 STA $2100  [$00:2100]   ;Aを[$00:2100]に書き込み
+$C0/0EE4 STZ $420C  [$00:420C]   ;[$00:420C]に$00を書き込み
+$C0/0EE7 LDA #$63                ;Aに$63をロード
+$C0/0EE9 STA $2101  [$00:2101]   ;Aを[$00:2101]に書き込み
+$C0/0EEC STZ $2102  [$00:2102]   ;[$00:2102]に$00を書き込み
+$C0/0EEF STZ $2103  [$00:2103]   ;[$00:2103]に$00を書き込み
+$C0/0EF2 LDA #$09                ;Aに$09をロード
+$C0/0EF4 STA $2105  [$00:2105]   ;Aを[$00:2105]に書き込み
+$C0/0EF7 STZ $2106  [$00:2106]   ;[$00:2106]に$00を書き込み
+$C0/0EFA LDA #$41                ;Aに$41をロード
+$C0/0EFC STA $2107  [$00:2107]   ;Aを[$00:2107]に書き込み
+$C0/0EFF LDA #$51                ;Aに$51をロード
+$C0/0F01 STA $2108  [$00:2108]   ;Aを[$00:2108]に書き込み
+$C0/0F04 LDA #$48                ;Aに$48をロード
+$C0/0F06 STA $2109  [$00:2109]   ;Aを[$00:2109]に書き込み
+$C0/0F09 LDA #$00                ;Aに$00をロード
+$C0/0F0B STA $210A  [$00:210A]   ;Aを[$00:210A]に書き込み
+$C0/0F0E LDA #$00                ;Aに$00をロード
+$C0/0F10 STA $210B  [$00:210B]   ;Aを[$00:210B]に書き込み
+$C0/0F13 LDA #$03                ;Aに$03をロード
+$C0/0F15 STA $210C  [$00:210C]   ;Aを[$00:210C]に書き込み
+$C0/0F18 STZ $210D  [$00:210D]   ;[$00:210D]に$00を書き込み
+$C0/0F1B STZ $210D  [$00:210D]   ;[$00:210D]に$00を書き込み
+$C0/0F1E STZ $210F  [$00:210F]   ;[$00:210F]に$00を書き込み
+$C0/0F21 STZ $210F  [$00:210F]   ;[$00:210F]に$00を書き込み
+$C0/0F24 STZ $2111  [$00:2111]   ;[$00:2111]に$00を書き込み
+$C0/0F27 STZ $2111  [$00:2111]   ;[$00:2111]に$00を書き込み
+$C0/0F2A LDA #$FF                ;Aに$FFをロード
+$C0/0F2C STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/0F2F STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/0F32 STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C0/0F35 STA $2110  [$00:2110]   ;Aを[$00:2110]に書き込み
+$C0/0F38 STA $2112  [$00:2112]   ;Aを[$00:2112]に書き込み
+$C0/0F3B STA $2112  [$00:2112]   ;Aを[$00:2112]に書き込み
+$C0/0F3E LDA #$80                ;Aに$80をロード
+$C0/0F40 STA $2115  [$00:2115]   ;Aを[$00:2115]に書き込み
+$C0/0F43 STZ $2123  [$00:2123]   ;[$00:2123]に$00を書き込み
+$C0/0F46 STZ $2124  [$00:2124]   ;[$00:2124]に$00を書き込み
+$C0/0F49 STZ $2125  [$00:2125]   ;[$00:2125]に$00を書き込み
+$C0/0F4C STZ $2126  [$00:2126]   ;[$00:2126]に$00を書き込み
+$C0/0F4F STZ $2127  [$00:2127]   ;[$00:2127]に$00を書き込み
+$C0/0F52 STZ $2128  [$00:2128]   ;[$00:2128]に$00を書き込み
+$C0/0F55 STZ $2129  [$00:2129]   ;[$00:2129]に$00を書き込み
+$C0/0F58 STZ $212A  [$00:212A]   ;[$00:212A]に$00を書き込み
+$C0/0F5B STZ $212B  [$00:212B]   ;[$00:212B]に$00を書き込み
+$C0/0F5E STZ $212C  [$00:212C]   ;[$00:212C]に$00を書き込み
+$C0/0F61 STZ $212D  [$00:212D]   ;[$00:212D]に$00を書き込み
+$C0/0F64 STZ $212E  [$00:212E]   ;[$00:212E]に$00を書き込み
+$C0/0F67 STZ $212F  [$00:212F]   ;[$00:212F]に$00を書き込み
+$C0/0F6A LDA #$30                ;Aに$30をロード
+$C0/0F6C STA $2130  [$00:2130]   ;Aを[$00:2130]に書き込み
+$C0/0F6F STZ $2131  [$00:2131]   ;[$00:2131]に$00を書き込み
+$C0/0F72 LDA #$E0                ;Aに$E0をロード
+$C0/0F74 STA $2132  [$00:2132]   ;Aを[$00:2132]に書き込み
+$C0/0F77 LDA #$00                ;Aに$00をロード
+$C0/0F79 STA $2133  [$00:2133]   ;Aを[$00:2133]に書き込み
+$C0/0F7C RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上から、以下のようにI/Oレジスタアドレスが設定されている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2100]</code></td><td>INIDISP</td><td>スクリーン初期化</td><td><span class="formula">$8F</span></td></tr>
+	<tr><td><code>[$00:2101]</code></td><td>OBJSEL</td><td>スプライトサイズ・データ領域選択</td><td><span class="formula">$63</span></td></tr>
+	<tr><td><code>[$00:2102]</code></td><td>OAMADDL</td><td>OAM下位アドレス</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2103]</code></td><td>OAMADDH</td><td>OAM上位アドレスとスプライト優先順位に</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2105]</code></td><td>BGMODE</td><td>BG制御レジスタ（BGMode設定）</td><td><span class="formula">$09</span></td></tr>
+	<tr><td><code>[$00:2106]</code></td><td>MOSAIC</td><td>モザイク表示用サイズ・スクリーン設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2107]</code></td><td>BG1SC</td><td>BG1のBGマップ設定</td><td><span class="formula">$41</span></td></tr>
+	<tr><td><code>[$00:2108]</code></td><td>BG2SC</td><td>BG2のBGマップ設定</td><td><span class="formula">$51</span></td></tr>
+	<tr><td><code>[$00:2109]</code></td><td>BG3SC</td><td>BG3のBGマップ設定</td><td><span class="formula">$48</span></td></tr>
+	<tr><td><code>[$00:210A]</code></td><td>BG4SC</td><td>BG4のBGマップ設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:210B]</code></td><td>BG12NBA</td><td>BG1,BG2キャラクタデータ領域設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:210C]</code></td><td>BG34NBA</td><td>BG3,BG4キャラクタデータ領域設定</td><td><span class="formula">$03</span></td></tr>
+	<tr><td><code>[$00:210D]</code></td><td>BG1HOFS</td><td>BG1水平スクロール量</td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:210F]</code></td><td>BG2HOFS</td><td>BG2水平スクロール量</td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:2111]</code></td><td>BG3HOFS</td><td>BG3水平スクロール量</td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:210E]</code></td><td>BG1VOFS</td><td>BG1垂直スクロール量</td><td><span class="formula">$FFFF</span></td></tr>
+	<tr><td><code>[$00:2110]</code></td><td>BG2VOFS</td><td>BG2垂直スクロール量</td><td><span class="formula">$FFFF</span></td></tr>
+	<tr><td><code>[$00:2112]</code></td><td>BG3VOFS</td><td>BG3垂直スクロール量</td><td><span class="formula">$FFFF</span></td></tr>
+	<tr><td><code>[$00:2115]</code></td><td>VMAINC</td><td>ビデオポート調整</td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>[$00:2123]</code></td><td>W12SEL</td><td>BG1,BG2ウィンドウマスク設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2124]</code></td><td>W34SEL</td><td>BG3,BG4ウィンドウマスク設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2125]</code></td><td>WOBJSEL</td><td>スプライトウィンドウマスク設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2126]</code></td><td>WH0</td><td>ウィンドウ1左座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2127]</code></td><td>WH1</td><td>ウィンドウ1右座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2128]</code></td><td>WH2</td><td>ウィンドウ2左座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2129]</code></td><td>WH3</td><td>ウィンドウ2右座標設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212A]</code></td><td>WBGLOG</td><td>BGウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212B]</code></td><td>WOBJLOG</td><td>スプライトウインドウマスクロジック設定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212C]</code></td><td>TM</td><td>メインスクリーン指定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212D]</code></td><td>TS</td><td>サブスクリーン指定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212E]</code></td><td>TMW</td><td>メインスクリーンウインドウマスク指定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212F]</code></td><td>TSW</td><td>サブスクリーンウインドウマスク指定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2130]</code></td><td>CGSWSEL</td><td>色追加選択</td><td><span class="formula">$30</span></td></tr>
+	<tr><td><code>[$00:2131]</code></td><td>CGADSUB</td><td>色計算指定</td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2132]</code></td><td>COLDATA</td><td>固定色のデータ</td><td><span class="formula">$E0</span></td></tr>
+	<tr><td><code>[$00:2133]</code></td><td>SETINI</td><td>スクリーンモード/ビデオ設定</td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+
+<p>フィールドとの違いは、設定しているI/Oレジスタの種類自体など色々とあるのだが、メインスクリーン指定<code>[$00:212C]</code>やサブスクリーン指定<code>[$00:212D]</code>がいずれも<span class="formula">$00</span>で、どのBGもスプライト（OBJ）も非表示なので、あくまでも初期設定に近い。<br>
+この後にさらに処理が続き、</p>
+
+<div class="code-container"><pre>
+$C0/E017 LDA #$13                ;Aに$13(0001 0011)をロード
+$C0/E019 STA $212C  [$00:212C]   ;Aを[$00:212C]に書き込み　TM メインスクリーン指定 BG1/BG2/OBJ
+$C0/E01C LDA #$42                ;Aに$42(0100 0010)をロード
+$C0/E01E STA $2107  [$00:2107]   ;Aを[$00:2107]に書き込み BG1SC (BG1設定)　横32x縦64タイル
+$C0/E021 LDA #$52                ;Aに$52(0101 0010)をロード
+$C0/E023 STA $2108  [$00:2108]   ;Aを[$00:2108]に書き込み BG2SC (BG2設定)　横32x縦64タイル
+$C0/E026 LDX #$0200              ;Xに$0200をロード
+$C0/E029 STX $0232  [$00:0232]   ;Xを[$00:0233][$00:0232]に書き込み
+$C0/E02C STX $0234  [$00:0234]   ;Xを[$00:0235][$00:0234]に書き込み
+$C0/E02F JSR $E1FD  [$C0:E1FD]   ;[$C0:E1FD]へジャンプ
+
+$C0/E1FD LDX #$0250              ;Xに$0250をロード
+$C0/E200 STZ $00,x  [$00:0250]   ;[$00:0250]に$00を書き込み
+$C0/E202 STZ $01,x  [$00:0251]   ;[$00:0251]に$00を書き込み
+$C0/E204 STZ $02,x  [$00:0252]   ;[$00:0252]に$00を書き込み
+$C0/E206 LDA #$01                ;Aに$01をロード
+$C0/E208 STA $03,x  [$00:0253]   ;Aを[$00:0253]に書き込み
+$C0/E20A STA $04,x  [$00:0254]   ;Aを[$00:0254]に書き込み
+$C0/E20C STA $05,x  [$00:0255]   ;Aを[$00:0255]に書き込み
+$C0/E20E RTS                     ;サブルーチン戻り
+
+$C0/E032 JSR $E1A2  [$C0:E1A2]   ;[$C0:E1A2]へジャンプ
+
+$C0/E1A2 LDA $0250  [$00:0250]   ;Aに[$00:0250]($00)をロード
+$C0/E1A5 STA $210D  [$00:210D]   ;A($00)を[$00:210D]に書き込み
+$C0/E1A8 STZ $210D  [$00:210D]   ;[$00:210D]に$00を書き込み
+$C0/E1AB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/E1AD LDA $0234  [$00:0234]   ;Aに[$00:0235][$00:0234]($0200)をロード
+$C0/E1B0 LSR A                   ;Aを論理右シフト　(/2)
+$C0/E1B1 DEC A                   ;Aをデクリメント -1
+$C0/E1B2 SEP #$20                ;MフラグON　Aレジスタは8bit幅 A:00FF 
+$C0/E1B4 STA $210E  [$00:210E]   ;A($FF)を[$00:210E]に書き込み
+$C0/E1B7 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/E1B8 STA $210E  [$00:210E]   ;A($00)を[$00:210E]に書き込み
+$C0/E1BB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/E1BD LDA $0234  [$00:0234]   ;Aに[$00:0235][$00:0234]($0200)をロード
+$C0/E1C0 LSR A                   ;Aを論理右シフト　(/2)
+$C0/E1C1 DEC A                   ;Aをデクリメント -1
+$C0/E1C2 SEP #$20                ;MフラグON　Aレジスタは8bit幅 A:00FF 
+$C0/E1C4 STA $2110  [$00:2110]   ;A($FF)を[$00:2110]に書き込み
+$C0/E1C7 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/E1C8 STA $2110  [$00:2110]   ;A($00)を[$00:2110]に書き込み
+$C0/E1CB RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/E017</span></code>～<code><span class="r">$C0/E02F</span></code>で、タイトル画面用の重要な設定が決まる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:212C]</code></td><td>TM</td><td>メインスクリーン指定</td><td><span class="formula">$13</span> BG1/BG2/OBJ</td></tr>
+	<tr><td><code>[$00:2107]</code></td><td>BG1SC</td><td>BG1設定</td><td><span class="formula">$42</span> 横32×縦64タイル</td></tr>
+	<tr><td><code>[$00:2108]</code></td><td>BG2SC</td><td>BG2設定</td><td><span class="formula">$52</span> 横32×縦64タイル</td></tr>
+</tbody>
+</table>
+
+<p>ここで通常のフィールドと同様、<code>[$00:212C]</code>に<span class="formula">$13</span>が書き込まれて、BG1・BG2・スプライト（OBJ）がメインスクリーンに表示されることが決まる。<br>
+<code>[$00:2107]</code>と<code>[$00:2108]</code>にそれぞれ<span class="formula">$42</span>と<span class="formula">$52</span>が書き込まれるが、Bit2～7のBGマップ開始アドレスは横に置いておくとして、画面サイズが横32x縦64タイルと設定されたことがわかる。</p>
+
+<p>その後に<br>
+<code>[$00:0233]</code><code>[$00:0232]</code><br>
+<code>[$00:0235]</code><code>[$00:0234]</code><br>
+の、各2バイトに<span class="formula">$0200</span>が書き込まれているが、これは後に画面のピクセル数（64タイル = 64×8ピクセル = 512 = <span class="formula">$0200</span>）を計算するために使う。</p>
+
+<p><code><span class="r">$C0/E1FD</span></code>～<code><span class="r">$C0/E20E</span></code>で、以下のように値が書き込まれているが、このアドレスはこの先スクロール量の計算用に使われ、初期値が書き込まれている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0250]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:0251]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:0252]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:0253]</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>[$00:0254]</code></td><td><span class="formula">$01</span></td></tr>
+	<tr><td><code>[$00:0255]</code></td><td><span class="formula">$01</span></td></tr>
+</tbody>
+</table>
+
+<p>さらに、<code><span class="r">$C0/E1A2</span></code>～<code><span class="r">$C0/E1CB</span></code>で、<code>[$00:210E]</code>と<code>[$00:2110]</code>の初期値が計算・書き込まれる。</p>
+
+<div class="code-container"><pre>
+$C0/E1B4 STA $210E  [$00:210E]   ;A($FF)を[$00:210E]に書き込み
+$C0/E1B7 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/E1B8 STA $210E  [$00:210E]   ;A($00)を[$00:210E]に書き込み
+$C0/E1BB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/E1BD LDA $0234  [$00:0234]   ;Aに[$00:0235][$00:0234]($0200)をロード
+$C0/E1C0 LSR A                   ;Aを論理右シフト　(/2)
+$C0/E1C1 DEC A                   ;Aをデクリメント -1
+$C0/E1C2 SEP #$20                ;MフラグON　Aレジスタは8bit幅 A:00FF 
+$C0/E1C4 STA $2110  [$00:2110]   ;A($FF)を[$00:2110]に書き込み
+$C0/E1C7 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/E1C8 STA $2110  [$00:2110]   ;A($00)を[$00:2110]に書き込み
+</pre></div>
+
+<ul>
+	<li>BG1垂直スクロール量<code>[$00:210E]</code>：<span class="formula">$00FF</span>（2度書き込み）</li>
+	<li>BG2垂直スクロール量<code>[$00:2110]</code>：<span class="formula">$00FF</span>（2度書き込み）</li>
+</ul>
+
+<p>であるから、タイトル画面表示のタイミングで、縦方向には<span class="formula">$00FF</span>ピクセルスクロールした状態で固定ということになる。<br>
+BG1は横32×縦64タイルで、タイトル画面時は下に32タイル、つまり<span class="formula">$00FF</span>ピクセル移動した位置で固定させる、ということである。</p>
+
+<h3>HDMA転送設定</h3>
+
+<p>HDMA転送はチャネル6とチャネル7が使われており、以下で設定している。</p>
+
+<div class="code-container"><pre>
+$C0/E1CC LDA #$02                ;Aに$02をロード
+$C0/E1CE STA $4360  [$00:4360]   ;Aを[$00:4360]に書き込み
+$C0/E1D1 LDA #$0D                ;Aに$0Dをロード
+$C0/E1D3 STA $4361  [$00:4361]   ;Aを[$00:4361]に書き込み
+$C0/E1D6 LDX #$3C70              ;Xに$3C70をロード
+$C0/E1D9 STX $4362  [$00:4362]   ;Xを[$00:4363][$00:4362]に書き込み
+$C0/E1DC LDA #$7F                ;Aに$7Fをロード
+$C0/E1DE STA $4364  [$00:4364]   ;Aを[$00:4364]に書き込み
+$C0/E1E1 STA $4367  [$00:4367]   ;Aを[$00:4367]に書き込み
+;
+;HDMA チャネル6
+;[$00:4360]	GDMA / HDMA設定レジスタ
+;[$00:4361]	転送先指定	$0D= BG1HOFS
+;[$00:4363][$00:4362]	データ元アドレス（開始位置）	$3C70
+;[$00:4364]	データ元バンク	$7F
+;[$00:4367]	HDMA間接アドレスバンクバイト	$7F
+;
+$C0/E1E4 LDA #$02                ;Aに$02をロード
+$C0/E1E6 STA $4370  [$00:4370]   ;Aを[$00:4370]に書き込み
+$C0/E1E9 LDA #$0E                ;Aに$0Eをロード
+$C0/E1EB STA $4371  [$00:4371]   ;Aを[$00:4371]に書き込み
+$C0/E1EE LDX #$3C60              ;Xに$3C60をロード
+$C0/E1F1 STX $4372  [$00:4372]   ;Xを[$00:4373][$00:4372]に書き込み
+$C0/E1F4 LDA #$7F                ;Aに$7Fをロード
+$C0/E1F6 STA $4374  [$00:4374]   ;Aを[$00:4374]に書き込み
+$C0/E1F9 STA $4377  [$00:4377]   ;Aを[$00:4377]に書き込み
+;
+;HDMA チャネル7
+;[$00:4370]	GDMA / HDMA設定レジスタ	$02
+;[$00:4371]	転送先指定	$0E= BG1VOFS
+;[$00:4373][$00:4372]	データ元アドレス（開始位置）	$3C60
+;[$00:4374]	データ元バンク	$7F
+;[$00:4377]	HDMA間接アドレスバンクバイト	$7F
+;
+$C0/E1FC RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>まとめると、</p>
+
+<table>
+<thead>
+	<tr><th>HDMA チャネル6<br>I/Oアドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4360]</code></td><td>GDMA / HDMA設定レジスタ</td><td><span class="formula">$02</span><br>直接テーブルモード 1レジスタ2書き込み </td></tr>
+	<tr><td><code>[$00:4361]</code></td><td>転送先指定</td><td><span class="formula">$0D</span>= BG1HOFS<br>BG1水平スクロール量<code>[$00:210D]</code></td></tr>
+	<tr><td><code>[$00:4363]</code><code>[$00:4362]</code></td><td>データ元アドレス（開始位置）</td><td><span class="formula">$3C70</span></td></tr>
+	<tr><td><code>[$00:4364]</code></td><td>データ元バンク</td><td><span class="formula">$7F</span></td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>HDMA チャネル7<br>I/Oアドレス</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:4370]</code></td><td>GDMA / HDMA設定レジスタ</td><td><span class="formula">$02</span><br>直接テーブルモード 1レジスタ2書き込み </td></tr>
+	<tr><td><code>[$00:4371]</code></td><td>転送先指定</td><td><span class="formula">$0E</span>= BG1VOFS<br>BG1垂直スクロール量<code>[$00:210E]</code></td></tr>
+	<tr><td><code>[$00:4373]</code><code>[$00:4372]</code></td><td>データ元アドレス（開始位置）</td><td><span class="formula">$3C60</span></td></tr>
+	<tr><td><code>[$00:4374]</code></td><td>データ元バンク</td><td><span class="formula">$7F</span></td></tr>
+</tbody>
+</table>
+
+<p>BG1水平スクロール量<code>[$00:210D]</code>とBG1垂直スクロール量<code>[$00:210E]</code>に関するHDMA転送設定なのだが、タイトル画面だけであれば垂直スクロールはしていない。<br>
+デモ画面において何のボタンも押さずに待っていると、最終的に「Welcome to LIVE A LIVE」と「LIVE A LIVE」のロゴが表示され、画面上から下にスクロールし（ここで垂直スクロール量を変更）、タイトル画面となるが、「画面上から下にスクロール」の設定のために垂直スクロール量も設定していたのである。<br>
+タイトル画面の雲の横スクロールは、BG1水平スクロール量<code>[$00:210D]</code>で決めている。</p>
+
+<p>HDMAテーブルが書かれている、<code>$7F:3C60</code>～と<code>$7F:3C70</code>～は、上のHDMAチャネル設定の後に計算されて決まる。<br>
+HDMAテーブル計算用のサブルーチンが<code><span class="r">$C0/E231</span></code>～<code><span class="r">$C0/E387</span></code>に当たるが、その説明は後として、タイトル画面の初期値として入る<code>$7F:3C60</code>～と<code>$7F:3C70</code>～は以下の通りである（16ビット区切り）。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7F:3C60</code>～<code>$7F:3C6F</code></td><td class="mono">6F FF 00 18 FF 00 58 FF 00 00 FF 00 55 55 55 55</td></tr>
+	<tr><td><code>$7F:3C70</code>～<code>$7F:3C7F</code></td><td class="mono">48 00 00 20 00 00 20 00 00 58 00 00 00 55 55 55</td></tr>
+</tbody>
+</table>
+
+<p>水平スクロール量、垂直スクロール量どちらも2バイトの容量を書き込まなければならないため、「1レジスタ2書き込み」の設定になっている。<br>
+3バイト区切りでHDMAテーブルが設定されているはずである。<br>
+先に、タイトル画面では変動しないはずのBG1垂直スクロール量<code>[$00:210E]</code>を見てみよう。<code>$7F:3C60</code>～から3バイト区切りで見ると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>書き込み<br>スキャンライン数</th><th><code>[$00:210E]</code>2度書き</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$6F</span></td><td><span class="formula">$FF</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$18</span></td><td><span class="formula">$FF</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$58</span></td><td><span class="formula">$FF</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$00</span></td><td><span class="formula">$FF</span>, <span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>タイトル画面では上の数値のまま<code>$7F:3C60</code>～<code>$7F:3C6B</code>が固定されている。<br>
+実質、どのスキャンラインも<code>[$00:210E]</code>に<span class="formula">$00FF</span>を書き込んでいることになる。<br>
+<code><span class="r">$C0/E1A2</span></code>～<code><span class="r">$C0/E1CB</span></code>で書き込まれた初期値と変わらないことがわかる。<br>
+（それならタイトル表示の時点でHDMAチャネル7のHDMA転送は止めても良い気がするのだが、続ける理由は筆者にはよくわからない）</p>
+
+<p>一方、BG1水平スクロール量<code>[$00:210D]</code>は初期値が以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>書き込み<br>スキャンライン数</th><th><code>[$00:210D]</code>2度書き</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$48</span></td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$20</span></td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$20</span></td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$58</span></td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$00</span></td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>スキャンライン数から、雲の位置で3層＋雲のない層に分けていることがわかる。<br>
+この3層を便宜上、以降はエリアA、エリアB、エリアC、雲のない層エリアDとしておく。</p>
+
+<table>
+<thead>
+	<tr><th>エリア</th><th>スキャンライン数</th><th>Y座標（ピクセル単位）</th></tr>
+</thead>
+<tbody>
+	<tr><td>A</td><td><span class="formula">$48</span></td><td><span class="formula">0～72</span></td></tr>
+	<tr><td>B</td><td><span class="formula">$20</span></td><td><span class="formula">73～104</span></td></tr>
+	<tr><td>C</td><td><span class="formula">$20</span></td><td><span class="formula">105～136</span></td></tr>
+	<tr><td>D</td><td><span class="formula">$58</span></td><td><span class="formula">137～224</span></td></tr>
+</tbody>
+</table>
+
+<p>137スキャンラインより下エリアDは雲ではない部分でスクロールさせない。<br>
+では、<code>$7F:3C70</code>～はどう決めているのか。<br>
+横幅は256ピクセルだから、スクロール量は$000～$0FFの間でループさせれば、左にBGが移動し、かつ、右端からは左にはみ出した部分が出てくるように見えるはずだ。<br>
+スキャンライン数は固定だから、</p>
+
+<table>
+<thead>
+	<tr><th>エリア</th><th>スキャンライン数</th><th><code>[$00:210D]</code>2バイト</th></tr>
+</thead>
+<tbody>
+	<tr><td>A</td><td><code>[$7F:3C70]</code>: <span class="formula">$48</span></td><td><code>[$7F:3C72]</code><code>[$7F:3C71]</code>: <span class="formula">$0000</span>～<span class="formula">$00FF</span></td></tr>
+	<tr><td>B</td><td><code>[$7F:3C73]</code>: <span class="formula">$20</span></td><td><code>[$7F:3C75]</code><code>[$7F:3C74]</code>: <span class="formula">$0000</span>～<span class="formula">$00FF</span></td></tr>
+	<tr><td>C</td><td><code>[$7F:3C76]</code>: <span class="formula">$20</span></td><td><code>[$7F:3C78]</code><code>[$7F:3C77]</code>: <span class="formula">$0000</span>～<span class="formula">$00FF</span></td></tr>
+	<tr><td>D</td><td><code>[$7F:3C79]</code>: <span class="formula">$58</span></td><td><code>[$7F:3C7B]</code><code>[$7F:3C7A]</code>: <span class="formula">$0000</span>固定（スクロールしない）</td></tr>
+</tbody>
+</table>
+
+<p>となるはずで、実質変動するのは<code>[$7F:3C71]</code>, <code>[$7F:3C74]</code>, <code>[$7F:3C77]</code>だけである。</p>
+
+<p>実際の計算を見てみよう。</p>
+
+<div class="code-container"><pre>
+$C0/E231 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/E232 LDA #$7F                ;Aに$7Fをロード
+$C0/E234 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/E235 PLB                     ;DBレジスタにスタックからプル
+;BG1垂直スクロール量[$00:210E]のHDMAテーブル$7F:3C60～計算
+$C0/E236 LDX #$3C60              ;Xに$3C60をロード
+$C0/E239 LDA #$6F                ;Aに$6Fをロード
+$C0/E23B STA $0000,x[$7F:3C60]   ;A($6F)を[$7F:3C60]に書き込み
+$C0/E23E REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/E240 LDA $000234[$00:0234]   ;Aに[$00:0235][$00:0234](0200)をロード
+$C0/E244 LSR A                   ;Aを論理右シフト　(/2)
+$C0/E245 DEC A                   ;Aをデクリメント -1
+$C0/E246 STA $0001,x[$7F:3C61]   ;A(00FF)を[$7F:3C62][$7F:3C61]に書き込み
+$C0/E249 STA $0004,x[$7F:3C64]   ;A(00FF)を[$7F:3C65][$7F:3C64]に書き込み
+$C0/E24C LDA $000234[$00:0234]   ;A(0200)に[$00:0235][$00:0234]をロード
+$C0/E250 BMI $05    [$E257]      ;ネガティブフラグが立っているとき[$E257]分岐
+$C0/E252 CMP #$0150              ;A(0200)と$0150を減算比較（ステータスレジスタ変更のみ）
+$C0/E255 BCS $0C    [$E263]      ;キャリーフラグが立っているとき[$E263]分岐
+$C0/E263 SBC #$0150              ;A(0200) - $0150 
+$C0/E266 LSR A                   ;A(00B0)を論理右シフト　(/2)
+$C0/E267 STA $30    [$00:0030]   ;A(0058)を[$00:0031][$00:0030]に書き込み
+$C0/E269 STZ $0007,x[$7F:3C67]   ;[$7F:3C68][$7F:3C67]に$0000を書き込み
+$C0/E26C LDA $000232[$00:0232]   ;Aに[$00:0233][$00:0232](0200)をロード
+$C0/E270 LSR A                   ;A(0200)を論理右シフト　(/2)
+$C0/E271 DEC A                   ;A(0100)をデクリメント -1
+$C0/E272 STA $000A,x[$7F:3C6A]   ;A(00FF)を[$7F:3C6B][$7F:3C6A]に書き込み
+$C0/E275 LDA $000232[$00:0232]   ;Aに[$00:0233][$00:0232](0200)をロード
+$C0/E279 BMI $52    [$E2CD]      ;ネガティブフラグが立っているとき[$E2CD]分岐
+$C0/E27B SEC                     ;キャリーフラグON
+$C0/E27C SBC #$0150              ;A(0200) - $0150
+$C0/E27F BCC $4C    [$E2CD]      ;キャリーフラグが立っていないとき[$E2CD]分岐
+$C0/E281 LSR A                   ;A(00B0)を論理右シフト　(/2)
+$C0/E282 STA $32    [$00:0032]   ;A(0058)を[$00:0033][$00:0032]に書き込み
+$C0/E284 LDA $30    [$00:0030]   ;A(0058)に[$00:0031][$00:0030]をロード
+$C0/E286 SEC                     ;キャリーフラグON
+$C0/E287 SBC $32    [$00:0032]   ;A(0058) - [$00:0033][$00:0032](0058)
+$C0/E289 STA $32    [$00:0032]   ;A(0000)を[$00:0033][$00:0032]に書き込み
+$C0/E28B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/E28D LDA #$70                ;Aに$70をロード
+$C0/E28F SEC                     ;キャリーフラグON
+$C0/E290 SBC $30    [$00:0030]   ;A(70) - [$00:0030](58)
+$C0/E292 STA $0003,x[$7F:3C63]   ;A(18)を[$7F:3C63]に書き込み
+$C0/E295 LDA $32    [$00:0032]   ;Aに[$00:0032]をロード
+$C0/E297 BEQ $1E    [$E2B7]      ;ゼロフラグが立っているとき[$E2B7]分岐
+$C0/E2B7 LDA $30    [$00:0030]   ;Aに[$00:0030](58)をロード
+$C0/E2B9 STA $0006,x[$7F:3C66]   ;A(58)を[$7F:3C66]に書き込み
+$C0/E2BC LDA $000A,x[$7F:3C6A]   ;Aに[$7F:3C6A](FF)をロード
+$C0/E2BF STA $0007,x[$7F:3C67]   ;A(FF)を[$7F:3C67]に書き込み
+$C0/E2C2 LDA $000B,x[$7F:3C6B]   ;Aに[$7F:3C6B](00)をロード
+$C0/E2C5 STA $0008,x[$7F:3C68]   ;A(00)を[$7F:3C68]に書き込み
+$C0/E2C8 STZ $0009,x[$7F:3C69]   ;[$7F:3C69]に$00を書き込み
+$C0/E2CB BRA $12    [$E2DF]      ;フラグにかかわりなく常に分岐[$E2DF]
+;BG1水平スクロール量[$00:210D]のHDMAテーブル$7F:3C70～計算
+$C0/E2DF LDX #$3C70              ;Xに$3C70をロード
+$C0/E2E2 LDA $000250[$00:0250]   ;Aに[$00:0250](00)をロード
+$C0/E2E6 STA $0001,x[$7F:3C71]   ;A(00)を[$7F:3C71]に書き込み
+$C0/E2E9 STZ $0002,x[$7F:3C72]   ;[$7F:3C72]に$00を書き込み
+$C0/E2EC STA $0004,x[$7F:3C74]   ;Aを[$7F:3C74](00)に書き込み
+$C0/E2EF STZ $0005,x[$7F:3C75]   ;[$7F:3C75]に$00を書き込み
+$C0/E2F2 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/E2F4 LDA $000234[$00:0234]   ;Aに[$00:0235][$00:0234](0200)をロード
+$C0/E2F8 BMI $7D    [$E377]      ;ネガティブフラグが立っているとき[$E377]分岐
+$C0/E2FA CMP #$00D0              ;Aと$00D0を減算比較（ステータスレジスタ変更のみ）
+$C0/E2FD BCC $78    [$E377]      ;キャリーフラグが立っていないとき[$E377]分岐
+$C0/E2FF SEC                     ;キャリーフラグON
+$C0/E300 SBC #$00D0              ;A(0200) - $00D0
+$C0/E303 LSR A                   ;A(0130)を論理右シフト　(/2)
+$C0/E304 STA $30    [$00:0030]   ;A(0098)を[$00:0031][$00:0030]に書き込み
+$C0/E306 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/E308 LDA #$E0                ;Aに$E0をロード
+$C0/E30A SEC                     ;キャリーフラグON
+$C0/E30B SBC $30    [$00:0030]   ;A($E0) - [$00:0030](98)
+$C0/E30D CMP #$70                ;Aと$70を減算比較（ステータスレジスタ変更のみ）
+$C0/E30F BCC $11    [$E322]      ;キャリーフラグが立っていないとき[$E322]分岐
+$C0/E322 STA $0000,x[$7F:3C70]   ;A(48)を[$7F:3C70]に書き込み
+$C0/E325 LDA $000251[$00:0251]   ;Aに[$00:0251](00)をロード
+$C0/E329 STA $0004,x[$7F:3C74]   ;A(00)を[$7F:3C74]に書き込み
+$C0/E32C STZ $0005,x[$7F:3C75]   ;[$7F:3C75]に$00を書き込み
+$C0/E32F LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/E331 CMP #$20                ;A(98)と$20を減算比較（ステータスレジスタ変更のみ）
+$C0/E333 BCC $3A    [$E36F]      ;キャリーフラグが立っていないとき[$E36F]分岐
+$C0/E335 BEQ $38    [$E36F]      ;ゼロフラグが立っているとき[$E36F]分岐
+$C0/E337 SBC #$20                ;A(98) - $20
+$C0/E339 STA $30    [$00:0030]   ;A(78)を[$00:0030]に書き込み
+$C0/E33B LDA #$20                ;Aに$20をロード
+$C0/E33D STA $0003,x[$7F:3C73]   ;A($20)を[$7F:3C73]に書き込み
+$C0/E340 LDA $000252[$00:0252]   ;A(00)に[$00:0252]をロード
+$C0/E344 STA $0007,x[$7F:3C77]   ;A(00)を[$7F:3C77]に書き込み
+$C0/E347 STZ $0008,x[$7F:3C78]   ;[$7F:3C78]に$00を書き込み
+$C0/E34A LDA $30    [$00:0030]   ;Aに[$00:0030](78)をロード
+$C0/E34C CMP #$20                ;Aと$20を減算比較（ステータスレジスタ変更のみ）
+$C0/E34E BCC $17    [$E367]      ;キャリーフラグが立っていないとき[$E367]分岐
+$C0/E350 BEQ $15    [$E367]      ;ゼロフラグが立っているとき[$E367]分岐
+$C0/E352 SBC #$20                ;A(78) - $20
+$C0/E354 STA $0009,x[$7F:3C79]   ;A(58)を[$7F:3C79]に書き込み
+$C0/E357 LDA #$20                ;Aに$20をロード
+$C0/E359 STA $0006,x[$7F:3C76]   ;A($20)を[$7F:3C76]に書き込み
+$C0/E35C STZ $000A,x[$7F:3C7A]   ;[$7F:3C7A]に$00を書き込み
+$C0/E35F STZ $000B,x[$7F:3C7B]   ;[$7F:3C7B]に$00を書き込み
+$C0/E362 STZ $000C,x[$7F:3C7C]   ;[$7F:3C7C]に$00を書き込み
+$C0/E365 BRA $1F    [$E386]      ;フラグにかかわりなく常に分岐[$E386]
+$C0/E386 PLB                     ;DBレジスタにスタックからプル
+$C0/E387 RTS                     ;サブルーチン戻り
+
+$C0/E083 LDA #$C0                ;Aに$C0をロード
+$C0/E085 STA $420C  [$00:420C]   ;Aを[$00:420C]に書き込み HDMA転送
+$C0/E088 LDA #$01                ;Aに$01をロード
+$C0/E08A STA $0237  [$00:0237]   ;Aを[$00:0237]に書き込み
+$C0/E08D JSR $E20F  [$C0:E20F]   ;[$C0:E20F]へジャンプ
+</pre></div>
+
+<p>BG1水平スクロール量<code>[$00:210D]</code>用のHDMAテーブルである<code>$7F:3C70</code>～の計算は<code><span class="r">$C0/E2DF</span></code>からなので、そこから説明する。<br>
+処理を追ってみると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>計算</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula"><code>[$7F:3C71]</code> = <code>[$00:0250]</code>($00)</span></td><td>エリアAスクロール量（下1バイト）</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C72]</code> = $00</span></td><td>エリアAスクロール量（上1バイト）<span class="formula">$00</span>固定</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C74]</code> = <code>[$00:0250]</code>($00)</span></td><td>エリアBスクロール量（下1バイト）</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C75]</code> = $00</span></td><td>エリアBスクロール量（上1バイト）<span class="formula">$00</span>固定</td></tr>
+</tbody>
+</table>
+
+<p><span class="formula"><code>[$00:0031]</code><code>[$00:0030]</code> = (<code>[$00:0235]</code><code>[$00:0234]</code>($0200) - $00D0)/2 = $0098</span></p>
+
+<table>
+<thead>
+	<tr><th>計算</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula"><code>[$7F:3C70]</code> = $E0 - <code>[$00:0030]</code>($98) = $48</span></td><td>エリアAスキャンライン数</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C74]</code> = <code>[$00:0251]</code>($00)</span></td><td>エリアBスクロール量（下1バイト）計算値</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C75]</code> = $00</span></td><td>エリアBスクロール量（上1バイト）<span class="formula">$00</span>固定</td></tr>
+</tbody>
+</table>
+
+<p><span class="formula"><code>[$00:0030]</code> = <code>[$00:0030]</code>($98) - 20 = $78</span></p>
+
+<table>
+<thead>
+	<tr><th>計算</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula"><code>[$7F:3C73]</code> = $20</span></td><td>エリアBスキャンライン数</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C77]</code> = <code>[$00:0252]</code>($00)</span></td><td>エリアCスクロール量（下1バイト）計算値</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C78]</code> = $00</span></td><td>エリアCスクロール量（上1バイト）<span class="formula">$00</span>固定</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C79]</code> = <code>[$00:0030]</code>($78) - $20 = $58</span></td><td>エリアDスキャンライン数</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C76]</code> = $20</span></td><td>エリアCスキャンライン数</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C7A]</code> = $00</span></td><td>エリアDスクロール量（下1バイト）（スクロールしない）</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C7B]</code> = $00</span></td><td>エリアDスクロール量（上1バイト）（スクロールしない）</td></tr>
+	<tr><td><span class="formula"><code>[$7F:3C7C]</code> = $00</span></td><td>※HDMA転送終了用の<span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>実質、<code>[$00:0250]</code>, <code>[$00:0251]</code>, <code>[$00:0252]</code>がエリアA, B, Cのスクロール量そのままだということがわかる。<br>
+また、ここより前に<code>[$00:0235]</code><code>[$00:0234]</code>に書き込んだ<span class="formula">$0200</span>は、エリアのスキャンライン数を決めるための値だったこともわかる。</p>
+
+<p><code>[$00:0250]</code>, <code>[$00:0251]</code>, <code>[$00:0252]</code>は、<code><span class="r">$C0/E1FD</span></code>～<code><span class="r">$C0/E20E</span></code>で初期値が<span class="formula">$00</span>と書き込まれているため、スクロール量初期値は<span class="formula">$0000</span>である。</p>
+
+<p>BG1水平スクロール量<code>[$00:210D]</code>用のHDMAテーブルが決まった直後の<code><span class="r">$C0/E083</span></code>～<code><span class="r">$C0/E08D</span></code>でHDMA転送を行っており、この後のHBlankのタイミングでHDMA転送を行って、各スキャンラインの水平スクロール量を更新する。</p>
+
+<p>HDMA転送を行った直後、以下処理で<code>[$00:0250]</code>, <code>[$00:0251]</code>, <code>[$00:0252]</code>が更新される。</p>
+
+<div class="code-container"><pre>
+$C0/E20F LDX #$0250              ;Xに$0250をロード
+$C0/E212 DEC $03,x  [$00:0253]   ;[$00:0253](初期値$01)をデクリメント -1
+$C0/E214 BNE $06    [$E21C]      ;ゼロフラグが立っていないとき[$E21C]分岐
+;ゼロフラグON
+$C0/E216 LDA #$02                ;Aに$02をロード
+$C0/E218 STA $03,x  [$00:0253]   ;Aを[$00:0253]に書き込み
+$C0/E21A INC $00,x  [$00:0250]   ;[$00:0250](初期値$00)をインクリメント +1
+$C0/E21C DEC $04,x  [$00:0254]   ;[$00:0254](初期値$01)をデクリメント -1
+$C0/E21E BNE $06    [$E226]      ;ゼロフラグが立っていないとき[$E226]分岐
+;ゼロフラグON
+$C0/E220 LDA #$04                ;Aに$04をロード
+$C0/E222 STA $04,x  [$00:0254]   ;Aを[$00:0254]に書き込み
+$C0/E224 INC $01,x  [$00:0251]   ;[$00:0251](初期値$00)をインクリメント +1
+$C0/E226 DEC $05,x  [$00:0255]   ;[$00:0255](初期値$01)をデクリメント -1
+$C0/E228 BNE $06    [$E230]      ;ゼロフラグが立っていないとき[$E230]分岐
+;ゼロフラグON
+$C0/E22A LDA #$08                ;Aに$08をロード
+$C0/E22C STA $05,x  [$00:0255]   ;Aを[$00:0255](初期値$01)に書き込み
+$C0/E22E INC $02,x  [$00:0252]   ;[$00:0252](初期値$00)をインクリメント +1
+$C0/E230 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>初期値に<span class="formula">$01</span>を書き込んだ<code>[$00:0253]</code>～<code>[$00:0255]</code>の値により、途中にゼロフラグ分岐がある。<br>
+整理してみると下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>エリア</th><th>スクロール量</th><th>スクロール量</th></tr>
+</thead>
+<tbody>
+	<tr><td>エリアA</td><td><code>[$00:0250]</code></td><td><code>[$00:0253]</code>を<span class="formula">-1</span>して<span class="formula">$00</span>の時、<span class="formula">$02</span>を書き込み、<code>[$00:0250]</code>を<span class="formula">+1</span></td></tr>
+	<tr><td>エリアB</td><td><code>[$00:0251]</code></td><td><code>[$00:0254]</code>を<span class="formula">-1</span>して<span class="formula">$00</span>の時、<span class="formula">$04</span>を書き込み、<code>[$00:0251]</code>を<span class="formula">+1</span></td></tr>
+	<tr><td>エリアC</td><td><code>[$00:0252]</code></td><td><code>[$00:0255]</code>を<span class="formula">-1</span>して<span class="formula">$00</span>の時、<span class="formula">$08</span>を書き込み、<code>[$00:0252]</code>を<span class="formula">+1</span></td></tr>
+</tbody>
+</table>
+
+<p>結果として、エリアAは毎フレーム、<code>[$00:0253]</code>が<span class="formula">$02</span>→<span class="formula">$01</span>→<span class="formula">$02</span>→<span class="formula">$01</span>→……を繰り返し、<code>[$00:0250]</code>は<span class="formula">$02</span>が書き込まれたタイミング、つまり2フレームに1回、<code>[$00:0250]</code>を<span class="formula">+1</span>してスクロール量が増加する。<br>
+同じ理屈で、エリアBは4フレームに1回、<code>[$00:0251]</code>を<span class="formula">+1</span>してスクロール量が増加する。<br>
+エリアCは8フレームに1回、<code>[$00:0252]</code>を<span class="formula">+1</span>してスクロール量が増加する。<br>
+これがエリア毎（スキャンライン毎）にスクロール量が変わる仕組みである。<br>
+インクリメント時にキャリー（繰り上がり）は考慮していないのでオーバーフローして<span class="formula">$FF</span>の次は<span class="formula">$00</span>に戻るのだが、むしろそれで<code>[$00:210D]</code>（水平スクロール量）の無限ループが完成するため、問題ない。</p>
+
+<p>以上を繰り返してHDMA転送による多重スクロールを行っている。</p>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="scroll.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="rasterscroll.html"><span class="button">&#9654;次 ラスタースクロール</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -212,6 +212,9 @@ table {
 当コンテンツでは多重スクロールという名称で説明をする。<br>
 詳細は<a href="#scr01">多重スクロール</a>の項目で説明している。</p>
 
+<p>また、スクロールの仕組みの説明の補足として、最後に<a href="#scr02">無限ループとスクロール</a>についても説明している。<br>
+次ページの<a href="scroll2.html">HDMA転送による多重スクロール</a>も合わせて御覧いただきたい。</p>
+
 <p>背景のスクロールの値はI/Oポートアドレス<code>$00:210D</code>～<code>$00:2114</code>で決めている。<br>
 なお、BGMode7（画面の回転などが可能なモード）だと異なる値の設定になるが、今回は通常のゲームプレイ画面、BGMode1での話とする。</p>
 
@@ -775,6 +778,42 @@ BG1が1フレームに2ピクセル、BG2が1フレームに1ピクセルずつ�
 ここが特殊な処理扱いなのは左右でループするマップだからであろう。<br>
 イベント関連で多重スクロールが使われているシーンは多く、<span class="formula">$01</span>や<span class="formula">$02</span>で処理しているようである（未確認）。</p>
 
+<h3 id="scr02">補足 無限ループとスクロール</h3>
+
+<p>通常のフィールドやマップは、移動すると壁にぶつかったり他のマップへの出入り口に到達して、どこかでスクロールが止まる。<br>
+だが、本作の一部のマップは上下や左右がいつまでも無限にスクロールする。<br>
+原始編のポゴの夢の花畑や（実際には100マス移動でイベントが始まったりするため、プレイヤーが無限に移動することはできない）、最終編でオルステッド以外を主人公にしたときに飛ばされる異次元空間、知のダンジョンの横方向無限ループフロアなど。<br>
+こういうマップでは、ループする時に上下左右に新たにマップをくっつけるような処理をする必要はない。<br>
+例えばBG1なら<code>[$00:2107]</code>で背景サイズを決めて、縦32×横32タイルで並べるとか、本作のほとんどのマップで採用されている縦32×横64タイルにするなど設定をする。<br>
+この時に、例えば縦32×横64なら、真下にミラーリングで縦32×横64がもうひとつ並ぶので、上下に関してはおなじ背景がふたつ並ぶ。<br>
+さらに、スクロール量は<span class="formula">$000</span>～<span class="formula">$3FF</span>、10進数<span class="formula">0</span>～<span class="formula">1023</span>（ピクセル）、つまり縦64×横64タイルであり、<span class="formula">0</span>～<span class="formula">1023</span>が無限ループする。<br>
+つまり、壁など障害物がない限り、真っ平らのマップなら、上下左右移動すると背景が無限スクロールすることになる。</p>
+
+<p>例えば最終編・異次元空間だと、縦64×横32タイルのマップであり、上下左右が無限ループする。<br>
+100マス歩いた時に出現する階段以外の障害物はないから、階段を避ければ上下左右ひたすら移動することで水平スクロール量・垂直スクロール量が<span class="formula">0</span>～<span class="formula">1023</span>で無限ループする。<br>
+横方向で考えると、水平スクロール量が<span class="formula">$000</span>の時、</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/mugen01.png" class="modal-link">
+		<img src="img/mugen01.png" alt="BG 縦64×横32タイル" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>実際には上図の中で、枠で囲った範囲、つまり垂直スクロール量で指定した縦224ピクセル部分だけがゲーム画面に表示される。<br>
+水平スクロール量を256ピクセルのちょうど中央あたりの<span class="formula">$080</span>に設定すると、</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/mugen02.png" class="modal-link">
+		<img src="img/mugen02.png" alt="BG 縦64×横32タイル 水平スクロール量変化" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>このように元の画像を横方向につなげて、その途中がゲーム画面に表示されるようなイメージと考えていただきたい。<br>
+元背景画像の右から<span class="formula">$80</span>～<span class="formula">$FF</span>ピクセル（右半分）は、これといって特別な設定をしなくても、ゲーム画面左側に表示される。<br>
+これが無限ループの基本的な仕組みになる。</p>
+
+<p>次ページでは、無限ループを利用した<a href="scroll2.html">HDMA転送による多重スクロール</a>を紹介する。</p>
+
 <!-- <script>//リストタイトル静的生成
 document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
 </script> -->
@@ -786,7 +825,7 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 <div class="pagelink">
 	<div id="pageprev"><a href="window.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-	<div id="pagenext"><a href="rasterscroll.html"><span class="button">&#9654;次 ラスタースクロール</span></a></div>
+	<div id="pagenext"><a href="scroll2.html"><span class="button">&#9654;次 HDMA転送による多重スクロール</span></a></div>
 </div>
 
 </div>
@@ -797,8 +836,8 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 
 <!-- sidebar -->
 
-<!-- <script>let arrowOn=false;</script>
-<script src="../../js/modal.min.js?20250722"></script> -->
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
 
 <div class="accordion">
 
