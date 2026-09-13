@@ -211,6 +211,8 @@ table {
 <p>中世編はランダムエンカウントで、エリアとシナリオ進行度によって、敵パーティが複数パターンから確率で決まる。<br>
 最終編もランダムエンカウントで、味方キャラの合計レベルとエリアにより敵パーティが4種類から各1/4で決まる。<span class="tri"><a href="program16.html">最終編敵パーティ</a></span>で解説している。</p>
 
+<p>このページの最後に、<a href="#kinmirai">近未来編ワールドマップ</a>についてもおまけで記しておく。</p>
+
 <h3><code>[$00:0041]</code>（エリア固有値）について</h3>
 
 <p>ランダムエンカウントのみならず、戦闘における各種の判定で重要になってくるのが、<code>[$00:0040]</code><code>[$00:0041]</code>の値である。<br>
@@ -916,6 +918,78 @@ $C1/F623 JSR $FB2B  [$C1:FB2B]   ;[$C1:FB2B]へジャンプ
 	<tr><td><span class="formula">$35</span></td><td>1</td><td>ドラグノフォビア×2</td></tr>
 </tbody>
 </table>
+
+<h3 id="kinmirai">近未来編ワールドマップ</h3>
+
+<p>おまけで近未来編ワールドマップの敵パーティ計算方法も記しておく。<br>
+<code><span class="r">$C1/F55D</span></code>～<code><span class="r">$C1/F623</span></code>の<code><span class="r">$C1/F598</span></code>の分岐が近未来編である。</p>
+
+<div class="code-container"><pre>
+;（前略）
+$C1/F598 BNE $15    [$F5AF]      ;ゼロフラグが立っていないとき[$F5AF]分岐
+;ゼロフラグON 近未来編処理
+$C1/F59A LDA $0041  [$00:0041]   ;Aに[$00:0041]($80)をロード
+$C1/F59D BIT #$03                ;Aと$03で論理積（ステータスフラグ変更のみ）
+$C1/F59F BNE $0E    [$F5AF]      ;ゼロフラグが立っていないとき[$F5AF]分岐
+;ゼロフラグON
+$C1/F5A1 LDA $0E86  [$00:0E86]   ;Aに[$00:0E86](シナリオ別キャラデータ アキラのLV)をロード
+$C1/F5A4 CLC                     ;キャリーフラグクリア
+$C1/F5A5 ADC #$74                ;A + $74（LV+$74）
+$C1/F5A7 CMP #$82                ;Aと$82を減算比較（ステータスレジスタ変更のみ）
+$C1/F5A9 BCC $45    [$F5F0]      ;キャリーフラグが立っていないとき[$F5F0]分岐
+;キャリーフラグON（アキラのレベルが14($0E)以上）
+$C1/F5AB LDA #$81                ;Aに$81をロード
+$C1/F5AD BRA $41    [$F5F0]      ;フラグにかかわりなく常に分岐[$F5F0]
+;キャリーフラグOFF（アキラのレベルが14($0E)未満）
+;処理合流
+$C1/F5F0 STA $50    [$00:0350]   ;Aを[$00:0350]に書き込み（LV+$74または$81, $78~$81）
+$C1/F5F2 STZ $51    [$00:0351]   ;[$00:0351]に$00を書き込み
+$C1/F5F4 CMP #$D3                ;Aと$D3を減算比較（ステータスレジスタ変更のみ）
+$C1/F5F6 BNE $03    [$F5FB]      ;ゼロフラグが立っていないとき[$F5FB]分岐
+$C1/F5FB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/F5FD LDA $50    [$00:0350]   ;Aに[$00:0351][$00:0350]をロード
+$C1/F5FF ASL A                   ;Aを算術左シフト *2
+$C1/F600 ADC $D60020[$D6:0020]   ;A + [$D6:0021][$D6:0020]($4080)
+$C1/F604 TAX                     ;Aの値をXレジスタに転送
+$C1/F605 LDA $D60000,x           ;Aに[$D60000,x+1][$D60000,x]をロード
+$C1/F609 TAX                     ;Aの値をXレジスタに転送
+$C1/F60A STA $52    [$00:0352]   ;Aを[$00:0353][$00:0352]に書き込み
+;（中略）
+$C1/F623 JSR $FB2B  [$C1:FB2B]   ;[$C1:FB2B]へジャンプ
+</pre></div>
+
+<p>近未来編ワールドマップだと<code>[$00:0041]</code>に<span class="formula">$80</span>が入っていて、<code><span class="r">$C1/F59F</span></code>でゼロフラグが立ち、ワールドマップ判定になる。<br>
+<code><span class="r">$C1/F5A1</span></code>でロードする<code>[$00:0E86]</code>は、シナリオ別キャラデータのアキラのレベルである。<br>
+アキラの初期レベルは4だから、<span class="formula">4</span>～<span class="formula">99</span>（<span class="formula">$04</span>～<span class="formula">$63</span>）の範囲の値である。<br>
+<code><span class="r">$C1/F5A9</span></code>でキャリーフラグ分岐があるが、これは「<span class="formula">アキラのレベル + $74</span>」と<span class="formula">$82</span>の減算結果のキャリーフラグ判定である。<br>
+アキラのレベルが<span class="formula">14</span>(<span class="formula">$0E</span>)以上か未満かで判定が分岐し、アキラのレベルが<span class="formula">14</span>以上だと<code>A</code>を<span class="formula">$81</span>に、<span class="formula">14</span>未満は「<span class="formula">アキラのレベル + $74</span>」のままとする。<br>
+つまり、アキラのレベルが<span class="formula">4</span>～<span class="formula">13</span>なら<span class="formula">$78</span>～<span class="formula">$81</span>、レベルが<span class="formula">14</span>以上だと<span class="formula">$81</span>固定である。<br>
+「<span class="formula">アキラのレベル + $74</span>」だが、レベル最大値は<span class="formula">$63</span>で、<span class="formula">$63 + $74 = $D7</span>だからオーバーフローすることはないはず。</p>
+
+<p>ワールドマップの敵はアキラのレベルが<span class="formula">13</span>以上だと、レベル<span class="formula">13</span>で出現する敵パーティで固定になるが、その分岐が<code><span class="r">$C1/F5A9</span></code>のキャリーフラグ分岐ということがわかる。</p>
+
+<p>計算値の<span class="formula">$78</span>～<span class="formula">$81</span>は<code><span class="r">$C1/F5F0</span></code>で<code>[$00:0350]</code>に書き込まれ、以降は原始編や中世編と共通処理である。<br>
+原始編と同じく、<code>[$00:0350]</code>に書き込まれた値＝敵パーティIDである。</p>
+
+<table>
+<thead>
+	<tr><th>アキラのLV</th><th><code>[$00:0350]</code></th><th>呼び出し先</th><th>敵パーティ</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">04</span></td><td><span class="formula">$78</span></td><td><span class="formula"><code>[$D6:4171]</code><code>[$D6:4170]</code> = $49C0</span></td><td>ラジコン１号×3,クルセイダー</td></tr>
+	<tr><td><span class="formula">05</span></td><td><span class="formula">$79</span></td><td><span class="formula"><code>[$D6:4173]</code><code>[$D6:4172]</code> = $49CF</span></td><td>ラリアット１号×2,クルセイダー</td></tr>
+	<tr><td><span class="formula">06</span></td><td><span class="formula">$7A</span></td><td><span class="formula"><code>[$D6:4175]</code><code>[$D6:4174]</code> = $49DC</span></td><td>ラジコン２号×14,クルセイダーＲＳ</td></tr>
+	<tr><td><span class="formula">07</span></td><td><span class="formula">$7B</span></td><td><span class="formula"><code>[$D6:4177]</code><code>[$D6:4176]</code> = $4A01</span></td><td>キョクシン１号×3,クルセイダーＲＳ</td></tr>
+	<tr><td><span class="formula">08</span></td><td><span class="formula">$7C</span></td><td><span class="formula"><code>[$D6:4179]</code><code>[$D6:4178]</code> = $4A10</span></td><td>ラリアット１号×2,ラリアット２号×2,クルセイダーＲＳ</td></tr>
+	<tr><td><span class="formula">09</span></td><td><span class="formula">$7D</span></td><td><span class="formula"><code>[$D6:417B]</code><code>[$D6:417A]</code> = $4A21</span></td><td>ブル・コマツ１号,クルセイダーＲＳ,ラジコン２号×4</td></tr>
+	<tr><td><span class="formula">10</span></td><td><span class="formula">$7E</span></td><td><span class="formula"><code>[$D6:417D]</code><code>[$D6:417C]</code> = $4A34</span></td><td>ラリアット１号×3,ラリアット３号×2,ラリアット２号×3,クルセイダー</td></tr>
+	<tr><td><span class="formula">11</span></td><td><span class="formula">$7F</span></td><td><span class="formula"><code>[$D6:417F]</code><code>[$D6:417E]</code> = $4A4D</span></td><td>ラリアット３号,クルセイダーＲＳ,ヘーベル１号×7</td></tr>
+	<tr><td><span class="formula">12</span></td><td><span class="formula">$80</span></td><td><span class="formula"><code>[$D6:4181]</code><code>[$D6:4180]</code> = $4A66</span></td><td>サイコ１号×3,クルセイダーＲＳ</td></tr>
+	<tr><td><span class="formula">13</span></td><td><span class="formula">$81</span></td><td><span class="formula"><code>[$D6:4183]</code><code>[$D6:4182]</code> = $4A75</span></td><td>キョクシン２号,クルセイダーＲＳ,ヘーベル１号×6,ラジコン２号×7</td></tr>
+</tbody>
+</table>
+
+<p>以上から、<code>[$D6:4170]</code>～<code>[$D6:4183]</code>に近未来編ワールドマップ用敵パーティ編成が格納されていたことがわかった。</p>
 
 <script>//ソースコード色分け処理
 window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});

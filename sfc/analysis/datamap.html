@@ -357,6 +357,7 @@ table {
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:0080</code>～<code>$D6:207F</code></td><td>カラーパレット（敵キャラ、32×32サイズ時）</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:2080</code>～<code>$D6:235F</code></td><td>カラーパレット（味方キャラ、32×32サイズ時）</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:4080</code>～<code>$D6:40BF</code></td><td>最終編・敵パーティ編成テーブル</td></tr>
+	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:4170</code>～<code>$D6:4183</code></td><td>近未来編・ワールドマップ敵パーティ編成テーブル</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:4280</code>～<code>$D6:512E</code></td><td>敵パーティデータ（<a href="d5.html#enemyparty">詳細</a>）</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:512F</code>～<code>$D6:514F</code></td><td>各シナリオの味方パーティIDリスト（<a href="d5.html#charaparty">詳細</a>）</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:53CB</code>～<code>$D6:541A</code></td><td>原始編・敵パーティ編成テーブル</td></tr>
@@ -447,6 +448,7 @@ table {
 	<tr><td><code>$C0:B838</code>～<code>$C0:B8E5</code></td><td>マップ用・コントローラーのボタンを押したか判定ループ（<code>[$00:4212][$00:4218]</code>のチェック）</td></tr>
 	<tr><td><code>$C0:B900</code>～<code>$C0:B924</code></td><td>マップ乱数計算</td></tr>
 	<tr><td><code>$C0:B925</code>～<code>$C0:B931</code></td><td>VBlankフラグ判定ループ(<code>[$00:4212]</code> 上1ビット判定）</td></tr>
+	<tr><td><code>$C0:B932</code>～<code>$C0:B93E</code></td><td>エンディング終了後用のVBlankフラグ判定ループ(<code>[$00:4212]</code> 上1ビット判定）</td></tr>
 	<tr><td><code>$C0:B97C</code>～<code>$C0:B98C</code></td><td><code>A</code>レジスタに<span class="formula">$01</span>をロードし<code>A</code>をスタックにプッシュしてから<code>$C0/B925</code>（VBlankフラグ判定ループ）にジャンプし画面の輝度<code>[$00:2100]</code>変更ループ</td></tr>
 	<tr><td><code>$C0:BA12</code>～<code>$C0:BA75</code></td><td>16bit×16bit乗算サブルーチン</td></tr>
 	<tr><td><code>$C0:BA76</code>～<code>$C0:BAA6</code></td><td>符号付8bit×8bit乗算サブルーチン</td></tr>
@@ -514,7 +516,8 @@ table {
 	<tr><th>アドレス</th><th>内容</th></tr>
 </thead>
 <tbody>
-	<tr><td><code>$C1:0000</code>～<code>$C1:0079</code></td><td>戦闘開始時処理</td></tr>
+	<tr><td><code>$C1:0000</code>～<code>$C1:0079</code></td><td>戦闘開始/終了時処理　※戦闘開始は<code>$C1/0049</code>で分岐処理し<code>$C1/0060</code>へ</td></tr>
+	<tr><td><code>$C1:004B</code>～<code>$C1:005F</code></td><td>※<code>$C1/0049</code>分岐<code>[$00:2100]</code>に<span class="formula">$8F</span>（FBlank強制割り込みで画面を黒一色にする）、<code>[$00:4200]</code>に<span class="formula">$01</span>を書き込んで戦闘終了処理</td></tr>
 	<tr><td><code>$C1:00A7</code>～<code>$C1:00AA</code></td><td>戦闘開始時 味方行動順決定</td></tr>
 	<tr><td><code>$C1:0136</code>～<code>$C1:0140</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタ書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C1:0327</code>～<code>$C1:0346</code></td><td><code>[$7E:FEFB]</code>判定後、<code>[$7E:FEF0]</code>（戦闘中タイマー）に<span class="formula">$7F</span>セット</td></tr>
@@ -587,6 +590,10 @@ table {
 	<tr><td><code>$C1:3E61</code>～<code>$C1:3EC7</code></td><td>表示する文字列を取得し<code>$7E:FF00</code>～<code>$7E:FF60</code>にコピー</td></tr>
 	<tr><td><code>$C1:3EC8</code>～<code>$C1:3F7D</code></td><td><code>$7E:FF00</code>～<code>$7E:FF60</code>ににコピーした文字列から文字の画像データをロード, 文字数とVRAMでの位置判定</td></tr>
 	<tr><td><code>$C1:41F2</code>～<code>$C1:4391</code></td><td>敵の移動処理</td></tr>
+	<tr><td><code>$C1:4535</code>～<code>$C1:4549</code></td><td><span class="formula"><code>$0018,x</code>(キャラ位置のマス目のX座標)*$100*$20</span></td></tr>
+	<tr><td><code>$C1:454A</code>～<code>$C1:455E</code></td><td><span class="formula"><code>$0019,x</code>(キャラ位置のマス目のY座標)*$100*$18</span></td></tr>
+	<tr><td><code>$C1:45D5</code>～<code>$C1:4582</code></td><td><span class="formula"><code>$0018,x</code>(キャラ位置のマス目のX座標)*$100*$20 + $10</span>をピクセル単位X座標<code>$0010,x</code>に、<span class="formula"><code>$0019,x</code>(キャラ位置のマス目のY座標)*$100*$18 + $1F</span>をピクセル単位Y座標<code>$0012,x</code>にセット</td></tr>
+	<tr><td><code>$C1:45EE</code>～<code>$C1:45F6</code></td><td><code>X</code>,<code>Y</code>をスタックに格納して<code>$C1/45D5</code>～<code>$C1/4582</code>実行</td></tr>
 	<tr><td><code>$C1:46C8</code>～<code>$C1:46C9</code></td><td>乗算・除算時の時間経過用</td></tr>
 	<tr><td><code>$C1:4D7E</code>～<code>$C1:4D89</code></td><td>シナリオIDまたは最終編主人公から、カーソル画像のアドレスを算出して、スプライトをVRAMに転送</td></tr>
 	<tr><td><code>$C1:4D8A</code>～<code>$C1:4DD1</code></td><td>戦闘時の数字、記号、技範囲枠など固定スプライトをVRAMに転送</td></tr>
