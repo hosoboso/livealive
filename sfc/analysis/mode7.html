@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景拡大・縮小・回転（BGMode7）">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景拡大・縮小・回転（BGMode7）">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 背景拡大・縮小・回転（BGMode7）</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+
+.fit-picture {
+  width: 30px;
+  height: 50px;
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 背景拡大・縮小・回転（BGMode7）</h1>
+<h2>背景拡大・縮小・回転（BGMode7）</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここでは、スーパーファミコンの特徴のひとつ、背景拡大・縮小・回転機能について、本作で使用している場面の解説をする。<br>
+背景について、まずは<a href="bg.html">背景グラフィックと効果</a>などに目を通していただきたい。</p>
+
+<p>また、やや高度な数学（三角関数、線型代数学における行列）を含む説明を行うが、わからなければ適当に飛ばしてもらっても構わない。</p>
+
+<p>拡大・縮小・回転機能だが、BGMode7を使わなくても可能である。<br>
+他でもない、戦闘開始時の三角形が回転しながら小さくなって背景をマスクしていくウィンドウ処理も、ウィンドウマスクの縮小・回転処理であるが、BGMode7は使っていない。<br>
+ウィンドウのマスク処理であれば、マスクの境界部分の座標だけ計算すれば良いのだが、画像全体を回したり拡大縮小する場合は全座標（全ピクセル、<span class="formula">256×242 = 61952</span>ピクセル）の計算をしなければならないため、必要なプログラムも計算量も膨大になる。<br>
+さらにいえば回転や拡大の場合、画面以上のサイズの画像の計算も行わなければならない。<br>
+スーパーファミコンのBGMode7、拡大・縮小・回転機能は、そういった計算の手間をある程度省き、かつ高速に計算してくれる機能、と考えて良い（と思う）。<br>
+画像を用意して、あとは「この画像をこの角度だけ右（または左）回転させる、または拡大縮小するので、座標を計算して表示させてくれ」という、拡大縮小の度合いや角度の指示などを行えば変換してくれるのがBGMode7（背景拡大・縮小・回転）というモードになる。<br>
+（という理解でたぶん間違っていない……はず）</p>
+
+<p>本作で拡大・縮小・回転機能を使っている箇所は、</p>
+
+<ul>
+	<li>ゲーム起動直後の「SQUARE SOFT」ロゴが表示されている時</li>
+	<li>タイトルデモで、「Welcome to LIVE A LIVE」の表示時、「LIVE A LIVE」部分に横拡大処理が入る時</li>
+	<li>ＳＦ編のキャプテンスクウェア開始時にキャプテンが回転しながら拡大処理される時</li>
+</ul>
+
+<p>あたりである。他にもあるかもしれない。</p>
+
+<div id="captiondata"></div>
+
+<h3>BGMode7の仕様</h3>
+
+<p>スーパーファミコンは背景（BG）を最大4枚扱うことが可能であるが、「何枚使えるか」「それぞれ何色使えるか」をBGMode0～7の8種類のモードから選択し、I/Oポートアドレス<code>[$00:2105]</code>に値を書き込んで決める。<br>
+本作の場合、通常のゲーム画面はBGMode1（BG1・16色, BG2・16色, BG3・4色）を使っている。<br>
+背景拡大・縮小・回転機能が使えるのはBGMode7のみで、BGMode1の背景設定とはかなり異なる。<br>
+まず、BGMode7は背景を1枚、BG1しか使えない。厳密には設定次第でBG2も使えるそうであるが、本作では多分使っていない。<br>
+スプライト（OBJ）は通常通りに設置できるため、スプライトにもう1枚分背景の画像を設置するという方法もある。<br>
+実際、キャプテンスクウェアでは、BG1に回転するキャプテン＋背景、スプライトに「CAPTAIN SQUARE」ロゴや下部の「&#xa9;ARUMAT SOFT 2099」とフクロウマークを表示させている。</p>
+
+<p>BGMode7の仕様についてもう少し記しておく。</p>
+
+<h4>VRAMの構成</h4>
+
+<p>BGMode1の場合、BG1のタイルデータはVRAMアドレス<code>$0000</code>～<code>$5FFF</code>（タイル1個のデータは32バイト）、BGマップデータは<code>$8000</code>～<code>$8FFF</code>（タイル1個（8×8ピクセル）につき、2バイトのデータ）、というように、画像（タイル）データと、タイルをどう並べるかのBGマップデータを分けてVRAMに配置していた。<br>
+だが、BGMode7は、背景サイズが128×128タイル（1024×1024ピクセル）で固定。<br>
+BGマップとタイルデータだが、VRAMのアドレス<code>$0000</code>から順に、</p>
+
+<p>BGマップ1バイト→タイルデータ1バイト（1ピクセル）→BGマップ1バイト→タイルデータ1バイト（1ピクセル）→……</p>
+
+<p>と、1バイトずつ交互に並ぶ。BGMode1などとはまったく異なる。<br>
+また、VRAMアドレス<code>$0000</code>～<code>$7FFF</code>しか使用しない。</p>
+
+<h5>BGマップ</h5>
+
+<p>BGMode1ならBGマップはタイル1個につき2バイトのデータだが、BGMode7だと1バイトしかない。<br>
+タイル番号<span class="formula">$00</span>～<span class="formula">$FF</span>のデータが格納されているだけである。<br>
+BG優先度、X反転、Y反転を設定することはできない。<br>
+（ただし、<code>$00:211A</code>で設定することにより、画面全体の反転はできるらしい）<br>
+128×128タイルのBGマップだから、横1行分が128（<span class="formula">$80</span>）バイト。<br>
+128×128タイルなら<span class="formula">$80 * 80 = $4000</span>バイトのデータになる。</p>
+
+<h5>タイルデータ</h5>
+
+<p>タイルデータは1バイトに1×1ピクセルのデータが入り、カラーパレット<span class="formula">$00</span>～<span class="formula">$FF</span>の値が入っている。<br>
+つまり、ビット深度が8bppであり、BGMode1だとカラーパレット（CGRAM）に格納できる最大の色数256色が扱えるということである。<br>
+タイルサイズは8×8ピクセルなので、タイル1個分のデータが<span class="formula">64</span>バイト（<span class="formula">$40</span>バイト）ということになる。<br>
+タイルに使えるのはBGマップとタイルデータで半分ずつだから、<span class="formula">$4000</span>バイト分、つまりタイル<span class="formula">$100</span>（<span class="formula">256</span>）個分である。</p>
+
+<p>なぜ1バイトずつ交互にBGマップとタイルデータが並んでいるのかというと、インターリーブというデータ読み込み高速化手法があり、</p>
+<ul>
+	<li><a href="https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%A2%E3%83%AA%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%AA%E3%83%BC%E3%83%96" target="_blank">メモリインターリーブ - Wikipedia</a></li>
+	<li><a href="https://e-words.jp/w/%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%AA%E3%83%BC%E3%83%96.html" target="_blank">インターリーブとは - IT用語辞典 e-Words</a></li>
+</ul>
+<p>スーファミのCPUから、VRAM内のBGマップとタイルデータを担当する部分（のようなもの）に並列にデータを送った方が処理速度が上がるから、ということらしい。</p>
+
+<p>カラーパレット（CGRAM）の仕様はBGMode1と変わらない。<br>
+上の通りBGMode7だとカラーパレットの256色どれでも指定できる。<br>
+ただ、スプライトも同時に表示するならスプライト用カラーパレットが兼用になる（CGRAMアドレス<code>$0100</code>～<code>$01FF</code>がスプライト用カラーパレット割り当て領域）。</p>
+
+<h4>I/Oポートアドレス</h4>
+
+<p>VRAMにはBGマップとタイルデータを送るのみである。<br>
+他モードと同じく、ゲーム画面に画像を表示できるが、それだけである。<br>
+拡大縮小・回転は、I/Oポートアドレスに書き込むことで指示する。<br>
+BGMode7に関わるI/Oポートアドレスは以下になる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名前</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:211A</code></td><td>M7SEL</td><td>画面モード7初期化</td></tr>
+	<tr><td><code>$00:211B</code></td><td>M7A</td><td>Mode7拡大縮小回転用マトリックスA</td></tr>
+	<tr><td><code>$00:211C</code></td><td>M7B</td><td>Mode7拡大縮小回転用マトリックスB</td></tr>
+	<tr><td><code>$00:211D</code></td><td>M7C</td><td>Mode7拡大縮小回転用マトリックスC</td></tr>
+	<tr><td><code>$00:211E</code></td><td>M7D</td><td>Mode7拡大縮小回転用マトリックスD</td></tr>
+	<tr><td><code>$00:211F</code></td><td>M7X</td><td>Mode7中央位置X</td></tr>
+	<tr><td><code>$00:2120</code></td><td>M7Y</td><td>Mode7中央位置Y</td></tr>
+</tbody>
+</table>
+
+<p>この中で<code>$00:211B</code>と<code>$00:211C</code>は、符号付16bit × 8bitの計算に使えるということを別ページで何度か紹介した。<br>
+スーパーファミコンのアセンブリ言語には乗算や除算の命令がなく、色々な方法を使って乗除算を行うが、BGMode7を使っていない時なら、乗算に使うことが可能である。<br>
+逆にいえばBGMode7の時に乗算をしたい場合は<code>$00:211B</code>と<code>$00:211C</code>を使わずに行う必要がある。</p>
+
+<h5><code>$00:211A</code> 画面モード7初期化</h5>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit7</td><td>プレイ画面サイズ <span class="formula">0</span>:画面サイズを1024×1024, <span class="formula">1</span>:1024×1024より拡大</td></tr>
+	<tr><td>Bit6</td><td>Bit7が<span class="formula">1</span>の時、空き領域をどうするか <span class="formula">0</span>:透過（固定色）, <span class="formula">1</span>:タイル番号0で塗りつぶし</td></tr>
+	<tr><td>Bit1</td><td>x軸（水平）反転 <span class="formula">0</span>:反転しない, <span class="formula">1</span>:反転する</td></tr>
+	<tr><td>Bit0</td><td>y軸（垂直）反転 <span class="formula">0</span>:反転しない, <span class="formula">1</span>:反転する</td></tr>
+</tbody>
+</table>
+
+<p>本作だと<code>$00:211A</code>は<span class="formula">$80</span>に設定される。<br>
+というのは、BGMode7だと画面サイズが1024×1024と大きく設定できるものの、Bit7に<span class="formula">1</span>を入れておけば、倍率次第でゲーム画面でとても小さく縮小することが可能であり（1×1ピクセルに縮小もできる）、256×224ピクセルの画面に余り（画面外）ができてしまう。<br>
+その画面外を透過処理するように設定している。固定色があるなら固定色を表示することになり、本作だとだいたい真っ黒である。<br>
+また、水平・垂直反転は行わない。</p>
+
+<h5><code>$00:211B</code>～<code>$00:211E</code> Mode7拡大縮小回転用マトリックス</h5>
+
+<p>拡大縮小・回転を決めるための肝となるアドレスで、4つとも2度書きで2バイトの値を設定する。<br>
+書き込む値は「8ビット符号付き整数・固定小数点」という形式で、整数だけでなく小数も扱う。</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/%E5%9B%BA%E5%AE%9A%E5%B0%8F%E6%95%B0%E7%82%B9%E6%95%B0" target="_blank">固定小数点数 - Wikipedia</a></p>
+
+<p>これは、16ビットの値を8ビット・8ビットに分けて、上8ビットは符号付き整数（<span class="formula">-127～+127</span>）、下8ビットは小数点以下部分とする表記。<br>
+整数部は通常の2進数（ただし符号付き）で考えれば良いが、小数点以下については<span class="formula">2<sup>-1</sup></span>の位、<span class="formula">2<sup>-2</sup></span>の位……と考えていかなければならない。</p>
+
+<p>例えば、10進数の<span class="formula">0.5</span>は<span class="formula">2<sup>-1</sup></span>だから、8ビットの一番上の位に<span class="formula">1</span>が立ち、他は<span class="formula">0</span>で、<span class="formula">%1000 0000</span> = <span class="formula">$80</span>。<br>
+<span class="formula">0.5</span>を「8ビット符号付き整数・固定小数点」にしたら、整数部は<span class="formula">0</span>だから「<span class="formula">$0080</span>」ということになる。<br>
+だが、<span class="formula">0.6</span>は<span class="formula">2</span>の<span class="formula">-n</span>乗ではぴったりの数で表現ができないので、近い数で表現するしかない。<br>
+逆に言えば<span class="formula">2</span>の<span class="formula">-n</span>乗の組み合わせで表現可能な小数しか固定小数点で表現できない。このあたりの事情の諸々は<br>
+<a href="https://ja.wikipedia.org/wiki/%E5%9B%BA%E5%AE%9A%E5%B0%8F%E6%95%B0%E7%82%B9%E6%95%B0" target="_blank">固定小数点数 - Wikipedia</a><br>
+あたりなどを見ていただきたい。<br>
+スーパーファミコンで10進数の小数を扱うのは難しいため、人間からするとややこしく見える、この手段を使うしかないのである。<br>
+（2020年代の一般的なコンピュータやゲーム機でも、10進数の小数は近似的な値を使っているが、スーパーファミコンの時代よりも精度が上がったというだけである。<a href="https://ja.wikipedia.org/wiki/%E6%B5%AE%E5%8B%95%E5%B0%8F%E6%95%B0%E7%82%B9%E6%95%B0" target="_blank">浮動小数点数 - Wikipedia</a>などを参照のこと）</p>
+
+<p>負の値の表現は少しややこしく、いわゆる2の補数の考え方で計算した方が変換として楽。<br>
+正の値の全ビットを反転して<span class="formula">1</span>を加算すれば良い。<br>
+または<span class="formula">$10000</span>から正の値を引き算する手もある。</p>
+
+<div class="place"><p>例：<br>
+10進数<span class="formula">0.25</span>を「8ビット符号付き整数・固定小数点」に変換する場合、<br>
+整数部：<span class="formula">0 = %00000000</span><br>
+小数部：<span class="formula">0.25</span><br>
+<span class="formula">0.25</span>は<span class="formula">2<sup>-2</sup></span>になるので小数点第二位にのみ1が立ち、2進数で<span class="formula">%01000000</span>である。<br>
+後は、整数部<span class="formula">%00000000</span>と小数部<span class="formula">%01000000</span>をくっつけて、16進数にすれば良い。</p>
+<ul>
+	<li>2進数表現: <span class="formula">%00000000.01000000</span></li>
+	<li>16進数表現: <span class="formula">$0040</span></li>
+</ul>
+
+<p>10進数<span class="formula">-0.25</span>の場合、<br>
+<span class="formula">0.25 (%00000000.01000000)</span>の全ビット反転→<span class="formula">11111111.10111111</span><br>
+<span class="formula">%1</span>を加算して、</p>
+<ul>
+	<li>2進数表現: <span class="formula">11111111.11000000</span></li>
+	<li>16進数表現: <span class="formula">$FFC0</span></li>
+</ul>
+<p><span class="formula">$10000 - $0040</span>で計算しても同じ（答えは<span class="formula">$FFC0</span>）</p>
+</div>
+
+<p>さて、<code>$00:211B</code>～<code>$00:211E</code>に何の値を書き込むのかだが、拡大縮小の倍率・回転角度をそのまま書き込むのではない。<br>
+BGMode7では、BGマップに書かれた座標を行列と見て、行列の変形（拡大縮小・回転）を行う。</p>
+
+<ul>
+	<li><a href="https://ja.wikipedia.org/wiki/%E8%A1%8C%E5%88%97" target="_blank">行列 - Wikipedia</a></li>
+	<li><a href="https://ja.wikipedia.org/wiki/%E5%9B%9E%E8%BB%A2%E8%A1%8C%E5%88%97" target="_blank">回転行列 - Wikipedia</a></li>
+</ul>
+
+<p>※線形代数における行列は、かつては高校数学で学ぶ範囲だったが、2012年には廃止されており、コンピュータ分野の学校や、理工系大学の初級数学として学ぶ内容になっている。<br>
+といっても理屈自体は難しい話ではなく、簡単に言えば「数字の表の計算」である。<br>
+数字が並んでいる表（座標）を回したり拡大縮小させる計算が行列計算だと思っていただきたい。<br>
+この先も面倒な計算のあたりは飛ばしていただいて構わない。</p>
+
+<div class="place"><p>行列は本来、下画像のような、</p>
+
+<img src="img/matrix.png" alt="行列" class="fit-picture">
+
+<p>行をまたいだ[ ]で記すのだが、ウェブサイトで表示するには別途いろいろな方法を使う必要があるので（そのためだけに処理が重くなるので）、当コンテンツでは簡易的に</p>
+<div class="mono">
+[x]<br>
+[y]
+</div>
+<p>のように記す。ご了承いただきたい。</p></div>
+
+<p>ある一点の座標を行列で</p>
+<div class="mono">
+[x]<br>
+[y]
+</div>
+<p>とする。<br>
+原点中心に反時計回りに角度<span class="formula">&#x3b8;</span>回転させた座標は、行列の乗算</p>
+
+<div class="mono">
+[<span class="formula">cos&#x3b8;</span> ​−<span class="formula">sin&#x3b8;</span>][x]<br>
+[<span class="formula">sin&#x3b8;</span>　<span class="formula">cos&#x3b8;</span>][y]
+</div>
+
+で求められる（2次元の回転行列）。
+<p>（どうしてなのかといった、きちんとした説明は他でお読みいただきたい）<br>
+この、</p>
+
+<div class="mono">
+[<span class="formula">cos&#x3b8;</span> ​−<span class="formula">sin&#x3b8;</span>]<br>
+[<span class="formula">sin&#x3b8;</span>　<span class="formula">cos&#x3b8;</span>]
+</div>
+
+が、
+
+<div class="mono">
+<code>[$00:211B</code> (M7A) <code>$00:211C</code> (M7B)]<br>
+<code>[$00:211D</code> (M7C) <code>$00:211E</code> (M7D)]
+</div>
+
+<p>に対応している。<br>
+<span class="formula">sin&#x3b8;</span>や<span class="formula">cos&#x3b8;</span>は<span class="formula">-1～1</span>の値だから、正負の値かつ小数点以下の値を書き込まなければならないのである。<br>
+ただ、これだけだと回転度合い（角度）しか指示できない。<br>
+拡大縮小だが、実際には上の値に拡大縮小係数（要するに倍率）を掛け算した値を書き込む。</p>
+
+<ul>
+	<li>&#x3b1;: X軸の拡大縮小係数</li>
+	<li>&#x3b2;: Y軸の拡大縮小係数</li>
+</ul>
+
+<p>として、</p>
+
+<div class="mono">
+[<span class="formula">cos&#x3b8;</span> * (1/&#x3b1;) ​−<span class="formula">sin&#x3b8;</span> * (1/&#x3b1;)]<br>
+[<span class="formula">sin&#x3b8;</span> * (1/&#x3b2;)　<span class="formula">cos&#x3b8;</span> * (1/&#x3b2;)]
+</div>
+
+<p><code>$00:211B</code>(M7A) = <span class="formula">cos&#x3b8; * (1/&#x3b1;)</span><br>
+<code>$00:211C</code>(M7B) = <span class="formula">​−sin&#x3b8; * (1/&#x3b1;)</span><br>
+<code>$00:211D</code>(M7C) = <span class="formula">sin&#x3b8; * (1/&#x3b2;)</span><br>
+<code>$00:211E</code>(M7D) = <span class="formula">cos&#x3b8; * (1/&#x3b2;)</span></p>
+
+<p>これが正確な定義である。<br>
+行列や三角関数のことがよくわからないなら、このあたりはとりあえず「そういうもの」と思っておいてくだされば良い。</p>
+
+<p>もし拡大や縮小だけなら、角度<span class="formula">&#x3b8;</span>は回転なしで<span class="formula">0</span>とすれば良いため、</p>
+
+<p><span class="formula"><code>$00:211B</code> = cos0 * (1/&#x3b1;) = 1 * (1/&#x3b1;) = 1/&#x3b1;</span><br>
+<span class="formula"><code>$00:211C</code> = ​−sin0 * (1/&#x3b1;) = 0 * (1/&#x3b1;) = 0</span><br>
+<span class="formula"><code>$00:211D</code> = sin0 * (1/&#x3b2;) = 0 * (1/&#x3b2;) = 0</span><br>
+<span class="formula"><code>$00:211E</code> = cos0 * (1/&#x3b2;) = 1 * (1/&#x3b2;) = 1/&#x3b2;</span></p>
+
+<p>このようになる。<br>
+拡大縮小もしないのなら、<span class="formula">&#x3b1;, &#x3b2; = 1</span>（倍率<span class="formula">1</span>の意味）なので、</p>
+
+<p><span class="formula"><code>$00:211B</code> = $0100</span>（<span class="formula">$00, $01</span>の順に2度書き）<br>
+<span class="formula"><code>$00:211C</code> = $0000</span>（<span class="formula">$00, $00</span>の順に2度書き）<br>
+<span class="formula"><code>$00:211D</code> = $0000</span>（<span class="formula">$00, $00</span>の順に2度書き）<br>
+<span class="formula"><code>$00:211E</code> = $0100</span>（<span class="formula">$00, $01</span>の順に2度書き）</p>
+
+<p>である。<br>
+<code>$00:211B</code>や<code>$00:211E</code>に書き込んだのは<span class="formula">$0100</span> = 10進数<span class="formula">256</span>ではない。<br>
+上1バイトが符号付き整数で、下1バイトが小数点以下だから、10進数の「<span class="formula">1.00</span>」である。<br>
+というように、値の書き込み方が特殊であることに注意。</p>
+
+<h5><code>$00:211F</code>～<code>$00:2120</code> Mode7中央位置(X,Y)</h5>
+
+<p>上の回転の話で「原点中心に回転させる」と書いたが、<code>$00:211F</code>～<code>$00:2120</code>に原点（回転の中心位置）となる座標を設定できる。ピクセル単位で左上位置基準。<br>
+拡大縮小でも中心座標は必要（中心位置を基準に拡大縮小するため）<br>
+どちらも2度書きで2バイトの値を設定する。</p>
+
+<div class="place"><p>例：</p>
+
+<p>キャプテンスクウェアの画像を、<span class="formula">60&#xb0;</span>反時計回りに回転させ、縦横どちらも2倍のサイズでBG1に表示させる、という場合、キャプテンスクウェアの画像の座標（BGマップ）すべてに対して、「<span class="formula">60&#xb0;</span>反時計回りに回転させ、縦横どちらも2倍」という計算をしなければならない。<br>
+BGMode7では、画像の倍率と回転角度を決めたら、下の計算をして<code>$00:211B</code>～<code>$00:211E</code>に書き込むと全座標の計算をしてくれる。<br>
+ここでは説明を簡単にするために、回転中心位置の原点は<span class="formula">(0,0)</span>とする。</p>
+
+<p><span class="formula">&#x3b8; = 60&#xb0;</span><br>
+<span class="formula">&#x3b1; = 2</span><br>
+<span class="formula">&#x3b2; = 2</span></p>
+
+<ul>
+	<li><span class="formula">cos&#x3b8; * (1/&#x3b1;) = cos60&#xb0; * (1/2) = 0.5 * 1/2 = 0.25</span></li>
+	<li><span class="formula">​−sin&#x3b8; * (1/&#x3b1;) = ​−sin60&#xb0; * (1/2) = ​−0.866 * 1/2 = ​−0.433</span></li>
+	<li><span class="formula">sin&#x3b8; * (1/&#x3b2;) = sin60&#xb0; * (1/2) = 0.866 * 1/2 = 0.433</span></li>
+	<li><span class="formula">cos&#x3b8; * (1/&#x3b2;) = cos60&#xb0; * (1/2) = 0.5 * 1/2 = 0.25</span></li>
+</ul>
+<p>※<span class="formula">sin60&#xb0; = &#x221a;3/2</span>、近似値の<span class="formula">0.866</span>とする</p>
+
+<p>上の数値を8ビット符号付き整数・固定小数点にして<code>$00:211B</code>～<code>$00:211E</code>に書き込めばよい。<br>
+10進数の<span class="formula">0.25</span>は、先に示した通りに<span class="formula">$0040</span>である。<br>
+<span class="formula">0.433</span>だが、固定小数点の考え方ではぴったりの値がないので（そもそも<span class="formula">sin60&#xb0;</span>にも近似値の<span class="formula">0.866</span>を使っている）、とりあえず、</p>
+
+<p><span class="formula">2<sup>-2</sup> + 2<sup>-3</sup> +2<sup>-4</sup> = 0.4375</span></p>
+
+<p>で小数部8ビットを<span class="formula">%01110000</span> (<span class="formula">$70</span>)ということにしてみよう。<br>
+<span class="formula">-0.4375</span>の方は<span class="formula">%0000 0000 0111 0000</span>を全ビット反転して<span class="formula">+%1</span>するから、<span class="formula">%1111 1111 1000 1111 = $FF90</span>となる。</p>
+
+<p><span class="formula"><code>$00:211B</code> = $0040</span><br>
+<span class="formula"><code>$00:211C</code> = $FF90</span><br>
+<span class="formula"><code>$00:211D</code> = $0070</span><br>
+<span class="formula"><code>$00:211E</code> = $0040</span></p>
+
+<p>を書き込むと、キャプテンスクウェアの画像の全座標に対し「60&#xb0;反時計回りに回転させ、縦横どちらも2倍」という処理をして、実際の画面を描画してくれることになる。<br>
+ただし以上の処理は「BGマップの書き換え」ではない。<br>
+BGマップはそのままで画面の画像の変形のみ行ってくれる処理である。</p>
+
+<p>つまりプログラマー側は、</p>
+
+<p><span class="formula">cos&#x3b8; * (1/&#x3b1;)</span><br>
+​<span class="formula">−sin&#x3b8; * (1/&#x3b1;)</span><br>
+<span class="formula">sin&#x3b8; * (1/&#x3b2;)</span><br>
+<span class="formula">cos&#x3b8; * (1/&#x3b2;)</span></p>
+
+<p>を計算するサブルーチンだけは作らなければならないということである。<br>
+（もちろん、ライブ・ア・ライブのプログラムの中にはきちんと入っている）<br>
+三角関数表と、8ビット符号付き整数・固定小数点に変換するサブルーチンが必要になってくる。</p></div>
+
+<h3>サブルーチン</h3>
+
+<p>BGMode7を使用している場所が限られているためか、デモ画面とキャプテンスクウェア用とでほぼ専用サブルーチンが存在しているようである。<br>
+おそらく、</p>
+
+<ul>
+	<li><code><span class="r">$C0/DCD1</span></code>～<code><span class="r">$C0/DFA7</span></code>：デモ画面用BGMode7</li>
+	<li><code><span class="r">$C0/F338</span></code>～<code><span class="r">$C0/F5E2</span></code>：キャプテンスクウェア用BGMode7</li>
+	<li><code><span class="r">$C0/F60D</span></code>～<code><span class="r">$C0/FB18</span></code>：BGMode7計算用サブルーチン</li>
+</ul>
+
+<p>と思われる。キャプテンスクウェア用になかなか贅沢にサブルーチンを使っているようだ。</p>
+
+<p>ここではキャプテンスクウェア開始時の処理を例に解説していく。<br>
+キャプテンスクウェア開始時は、</p>
+
+<ol>
+	<li>「CAPTAIN」の文字が1文字ずつ拡大→縮小されて表示される（規定位置に表示されたらスプライトに変更）</li>
+	<li>「SQUARE」の文字列が回転＋拡大しながら表示される（規定位置に表示されたらスプライトに変更）</li>
+	<li>キャプテンと背景が回転＋拡大されながら表示される（「CAPTAIN SQUARE」ロゴなどはスプライト）</li>
+</ol>
+
+<p>というように細かく段階を分けて画像表示している。</p>
+
+<h4>初期設定</h4>
+
+<p><a href="scroll2.html">HDMA転送による多重スクロール</a>で、タイトルデモ中の初期設定は<code><span class="r">$C0/0EDF</span></code>～<code><span class="r">$C0/0F7C</span></code>で行われていると説明した。<br>
+キャプテンスクウェア開始時（Mode7切り替え時）も同じ処理が入るため、この設定はBGMode7を含む場面での初期設定ということになるのだろう（と思われるが実際はどうなのかわからない）<br>
+ということで、<code><span class="r">$C0/0EDF</span></code>～<code><span class="r">$C0/0F7C</span></code>の説明は省略する。<br>
+タイトルデモでBGMode1を使っている時との違いは、その後に<code><span class="r">$C0/0F80</span></code>～の処理が続くことである。</p>
+
+<div class="code-container"><pre>
+$C0/0EDF LDA #$8F                ;Aに$8Fをロード
+;（中略）
+$C0/0F7C RTS                     ;サブルーチン戻り
+
+$C0/0F80 LDA #$0F                ;Aに$0Fをロード
+$C0/0F82 STA $2105  [$00:2105]   ;Aを[$00:2105]に書き込み
+$C0/0F85 LDA #$80                ;Aに$80をロード
+$C0/0F87 STA $211A  [$00:211A]   ;Aを[$00:211A]に書き込み
+$C0/0F8A LDA #$01                ;Aに$01をロード
+$C0/0F8C STZ $211B  [$00:211B]   ;[$00:211B]に$00を書き込み
+$C0/0F8F STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C0/0F92 STZ $211C  [$00:211C]   ;[$00:211C]に$00を書き込み
+$C0/0F95 STZ $211C  [$00:211C]   ;[$00:211C]に$00を書き込み
+$C0/0F98 STZ $211D  [$00:211D]   ;[$00:211D]に$00を書き込み
+$C0/0F9B STZ $211D  [$00:211D]   ;[$00:211D]に$00を書き込み
+$C0/0F9E STZ $211E  [$00:211E]   ;[$00:211E]に$00を書き込み
+$C0/0FA1 STA $211E  [$00:211E]   ;Aを[$00:211E]に書き込み
+$C0/0FA4 STZ $211F  [$00:211F]   ;[$00:211F]に$00を書き込み
+$C0/0FA7 STZ $211F  [$00:211F]   ;[$00:211F]に$00を書き込み
+$C0/0FAA STZ $2120  [$00:2120]   ;[$00:2120]に$00を書き込み
+$C0/0FAD STZ $2120  [$00:2120]   ;[$00:2120]に$00を書き込み
+$C0/0FB0 RTS                     ;サブルーチン戻り
+
+$C0/F338 LDA #$10                ;Aに$10をロード
+$C0/F33A STA $212C  [$00:212C]   ;Aを[$00:212C]に書き込み
+$C0/F33D LDX #$0000              ;Xに$0000をロード
+$C0/F340 JSL $CED45B[$CE:D45B]   ;[$CE:D45B]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/0F80</span></code>～<code><span class="r">$C0/0FB0</span></code>がBGMode7用の専用設定である。<br>
+<code><span class="r">$C0/F338</span></code>～<code><span class="r">$C0/F340</span></code>で<code>[$00:212C]</code>のメインスクリーン指定も合わせて行っているため、まとめてみると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>名称</th><th>内容</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:2105]</code></td><td>BGMODE</td><td>BGモード・キャラクタサイズ設定</td><td><span class="formula">$0F</span></td></tr>
+	<tr><td><code>[$00:211A]</code></td><td>M7SEL</td><td>画面モード7初期化</td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>[$00:211B]</code></td><td>M7B</td><td>Mode7拡大縮小回転用マトリックスB</td><td><span class="formula">$00</span>, <span class="formula">$01</span></td></tr>
+	<tr><td><code>[$00:211C]</code></td><td>M7B</td><td>Mode7拡大縮小回転用マトリックスB</td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:211D]</code></td><td>M7C</td><td>Mode7拡大縮小回転用マトリックスC</td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:211E]</code></td><td>M7D</td><td>Mode7拡大縮小回転用マトリックスD</td><td><span class="formula">$00</span>, <span class="formula">$01</span></td></tr>
+	<tr><td><code>[$00:211F]</code></td><td>M7X</td><td>Mode7中央位置X</td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:2120]</code></td><td>M7Y</td><td>Mode7中央位置Y</td><td><span class="formula">$00</span>, <span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:212C]</code></td><td>TM </td><td>メインスクリーン指定</td><td><span class="formula">$10</span></td></tr>
+</tbody>
+</table>
+
+
+<p>他の場面では<code>[$00:2105]</code>には<span class="formula">$09</span>を書き込んでBGMode1を指定していたが、<code><span class="r">$C0/0F82</span></code>では<code>[$00:2105]</code>に<span class="formula">$0F</span>（<span class="formula">%0000 1111</span>）が書き込まれている。<br>
+これによりBGMode7が指定されている（下3ビットがBGMode指定）。<br>
+BGMode7かつ、<code>[$00:2133]</code>（SETINI スクリーンモード/ビデオ設定）でBit6に<span class="formula">1</span>が立っている時はBGMode7でBG2も使えるようになるのだが、<code><span class="r">$C0/0F79</span></code>で<code>[$00:2133]</code>に<span class="formula">$00</span>が書き込まれているため、BGMode7かつBGはBG1のみ、ということになる。これはキャプテンスクウェアでもタイトルデモでも同じ。</p>
+
+<p><code>[$00:211A]</code>は上でも少し説明した通り、Bit7に<span class="formula">1</span>が入っているので、1024ピクセルより大きく表示でき、画面外は透過（固定色）扱いになる。実質黒一色である。</p>
+
+<p><code>[$00:211B]</code>～<code>[$00:211E]</code>は、</p>
+
+<p><span class="formula"><code>[$00:211B]</code> = $0100</span><br>
+<span class="formula"><code>[$00:211C]</code> = $0000</span><br>
+<span class="formula"><code>[$00:211D]</code> = $0000</span><br>
+<span class="formula"><code>[$00:211E]</code> = $0100</span></p>
+
+<p>なので、上で述べた通り、拡大縮小も回転もしていない状態である。初期値の書き込みということになる。</p>
+
+<p><code>[$00:211F]</code>, <code>[$00:2120]</code>も<span class="formula">$0000</span>, <span class="formula">$0000</span>で、中心座標は<span class="formula">(0, 0)</span>。これも初期値である。</p>
+
+<p><code>[$00:212C]</code>は<span class="formula">$10</span> (<span class="formula">%0001 0000</span>)で、メインスクリーンにOBJ（スプライト）を表示する指示である。<br>
+この値も後々で書き換えられるが、それまではBG（背景）は非表示ということになる。</p>
+
+<p>初期設定後は、BGMode1と同じく、BG1に必要なデータをVRAM、CGRAMに転送処理していく。<br>
+キャプテンスクウェアの場合はスプライトも設置するから、OAMへの転送もある。<br>
+今回はBGMode1の背景処理の話を中心に説明するので、スプライト関係は必要な時にのみ紹介する。</p>
+
+<h4>CGRAM転送</h4>
+
+<p><code><span class="r">$CE/D47E</span></code>～<code><span class="r">$CE/D89D</span></code>で<code>$CE:003C</code>～<code>$CE:0075</code>が2バイトずつ<code>$7E:8020</code>～<code>$7E:8059</code>にコピーされるが、これが最初に転送されるCGRAMの値になる。<br>
+実際の転送は以下。</p>
+
+<div class="code-container"><pre>
+$C0/F780 LDA #$00                ;Aに$00をロード
+$C0/F782 STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/F785 LDA #$22                ;Aに$22をロード
+$C0/F787 STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/F78A LDX #$8020              ;Xに$8020をロード
+$C0/F78D STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/F790 LDA #$7E                ;Aに$7Eをロード
+$C0/F792 STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/F795 STZ $2121  [$00:2121]   ;[$00:2121]に$00を書き込み
+$C0/F798 LDX #$0020              ;Xに$0020をロード
+$C0/F79B STX $4305  [$00:4305]   ;Xを[$00:4306][$00:4305]に書き込み
+$C0/F79E LDA #$01                ;Aに$01をロード
+$C0/F7A0 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2121]	CGRAMアドレス ※word単位	$00
+;[$00:4300]	GDMA / HDMA設定レジスタ	$00　1レジスタ1書き込み
+;[$00:4301]	転送先指定	$22=CGRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$8020
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$0020
+;$7E:8020 -> CGRAM $00word($00byte) +$0020byte
+;
+$C0/F7A3 LDX #$8020              ;Xに$8020をロード
+$C0/F7A6 STX $4302  [$00:4302]   ;Xを[$00:4302]に書き込み
+$C0/F7A9 LDA #$80                ;Aに$80をロード
+$C0/F7AB STA $2121  [$00:2121]   ;Aを[$00:2121]に書き込み
+$C0/F7AE LDX #$0040              ;Xに$0040をロード
+$C0/F7B1 STX $4305  [$00:4305]   ;Xを[$00:4306][$00:4305]に書き込み
+$C0/F7B4 LDA #$01                ;Aに$01をロード
+$C0/F7B6 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2121]	CGRAMアドレス ※word単位	$80
+;[$00:4300]	GDMA / HDMA設定レジスタ	$00　1レジスタ1書き込み
+;[$00:4301]	転送先指定	$22=CGRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$8020
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$0040
+;$7E:8020 -> CGRAM $80word($100byte) +$0040byte
+;
+$C0/F7B9 RTS                     ;サブルーチン戻り
+
+$C0/F60D STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/F60F STZ $2115  [$00:2115]   ;[$00:2115]に$00を書き込み
+$C0/F612 STZ $2116  [$00:2116]   ;[$00:2116]に$00を書き込み
+$C0/F615 STZ $2117  [$00:2117]   ;[$00:2117]に$00を書き込み
+$C0/F618 LDA #$08                ;Aに$08をロード
+$C0/F61A STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/F61D LDA #$18                ;Aに$18をロード
+$C0/F61F STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/F622 LDX #$0030              ;Xに$0030をロード
+$C0/F625 STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/F628 STZ $4304  [$00:4304]   ;[$00:4304]に$00を書き込み
+$C0/F62B LDX #$4000              ;Xに$4000をロード
+$C0/F62E STX $4305  [$00:4305]   ;Xを[$00:4306][$00:4305]に書き込み
+$C0/F631 LDA #$01                ;Aに$01をロード
+$C0/F633 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2117][$00:2116]	VRAMアドレス ※word単位	$0000
+;[$00:4300]	GDMA / HDMA設定レジスタ	$08　fixed　1レジスタ1書き込み
+;[$00:4301]	転送先指定	$18=VRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$0030
+;[$00:4304]	データ元バンク	$00
+;[$00:4306][$00:4305]	転送するデータ量	$4000
+;$00:0030 -> VRAM $0000word($0000byte) +$4000byte
+;
+$C0/F636 LDA #$80                ;Aに$80をロード
+$C0/F638 STA $2115  [$00:2115]   ;Aを[$00:2115]に書き込み
+$C0/F63B STZ $2116  [$00:2116]   ;[$00:2116]に$00を書き込み
+$C0/F63E STZ $2117  [$00:2117]   ;[$00:2117]に$00を書き込み
+$C0/F641 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/F642 LDA #$7E                ;Aに$7Eをロード
+$C0/F644 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/F645 PLB                     ;DBレジスタにスタックからプル
+$C0/F646 LDX #$8540              ;Xに$8540をロード
+$C0/F649 LDY #$0100              ;Yに$0100をロード
+$C0/F64C JSR $FAD6  [$C0:FAD6]   ;[$C0:FAD6]へジャンプ
+</pre></div>
+
+<p>CGRAMはアドレス<code>$0000</code>から<span class="formula">$20</span>バイト、<code>$0100</code>から<span class="formula">$40</span>バイトなので、カラーパレット0, 8, 9の転送である。<br>
+VRAMはアドレス<code>$0000</code>から、<code>$00:0030</code>(<span class="formula">$00</span>)の固定値を<span class="formula">$4000</span>バイト転送となっている。<br>
+なので、実質アドレス<code>$0000</code>～<code>$4000</code>の初期化である。</p>
+
+<h4>BG1のタイルデータ転送</h4>
+
+<p>直後から、GDMA転送を使わず、直に<code>[$00:2118]</code>（VMDATAL VRAMデータ書き込み(下位)）と<code>[$00:2119]</code>（VMDATAH VRAMデータ書き込み(上位)）を使ってVRAMへの書き込みを行う。<br>
+ここが、BG1のタイルデータ転送である。<br>
+<code>[$00:2119]</code>に値を書き込むと自動的にVRAMのアドレスがインクリメントされるため、1バイト間隔で値を書き込んでいくことになるから、タイルデータ1バイト（1ピクセル分）をひたすら書き込んでいく処理である。</p>
+
+<div class="code-container"><pre>
+$C0/FAD6 LDA #$08                ;Aに$08をロード
+$C0/FAD8 STA $34    [$00:0034]   ;A($08)を[$00:0034]に書き込み
+$C0/FADA LDA $0000,x[$7E:8540]   ;Aに[$7E:8540]をロード
+$C0/FADD STA $30    [$00:0030]   ;A($00)を[$00:0030]に書き込み
+$C0/FADF LDA $0001,x[$7E:8541]   ;Aに[$7E:8541]をロード
+$C0/FAE2 STA $31    [$00:0031]   ;A($00)を[$00:0031]に書き込み
+$C0/FAE4 LDA $0010,x[$7E:8550]   ;Aに[$7E:8550]をロード
+$C0/FAE7 STA $32    [$00:0032]   ;A($00)を[$00:0032]に書き込み
+$C0/FAE9 LDA $0011,x[$7E:8551]   ;Aに[$7E:8551]をロード
+$C0/FAEC STA $33    [$00:0033]   ;A($00)を[$00:0033]に書き込み
+$C0/FAEE LDA #$08                ;Aに$08をロード
+$C0/FAF0 STA $36    [$00:0036]   ;Aを[$00:0036]に書き込み
+;ループ処理
+$C0/FAF2 LDA #$00                ;Aに$00をロード
+$C0/FAF4 ASL $33    [$00:0033]   ;A[$00:0033]を算術左シフト *2
+$C0/FAF6 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/FAF7 ASL $32    [$00:0032]   ;A[$00:0032]を算術左シフト *2
+$C0/FAF9 ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/FAFA ASL $31    [$00:0031]   ;A[$00:0031]を算術左シフト *2
+$C0/FAFC ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/FAFD ASL $30    [$00:0030]   ;A[$00:0030]を算術左シフト *2
+$C0/FAFF ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C0/FB00 STA $002119[$00:2119]   ;Aを[$00:2119](VRAMデータ書き込み(上位))に書き込み
+$C0/FB04 DEC $36    [$00:0036]   ;[$00:0036]（初期値$08）をデクリメント -1
+$C0/FB06 BNE $EA    [$FAF2]      ;ゼロフラグが立っていないとき[$FAF2]分岐
+;ループ処理ここまで
+$C0/FB08 INX                     ;Xをインクリメント +1
+$C0/FB09 INX                     ;Xをインクリメント +1
+$C0/FB0A DEC $34    [$00:0034]   ;[$00:0034]をデクリメント -1
+$C0/FB0C BNE $CC    [$FADA]      ;ゼロフラグが立っていないとき[$FADA]分岐
+$C0/FB0E REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/FB10 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/FB11 CLC                     ;キャリーフラグクリア
+$C0/FB12 ADC #$0010              ;A + $0010
+$C0/FB15 TAX                     ;Aの値をXレジスタに転送
+$C0/FB16 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/FB18 RTS                     ;サブルーチン戻り
+
+$C0/F64F DEY                     ;Y（初期値Y:0100）をデクリメント -1
+$C0/F650 BNE $FA    [$F64C]      ;ゼロフラグが立っていないとき[$F64C]分岐
+$C0/F64C JSR $FAD6  [$C0:FAD6]   ;[$C0:FAD6]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/FAD6</span></code>～<code><span class="r">$C0/FB18</span></code>, <code><span class="r">$C0/F64F</span></code>～<code><span class="r">$C0/F64C</span></code>までもループになっているが、その内側のループを見ると、<code><span class="r">$C0/FB00</span></code>でVRAMに1バイトのデータを書き込んでおり、このループは8回分である。<br>
+つまり8バイト分のデータを計算して転送する処理である。<br>
+このループが<span class="formula">$100</span>回分ひたすら続くが、元々の転送する値（<code><span class="r">$C0/FADA</span></code>～で読み込まれている値）は<code>$7E:8540</code>～<code>$7E:A53F</code>の<span class="formula">$2000</span>バイト分。<br>
+4バイト分ロードして8バイトのデータを計算しVRAMに転送するため、実際には<span class="formula">$4000</span>バイト、つまりBG1のタイルデータの値すべてが転送される。<br>
+1バイト間隔で値を書き込んだりする都合と、タイルデータ（実際には256色パレット番号の値と同一になるが）をビットプレーン変換する都合で<code><span class="r">$C0/FAF2</span></code>～<code><span class="r">$C0/FAFF</span></code>の処理が行われている。</p>
+
+<p><span class="formula">$4000</span>バイト転送されたBG1のタイルデータだが、キャプテンスクウェアの場合、回転するキャプテンや、その背景となる星、「CAPTAIN SQUARE」ロゴなどがすべて格納されている。<br>
+<code>$7E:8540</code>～<code>$7E:A53F</code>は、上処理直前に、<code><span class="r">$CE/D47E</span></code>～<code><span class="r">$CE/D89D</span></code>の処理で、<code>$CE:001C</code>～<code>$CE:160F</code>が<code>$7E:8000</code>～<code>$7E:A53F</code>にコピーされている（一部の値は反転処理などしているが）。<br>
+この時点ではまだBG1のBGマップは書き込まれていない。</p>
+
+<p>この後にスプライトのタイルデータの送信が行われる。<br>
+<code>$7E:8540</code>～<code>$7E:8B3F</code>から、VRAMアドレス<code>$C000</code>～<code>$DADF</code>へ転送されているが、処理は省略する。<br>
+VRAM<code>$0000</code>～<code>$4000</code>の初期化も含め、<code><span class="r">$C0/F60D</span></code>～<code><span class="r">$C0/F757</span></code>が、間に他サブルーチンを挟みながらのVRAMにBG1・スプライトのタイルデータ転送処理になっている。</p>
+
+<p>スプライトの配置であるOAMデータの転送はこの後に<code><span class="r">$C0/F347</span></code>～<code><span class="r">$C0/F353</span></code>で行われている。詳細は省略。</p>
+
+<h4>拡大縮小・回転の中心座標設定</h4>
+<br>
+<div class="code-container"><pre>
+$C0/F356 LDA #$EF                ;Aに$EFをロード
+$C0/F358 STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/F35B LDA #$FF                ;Aに$FFをロード
+$C0/F35D STA $210E  [$00:210E]   ;Aを[$00:210E]に書き込み
+$C0/F360 LDA #$08                ;Aに$08をロード
+$C0/F362 STA $211F  [$00:211F]   ;Aを[$00:211F]に書き込み(Mode7中央位置X)
+$C0/F365 STZ $211F  [$00:211F]   ;[$00:211F]に$00を書き込み
+$C0/F368 LDA #$18                ;Aに$18をロード
+$C0/F36A STA $2120  [$00:2120]   ;Aを[$00:2120]に書き込み(Mode7中央位置Y)
+$C0/F36D STZ $2120  [$00:2120]   ;[$00:2120]に$00を書き込み
+$C0/F370 STZ $02A4  [$00:02A4]   ;[$00:02A4]に$00を書き込み
+$C0/F373 JSR $B97C  [$C0:B97C]   ;[$C0:B97C]へジャンプ
+</pre></div>
+
+<p>ここで、BG1垂直スクロール量<code>[$00:210E]</code>と、拡大縮小・回転の中心座標になる、<code>[$00:211F]</code>と<code>[$00:2120]</code>の更新が行われる。<br>
+計算された値ではなく、以下のように固定値の書き込みである。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:210E]</code></td><td><span class="formula">$FFEF</span></td></tr>
+	<tr><td><code>[$00:211F]</code></td><td><span class="formula">$0008</span></td></tr>
+	<tr><td><code>[$00:2120]</code></td><td><span class="formula">$0018</span></td></tr>
+</tbody>
+</table>
+
+<p>これが、最初に「CAPTAIN」の7文字が飛んでくる時の中心座標設定である。<br>
+座標(<span class="formula">$0008</span>, <span class="formula">$0018</span>)を基準として拡大縮小を行うことになる。<br>
+ちょうど、文字の中心付近にあたる。</p>
+
+<p>もっと後になるが、</p>
+
+<table>
+<thead>
+	<tr><th>サブルーチンアドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code><span class="r">$C0/F439</span></code>～<code><span class="r">$C0/F467</span></code></td><td>「SQUARE」部分が飛んでくる時の中心座標設定サブルーチン</td></tr>
+	<tr><td><code><span class="r">$C0/F51C</span></code>～<code><span class="r">$C0/F540</span></code></td><td>キャプテンが回転しながら飛んでくる時の中心座標設定サブルーチン</td></tr>
+</tbody>
+</table>
+
+<p>と、キャプテンスクウェア用に設定した座標を書き込むサブルーチンがあるため、<code><span class="r">$C0/F338</span></code>～<code><span class="r">$C0/F5E2</span></code>はキャプテンスクウェア用BGMode7のサブルーチンと見てほぼ間違いないようだ（筆者は全サブルーチンを確認してはいないのでわからないが、おそらく）。</p>
+
+<h4>BG1のBGマップ転送・BGMode7表示</h4>
+
+<p>BG1のBGマップは以下処理で入っていくが、キャプテンスクウェアの場合、まず最初に「CAPTAIN SQUARE」ロゴの「CAPTAIN」部分が一文字ずつ拡大→縮小処理されるので、最初にBG1に設置されるのは「CAPTAIN SQUARE」ロゴの「C」部分である。<br>
+「CAPTAIN SQUARE」の部分で文字が飛んでくる時に効果音が入る都合で、まず効果音関係の処理があり（<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/017F</span></code>）、その後からBGマップの処理が開始になる。<br>
+BG1のBGマップは128×128タイル分必要になるが、「C」の文字部分だけBGマップとして転送すれば良いので（他は<span class="formula">$00</span>で埋めれば良いし、初期化の時点で<span class="formula">$00</span>が書き込まれている）、BG1のBGマップとして更新しなければならない部分は少ない。<br>
+BGMode7の処理についても記していく。</p>
+
+<div class="code-container"><pre>
+$C0/F37D LDA #$F0                ;Aに$F0をロード
+$C0/F37F STA $28    [$00:0028]   ;Aを[$00:0028]に書き込み
+$C0/F381 STZ $26    [$00:0026]   ;[$00:0026]に$00を書き込み
+$C0/F383 LDX #$4000              ;Xに$4000をロード
+$C0/F386 STX $02A0  [$00:02A0]   ;Xを[$00:02A1][$00:02A0]に書き込み
+$C0/F389 STX $02A2  [$00:02A2]   ;Xを[$00:02A3][$00:02A2]に書き込み
+$C0/F38C STX $02A6  [$00:02A6]   ;Xを[$00:02A7][$00:02A6]に書き込み
+$C0/F38F JSR $FA4F  [$C0:FA4F]   ;[$C0:FA4F]へジャンプ
+</pre></div>
+
+<p>ここで<span class="formula">$4000</span>が<code>[$00:02A1]</code><code>[$00:02A0]</code>, <code>[$00:02A3]</code><code>[$00:02A2]</code>, <code>[$00:02A7]</code><code>[$00:02A6]</code>に書き込まれている。<br>
+これらのアドレスに加え、のちに計算に使われる<code>[$00:02A8]</code>～<code>[$00:02AF]</code>が、BGMode7のI/Oアドレス<code>[$00:211B]</code>～<code>[$00:211E]</code>に書き込まれていく。<br>
+よって上の<code><span class="r">$C0/F37D</span></code>～からしばらくは（<code><span class="r">$C0/F392</span></code>まで）、BGMode7用の初期値の計算になるが、ここでは詳細は省く。</p>
+
+<div class="code-container"><pre>
+$C0/F395 LDA #$11                ;Aに$11をロード
+$C0/F397 STA $212C  [$00:212C]   ;Aを[$00:212C]に書き込み
+$C0/F39A JSR $FABA  [$C0:FABA]   ;[$C0:FABA]へジャンプ
+</pre></div>
+
+<p>BGMode7用の初期値の計算が終わると、上処理で、<code>[$00:212C]</code>（メインスクリーン指定）に<span class="formula">$11</span>を書き込み、BG1とOBJを表示させる。<br>
+BGMode7の画面表示の開始であるが、BG1のBGマップがまだ転送されていないから、現時点では画面は真っ暗なままである。</p>
+
+<div class="code-container"><pre>
+$C0/FABA LDX #$02A8              ;Xに$02A8をロード
+$C0/FABD LDY #$211B              ;Yに$211Bをロード
+$C0/FAC0 LDA #$04                ;Aに$04をロード
+$C0/FAC2 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;ループ処理
+$C0/FAC4 LDA $00,x  [$00:02A8]   ;Aに[$00:02A8], [$00:02AA], [$00:02AC], [$00:02AE]をロード
+$C0/FAC6 STA $0000,y[$00:211B]   ;Aを[$00:211B], [$00:211C], [$00:211D], [$00:211E]に書き込み
+$C0/FAC9 LDA $01,x  [$00:02A9]   ;Aに[$00:02A9], [$00:02AB], [$00:02AD], [$00:02AF]をロード
+$C0/FACB STA $0000,y[$00:211B]   ;Aを[$00:211B], [$00:211C], [$00:211D], [$00:211E]に書き込み
+$C0/FACE INX                     ;Xをインクリメント +1
+$C0/FACF INX                     ;Xをインクリメント +1
+$C0/FAD0 INY                     ;Yをインクリメント +1
+$C0/FAD1 DEC $30    [$00:0030]   ;[$00:0030](初期値$04)をデクリメント -1
+$C0/FAD3 BNE $EF    [$FAC4]      ;ゼロフラグが立っていないとき[$FAC4]分岐
+;ループ処理ここまで
+$C0/FAD5 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上がBGMode7に使う4種のI/Oアドレスへの書き込み用サブルーチンである。<br>
+まとめてみると、各アドレスに1バイトの値を2度書きして16ビットの値を設定しているのがわかる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:211B]</code></td><td><code>[$00:02A9]</code><code>[$00:02A8]</code></td></tr>
+	<tr><td><code>[$00:211C]</code></td><td><code>[$00:02AB]</code><code>[$00:02AA]</code></td></tr>
+	<tr><td><code>[$00:211D]</code></td><td><code>[$00:02AD]</code><code>[$00:02AC]</code></td></tr>
+	<tr><td><code>[$00:211E]</code></td><td><code>[$00:02AF]</code><code>[$00:02AE]</code></td></tr>
+</tbody>
+</table>
+
+<p><code>[$00:02A8]</code>～<code>[$00:02AF]</code>を計算し更新して<code>[$00:211B]</code>～<code>[$00:211E]</code>に書き込み、BG1の回転・拡大縮小を操作していく、というのが基本である。<br>
+ただし現時点では上の処理をしてもBG1は真っ暗なので、見た目の変化はない。<br>
+また、この時点で書き込まれた数値は、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:211B]</code></td><td><span class="formula">$0002</span></td></tr>
+	<tr><td><code>[$00:211C]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:211D]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:211E]</code></td><td><span class="formula">$0002</span></td></tr>
+</tbody>
+</table>
+
+<p>である。この数値で何が起こるのかは後で説明する。</p>
+
+<div class="code-container"><pre>
+$C0/F39D LDA $28    [$00:0028]   ;Aに[$00:0028]をロード
+$C0/F39F STA $210D  [$00:210D]   ;A(F0)を[$00:210D](BG1水平スクロール量)に書き込み 
+$C0/F3A2 LDA #$FF                ;Aに$FFをロード
+$C0/F3A4 STA $210D  [$00:210D]   ;A($FF)を[$00:210D]に書き込み
+$C0/F3A7 JSR $F884  [$C0:F884]   ;[$C0:F884]へジャンプ
+
+$C0/F884 LDA #$00                ;Aに$00をロード
+$C0/F886 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/F887 LDA $26    [$00:0026]   ;Aに[$00:0026]をロード
+$C0/F889 ASL A                   ;Aを算術左シフト *2
+$C0/F88A TAX                     ;Aの値をXレジスタに転送
+$C0/F88B STZ $2115  [$00:2115]   ;[$00:2115](ビデオポート調整)に$00を書き込み
+$C0/F88E PHB                     ;DBレジスタをスタックにプッシュ
+$C0/F88F LDA #$7E                ;Aに$7Eをロード
+$C0/F891 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/F892 PLB                     ;DBレジスタにスタックからプル
+$C0/F893 LDY #$0000              ;Yに$0000をロード
+$C0/F896 LDA #$05                ;Aに$05をロード
+$C0/F898 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;ループ処理
+$C0/F89A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/F89C PHY                     ;Yレジスタをスタックへプッシュ
+$C0/F89D TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/F89E STA $002116[$00:2116]   ;Aを[$00:2116](VRAM読み込みアドレス(下位))に書き込み
+$C0/F8A2 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/F8A4 LDA $8462,x[$7E:8462]   ;Aに[$7E:8462]～[$7E:84E2]をロード
+$C0/F8A7 STA $002118[$00:2118]   ;Aを[$00:2118](VRAMデータ書き込み(下位))に書き込み
+$C0/F8AB LDA $8463,x[$7E:8463]   ;Aに[$7E:8463]～[$7E:84E3]をロード
+$C0/F8AE STA $002118[$00:2118]   ;Aを[$00:2118]に書き込み
+$C0/F8B2 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/F8B4 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/F8B5 CLC                     ;キャリーフラグクリア
+$C0/F8B6 ADC #$0020              ;A + $0020
+$C0/F8B9 TAX                     ;Aの値をXレジスタに転送
+$C0/F8BA PLA                     ;Aレジスタにスタックからプル
+$C0/F8BB CLC                     ;キャリーフラグクリア
+$C0/F8BC ADC #$0080              ;A + $0080
+$C0/F8BF TAY                     ;Aの値をYレジスタに転送
+$C0/F8C0 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/F8C2 DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/F8C4 BNE $D4    [$F89A]      ;ゼロフラグが立っていないとき[$F89A]分岐
+;ループ処理ここまで
+$C0/F8C6 PLB                     ;DBレジスタにスタックからプル
+$C0/F8C7 LDA #$80                ;Aに$80をロード
+$C0/F8C9 STA $2115  [$00:2115]   ;Aを[$00:2115]に書き込み
+$C0/F8CC RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここでBG1のBGマップが設置される。<br>
+<code>[$00:2118]</code>(VRAMデータ書き込み(下位))に書き込むことで1バイト間隔でBGマップを書き込んでいく仕組みである。<br>
+最初に書き込まれるのは「C」の文字、<code>[$7E:8462]</code>～<code>[$7E:84E3]</code>である。ちなみに10タイル分。</p>
+
+<p>さて、BG1のBGマップが書き込まれたので、<code>[$00:211B]</code>～<code>[$00:211E]</code>の設定に従って拡大縮小・回転させて画面表示されるはず。<br>
+初期値は先に説明したとおり、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:211B]</code></td><td><span class="formula">$0002</span></td></tr>
+	<tr><td><code>[$00:211C]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:211D]</code></td><td><span class="formula">$0000</span></td></tr>
+	<tr><td><code>[$00:211E]</code></td><td><span class="formula">$0002</span></td></tr>
+</tbody>
+</table>
+
+<p>この数値を「8ビット符号付き整数・固定小数点」で読む。<br>
+<span class="formula">$0000</span>は<span class="formula">0</span>だから省くが、<span class="formula">$0002</span>は整数部分が<span class="formula">$00</span>、小数点以下が<span class="formula">$02</span>（<span class="formula">%0000 0010</span>）。<br>
+10進数だと<span class="formula">2<sup>-7</sup> = 0.0078125</span>である。</p>
+
+<p>原点中心に反時計回りに角度<span class="formula">&#x3b8;</span>回転させた座標は、</p>
+
+<p><span class="formula">&#x3b1;</span>: X軸の拡大縮小係数<br>
+<span class="formula">&#x3b2;</span>: Y軸の拡大縮小係数</p>
+
+<div class="mono">
+[<span class="formula">cos&#x3b8;</span> * (1/&#x3b1;) ​−<span class="formula">sin&#x3b8;</span> * (1/&#x3b1;)]<br>
+[<span class="formula">sin&#x3b8;</span> * (1/&#x3b2;)　<span class="formula">cos&#x3b8;</span> * (1/&#x3b2;)]
+</div>
+
+<p>であり、<code>[$00:211C]</code>と<code>[$00:211D]</code>が<span class="formula">0</span>の時は回転させていない、つまり<span class="formula">&#x3b8; = 0</span>である。</p>
+
+<p><span class="formula"><code>$00:211B</code> = cos0 * (1/&#x3b1;) = 1 * (1/&#x3b1;) = 1/&#x3b1;</span><br>
+<span class="formula"><code>$00:211C</code> = ​−sin0 * (1/&#x3b1;) = 0 * (1/&#x3b1;) = 0</span><br>
+<span class="formula"><code>$00:211D</code> = sin0 * (1/&#x3b2;) = 0 * (1/&#x3b2;) = 0</span><br>
+<span class="formula"><code>$00:211E</code> = cos0 * (1/&#x3b2;) = 1 * (1/&#x3b2;) = 1/&#x3b2;</span></p>
+
+<p>なので、<br>
+<span class="formula">1/&#x3b1; = 2<sup>-7</sup></span><br>
+<span class="formula">1/&#x3b2; = 2<sup>-7</sup></span></p>
+
+<p><span class="formula">&#x3b1; = 128</span><br>
+<span class="formula">&#x3b2; = 128</span></p>
+
+<p>結局<span class="formula">2<sup>7</sup></span>が倍率である。<br>
+X軸・Y軸ともに同じ倍率なので、縦横同率比である。<br>
+初期状態では、BG1の画像を128倍して表示しろ、ということになる。これだけ拡大したら当然ながら実際のゲーム画面からははみ出す。<br>
+ゲーム画面では、画面いっぱいに「C」の文字の一部が表示され、そこから徐々に縮小されて、最終的に等倍で画面左上に「C」が表示される。<br>
+この時の倍率も、少しずつ加速していくように設定されている。</p>
+
+<table>
+<thead>
+	<tr><th>フレーム</th><th><code>$00:211B</code></th><th>倍率</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">01</span></td><td><span class="formula">$0002</span></td><td><span class="formula">128</span></td></tr>
+	<tr><td><span class="formula">02</span></td><td><span class="formula">$0002</span></td><td><span class="formula">128</span></td></tr>
+	<tr><td><span class="formula">03</span></td><td><span class="formula">$0002</span></td><td><span class="formula">128</span></td></tr>
+	<tr><td><span class="formula">04</span></td><td><span class="formula">$0002</span></td><td><span class="formula">128</span></td></tr>
+	<tr><td><span class="formula">05</span></td><td><span class="formula">$0004</span></td><td><span class="formula">64</span></td></tr>
+	<tr><td><span class="formula">06</span></td><td><span class="formula">$0004</span></td><td><span class="formula">64</span></td></tr>
+	<tr><td><span class="formula">07</span></td><td><span class="formula">$0005</span></td><td><span class="formula">51.2</span></td></tr>
+	<tr><td><span class="formula">08</span></td><td><span class="formula">$0008</span></td><td><span class="formula">32</span></td></tr>
+	<tr><td><span class="formula">09</span></td><td><span class="formula">$000A</span></td><td><span class="formula">25.6</span></td></tr>
+	<tr><td><span class="formula">10</span></td><td><span class="formula">$0010</span></td><td><span class="formula">16</span></td></tr>
+	<tr><td><span class="formula">11</span></td><td><span class="formula">$0015</span></td><td><span class="formula">12.19</span></td></tr>
+	<tr><td><span class="formula">12</span></td><td><span class="formula">$0020</span></td><td><span class="formula">8</span></td></tr>
+	<tr><td><span class="formula">13</span></td><td><span class="formula">$002A</span></td><td><span class="formula">6.10</span></td></tr>
+	<tr><td><span class="formula">14</span></td><td><span class="formula">$0040</span></td><td><span class="formula">4</span></td></tr>
+	<tr><td><span class="formula">15</span></td><td><span class="formula">$0055</span></td><td><span class="formula">3.01</span></td></tr>
+	<tr><td><span class="formula">16</span></td><td><span class="formula">$0080</span></td><td><span class="formula">2</span></td></tr>
+	<tr><td><span class="formula">17</span></td><td><span class="formula">$00AA</span></td><td><span class="formula">1.51</span></td></tr>
+	<tr><td><span class="formula">18</span></td><td><span class="formula">$0100</span></td><td><span class="formula">1</span></td></tr>
+</tbody>
+</table>
+
+<p>等倍まで拡大した時点で、同じ位置に「C」のスプライトを設置し（OAM更新）、次の文字「A」を同様に縮小処理して……を繰り返していけば「CAPTAIN」のロゴ部分が完成である。</p>
+
+<p>以上が基本的なBGMode7の処理である。<br>
+キャプテンスクウェアの場合、後は、</p>
+
+<ul>
+	<li>「SQUARE」の文字列が回転＋拡大しながら表示される（規定位置に表示されたらスプライトに変更）</li>
+	<li>キャプテンと背景が回転＋拡大されながら表示される（「CAPTAIN SQUARE」ロゴなどはスプライト）</li>
+</ul>
+
+<p>であるから、回転処理も加わる。<br>
+<a href="rasterscroll.html">ラスタースクロール</a>でも紹介したが、<code>$C0:BC94</code>～<code>$C0:BCB9</code>に<span class="formula">5&#xb0;</span>ずつの正接（sin）の三角関数表が入っており（<span class="formula">90&#xb0;</span>ずらせばcosの三角関数表でもある）、キャプテンの回転処理時は1フレームで<span class="formula">5&#xb0;</span>ずつ回転させている。<br>
+つまり<span class="formula">90&#xb0;</span>回転に<span class="formula">18</span>フレーム、<span class="formula">360&#xb0;</span>つまり1周回すのに<span class="formula">72</span>フレーム（<span class="formula">1</span>秒ちょっと）かかる。</p>
+
+<p><code>[$00:211B]</code>～<code>[$00:211E]</code>に書き込む値の計算方法についてはややこしいので省いた（筆者もよくわからないので）。<br>
+見た感じでは、</p>
+
+<table>
+<thead>
+	<tr><th>サブルーチンアドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code><span class="r">$C0/FB5C</span></code>～<code><span class="r">$C0/FBA1</span></code></td><td><span class="formula">sin&#x3b8;</span>または<span class="formula">cos&#x3b8;</span>,拡大縮小倍率の<span class="formula">&#x3b1;</span>及び<span class="formula">&#x3b2;</span>の計算</td></tr>
+	<tr><td><code><span class="r">$C0/FA4F</span></code>～<code><span class="r">$C0/FA77</span></code>及び<code><span class="r">$C0/FA83</span></code>～<code><span class="r">$C0/FAA0</span></code></td><td>三角関数表呼び出し</td></tr>
+</tbody>
+</table>
+
+<p>で、<span class="formula">1/&#x3b1;</span>または<span class="formula">1/&#x3b2;</span>、<span class="formula">sin&#x3b8;</span>または<span class="formula">cos&#x3b8;</span>を求めているようである。<br>
+乗算は<code><span class="r">$C0/BA76</span></code>～<code><span class="r">$C0/BAA6</span></code>に符号付8bit x 8bit（<code>[$00:4202]</code>～<code>[$00:4203]</code>を使う）のサブルーチンを使う。</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="scroll2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<!--  <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

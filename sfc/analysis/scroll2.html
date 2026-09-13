@@ -171,7 +171,7 @@ table {
 	<ul>
 		<li><a href="graphic.html">グラフィックについて</a></li>
 		<li><a href="sprite.html">スプライト(1)</a></li>
-		<li><a href="sprite.html">スプライト(2)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
 		<li><a href="bg.html">背景</a></li>
 		<li><a href="bg1.html">背景(フィールド)</a></li>
 		<li><a href="bg2.html">背景(戦闘)</a></li>
@@ -182,6 +182,7 @@ table {
 		<li><a href="mosaic.html">モザイク処理</a></li>
 		<li><a href="scroll.html">スクロール</a></li>
 		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
 	</ul>
 </li>
 </ul>
@@ -268,7 +269,8 @@ BG1が多重スクロールを担当していて、一番下の魔王山部分�
 
 <h3>初期設定</h3>
 
-<p>これまでもI/Oレジスタアドレスの初期設定サブルーチンを紹介してきたが、タイトル画面の初期設定は、フィールドでのサブルーチンにあたるバンク<span class="formula">$C0</span>のサブルーチンを使っているものの、通常のプレイにおける<a href="bg1.html">フィールドでのサブルーチン</a>の初期設定<code><span class="r">$C0/0DF6</span></code>～<code><span class="r">$C0/0ED7</span></code>ではない。</p>
+<p>これまでもI/Oレジスタアドレスの初期設定サブルーチンを紹介してきたが、タイトル画面の初期設定は、フィールドでのサブルーチンにあたるバンク<span class="formula">$C0</span>のサブルーチンを使っているものの、通常のプレイにおける<a href="bg1.html">フィールドでのサブルーチン</a>の初期設定<code><span class="r">$C0/0DF6</span></code>～<code><span class="r">$C0/0ED7</span></code>ではない。<br>
+キャプテンスクウェア開始時（BGMode7切り替え時）も同じ処理が入るため、BGMode7が関係する場面での初期化に使うサブルーチンなのかもしれない。</p>
 
 <div class="code-container"><pre>
 $C0/0EDF LDA #$8F                ;Aに$8Fをロード
@@ -465,20 +467,6 @@ $C0/E1CB RTS                     ;サブルーチン戻り
 </table>
 
 <p>さらに、<code><span class="r">$C0/E1A2</span></code>～<code><span class="r">$C0/E1CB</span></code>で、<code>[$00:210E]</code>と<code>[$00:2110]</code>の初期値が計算・書き込まれる。</p>
-
-<div class="code-container"><pre>
-$C0/E1B4 STA $210E  [$00:210E]   ;A($FF)を[$00:210E]に書き込み
-$C0/E1B7 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
-$C0/E1B8 STA $210E  [$00:210E]   ;A($00)を[$00:210E]に書き込み
-$C0/E1BB REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
-$C0/E1BD LDA $0234  [$00:0234]   ;Aに[$00:0235][$00:0234]($0200)をロード
-$C0/E1C0 LSR A                   ;Aを論理右シフト　(/2)
-$C0/E1C1 DEC A                   ;Aをデクリメント -1
-$C0/E1C2 SEP #$20                ;MフラグON　Aレジスタは8bit幅 A:00FF 
-$C0/E1C4 STA $2110  [$00:2110]   ;A($FF)を[$00:2110]に書き込み
-$C0/E1C7 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
-$C0/E1C8 STA $2110  [$00:2110]   ;A($00)を[$00:2110]に書き込み
-</pre></div>
 
 <ul>
 	<li>BG1垂直スクロール量<code>[$00:210E]</code>：<span class="formula">$00FF</span>（2度書き込み）</li>
