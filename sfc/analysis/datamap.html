@@ -154,7 +154,7 @@ table {
 		<li><a href="program11.html">セレクトバグ</a></li>
 		<li><a href="program13.html">現代編ワタナベイベント</a></li>
 		<li><a href="program16.html">最終編敵パーティ</a></li>
-		<li><a href="program16_2.html">原始/中世編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
 		<li><a href="program20.html">幕末編のザコ敵</a></li>
 		<li><a href="program22.html">ラーニング</a></li>
 		<li><a href="program23.html">功夫編・修行</a></li>
@@ -227,6 +227,8 @@ table {
 
 <p>筆者のプログラミング知識の不足ゆえに、誤りがある可能性も高いことをご了承いただきたい。<br>
 未調査の部分も多く、今後追記するかもしれない。</p>
+
+<p>RAM領域はページを分けている。<a href="datamap2.html">データマップ &gt; RAM</a>を参照。</p>
 
 <div id="captiondata"></div>
 
@@ -311,6 +313,8 @@ table {
 	<tr><td><code>$40</code></td><td><code>$C0</code></td><td><code>$C0:BCDD</code>～<code>$C0:BD1F</code></td><td>戦闘突入時三角形マスキングの座標計算係数</td></tr>
 	<tr><td><code>$41</code></td><td><code>$C1</code></td><td><code>$C1:0000</code>～<code>$C1:FDA5</code></td><td>（ほぼ）プログラム（戦闘関係, 後述）</td></tr>
 	<tr><td><code>$41</code></td><td><code>$C1</code></td><td><code>$C1:02B2</code>～<code>$C1:02B9</code></td><td>BG3ウィンドウ用赤系カラーパレット（4色）</td></tr>
+	<tr><td><code>$41</code></td><td><code>$C1</code></td><td><code>$C1:A5E6</code>～<code>$C1:A605</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン呼び出しアドレス値（2バイト）（<code>$C1/A72F</code>～<code>$C1/B01B</code>呼び出し）</td></tr>
+	<tr><td><code>$41</code></td><td><code>$C1</code></td><td><code>$C1:A606</code>～<code>$C1:A665</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン呼び出しアドレス値（2バイト）（<code>$C1/A8E2</code>～<code>$C1/B421</code>呼び出し）</td></tr>
 	<tr><td><code>$41</code></td><td><code>$C1</code></td><td><code>$C1:FDA6</code>～<code>$C1:FFFF</code></td><td>戦闘コマンドと戦闘終了時メッセージのテキスト（デバッグテキスト含む）</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:0000</code>～<code>$C2:6B4C</code></td><td>プログラム（主にメニュー画面関係, 後述）</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:712A</code>～<code>$C2:7133</code></td><td>メニュー画面コマンドの半透明位置を指定するHDMAテーブルの値</td></tr>
@@ -352,10 +356,12 @@ table {
 	<tr><td><code>$55</code></td><td><code>$D5</code></td><td><code>$D5:644B</code>～<code>$D5:64CA</code></td><td>行動異常データ（<a href="d5.html#koudoui">詳細</a>）</td></tr>
 	<tr><td><code>$55</code></td><td><code>$D5</code></td><td><code>$D5:64CB</code>～<code>$D5:71C3</code></td><td>敵移動データ</td></tr>
 	<tr><td><code>$55</code></td><td><code>$D5</code></td><td><code>$D5:71C4</code>～<code>$D5:81C3</code></td><td>アイテムデータ（<a href="d5.html#itemd">詳細</a>）</td></tr>
+	<tr><td><code>$55</code></td><td><code>$D5</code></td><td><code>$D5:8EA2</code>～<code>$D5:F97A</code></td><td>技のモーション（技データ00～05）</td></tr>
 	<tr><td><code>$55</code></td><td><code>$D5</code></td><td><code>$D5:F97B</code>～<code>$D5:F98A</code></td><td>敵サイズ（Bit3～5が敵の横幅（マス数）、Bit0～2が敵の縦幅（マス数））</td></tr>
 	<tr><td><code>$55</code></td><td><code>$D5</code></td><td><code>$D5:FC51</code>～<code>$D5:FC60</code></td><td>各シナリオのアイテム欄の開始アドレス＆枠数</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:0080</code>～<code>$D6:207F</code></td><td>カラーパレット（敵キャラ、32×32サイズ時）</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:2080</code>～<code>$D6:235F</code></td><td>カラーパレット（味方キャラ、32×32サイズ時）</td></tr>
+	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:2470</code>～<code>$D6:247F</code></td><td>カラーパレット（戦闘時BG3用ウィンドウ＆文字色）</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:4080</code>～<code>$D6:40BF</code></td><td>最終編・敵パーティ編成テーブル</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:4170</code>～<code>$D6:4183</code></td><td>近未来編・ワールドマップ敵パーティ編成テーブル</td></tr>
 	<tr><td><code>$56</code></td><td><code>$D6</code></td><td><code>$D6:4280</code>～<code>$D6:512E</code></td><td>敵パーティデータ（<a href="d5.html#enemyparty">詳細</a>）</td></tr>
@@ -522,19 +528,25 @@ table {
 	<tr><td><code>$C1:0136</code>～<code>$C1:0140</code></td><td><code>[$00:2100]</code>のディスプレイ制御レジスタ書き込みと<code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C1:0327</code>～<code>$C1:0346</code></td><td><code>[$7E:FEFB]</code>判定後、<code>[$7E:FEF0]</code>（戦闘中タイマー）に<span class="formula">$7F</span>セット</td></tr>
 	<tr><td><code>$C1:03F1</code>～<code>$C1:03F9</code></td><td>敵データ15・タイプと<span class="formula">$04</span>(OBJECT)で論理積を取る処理</td></tr>
+	<tr><td><code>$C1:047C</code>～<code>$C1:04BC</code></td><td><code>[$7E:A480]</code>に<span class="formula">$0F</span>, <code>[$7E:A481]</code><code>[$7E:A484]</code><code>[$7E:A485]</code><code>[$7E:A487]</code><code>[$7E:A488]</code><code>[$7E:A4A3]</code>～<code>[$7E:A4A6]</code>に<span class="formula">$00</span>, <code>[$7E:A482]</code><code>[$7E:A483]</code>に<span class="formula">$17</span>, <code>[$7E:A486]</code>に<span class="formula">$E0</span>書き込み</td></tr>
 	<tr><td><code>$C1:0BF7</code>～<code>$C1:0C10</code></td><td>ＳＦ編主人公　キューブにデータ切り替え開始</td></tr>
 	<tr><td><code>$C1:0C14</code>～<code>$C1:0C29</code></td><td>原始編・ざき3戦目　判定サブルーチン</td></tr>
 	<tr><td><code>$C1:0C2D</code>～<code>$C1:0C4A</code></td><td>原始編・ざき3戦目　ざきへの攻撃回数<code>$7E:9100</code>を<span class="formula">+1</span>する処理</td></tr>
 	<tr><td><code>$C1:0CF2</code>～<code>$C1:0D5A</code></td><td>ラーニング用 <code>$7E:9200</code>～に使用技を書き込み＋使用技判定処理</td></tr>
 	<tr><td><code>$C1:0D0D</code>～<code>$C1:0D14</code></td><td>功夫編修行 ラーニング用前処理</td></tr>
 	<tr><td><code>$C1:0D5B</code>～<code>$C1:0DBB</code></td><td>功夫編修行 戦闘終了時　ラーニング処理</td></tr>
+	<tr><td><code>$C1:1083</code>～<code>$C1:10B2</code></td><td>CGRAM転送 CGRAMアドレス<code>$0010</code>に<code>$D6:2470</code>～<code>$D6:2477</code>, CGRAMアドレス<code>$0018</code>に<code>$D6:2478</code>～<code>$D6:247F</code>（技名用）</td></tr>
 	<tr><td><code>$C1:10B3</code>～<code>$C1:10E8</code></td><td>ダメージフィールド発生処理</td></tr>
+	<tr><td><code>$C1:10F0</code>～<code>$C1:1136</code></td><td>戦闘フィールドマス<code>$00:04C8</code>～<code>$00:04FF</code>の値からダメージフィールドの状態確認</td></tr>
+	<tr><td><code>$C1:11D1</code>～<code>$C1:11E3</code></td><td><code>[$00:0070]</code>が<span class="formula">$01</span>ではなく<code>[$00:0040]</code>が<span class="formula">$04</span>でなければサウンド処理<code>$C3/0004</code>へ</td></tr>
+	<tr><td><code>$C1:12BF</code>～<code>$C1:12C7</code></td><td><code>[$00:1D00]</code>に<span class="formula">$F2</span>を書き込み効果音処理<code>$C1/11D1</code>へ</td></tr>
 	<tr><td><code>$C1:14C7</code>～<code>$C1:14DC</code></td><td>「アイテムを使う」コマンドが選択可能か判定</td></tr>
 	<tr><td><code>$C1:14DD</code>～<code>$C1:14EB</code></td><td><code>[$7E:FEFA]</code>（ハルマゲドンフラグ）と<code>[$00:0043]</code>から、逃げるが選択可能か判定</td></tr>
 	<tr><td><code>$C1:1528</code>～<code>$C1:156C</code></td><td>固定値を$20バイト毎ループ処理でコピー（一定範囲のアドレスの初期化）</td></tr>
 	<tr><td><code>$C1:156D</code>～<code>$C1:1630</code></td><td>ラーニング用 <code>$7E:9200</code>～に書き込まれた使用技を習得技として記録する処理</td></tr>
 	<tr><td><code>$C1:166E</code>～<code>$C1:169D</code></td><td>戦闘終了時 ドロップアイテム判定</td></tr>
 	<tr><td><code>$C1:16AD</code>～<code>$C1:171C</code></td><td>敵キャラ操作時　座標・向きを敵データから味方データにコピー</td></tr>
+	<tr><td><code>$C1:16CA</code>～<code>$C1:16E2</code></td><td>敵キャラのマス位置のX座標<code>$00:1BnA</code>に<span class="formula">*$20+$10</span>してピクセル座標<code>$00:1BnC</code>に書き込み、Y座標<code>$00:1BnB</code>に<span class="formula">*$18+$27</span>してピクセル座標<code>$00:1BnE</code>に書き込み</td></tr>
 	<tr><td><code>$C1:17E6</code>～<code>$C1:17E2</code></td><td>行動異常発生時 レベル修正</td></tr>
 	<tr><td><code>$C1:1ADD</code>～<code>$C1:1B21</code></td><td>功夫編ラストバトル　弟子に「旋牙連山拳」を習得</td></tr>
 	<tr><td><code>$C1:1BBE</code>～<code>$C1:1BE1</code></td><td>功夫編ラストバトル　弟子が「旋牙連山拳」を使用後に習得技から削除</td></tr>
@@ -550,7 +562,7 @@ table {
 	<tr><td><code>$C1:1E71</code>～<code>$C1:1E9A</code></td><td>敵キャラのダメージ処理</td></tr>
 	<tr><td><code>$C1:1EA3</code>～<code>$C1:1ECA</code></td><td>敵キャラの吸収処理</td></tr>
 	<tr><td><code>$C1:1ECE</code>～<code>$C1:1F05</code></td><td>ダメージフィールド消去判定</td></tr>
-	<tr><td><code>$C1:1F06</code>～<code>$C1:1F47</code></td><td><code>$7E:FEFD</code>を+1＆ダメージフィールド発動判定</td></tr>
+	<tr><td><code>$C1:1F06</code>～<code>$C1:1F47</code></td><td><code>$7E:FEFD</code>を<span class="formula">+1</span>＆ダメージフィールド発動判定</td></tr>
 	<tr><td><code>$C1:1F5C</code>～<code>$C1:1FAB</code></td><td>ダメージフィールド消去処理</td></tr>
 	<tr><td><code>$C1:1FB2</code>～<code>$C1:1FE9</code></td><td>ダメージフィールドのダメージ判定</td></tr>
 	<tr><td><code>$C1:1FEA</code>～<code>$C1:201F</code></td><td>味方キャラのフィールドダメージ処理</td></tr>
@@ -572,6 +584,8 @@ table {
 	<tr><td><code>$C1:2800</code>～<code>$C1:281A</code></td><td>移動または向き変え時の行動ポイント計算用　<span class="formula">$40 - 速/4</span>（※向き変えはこの<span class="formula">1/2</span>で行動ポイント増減）</td></tr>
 	<tr><td><code>$C1:281E</code>～<code>$C1:2833</code></td><td>味方の行動時、行動ポイント<code>[$00:03AF]</code><code>[$00:03AE]</code>増加処理</td></tr>
 	<tr><td><code>$C1:283D</code>～<code>$C1:2856</code></td><td>敵の移動または向き変え時、行動ポイント<code>[$00:03AF]</code><code>[$00:03AE]</code>減少処理</td></tr>
+	<tr><td><code>$C1:320E</code>～<code>$C1:3279</code></td><td>技を出すキャラのY座標（ピクセル単位中心位置）と向きを<code>[$7E:A020]</code>～<code>[$7E:A462]</code>にコピー</td></tr>
+	<tr><td><code>$C1:329F</code>～<code>$C1:32DD</code></td><td>技データ00～技データ05（技モーション呼び出しアドレス）を<code>$7E:A028</code>～<code>$7E:A468</code>に<span class="formula">$40</span>バイト間隔コピー</td></tr>
 	<tr><td><code>$C1:34EA</code>～<code>$C1:34F5</code></td><td>HBlank判定用 Hカウンタ（画面描画水平位置）が<span class="formula">$E0</span>以上かまたは<span class="formula">$50</span>未満か判定</td></tr>
 	<tr><td><code>$C1:34F6</code>～<code>$C1:3504</code></td><td>HBlank判定用 Hカウンタの値を取得</td></tr>
 	<tr><td><code>$C1:3546</code>～<code>$C1:35C3</code></td><td>戦闘開始時 行動異常</td></tr>
@@ -590,9 +604,9 @@ table {
 	<tr><td><code>$C1:3E61</code>～<code>$C1:3EC7</code></td><td>表示する文字列を取得し<code>$7E:FF00</code>～<code>$7E:FF60</code>にコピー</td></tr>
 	<tr><td><code>$C1:3EC8</code>～<code>$C1:3F7D</code></td><td><code>$7E:FF00</code>～<code>$7E:FF60</code>ににコピーした文字列から文字の画像データをロード, 文字数とVRAMでの位置判定</td></tr>
 	<tr><td><code>$C1:41F2</code>～<code>$C1:4391</code></td><td>敵の移動処理</td></tr>
-	<tr><td><code>$C1:4535</code>～<code>$C1:4549</code></td><td><span class="formula"><code>$0018,x</code>(キャラ位置のマス目のX座標)*$100*$20</span></td></tr>
-	<tr><td><code>$C1:454A</code>～<code>$C1:455E</code></td><td><span class="formula"><code>$0019,x</code>(キャラ位置のマス目のY座標)*$100*$18</span></td></tr>
-	<tr><td><code>$C1:45D5</code>～<code>$C1:4582</code></td><td><span class="formula"><code>$0018,x</code>(キャラ位置のマス目のX座標)*$100*$20 + $10</span>をピクセル単位X座標<code>$0010,x</code>に、<span class="formula"><code>$0019,x</code>(キャラ位置のマス目のY座標)*$100*$18 + $1F</span>をピクセル単位Y座標<code>$0012,x</code>にセット</td></tr>
+	<tr><td><code>$C1:4535</code>～<code>$C1:4549</code></td><td><span class="formula">マス目のX座標*$100*$20</span>して、マス目のX座標からピクセル単位の座標計算</td></tr>
+	<tr><td><code>$C1:454A</code>～<code>$C1:455E</code></td><td><span class="formula">マス目のY座標*$100*$18</span>して、マス目のX座標からピクセル単位の座標計算</td></tr>
+	<tr><td><code>$C1:45D5</code>～<code>$C1:4582</code></td><td><span class="formula"><code>$0018,x</code>(キャラ位置のマス目のX座標)*$100*$20 + $10</span>（ピクセル単位の座標のマス中心部）をピクセル単位X座標<code>$0010,x</code>に、<span class="formula"><code>$0019,x</code>(キャラ位置のマス目のY座標)*$100*$18 + $1F</span>（ピクセル単位の座標のマス中心部）をピクセル単位Y座標<code>$0012,x</code>にセット</td></tr>
 	<tr><td><code>$C1:45EE</code>～<code>$C1:45F6</code></td><td><code>X</code>,<code>Y</code>をスタックに格納して<code>$C1/45D5</code>～<code>$C1/4582</code>実行</td></tr>
 	<tr><td><code>$C1:46C8</code>～<code>$C1:46C9</code></td><td>乗算・除算時の時間経過用</td></tr>
 	<tr><td><code>$C1:4D7E</code>～<code>$C1:4D89</code></td><td>シナリオIDまたは最終編主人公から、カーソル画像のアドレスを算出して、スプライトをVRAMに転送</td></tr>
@@ -607,10 +621,13 @@ table {
 	<tr><td><code>$C1:5095</code>～<code>$C1:50EA</code></td><td>BG3のテキスト 文字部分を<code>$7E:B000</code>～にコピー</td></tr>
 	<tr><td><code>$C1:5143</code>～<code>$C1:5146</code></td><td>BG3のBGマップデータ転送（<code>$C1:8D42</code>～<code>$C1:8D60</code>）を実行してサブルーチン戻り</td></tr>
 	<tr><td><code>$C1:51FB</code>～<code>$C1:5245</code></td><td>敵位置マス判定処理</td></tr>
+	<tr><td><code>$C1:5263</code>～<code>$C1:52C3</code></td><td>敵状態判定</td></tr>
+	<tr><td><code>$C1:52C4</code>～<code>$C1:52F2</code></td><td>味方キャラ全体の位置のY軸（味方データ<code>$00:1C00+$12</code>,ピクセル単位）下位バイトに<span class="formula">+$20</span>（右1マス移動計算値）</td></tr>
 	<tr><td><code>$C1:5AC2</code>～<code>$C1:5B64</code></td><td>味方キャラのOAM下位テーブル用データ獲得</td></tr>
 	<tr><td><code>$C1:5EF5</code>～<code>$C1:5F1C</code></td><td>味方キャラのOAM上位テーブル用データ獲得</td></tr>
 	<tr><td><code>$C1:5F1D</code>～<code>$C1:5F85</code></td><td>味方キャラ以外のOAMデータ獲得</td></tr>
 	<tr><td><code>$C1:5FE0</code>～<code>$C1:60C9</code></td><td>キャラのスプライトデータをWRAM<code>$00:D000</code>～<code>$00:D400</code>にGDMA転送</td></tr>
+	<tr><td><code>$C1:5F89</code>～<code>$C1:5FDF</code></td><td>味方移動判定（味方データv$00:1C00+$1E, $1F</td>チェック）</td></tr>
 	<tr><td><code>$C1:612F</code>～<code>$C1:6144</code></td><td>HDMA転送＆NMIによる割り込み待ち用ループ</td></tr>
 	<tr><td><code>$C1:6145</code>～<code>$C1:614D</code></td><td>VBlankフラグ判定ループ(<code>[$00:4212]</code> 上1ビット判定）～NMI割り込み</td></tr>
 	<tr><td><code>$C1:6150</code>～<code>$C1:61A4</code></td><td>戦闘用乱数計算</td></tr>
@@ -695,7 +712,70 @@ table {
 	<tr><td><code>$C1:A12C</code>～<code>$C1:A179</code></td><td>敵が出した技が回復技または無属性ではないとき、技の属性を取り出す</td></tr>
 	<tr><td><code>$C1:A1BD</code>～<code>$C1:A21B</code></td><td>敵から1ヒット以上の攻撃を食らった時、習得技で反撃できるか判定し、反撃技が出せなくなる状態異常ではないか判定</td></tr>
 	<tr><td><code>$C1:A312</code>～<code>$C1:A161</code></td><td>敵が技を出した直後、味方側の被ヒット数<code>$00:1C3B/1C7B/1CBB/1CFB</code>を、<code>$7E:EA20/EA60/EAA0/EAE0</code>にコピー</td></tr>
+	<tr><td><code>$C1:A3E4</code>～<code>$C1:A3F3</code></td><td><code>$7E:A000</code>～<code>$7E:A47F</code>を<span class="formula">$00</span>で初期化</td></tr>
+	<tr><td><code>$C1:A43E</code>～<code>$C1:A44B</code></td><td><span class="formula">技データ19 &amp; $80</span>（範囲内に1ヒットなら<span class="formula">1</span>が立つ）でゼロフラグ分岐</td></tr>
+	<tr><td><code>$C1:A666</code>～<code>$C1:A6DA</code></td><td>技データ00～05からモーションのサブルーチンアドレス呼び出し＋ジャンプ</td></tr>
+	<tr><td><code>$C1:A72F</code>～<code>$C1:A74E</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン01</td></tr>
+	<tr><td><code>$C1:A751</code>～<code>$C1:A76B</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン02</td></tr>
+	<tr><td><code>$C1:A76E</code>～<code>$C1:A79B</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン03</td></tr>
+	<tr><td><code>$C1:A79E</code>～<code>$C1:A7CB</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン04</td></tr>
+	<tr><td><code>$C1:A7CE</code>～<code>$C1:A7EC</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン05</td></tr>
+	<tr><td><code>$C1:A7EF</code>～<code>$C1:A80D</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン06</td></tr>
+	<tr><td><code>$C1:A810</code>～<code>$C1:A82A</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン07</td></tr>
+	<tr><td><code>$C1:A82D</code>～<code>$C1:A836</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン08</td></tr>
+	<tr><td><code>$C1:A839</code>～<code>$C1:A8C6</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン09</td></tr>
+	<tr><td><code>$C1:A8C9</code>～<code>$C1:A8DF</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン10</td></tr>
+	<tr><td><code>$C1:A8E2</code>～<code>$C1:A943</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン01</td></tr>
+	<tr><td><code>$C1:A946</code>～<code>$C1:A958</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン02</td></tr>
+	<tr><td><code>$C1:A959</code>～<code>$C1:A969</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン03</td></tr>
+	<tr><td><code>$C1:A96C</code>～<code>$C1:A97C</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン04</td></tr>
+	<tr><td><code>$C1:A97F</code>～<code>$C1:A99D</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン05</td></tr>
+	<tr><td><code>$C1:A99E</code>～<code>$C1:A9CF</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン06</td></tr>
+	<tr><td><code>$C1:A9EE</code>～<code>$C1:AA19</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン07</td></tr>
+	<tr><td><code>$C1:AA1F</code>～<code>$C1:AA41</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン08</td></tr>
+	<tr><td><code>$C1:AA44</code>～<code>$C1:AA54</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン09</td></tr>
+	<tr><td><code>$C1:AA57</code>～<code>$C1:AA67</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン10</td></tr>
+	<tr><td><code>$C1:AA6A</code>～<code>$C1:AA7A</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン11</td></tr>
+	<tr><td><code>$C1:AA7D</code>～<code>$C1:AA8D</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン12</td></tr>
+	<tr><td><code>$C1:AA90</code>～<code>$C1:AAAD</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン13</td></tr>
+	<tr><td><code>$C1:AAB0</code>～<code>$C1:AB4C</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン14</td></tr>
+	<tr><td><code>$C1:AC5D</code>～<code>$C1:AC88</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン15</td></tr>
+	<tr><td><code>$C1:AC8B</code>～<code>$C1:AC96</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン16</td></tr>
+	<tr><td><code>$C1:ACA0</code>～<code>$C1:ACC9</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン11</td></tr>
+	<tr><td><code>$C1:ACCA</code>～<code>$C1:ACD9</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン17</td></tr>
+	<tr><td><code>$C1:ACDC</code>～<code>$C1:ACE7</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン18</td></tr>
+	<tr><td><code>$C1:ACEA</code>～<code>$C1:ACF9</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン19</td></tr>
+	<tr><td><code>$C1:ACFC</code>～<code>$C1:AD0B</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン20</td></tr>
+	<tr><td><code>$C1:AD0E</code>～<code>$C1:AD23</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン21</td></tr>
+	<tr><td><code>$C1:AE2C</code>～<code>$C1:AE42</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン22</td></tr>
+	<tr><td><code>$C1:AE43</code>～<code>$C1:AE55</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン23</td></tr>
+	<tr><td><code>$C1:AF44</code>～<code>$C1:AF52</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン24</td></tr>
+	<tr><td><code>$C1:AF48</code>～<code>$C1:AF52</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン25</td></tr>
+	<tr><td><code>$C1:AF4C</code>～<code>$C1:AF52</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン26</td></tr>
+	<tr><td><code>$C1:AF55</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン27（<code>BRL</code>）</td></tr>
+	<tr><td><code>$C1:AF58</code>～<code>$C1:AF7A</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン12</td></tr>
+	<tr><td><code>$C1:AF84</code>～<code>$C1:AF9E</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン13</td></tr>
+	<tr><td><code>$C1:AFA8</code>～<code>$C1:AFCC</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン14</td></tr>
+	<tr><td><code>$C1:AFD6</code>～<code>$C1:AFF8</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン15</td></tr>
+	<tr><td><code>$C1:B000</code>～<code>$C1:B01B</code></td><td><code>$C1/A6D0</code>用技モーションサブルーチン16</td></tr>
+	<tr><td><code>$C1:B019</code>～<code>$C1:B020</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン28</td></tr>
+	<tr><td><code>$C1:B023</code>～<code>$C1:B02A</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン29</td></tr>
+	<tr><td><code>$C1:B02D</code>～<code>$C1:B098</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン30</td></tr>
 	<tr><td><code>$C1:B0AF</code>～<code>$C1:B18C</code></td><td>技用のカラーパレットを<code>$7E:F980</code>～<code>$7E:F99E</code>にロード</td></tr>
+	<tr><td><code>$C1:B200</code>～<code>$C1:B251</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン31</td></tr>
+	<tr><td><code>$C1:B254</code>～<code>$C1:B268</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン32</td></tr>
+	<tr><td><code>$C1:B26B</code>～<code>$C1:B270</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン33</td></tr>
+	<tr><td><code>$C1:B273</code>～<code>$C1:B2F2</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン34</td></tr>
+	<tr><td><code>$C1:B30F</code>～<code>$C1:B312</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン35</td></tr>
+	<tr><td><code>$C1:B315</code>～<code>$C1:B329</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン36</td></tr>
+	<tr><td><code>$C1:B39E</code>～<code>$C1:B3C7</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン37</td></tr>
+	<tr><td><code>$C1:B3D3</code>～<code>$C1:B3FC</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン38</td></tr>
+	<tr><td><code>$C1:B408</code>～<code>$C1:B40D</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン39</td></tr>
+	<tr><td><code>$C1:B410</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン40（<code>BRL</code>）</td></tr>
+	<tr><td><code>$C1:B413</code>～<code>$C1:B416</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン41</td></tr>
+	<tr><td><code>$C1:B419</code>～<code>$C1:B41C</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン42</td></tr>
+	<tr><td><code>$C1:B41F</code>～<code>$C1:B421</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン43</td></tr>
+	<tr><td><code>$C1:B720</code>～<code>$C1:B732</code></td><td>技データ00～05からモーションのサブルーチンアドレス呼び出し</td></tr>
 	<tr><td><code>$C1:C39D</code>～<code>$C1:C3B7</code></td><td>自爆999ダメージタイプ処理開始</td></tr>
 	<tr><td><code>$C1:C3DD</code>～<code>$C1:C3E7</code></td><td>技タイプが「外すとダメージ」「自爆999ダメージ」か判定</td></tr>
 	<tr><td><code>$C1:C40F</code>～<code>$C1:C42B</code></td><td>被ダメージの単発値、ヒット数書き込み</td></tr>
@@ -716,6 +796,7 @@ table {
 	<tr><td><code>$C1:CF2F</code>～<code>$C1:CF5A</code></td><td>敵への吹き飛ばし処理</td></tr>
 	<tr><td><code>$C1:D025</code>～<code>$C1:D0F4</code></td><td>敵への吹き飛ばし座標計算</td></tr>
 	<tr><td><code>$C1:D1D5</code>～<code>$C1:D29C</code></td><td>味方キャラ　向き補正・回避属性判定（レベル補正）</td></tr>
+	<tr><td><code>$C1:D29D</code>～<code>$C1:D2BB</code></td><td><code>[$7E:9EF0]</code>～<code>[$7E:9EF6]</code>に<span class="formula">$00</span>書き込み</td></tr>
 	<tr><td><code>$C1:D6B9</code>～<code>$C1:D725</code></td><td>攻撃技のヒット数計算</td></tr>
 	<tr><td><code>$C1:D726</code>～<code>$C1:D7F4</code></td><td>攻撃技の敵ターゲット決定</td></tr>
 	<tr><td><code>$C1:D7A0</code>～<code>$C1:D7AD</code></td><td>味方キャラ　技使用時　ヒット数をインクリメント</td></tr>
@@ -732,7 +813,8 @@ table {
 	<tr><td><code>$C1:DCC1</code>～<code>$C1:DE82</code></td><td>味方へのステータス変動処理</td></tr>
 	<tr><td><code>$C1:DD83</code>～<code>$C1:DE9C</code></td><td>敵へのステータス変動処理</td></tr>
 	<tr><td><code>$C1:DF27</code>～<code>$C1:DF3B</code></td><td>武器の追加効果の状態異常判定</td></tr>
-	<tr><td><code>$C1:DFAF</code>～<code>$C1:DFE8</code></td><td>技範囲内に敵キャラがいるか判定</td></tr>
+	<tr><td><code>$C1:DFAF</code>～<code>$C1:DFE8</code></td><td>味方攻撃時、技範囲内に敵キャラがいるか判定</td></tr>
+	<tr><td><code>$C1:DFF0</code>～<code>$C1:E025</code></td><td>敵攻撃時、技範囲内に味方キャラがいるか判定<br>（味方キャラが攻撃範囲内にいたら、戦闘中の味方キャラデータ<code>$00:1C00+40n + $2F</code>に順に<span class="formula">$01</span>～<span class="formula">$04</span>の値を書き込む）</td></tr>
 	<tr><td><code>$C1:E061</code>～<code>$C1:E0A1</code></td><td>敵キャラ　向き補正用の中心マスを計算</td></tr>
 	<tr><td><code>$C1:E0A2</code>～<code>$C1:E0F4</code></td><td>敵キャラ　回避属性判定</td></tr>
 	<tr><td><code>$C1:E0F7</code>～<code>$C1:E124</code></td><td>味方が敵を攻撃する時、向き補正<code>[$7E:ABnB]</code>から、向き補正したレベルの値を<code>[$7E:ABnA]</code>に書き込む</td></tr>
@@ -915,1084 +997,15 @@ table {
 </tbody>
 </table>
 
-<h3>RAM領域</h3>
-
-<p>RAM（Random-Access Memory）領域はバンク<code>$00</code>～<code>$3F</code>の<code>$0000～$1FFF</code>、バンク<code>$7E</code>で、先に記した通りにバンク<code>$80</code>～にはバンク<code>$00</code>～がミラーリングされている。</p>
-
-<p><code>$7E:0000</code>～<code>$7F:FFFF</code>はWRAM（Work RAM）というメモリ領域で、<code>$7E:0000</code>～<code>$7F:1FFF</code>のみ、他バンクでもミラーリングされて共通の値が入る（バンク<code>$00</code>～<code>$3F</code>, <code>$80</code>～<code>$BF</code>）<br>
-だいたいの場合で<code>$00:0000</code>～<code>$00:1FFF</code>（またはミラーリングの<code>$7E:0000</code>～<code>$7F:1FFF</code>）にて数値の読み書き・計算をするのは、ここがWRAMだからである。</p>
-
-<p>WRAMの<code>$7F:2000</code>～<code>$7F:FFFF</code>はミラーリングされていないため、別途、<code>$00:2180</code>～<code>$00:2183</code>に値を読み書きすることで通信をして値を書き込む。<br>
-<code>$00:2180</code>～<code>$00:2183</code>のように外部メモリとやりとりをするためのアドレスをI/Oレジスタというが、この後で説明する。</p>
-
-<p>ミラーリング外の<code>$7E:2000</code>～には、VRAMなど外部メモリに送る画像関係データをまとめて書き込んで、ここからGDMA転送することがよくある。</p>
-
-<p>※下位バイト・上位バイトについて<br>
-アドレス1つに入るデータは1バイト（16進数2文字）だが、中には連続した2つのアドレスを使って、2バイト（16進数4文字）のデータを記録している値もある。<br>
-その場合は、下位バイトのアドレスに下2桁、上位バイトのアドレスに上2桁が入っており、上位バイトアドレスの値・下位バイトアドレスの値を繋げて2バイト分のデータとする。</p>
-
-<h4>I/Oレジスタ</h4>
-
-<ul>
-	<li><a href="https://github.com/akatsuki105/snes-docs-ja/blob/main/ioreg.md" target="_blank">I/Oレジスタ 一覧 snes-docs-ja</a></li>
-	<li><a href="https://e-words.jp/w/I-O%E3%83%9D%E3%83%BC%E3%83%88.html" target="_blank">I/Oポートとは - IT用語辞典 e-Words</a></li>
-</ul>
-
-<p>スーパーファミコンと周辺機器（ゲームカセット、操作用のコントローラ、及び、画像・音を出力するためのディスプレイやスピーカーつまりスーパーファミコンの時代だとブラウン管テレビ）が通信を行うための端子（接続部分）などをI/Oポートというのだが、これら周辺機器とのやりとり用に割り振られたメモリアドレスが「I/Oレジスタ」になる。<br>
-これはスーパーファミコンの仕様のため、どのスーパーファミコンソフトでも共通のはずである。<br>
-詳しいアドレスは上サイト様など参照。ここでは簡単な説明に留める。<br>
-プログラマーでない限りいろいろ詳しいことを知っておく必要はないし、筆者もわからないことだらけだが、とりあえず、知っておくと良いレジスタだけピックアップする。<br>
-用語の説明は表の下。</p>
-
-<table>
-<thead>
-	<tr><th>アドレス</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00:2100</code></td><td>ディスプレイ制御レジスタ1 </td></tr>
-	<tr><td><code>$00:2101</code></td><td>OBSEL（スプライトのサイズを設定）</td></tr>
-	<tr><td><code>$00:2102～$00:2103</code></td><td>OAMアドレス (下位8bit～上位1bit)</td></tr>
-	<tr><td><code>$00:2104</code></td><td>OAM書き込み</td></tr>
-	<tr><td><code>$00:2105</code></td><td>背景（BG）制御レジスタ</td></tr>
-	<tr><td><code>$00:2107</code></td><td>背景（BG1）画面設定</td></tr>
-	<tr><td><code>$00:2108</code></td><td>背景（BG2）画面設定</td></tr>
-	<tr><td><code>$00:2109</code></td><td>背景（BG3）画面設定</td></tr>
-	<tr><td><code>$00:210A</code></td><td>背景（BG4）画面設定</td></tr>
-	<tr><td><code>$00:2116～$00:2117</code></td><td>VRAMアドレス (下位8bit～上位8bit)</td></tr>
-	<tr><td><code>$00:2118～$00:2119</code></td><td>VRAMデータ書き込み (下位8bit～上位8bit)</td></tr>
-	<tr><td><code>$00:2121</code></td><td>CGRAM カラーパレットアドレス指定</td></tr>
-	<tr><td><code>$00:2122</code></td><td>CGRAM カラーパレット書き込み</td></tr>
-	<tr><td><code>$00:2140</code>～<code>$00:2143</code></td><td>サウンド用CPUであるAPU（SPC700）とのI/Oレジスタ（<code>$00:2144</code>～<code>$00:217F</code>は<code>$00:2140</code>～<code>$00:2143</code>をミラーリング）</td></tr>
-	<tr><td><code>$00:2180</code></td><td>WRAMデータレジスタ</td></tr>
-	<tr><td><code>$00:2181～$00:2183</code></td><td>WRAMアドレスレジスタ 3バイト (下位8bit・中位8bit・上位1bit)</td></tr>
-	<tr><td><code>$00:4200</code></td><td>割り込み有効化レジスタ</td></tr>
-	<tr><td><code>$00:420B</code></td><td>GDMA開始レジスタ</td></tr>
-	<tr><td><code>$00:420C</code></td><td>HDMAチャネルレジスタ</td></tr>
-	<tr><td><code>$00:4212</code></td><td>自動ジョイパッド読み取り機能のON・OFF状態</td></tr>
-	<tr><td><code>$00:4212</code></td><td>bit7　自動ジョイパッド読み取り機能のONOFF記録</td></tr>
-	<tr><td><code>$00:4218～$00:4219</code></td><td>自動ジョイパッド読み取り機能のコントローラ1のボタン状態出力先</td></tr>
-	<tr><td><code>$00:421A～$00:421B</code></td><td>自動ジョイパッド読み取り機能のコントローラ2のボタン状態出力先（本作未使用）</td></tr>
-	<tr><td><code>$00:4218</code>～<code>$00:421F</code></td><td>コントローラ（ジョイパッド）出力</td></tr>
-	<tr><td><code>$00:43n0</code></td><td>GDMA / HDMA設定レジスタ(チャネルn)</td></tr>
-	<tr><td><code>$00:43n1</code></td><td>GDMA 転送先指定 <span class="formula">$04</span>=OAM, <span class="formula">$18</span>=VRAM, <span class="formula">$22</span>=CGRAM, <span class="formula">$80</span>=WRAM</td></tr>
-	<tr><td><code>$00:43n3</code>～<code>$00:43n2</code></td><td>GDMA データ元アドレス（開始位置）</td></tr>
-	<tr><td><code>$00:43n4</code></td><td>GDMA データ元バンク</td></tr>
-	<tr><td><code>$00:43n6</code>～<code>$00:43n5</code></td><td>GDMA 転送するデータ量</td></tr>
-</tbody>
-</table>
-
-<ul>
-	<li>WRAM: Work RAM<br>
-	容量：128KB<br>
-	スーパーファミコンのメインメモリ。<code>$7E:0000</code>～<code>$7F:FFFF</code></li>
-
-	<li>VRAM: Video RAM<br>
-	容量：64KB<br>
-	グラフィックデータ（画像の構造）を記録するメモリ。</li>
-
-	<li>CGRAM: Color Generator RAM<br>
-	容量：512バイト<br>
-	スプライトや背景の色情報（カラーパレット）を記録するメモリ。<br>
-	アドレスをbyteではなくwordで指定するため注意が必要。2byte(バイト)で1word(ワード)になる。
-	</li>
-
-	<li>OAM: Object Attribute Memory<br>
-	容量：544バイト<br>
-	スプライトの配置を記録するメモリ。</li>
-
-	<li>データ転送</li>
-	<ul>
-		<li>GDMA(General Direct Memory Access):<br>
-		データ転送のこと。HDMAと合わせて8チャネル設定可能。<br>
-		これでWRAM, VRAM, CGRAM, OAMへデータを送る。</li>
-
-		<li>HDMA(HBlank DMA):<br>
-		HBlank（画面1行のグラフィックを描画した後の次の行の描画までの僅かな時間）を利用したデータ転送。</li>
-	</ul>
-</ul>
-
-<p>サブルーチンを見て、<code>$00:2100</code>～<code>$00:213F</code>の読み書きをしているのならだいたい画像関係だし、<code>$00:2140</code>～<code>$00:217F</code>ならサウンド関係（バンク<code>$C3</code>）、<code>$00:4218</code>～<code>$00:4219</code>はコントローラ出力の判定である。<br>
-<code>$00:43n?</code>は他メモリとのデータのやりとり（大抵はグラフィックのデータ）で、<code>$00:43n1</code>に何の値を書き込んだかで、カラーパレットのデータ（<span class="formula">$22</span>=CGRAM）か、スプライト位置（<span class="formula">$04</span>=OAM）か、大雑把に把握できる。<br>
-また、スーパーファミコンには画像の伸縮回転を行う機能があるが、そのためのI/Oレジスタ<code>$00:211B</code>～<code>$00:2120</code>を利用した乗算、<code>$00:4202</code>～<code>$00:4206</code>の乗算・除算用レジスタを使った乗算・除算も頻繁に見られる。</p>
-
-<p>ゲームプレイ中、プレイヤーからのコントローラ（ジョイパッド）の入力待ちのため<code>$00:4212</code>の状態の読み取りを1フレームに1回行っており、ログを取ってみると<code>$00:4212</code>の読み取りループばかり並ぶのはこのため。</p>
-
-<h4>セーブデータ</h4>
-
-<p>ゲームのセーブデータは、ゲームのカセット内に入っているSRAMというメモリで保存する。<br>
-このメモリはボタン電池で電力を供給しており、電池切れするとデータを保持できなくなる。<br>
-ゲームのカセットがスーパーファミコンに接続され電源が入っている時は、SRAMへの電力供給はスーパーファミコン側から行われるので、もし電池切れしていても、スーパーファミコンの電源を切らない限り、セーブデータは保存可能。</p>
-
-<p>SRAMは、メモリ割り当ての規格がHiROMの場合、バンク<code>$30</code>～<code>$3F</code>のアドレス<code>$6000</code>～<code>$7FFF</code>に割り当てられている。</p>
-
-<p>「ライブ・ア・ライブ」では、セーブデータ領域にバンク<code>$30</code>のみ使用している。<br>
-「ライブ・ア・ライブ」はセーブデータが4個あるが、データ領域は以下のように割り振られている。</p>
-
-<table>
-<thead>
-	<tr><th>アドレス</th><th>セーブデータ</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$30:6000</code>～<code>$30:67F7</code></td><td>セーブデータ1</td></tr>
-	<tr><td><code>$30:67F8</code>～<code>$30:6FEF</code></td><td>セーブデータ2</td></tr>
-	<tr><td><code>$30:6FF0</code>～<code>$30:77E7</code></td><td>セーブデータ3</td></tr>
-	<tr><td><code>$30:77E8</code>～<code>$30:7FEF</code></td><td>セーブデータ4</td></tr>
-</tbody>
-</table>
-
-<p>1つのセーブデータにセーブされるのは、<code>$00:0A00</code>～<code>$00:11F7</code>の領域にあたる。<br>
-保存する必要があるデータが<code>$00:0A00</code>～<code>$00:11F7</code>外にある場合、そのデータを<code>$00:0A00</code>～<code>$00:11F7</code>内にコピーすることになるが、収まりきれない一部データ（主にシナリオフラグ関係のデータ）は圧縮して<code>$00:0A00</code>～<code>$00:11F7</code>にコピーされ、セーブデータに保存される。<br>
-詳細は<a href="program35.html">セーブデータのセーブ・ロード</a>を参照。</p>
-
-<h4>フィールド</h4>
-
-<p>戦闘時の共通部分含む。</p>
-
-
-<table>
-<thead>
-	<tr><th>アドレス</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00:0000</code></td><td>フィールド・コントローラ1のボタンを押した判定（合計値が入る）<br>Rボタン:<span class="formula">$10</span> / Lボタン:<span class="formula">$20</span> / Xボタン:<span class="formula">$40</span> / Aボタン:<span class="formula">$80</span></td></tr>
-	<tr><td><code>$00:0001</code></td><td>フィールド・コントローラ1のボタンを押した判定（合計値が入る）<br>右:<span class="formula">$01</span> / 左:<span class="formula">$02</span> / 下:<span class="formula">$04</span> / 上:<span class="formula">$08</span> / スタートボタン:<span class="formula">$10</span> / セレクトボタン:<span class="formula">$20</span> / Yボタン:<span class="formula">$40</span> / Bボタン:<span class="formula">$80</span></td></tr>
-	<tr><td><code>$00:0002</code>～<code>$00:0003</code></td><td>フィールド・コントローラ2のボタン状況（本作では未使用）</td></tr>
-	<tr><td><code>$00:000C</code></td><td>マップ乱数計算用の値（戦闘中一時停止）</td></tr>
-	<tr><td><code>$00:000D</code></td><td>マップ乱数（戦闘中一時停止）</td></tr>
-	<tr><td><code>$00:002D</code></td><td>ランダムエンカウント時　増加値（下４ビット）</td></tr>
-	<tr><td><code>$00:0036</code></td><td>マップ乱数（<code>$00:000D</code>と同値）</td></tr>
-	<tr><td><code>$00:0070</code></td><td>通常は<span class="formula">$00</span>、デモ画面は<span class="formula">$01</span>以上（変動）</td></tr>
-	<tr><td><code>$00:0107</code></td><td>ランダムエンカウント時　危険度</td></tr>
-	<tr><td><code>$00:010B</code>～<code>$00:01FF</code></td><td>（※スタック領域。<code>PHX</code>や<code>PHY</code>などのニーモニックで値を一時的に記録するアドレス。詳細：<a href="https://donkeyhacks.zouri.jp/databank/65C816/stack.html" target="_blank">65C816のスタック</a>）</td></tr>
-	<tr><td><code>$00:0114</code></td><td>BG1のサイズ決定値</td></tr>
-	<tr><td><code>$00:0116</code></td><td>BG2のサイズ決定値　兼　背景（BG2）が多重スクロールするマップでは<span class="formula">$01</span>～<span class="formula">$03</span>, それ以外は<span class="formula">$00</span></td></tr>
-	<tr><td><code>$00:011F</code></td><td>ランダムエンカウント時　エリア危険度</td></tr>
-	<tr><td><code>$00:0134</code></td><td>BG1タイルマップアドレスとサイズ<code>[$00:2107]</code>の下2ビット（マップサイズ）の値</td></tr>
-	<tr><td><code>$00:0135</code></td><td>BG2タイルマップアドレスとサイズ<code>[$00:2108]</code>の下2ビット（マップサイズ）の値</td></tr>
-	<tr><td><code>$00:013D</code></td><td>アイテム取得や使用時、該当アイテムのアイテムIDが入る</td></tr>
-	<tr><td><code>$00:014A～4C</code></td><td>最終編 時のダンジョンの鐘の鳴った回数</td></tr>
-	<tr><td><code>$00:0160</code></td><td>場面チェンジのエフェクト<br><span class="formula">$00</span>=黒にフェードアウト/<span class="formula">$02</span>=白にフェードアウト/<span class="formula">$04</span>=モザイク/<span class="formula">$05</span>=丸囲み/<span class="formula">$06</span>=三角囲み（戦闘突入時）</td></tr>
-	<tr><td><code>$00:01A0</code>～<code>$00:01A3</code></td><td>味方キャラ1～4の移動時の状態？</td></tr>
-	<tr><td><code>$00:01A4</code>～<code>$00:01A8</code></td><td>味方キャラ1～4の移動時の状態？</td></tr>
-	<tr><td><code>$00:01A9</code></td><td>マップ上移動速度　<span class="formula">$10</span>:通常歩き　<span class="formula">$20</span>:ダッシュ　<span class="formula">$40</span>:おぼろ丸のダッシュ</td></tr>
-	<tr><td><code>$00:01AE</code></td><td><code>$00:01A9</code>と同値</td></tr>
-	<tr><td><code>$00:01B0</code></td><td>ポゴが匂いを嗅いで、匂いに触れた時に出ている吹き出しの中身<!-- 　0C魔王　0D肉　0Eざき　骸骨12 --></td></tr>
-	<tr><td><code>$00:01BB</code></td><td>ランダムエンカウント時　危険度合計値</td></tr>
-	<tr><td><code>$00:01C0</code>～</td><td>セリフ関係（テキスト呼び出し、吹き出し形状など）</td></tr>
-<!-- <code>$00:01C6</code>	セリフ関係
-<code>$00:01C7</code>	セリフ関係 -->
-	<tr><td><code>$00:01C1</code></td><td>吹き出しの位置と形状（吹き出しについている▽のマークの位置も）<!-- 通常画面上01　通常画面下02　通常＋右下選択肢03　通常＋上▽09　上叫び0B　アキラ思念上0C　アキラ思念下0D　上看板11 --></td></tr>
-	<tr><td><code>$00:01C6</code>～<code>$00:01C7</code></td><td>セリフテキスト読み込み位置指定</td></tr>
-<!-- $00:01CC～CD　思考吹き出しの下の丸2つの点滅位置？　CCは00～01　CDは？
-$00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
-	<tr><td><code>$00:0200</code></td><td>通常<span class="formula">$00</span>　フィールドでプレイヤーが操作できない時<span class="formula">$01</span>？（セリフ中や、敵シンボルと接触した時）</td></tr>
-	<tr><td><code>$00:020A</code></td><td>フィールド・コントローラ1のボタンを押した判定（合計値が入る）<br>右:<span class="formula">$01</span> / 左:<span class="formula">$02</span> / 下:<span class="formula">$04</span> / 上:<span class="formula">$08</span> / スタートボタン:<span class="formula">$10</span> / セレクトボタン:<span class="formula">$20</span> / Yボタン:<span class="formula">$40</span> / Bボタン:<span class="formula">$80</span></td></tr>
-	<tr><td><code>$00:0250</code>～<code>$$00:0252</code></td><td>HDMA転送による多段スクロール量計算用変数</td></tr>
-	<tr><td><code>$00:0253</code>～<code>$$00:0255</code></td><td>HDMA転送による多段スクロール量更新タイミング計算用変数</td></tr>
-	<tr><td><code>$00:0544</code>～<code>$00:0545</code></td><td>メニュー画面での現在のカーソル位置（十字ボタンで選択可能な画面における番号）</td></tr>
-	<tr><td><code>$00:054D</code></td><td>プレイ中のシナリオ番号</td></tr>
-	<tr><td><code>$00:054F</code></td><td>プレイ中のシナリオの主人公ID</td></tr>
-	<tr><td><code>$00:0565</code>～<code>$00:0566</code></td><td>メニュー画面　持ち物欄などでAボタンで何かを選んだ状態</td></tr>
-	<tr><td><code>$00:0567</code>～<code>$00:0568</code></td><td>メニュー画面　持ち物欄などでAボタンで何かを選んだ状態で更に他位置を選択</td></tr>
-	<tr><td><code>$00:0569</code>～<code>$00:056A</code></td><td>メニュー画面　装備、持ち物、技、隊形、音声、セーブを選んだ時、それぞれ<span class="formula">$0001</span>～<span class="formula">$0006</span>が入る</td></tr>
-	<tr><td><code>$00:0565</code></td><td>現代編　対戦相手画面<br>（通常<span class="formula">$FF</span>、対戦相手を選ぶと値が入る。ナムキャット<span class="formula">$00</span>、エイジャ<span class="formula">$01</span>、トゥーラ・ハン<span class="formula">$02</span>、森部<span class="formula">$03</span>、モーガン<span class="formula">$04</span>、イヤウケア<span class="formula">$05</span>、オディ・オブライト<span class="formula">$07</span><br>※<code>$00:0566</code>は通常<span class="formula">$FF、それ以外<span class="formula">$00</td></tr>
-	<tr><td><code>$00:057A</code></td><td>メニュー画面・GDMA転送チャネルの設定の有無</td></tr>
-	<tr><td><code>$00:057D～$00:057E</code></td><td>メニュー画面・コントローラ1のボタン状態出力先</td></tr>
-	<tr><td><code>$00:06B9</code></td><td>現代編　1番目に倒した対戦相手ID（1戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:06BA</code></td><td>現代編　2番目に倒した対戦相手ID（2戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:06BB</code></td><td>現代編　3番目に倒した対戦相手ID（3戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:06BC</code></td><td>現代編　4番目に倒した対戦相手ID（4戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:06BD</code></td><td>現代編　5番目に倒した対戦相手ID（5戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:06BE</code></td><td>現代編　6番目に倒した対戦相手ID（6戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:06BF</code></td><td>現代編　倒した対戦相手の人数累積（<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
-	<tr><td><code>$00:0700</code>～<code>$00:0920</code></td><td>OAMへ転送するスプライト用データ</td></tr>
-	<tr><td><code>$00:0A00</code></td><td>プレイ中のシナリオ　<a href="#scID">対応表</a></td></tr>
-	<tr><td><code>$00:0A01</code></td><td>シナリオのクリア状況<br>（8ビットが各シナリオ対応。上の桁から順に中世、原始、ＳＦ、功夫、西部、現代、近未来、幕末）</td></tr>
-	<tr><td><code>$00:0A02～03</code></td><td>現在居るエリアのID<br>（マップに対応した数値、シナリオ毎に異なる）</td></tr>
-	<tr><td><code>$00:0A04</code></td><td><span class="formula">$00</span>が入っていない場合、<code>$00:2131</code>（I/OポートアドレスCGADSUB グラフィック用カラーマス ColorMath制御）の初期値（ほぼSF編用？）</td></tr>
-	<tr><td><code>$00:0A05～07</code></td><td>グラフィック用カラーマス（Color Math）制御値<br>最終編 時のダンジョンの鐘の鳴った回数（<code>$00:014A</code>～<code>$00:014C</code>のコピー）</td></tr>
-	<tr><td><code>$00:0A10</code></td><td>最終編主人公　<a href="#scID">対応表</a></td></tr>
-	<tr><td><code>$00:0A11</code></td><td>2人目のシナリオ別キャラデータID</td></tr>
-	<tr><td><code>$00:0A12</code></td><td>3人目のシナリオ別キャラデータID</td></tr>
-	<tr><td><code>$00:0A13</code></td><td>4人目のシナリオ別キャラデータID</td></tr>
-	<tr><td><code>$00:0A14</code></td><td>パーティの人数（<span class="formula">$00</span>：1人、<span class="formula">$01</span>：2人、<span class="formula">$02</span>：3人、<span class="formula">$03</span>：4人）</td></tr>
-	<tr><td><code>$00:0A15</code></td><td>心山拳老師＆師範が誰か（功夫編・最終編のみ）<br><span class="formula">$00</span>=老師　<span class="formula">$01</span>=ユン　<span class="formula">$02</span>=レイ　<span class="formula">$03</span>=サモ</td></tr>
-
-	<tr><td><code>$00:0A20</code></td><td>キャラ1　移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A21</code></td><td>キャラ1　マップのX座標（マス目）</td></tr>
-	<tr><td><code>$00:0A22</code></td><td>キャラ2　移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A23</code></td><td>キャラ2　マップのX座標（マス目）</td></tr>
-	<tr><td><code>$00:0A24</code></td><td>キャラ3　移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A25</code></td><td>キャラ3　マップのX座標（マス目）</td></tr>
-	<tr><td><code>$00:0A26</code></td><td>キャラ4　移動中のX座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A27</code></td><td>キャラ4　マップのX座標（マス目）</td></tr>
-	<tr><td><code>$00:0A28</code></td><td>キャラ1　移動中のY座標のマスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A29</code></td><td>キャラ1　マップのY座標（マス目）</td></tr>
-	<tr><td><code>$00:0A2A</code></td><td>キャラ2　移動中のY座標マスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A2B</code></td><td>キャラ2　マップのY座標（マス目）</td></tr>
-	<tr><td><code>$00:0A2C</code></td><td>キャラ3　移動中のY座標マスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A2D</code></td><td>キャラ3　マップのY座標（マス目）</td></tr>
-	<tr><td><code>$00:0A2E</code></td><td>キャラ4　移動中のY座標マスとマスの間の位置？</td></tr>
-	<tr><td><code>$00:0A2F</code></td><td>キャラ4　マップのY座標（マス目）</td></tr>
-
-	<tr><td><code>$00:0A34</code></td><td>キャラ1　向き　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
-	<tr><td><code>$00:0A35</code></td><td>キャラ2　向き　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
-	<tr><td><code>$00:0A36</code></td><td>キャラ3　向き　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
-	<tr><td><code>$00:0A37</code></td><td>キャラ4　向き　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
-
-	<tr><td><code>$00:0A38</code>～<code>$00:0A39</code></td><td><code>[$00:210D]</code>（BG1水平スクロール量）計算用の値（2バイト）</td></tr>
-	<tr><td><code>$00:0A3A</code>～<code>$00:0A3B</code></td><td><code>[$00:210E]</code>（BG1垂直スクロール量）計算用の値（2バイト）</td></tr>
-	<tr><td><code>$00:0A3C</code>～<code>$00:0A3D</code></td><td><code>[$00:210F]</code>（BG2水平スクロール量）計算用の値（2バイト）</td></tr>
-	<tr><td><code>$00:0A3E</code>～<code>$00:0A3F</code></td><td><code>[$00:2110]</code>（BG2垂直スクロール量）計算用の値（2バイト）</td></tr>
-	<tr><td><code>$00:0A40</code>～<code>$00:0A41</code></td><td><code>[$00:210F]</code>（BG2水平スクロール量）多重スクロール時　計算用の値（2バイト）</td></tr>
-	<tr><td><code>$00:0A42</code>～<code>$00:0A43</code></td><td><code>[$00:2110]</code>（BG2垂直スクロール量）多重スクロール時　計算用の値（2バイト）</td></tr>
-
-	<tr><td><code>$00:0A53</code></td><td>1人目のキャラの向き？　下=<span class="formula">$00</span>/上=<span class="formula">$01</span>/左=<span class="formula">$02</span>/右=<span class="formula">$03</span></td></tr>
-	<tr><td><code>$00:0A54</code></td><td>1人目のキャラの座標？状態？</td></tr>
-	<tr><td><code>$00:0A55</code></td><td>1人目のキャラに対する2人目のキャラの相対距離？（移動中<span class="formula">$00</span>　ダッシュ<span class="formula">$04</span>　停止<span class="formula">$80</span>　向き変えで値変わる）</td></tr>
-	<tr><td><code>$00:0A56</code></td><td>1人目のキャラに対する3人目のキャラの相対距離？</td></tr>
-	<tr><td><code>$00:0A57</code></td><td>1人目のキャラに対する4人目のキャラの相対距離？</td></tr>
-<!-- 	<tr><td><code>$00:0A45</code></td><td>各シナリオの仲間1人目ID　最終編以外</td></tr>
-	<tr><td><code>$00:0A46</code></td><td>各シナリオの仲間2人目ID　最終編以外</td></tr>
-	<tr><td><code>$00:0A47</code></td><td>各シナリオの仲間3人目ID　最終編以外</td></tr> -->
-	<tr><td><code>$00:0A60</code></td><td>フィールド上BGM　サウンドルームBGMとは異なる　<a href="#BGMlist">BGM一覧表</a></td></tr>
-	<tr><td><code>$00:0A61</code></td><td>BGMの再生ピッチ？（通常<span class="formula">$FF</span>、「いいお天気でしょっ!」の夜バージョンは<span class="formula">$60</span>）</td></tr>
-	<tr><td><code>$00:0AB0</code></td><td>主人公の行動順-1<br>（以下<code>$00:0AB3</code>まで入る数値は<span class="formula">$00</span>～<span class="formula">$03</span>のいずれか、味方キャラ順は加入順）</td></tr>
-	<tr><td><code>$00:0AB1</code></td><td>味方キャラ1の行動順-1</td></tr>
-	<tr><td><code>$00:0AB2</code></td><td>味方キャラ2の行動順-1</td></tr>
-	<tr><td><code>$00:0AB3</code></td><td>味方キャラ3の行動順-1</td></tr>
-	<tr><td><code>$00:0AB1</code></td><td>隊形で左の位置にいる味方キャラ</td></tr>
-	<tr><td><code>$00:0AB2</code></td><td>隊形で右の位置にいる味方キャラ</td></tr>
-	<tr><td><code>$00:0AB3</code></td><td>隊形で下の位置にいる味方キャラ</td></tr>
-<!-- 	<tr><td><code>$00:0AB6～$00:0ABD</code></td><td>中世・最終以外は$FF、中世は$03/$02/$05/$04/$01/$06/$07/$FF、最終は$00/$03/$02/$05/$04/$01/$06/$07</td></tr> -->
-	
-	<tr><td><code>$00:0AB4</code>～<code>$00:0AB5</code></td><td>セーブ回数　下位バイト/上位バイト<br>999回（<span class="formula">$03E7</span>）を越えると0に戻る</td></tr>
-	<tr><td><code>$00:0AC0</code>～<code>$00:0AC1</code></td><td>マップタイマー00～15のON・OFF<br>C0に下位バイト、C1に上位バイト</td></tr>
-	<tr><td><code>$00:0AC2</code>～<code>$00:0AC3</code></td><td>マップタイマー00～15関連フラグ値<br>C2に下位バイト、C3に上位バイト</td></tr>
-	<tr><td><code>$00:0AC5</code></td><td>原始編・近未来編のシンボルエンカウントのON/OFF？</td></tr>
-	<tr><td><code>$00:0ACA</code>～<code>$00:0ACB</code></td><td>ポゴがパーティにいる時のみ、匂いを嗅いだ時の漂う匂いの表示タイマー。<br>匂いを嗅ぐと、<code>$00:0ACA</code>に<span class="formula">$01</span>、<code>$00:0ACB</code>に<span class="formula">$68</span>が入り、360フレーム（6秒）のカウントを行う</td></tr>
-	<tr><td><code>$00:0ACC</code></td><td>原始編でポゴが匂いを嗅げる、かつシンボルエンカウントありエリアだと<span class="formula">$01</span>が入る</td></tr>
-	<tr><td><code>$00:0ACE</code></td><td>主人公キャラID（最終編は<span class="formula">$08</span>で固定）<a href="#scID">対応表</a></td></tr>
-	<tr><td><code>$00:0AE0</code>～<code>$00:0AE1</code></td><td>マップタイマー00残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AE2</code>～<code>$00:0AE3</code></td><td>マップタイマー01残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AE4</code>～<code>$00:0AE5</code></td><td>マップタイマー02残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AE6</code>～<code>$00:0AE7</code></td><td>マップタイマー03残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AE8</code>～<code>$00:0AE9</code></td><td>マップタイマー04残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AEA</code>～<code>$00:0AEB</code></td><td>マップタイマー05残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AEC</code>～<code>$00:0AED</code></td><td>マップタイマー06残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AEE</code>～<code>$00:0AEF</code></td><td>マップタイマー07残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AF0</code>～<code>$00:0AF1</code></td><td>マップタイマー08残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AF2</code>～<code>$00:0AF3</code></td><td>マップタイマー09残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AF4</code>～<code>$00:0AF5</code></td><td>マップタイマー10残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AF6</code>～<code>$00:0AF7</code></td><td>マップタイマー11残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AF8</code>～<code>$00:0AF9</code></td><td>マップタイマー12残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AFA</code>～<code>$00:0AFB</code></td><td>マップタイマー13残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AFC</code>～<code>$00:0AFD</code></td><td>マップタイマー14残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0AFE</code>～<code>$00:0AFF</code></td><td>マップタイマー15残り時間　下位バイト/上位バイト</td></tr>
-	<tr><td><code>$00:0B01</code>～<code>$00:0BFF</code></td><td>アイテム欄に入っているアイテムID（最終編）</td></tr>
-	<tr><td><code>$00:0B01</code>～<code>$00:0B27</code></td><td>アイテム欄に入っているアイテムID（中世編）</td></tr>
-	<tr><td><code>$00:0B28</code>～<code>$00:0B4C</code></td><td>アイテム欄に入っているアイテムID（原始編）</td></tr>
-	<tr><td><code>$00:0B4D</code>～<code>$00:0B66</code></td><td>アイテム欄に入っているアイテムID（西部編）</td></tr>
-	<tr><td><code>$00:0B67</code>～<code>$00:0B88</code></td><td>アイテム欄に入っているアイテムID（幕末編）</td></tr>
-	<tr><td><code>$00:0B89</code>～<code>$00:0BBB</code></td><td>アイテム欄に入っているアイテムID（近未来編）</td></tr>
-	<tr><td><code>$00:0BBD</code>～<code>$00:0BE0</code></td><td>アイテム欄に入っているアイテムID（功夫編）</td></tr>
-	<tr><td><code>$00:0BF5</code>～<code>$00:0CF9</code></td><td>アイテム欄に入っているアイテムID（ＳＦ編）</td></tr>
-	<tr><td><code>$00:0C01</code>～<code>$00:0CFF</code></td><td>アイテム欄に入っているアイテムIDの各個数（最終編）</td></tr>
-	<tr><td><code>$00:0C01</code>～<code>$00:0C27</code></td><td>アイテム欄に入っているアイテムIDの各個数（中世編）</td></tr>
-	<tr><td><code>$00:0C28</code>～<code>$00:0C4C</code></td><td>アイテム欄に入っているアイテムIDの各個数（原始編）</td></tr>
-	<tr><td><code>$00:0C4D</code>～<code>$00:0C66</code></td><td>アイテム欄に入っているアイテムIDの各個数（西部編）</td></tr>
-	<tr><td><code>$00:0C67</code>～<code>$00:0C88</code></td><td>アイテム欄に入っているアイテムIDの各個数（幕末編）</td></tr>
-	<tr><td><code>$00:0C89</code>～<code>$00:0CBB</code></td><td>アイテム欄に入っているアイテムIDの各個数（近未来編）</td></tr>
-	<tr><td><code>$00:0CBD</code>～<code>$00:0CE0</code></td><td>アイテム欄に入っているアイテムIDの各個数（功夫編）</td></tr>
-	<tr><td><code>$00:0CF5</code>～<code>$00:0DF9</code></td><td>アイテム欄に入っているアイテムIDの各個数（ＳＦ編）</td></tr>
-	<tr><td><code>$00:0D00</code>～<code>$00:0FBF</code></td><td>【戦闘・マップ共通】シナリオ別キャラデータ（詳細後述）</td></tr>
-	<tr><td><code>$00:0F92</code></td><td>幕末編における忍者（2人組）の遭遇数<span class="formula">$00～$06</span><br>（戦闘開始直後に増加、「逃げる」コマンド選択時に増えた分だけ減少。<code>$00:$0F9F</code>まで同じ）</td></tr>
-	<tr><td><code>$00:0F93</code></td><td>虚無僧の遭遇数<span class="formula">$00～$03</span></td></tr>
-	<tr><td><code>$00:0F94</code></td><td>奴の遭遇数<span class="formula">$00～$0A</span></td></tr>
-	<tr><td><code>$00:0F95</code></td><td>浪人の遭遇数<span class="formula">$00～$0A</span></td></tr>
-	<tr><td><code>$00:0F96</code></td><td>藩士の遭遇数<span class="formula">$00～$07</span></td></tr>
-	<tr><td><code>$00:0F97</code></td><td>強藩士の遭遇数<span class="formula">$00～$0A</span></td></tr>
-	<tr><td><code>$00:0F98</code></td><td>外人の遭遇数<span class="formula">$00～$02</span></td></tr>
-	<tr><td><code>$00:0F99</code></td><td>商人の遭遇数<span class="formula">$00～$04</span></td></tr>
-	<tr><td><code>$00:0F9A</code></td><td>家老の遭遇数<span class="formula">$00～$05</span></td></tr>
-	<tr><td><code>$00:0F9B</code></td><td>忍者（1人）の遭遇数<span class="formula">$00～$08</span></td></tr>
-	<tr><td><code>$00:0F9C</code></td><td>くの一の遭遇数<span class="formula">$00～$04</span></td></tr>
-	<tr><td><code>$00:0F9D</code></td><td>腰元の遭遇数<span class="formula">$00～$09</span></td></tr>
-	<tr><td><code>$00:0F9F</code></td><td>忍者（4人組）の遭遇数<span class="formula">$00～$08</span></td></tr>
-
-	<tr><td><code>$00:10E5</code></td><td>最終編の戦闘時のBGM</td></tr>
-	<tr><td><code>$00:10FE</code>～<code>$00:10FF</code></td><td><code>$00:1300</code>～<code>$00:130F</code>を8ビット区切りで圧縮したデータ（セーブデータ保存用、セーブ時更新）</td></tr>
-	<tr><td><code>$00:11D0</code>～<code>$00:11EF</code></td><td><code>$00:1200</code>～<code>$00:12FF</code>を8ビット区切りで圧縮したデータ（セーブデータ保存用、セーブ時更新）</td></tr>
-	<tr><td><code>$00:11F0</code>～</td><td>イベントカウンター用メモリ（シナリオによりカウントする値は変わる）</td></tr>
-	<tr><td><code>$00:1200</code>～<code>$00:12FF</code></td><td>【戦闘・マップ共通】シナリオ進行フラグ（詳細は<span class="tri"><a href="flag.html">シナリオ進行フラグ</a></span>ページ参照）</td></tr>
-	<tr><td><code>$00:1300</code>～<code>$00:1301</code></td><td>心山拳伝承者　下位バイト/上位バイト<br><span class="formula">$0001</span>ならユン、<span class="formula">$0100</span>ならレイ、<span class="formula">$0000</span>だとサモ</td></tr>
-	<tr><td><code>$00:1303</code></td><td>初期値<span class="formula">$00</span>、西部編最後のマッドドッグとの戦闘で逃げると<span class="formula">$01</span></td></tr>
-	<tr><td><code>$00:1304</code></td><td>初期値<span class="formula">$00</span>、幕末編最後の選択肢で「面白い」を選ぶと<span class="formula">$01</span></td></tr>
-	<tr><td><code>$00:1D00</td><td>サウンドデータ転送ステータス<code>$00:2140</code>記録用【戦闘・マップ共通】</td></tr>
-	<tr><td><code>$00:1D01</td><td>サウンドデータサイズ<code>$00:2141</code>記録用【戦闘・マップ共通】</td></tr>
-	<tr><td><code>$00:1D02</code>～<code>$00:1D03</code></td><td>転送先アドレス2バイト（<code>$00:2142</code>～<code>$00:2143</code>）記録用【戦闘・マップ共通】</td></tr>
-	<tr><td><code>$00:1D05</code></td><td>現在のBGM【戦闘・マップ共通】　<a href="#BGMlist">BGM一覧表</a></td></tr>
-	<tr><td><code>$00:1DE2</code></td><td>現在のBGM【戦闘・マップ共通】　<a href="#BGMlist">BGM一覧表</a></td></tr>
-
-	<tr><td><code>$7E:2A00</code>～<code>$7E:2A3F</code></td><td>メニュー→装備で、該当キャラのシナリオ別キャラデータがそのまま入る（<span class="formula">$23</span>のみ例外、異なる値が入る）</td></tr>
-	<tr><td><code>$7E:2F3C</code></td><td>文字入力画面　ページ数（<span class="formula">$00</span>～、シナリオなどにより最大ページ数は変動）</td></tr>
-	<tr><td><code>$7E:2F40</code></td><td>文字入力画面　X軸のカーソル位置　左上座標を(0,0)とする。横方向は11文字。<span class="formula">$00</span>～<span class="formula">$0A</span></td></tr>
-	<tr><td><code>$7E:2F42</code></td><td>文字入力画面　Y軸のカーソル位置　左上座標を(0,0)とする。縦方向は9文字。<span class="formula">$00</span>～<span class="formula">$08</span</td></tr>
-	<tr><td><code>$7E:2F44</code></td><td>文字入力画面　入力した文字数（1文字で+2）　<span class="formula">$00</span>～<span class="formula">$0C</span</td></tr>
-	<tr><td><code>$7E:2F46</code>～<code>$7E:2F47</code></td><td>文字入力画面　入力欄1文字目（2バイト）</td></tr>
-	<tr><td><code>$7E:2F48</code>～<code>$7E:2F49</code></td><td>文字入力画面　入力欄2文字目（2バイト）</td></tr>
-	<tr><td><code>$7E:2F4A</code>～<code>$7E:2F4b</code></td><td>文字入力画面　入力欄3文字目（2バイト）</td></tr>
-	<tr><td><code>$7E:2F4C</code>～<code>$7E:2F4d</code></td><td>文字入力画面　入力欄4文字目（2バイト）</td></tr>
-	<tr><td><code>$7E:2F4E</code>～<code>$7E:2F4f</code></td><td>文字入力画面　入力欄5文字目（2バイト）</td></tr>
-	<tr><td><code>$7E:2F50</code>～<code>$7E:2F51</code></td><td>文字入力画面　入力欄6文字目（2バイト）</td></tr>
-	<tr><td><code>$7E:3100</code>～<code>$7E:31??</code></td><td>HDMAテーブル コピー先</td></tr>
-	<tr><td><code>$7E:3800</code>～<code>$7E:39FF</code></td><td>カラーパレットのデータ コピー先</td></tr>
-	<tr><td><code>$7E:8000</code>～<code>$7E:81FF</code></td><td>カラーパレットのコピー先アドレス</td></tr>
-	<tr><td><code>$7E:8A00</code>～<code>$7E:8AC6</code></td><td>文字入力画面　文字コード（1文字2バイト、左上から右下へ、横11文字分、縦9文字分）</td></tr>
-	<tr><td><code>$7E:8A00</code>～<code>$7E:8AFF</code></td><td>メニュー画面＞持ち物欄 整頓時アイテムIDコピー用アドレス</td></tr>
-	<tr><td><code>$7E:8B00</code>～<code>$7E:8BFF</code></td><td>メニュー画面＞持ち物欄 整頓時アイテム所持数コピー用アドレス</td></tr>
-	<tr><td><code>$7E:8C00</code>～<code>$7E:8DFF</code></td><td>メニュー画面用カラーパレットのデータ コピー先</td></tr>
-	<tr><td><code>$7E:901D</code></td><td>戦闘開始時に場の属性が決まっているエリアだと属性の値が入る</td></tr>
-	<tr><td><code>$7E:C000</code>～<code>$7E:CE7F</code></td><td>キャラのスプライトデータ コピー先</td></tr>
-</tbody>
-</table>
-
-<h5 id="scID">シナリオID対応表</h5>
-
-<table>
-<thead>
-	<tr><th>シナリオ</th><th>ID</th><th>キャラクター</th></tr>
-</thead>
-<tbody>
-	<tr><td>中世</td><td><span class="formula">$00</span></td><td>オルステッド</td></tr>
-	<tr><td>原始</td><td><span class="formula">$01</span></td><td>ポゴ</td></tr>
-	<tr><td>ＳＦ</td><td><span class="formula">$02</span></td><td>キューブ</td></tr>
-	<tr><td>功夫</td><td><span class="formula">$03</span></td><td>心山拳老師</td></tr>
-	<tr><td>西部</td><td><span class="formula">$04</span></td><td>サンダウン</td></tr>
-	<tr><td>現代</td><td><span class="formula">$05</span></td><td>高原日勝</td></tr>
-	<tr><td>近未来</td><td><span class="formula">$06</span></td><td>アキラ</td></tr>
-	<tr><td>幕末</td><td><span class="formula">$07</span></td><td>おぼろ丸</td></tr>
-	<tr><td>最終</td><td><span class="formula">$08</span></td><td>-</td></tr>
-</tbody>
-</table>
-
-<h5 id="BGMlist">BGM一覧表</h5>
-
-<p>タイトルはサウンドトラックに準拠。<br>
-（「いいお天気でしょっ!」の夜バージョンなど、一部楽曲のスローテンポな曲は原曲の再生ピッチを変更して流しているらしい）</p>
-
-<table>
-<thead>
-	<tr><th>ID</th><th>タイトル</th></tr>
-</thead>
-<tbody>
-	<tr><td><span class="formula">$00</span></td><td>無音（BGMなし）</td></tr>
-	<tr><td><span class="formula">$01</span></td><td>魔王への叙曲</td></tr>
-	<tr><td><span class="formula">$02</span></td><td>凛然たる戦い</td></tr>
-	<tr><td><span class="formula">$03</span></td><td>忍音</td></tr>
-	<tr><td><span class="formula">$04</span></td><td>WANDERER</td></tr>
-	<tr><td><span class="formula">$05</span></td><td>殺陣！</td></tr>
-	<tr><td><span class="formula">$06</span></td><td>THE WILDS</td></tr>
-	<tr><td><span class="formula">$07</span></td><td>UNDER THE FAKE</td></tr>
-	<tr><td><span class="formula">$08</span></td><td>UNSEEN SYNDROME</td></tr>
-	<tr><td><span class="formula">$09</span></td><td>NATIVE LIFE</td></tr>
-	<tr><td><span class="formula">$0A</span></td><td>WAIT FOR TRUTH</td></tr>
-	<tr><td><span class="formula">$0B</span></td><td>PSYCHOで夜露死苦!!</td></tr>
-	<tr><td><span class="formula">$0C</span></td><td>猛者達…</td></tr>
-	<tr><td><span class="formula">$0D</span></td><td>鳥児在天空飛翔 魚児在河里游泳</td></tr>
-	<tr><td><span class="formula">$0E</span></td><td>在中国的戦闘</td></tr>
-	<tr><td><span class="formula">$0F</span></td><td>効果音（幕末編・天井裏カラクリ音）</td></tr>
-	<tr><td><span class="formula">$10</span></td><td>KNOCK YOU DOWN!</td></tr>
-	<tr><td><span class="formula">$11</span></td><td>効果音（馬が走る音）</td></tr>
-	<tr><td><span class="formula">$12</span></td><td>効果音（ＳＦ編・宇宙船内）</td></tr>
-	<tr><td><span class="formula">$13</span></td><td>効果音（近未来編・港）</td></tr>
-	<tr><td><span class="formula">$14</span></td><td>老拳師下深山</td></tr>
-	<tr><td><span class="formula">$15</span></td><td>いいお天気でしょっ!</td></tr>
-	<tr><td><span class="formula">$16</span></td><td>KISS OF JEALOUSY</td></tr>
-	<tr><td><span class="formula">$17</span></td><td>密命</td></tr>
-	<tr><td><span class="formula">$18</span></td><td>GO!GO!ブリキ大王!!</td></tr>
-	<tr><td><span class="formula">$19</span></td><td>届かぬ翼</td></tr>
-	<tr><td><span class="formula">$1A</span></td><td>魔王山を往く</td></tr>
-	<tr><td><span class="formula">$1B</span></td><td>魔王オディオ</td></tr>
-	<tr><td><span class="formula">$1C</span></td><td>PURE ODIO</td></tr>
-	<tr><td><span class="formula">$1D</span></td><td>効果音（アキラ　レベルアップ音）</td></tr>
-	<tr><td><span class="formula">$1E</span></td><td>効果音（木魚のポクポク音）</td></tr>
-	<tr><td><span class="formula">$1F</span></td><td>効果音（風の吹く音）</td></tr>
-	<tr><td><span class="formula">$20</span></td><td>効果音（キューブの機械音）</td></tr>
-	<tr><td><span class="formula">$21</span></td><td>効果音（オルステッド　レベルアップ音）</td></tr>
-	<tr><td><span class="formula">$22</span></td><td>効果音（おぼろ丸　レベルアップ音）</td></tr>
-	<tr><td><span class="formula">$23</span></td><td>効果音（サモ・ユン　レベルアップ音・アチョーボイス）</td></tr>
-	<tr><td><span class="formula">$24</span></td><td>効果音（レイ　レベルアップ音・ボイス）</td></tr>
-	<tr><td><span class="formula">$25</span></td><td>SELECT・A・LIVE</td></tr>
-	<tr><td><span class="formula">$26</span></td><td>効果音（ポゴ　レベルアップ音・ボイス）</td></tr>
-	<tr><td><span class="formula">$27</span></td><td>効果音（ゴリのボイス/馬のいななき　兼用）</td></tr>
-	<tr><td><span class="formula">$28</span></td><td>効果音（高原日勝　レベルアップ音・ボイス）</td></tr>
-	<tr><td><span class="formula">$29</span></td><td>効果音（サンダウン　レベルアップ音・銃声）</td></tr>
-	<tr><td><span class="formula">$2A</span></td><td>効果音（近未来編・木琴）</td></tr>
-	<tr><td><span class="formula">$2B</span></td><td>MEGALOMANIA</td></tr>
-	<tr><td><span class="formula">$2C</span></td><td>効果音（強風の吹く音）</td></tr>
-	<tr><td><span class="formula">$2D</span></td><td>効果音（ＳＦ編/近未来編・パソコン効果音）</td></tr>
-	<tr><td><span class="formula">$2E</span></td><td>効果音（近未来編・筑波研究所最奥）</td></tr>
-	<tr><td><span class="formula">$2F</span></td><td>効果音（功夫編　銅鑼）</td></tr>
-	<tr><td><span class="formula">$30</span></td><td>効果音（西部編　鐘）</td></tr>
-	<tr><td><span class="formula">$31</span></td><td>効果音（幕末編　アイテム入手時）</td></tr>
-	<tr><td><span class="formula">$32</span></td><td>効果音（原始編　ウホウホ）</td></tr>
-	<tr><td><span class="formula">$33</span></td><td>最強-VICTORY ROAD-</td></tr>
-	<tr><td><span class="formula">$34</span></td><td>LIVE・A・LIVE</td></tr>
-	<tr><td><span class="formula">$35</span></td><td>CRY・A・LIVE</td></tr>
-	<tr><td><span class="formula">$36</span></td><td>WARM・A・LIVE</td></tr>
-	<tr><td><span class="formula">$37</span></td><td>絶望の都</td></tr>
-	<tr><td><span class="formula">$38</span></td><td>Sancho・de・Los・Panchoz</td></tr>
-	<tr><td><span class="formula">$39</span></td><td>効果音（マラカス）</td></tr>
-	<tr><td><span class="formula">$3A</span></td><td>効果音（各シナリオ開始時の低い音）</td></tr>
-	<tr><td><span class="formula">$3B</span></td><td>原始編・宴（リメイク版の「生贄の宴」）</td></tr>
-	<tr><td><span class="formula">$3C</span></td><td>Silent Labyrinth</td></tr>
-	<tr><td><span class="formula">$3D</span></td><td>ARMAGEDDON</td></tr>
-	<tr><td><span class="formula">$3E</span></td><td>CAPTAIN SQUARE</td></tr>
-	<tr><td><span class="formula">$3F</span></td><td>星屑のキャプテン</td></tr>
-	<tr><td><span class="formula">$40</span></td><td>効果音（近未来編・オルガン　むすんでひらいて）</td></tr>
-	<tr><td><span class="formula">$41</span></td><td>効果音（近未来編・オルガン　猫ふんじゃった）</td></tr>
-	<tr><td><span class="formula">$42</span></td><td>効果音（近未来編・オルガン　トッカータとフーガ）</td></tr>
-	<tr><td><span class="formula">$43</span></td><td>効果音（近未来編・オルガン　チョコボのテーマ）</td></tr>
-	<tr><td><span class="formula">$44</span></td><td>Live over Again</td></tr>
-	<tr><td><span class="formula">$45</span></td><td>Live for Live</td></tr>
-	<tr><td><span class="formula">$46</span></td><td>効果音（崩壊）</td></tr>
-	<tr><td><span class="formula">$47</span></td><td>効果音（ＳＦ編・警告音）</td></tr>
-	<tr><td><span class="formula">$48</span></td><td>効果音（功夫編・夜　虫の音）</td></tr>
-	<tr><td><span class="formula">$49</span></td><td>CAPTAIN SQUARE</td></tr>
-	<tr><td><span class="formula">$4A</span></td><td>効果音（ゲーム開始時「SQUARE SOFT」ボイス）</td></tr>
-	<tr><td><span class="formula">$4B</span></td><td>ILLUSION…</td></tr>
-	<tr><td><span class="formula">$4C</span></td><td>Versus!</td></tr>
-	<tr><td><span class="formula">$4D</span></td><td>原始編・宴　ボイスのみ</td></tr>
-	<tr><td colspan="2"><span class="formula">$4E</span>以降は無音</td></tr>
-</tbody>
-</table>
-
-<h4>共通</h4>
-
-<p>マップ・戦闘どちらでも共通して値が読み書きされるあたりのアドレス。<br>
-他にもあるが、重要そうなあたりを。</p>
-
-<p><span class="tri"><a href="flag.html">シナリオ進行フラグ</a></span>は量が膨大になるため、ページを分けた。</p>
-
-<h4>シナリオ別キャラデータ</h4>
-
-<p><code>$7E:0D00</code>～<code>$7E:0FBF</code>に入る、各シナリオのキャラ用データ。<br>
-1キャラあたり64バイトの容量がある。<br>
-戦闘中もそれ以外も同じアドレスに入っている。<br>
-主人公＋仲間3キャラのIDは順に<code>$7E:0A10</code>, <code>$7E:0A11</code>, <code>$7E:0A12</code>, <code>$7E:0A13</code>に入る（加入順？）</p>
-
-<p>最終編以外は、主人公キャラのID・<span class="formula">$08</span>・<span class="formula">$09</span>・<span class="formula">$0A</span>という順で上のアドレスに入ることになるが、最終編は各シナリオの主人公たちがパーティに加わった時点で2人目以降の値が更新されていく。</p>
-
-<table>
-<thead>
-	<tr><th>ID</th><th>アドレス</th><th>原始</th><th>ＳＦ</th><th>功夫</th><th>西部</th><th>現代</th><th>近未来</th><th>幕末</th><th>中世</th><th>最終</th></tr>
-</thead>
-<tbody>
-	<tr><td><span class="formula">$00</span></td><td><code>$7E:0D00</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>オルステッド</td><td>オルステッド</td></tr>
-	<tr><td><span class="formula">$01</span></td><td><code>$7E:0D40</code>～</td><td>ポゴ</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>ポゴ</td></tr>
-	<tr><td><span class="formula">$02</span></td><td><code>$7E:0D80</code>～</td><td>-</td><td>キャプテン<br>スクウェア<br>/キューブ</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>キューブ</td></tr>
-	<tr><td><span class="formula">$03</span></td><td><code>$7E:0DC0</code>～</td><td>-</td><td>-</td><td>心山拳老師</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>心山拳師範</td></tr>
-	<tr><td><span class="formula">$04</span></td><td><code>$7E:0E00</code>～</td><td>-</td><td>-</td><td>-</td><td>サンダウン</td><td>-</td><td>-</td><td>-</td><td>-</td><td>サンダウン</td></tr>
-	<tr><td><span class="formula">$05</span></td><td><code>$7E:0E40</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>高原　日勝</td><td>-</td><td>-</td><td>-</td><td>高原　日勝</td></tr>
-	<tr><td><span class="formula">$06</span></td><td><code>$7E:0E80</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>アキラ</td><td>-</td><td>-</td><td>アキラ</td></tr>
-	<tr><td><span class="formula">$07</span></td><td><code>$7E:0EC0</code>～</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>おぼろ丸</td><td>-</td><td>おぼろ丸</td></tr>
-	<tr><td><span class="formula">$08</span></td><td><code>$7E:0F00</code>～</td><td>ゴリ</td><td>-</td><td>ユン・ジョウ</td><td>マッドドッグ</td><td>-</td><td>タロイモ</td><td>とらわれの男</td><td>ストレイボウ</td><td>-</td></tr>
-	<tr><td><span class="formula">$09</span></td><td><code>$7E:0F40</code>～</td><td>べる</td><td>-</td><td>レイ・クウゴ</td><td>-</td><td>-</td><td>無法松</td><td>カラクリ丸</td><td>ウラヌス</td><td>-</td></tr>
-	<tr><td><span class="formula">$0A</span></td><td><code>$7E:0F80</code>～</td><td>ざき</td><td>-</td><td>サモ・ハッカ</td><td>-</td><td>-</td><td>ブリキ大王</td><td>-</td><td>ハッシュ</td><td>ブリキ大王</td></tr>
-</tbody>
-</table>
-
-<h5>シナリオ別キャラデータの64バイト分データ</h5>
-
-<p>便宜上、64バイト分のデータに<code>$00</code>～<code>$3F</code>と番号を付けた。<br>
-空欄は筆者には不明な部分。</p>
-
-<table>
-<thead>
-	<tr><th>数値</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00</code></td><td>キャラID（ブリキ大王は<span class="formula">$40</span>）</td></tr>
-	<tr><td><code>$01</code></td><td>　</td></tr>
-	<tr><td><code>$02</code></td><td>右装備の追加効果の値（=アイテムデータ15、戦闘開始時に更新される）</td></tr>
-	<tr><td><code>$03</code></td><td>　</td></tr>
-	<tr><td><code>$04</code></td><td rowspan="2"><code>$04</code>を下位バイト、<code>$05</code>を上位バイトとした4桁の値+<span class="formula">$D50000</span>に、<br>味方キャラデータがそっくり入っている</td></tr>
-	<tr><td><code>$05</code></td></tr>
-	<tr><td><code>$06</code></td><td>レベル</td></tr>
-	<tr><td><code>$07</code></td><td>　</td></tr>
-	<tr><td><code>$08</code></td><td>現在HP（下位バイト）</td></tr>
-	<tr><td><code>$09</code></td><td>現在HP（上位バイト）</td></tr>
-	<tr><td><code>$0A</code></td><td>最大HP（下位バイト）</td></tr>
-	<tr><td><code>$0B</code></td><td>最大HP（上位バイト）</td></tr>
-	<tr><td><code>$0C</code></td><td>前に出した技</td></tr>
-	<tr><td><code>$0D</code></td><td>覚えた技（下位バイト）技00～07を2進数で表す</td></tr>
-	<tr><td><code>$0E</code></td><td>覚えた技（上位バイト）技08～15を2進数で表す</td></tr>
-	<tr><td><code>$0F</code></td><td>　</td></tr>
-	<tr><td><code>$10</code></td><td>力（力＋装備上昇分）</td></tr>
-	<tr><td><code>$11</code></td><td>力</td></tr>
-	<tr><td><code>$12</code></td><td>力（装備上昇分）</td></tr>
-	<tr><td><code>$13</code></td><td>速（速＋装備上昇分）</td></tr>
-	<tr><td><code>$14</code></td><td>速</td></tr>
-	<tr><td><code>$15</code></td><td>速（装備上昇分）</td></tr>
-	<tr><td><code>$16</code></td><td>体（体＋装備上昇分）</td></tr>
-	<tr><td><code>$17</code></td><td>体</td></tr>
-	<tr><td><code>$18</code></td><td>体（装備上昇分）</td></tr>
-	<tr><td><code>$19</code></td><td>知（知＋装備上昇分）</td></tr>
-	<tr><td><code>$1A</code></td><td>知</td></tr>
-	<tr><td><code>$1B</code></td><td>知（装備上昇分）</td></tr>
-	<tr><td><code>$1C</code></td><td>側面補正</td></tr>
-	<tr><td><code>$1D</code></td><td>背面補正</td></tr>
-	<tr><td><code>$1E</code></td><td>経験値</td></tr>
-	<tr><td><code>$1F</code></td><td></td></tr>
-	<tr><td><code>$20</code></td><td>無効状態異常</td></tr>
-	<tr><td><code>$21</code></td><td>キャラ自身の回避属性（下位バイト）</td></tr>
-	<tr><td><code>$22</code></td><td>キャラ自身の回避属性（上位バイト）</td></tr>
-	<tr><td><code>$23</code></td><td>　</td></tr>
-	<tr><td><code>$24</code></td><td>頭装備</td></tr>
-	<tr><td><code>$25</code></td><td>右装備</td></tr>
-	<tr><td><code>$26</code></td><td>左装備</td></tr>
-	<tr><td><code>$27</code></td><td>体装備</td></tr>
-	<tr><td><code>$28</code></td><td>足装備</td></tr>
-	<tr><td><code>$29</code></td><td>アクセサリー1</td></tr>
-	<tr><td><code>$2A</code></td><td>アクセサリー2</td></tr>
-	<tr><td><code>$2B</code></td><td>アクセサリー3</td></tr>
-	<tr><td><code>$2C</code></td><td>アクセサリー4</td></tr>
-	<tr><td><code>$2D</code></td><td>アクセサリー5</td></tr>
-	<tr><td><code>$2E</code></td><td>(味方キャラデータ42 全キャラ<span class="formula">$00</span>)</td></tr>
-	<tr><td><code>$2F</code></td><td>防御合計値(初期値は味方キャラデータ43)</td></tr>
-	<tr><td><code>$30</code></td><td></td></tr>
-	<tr><td><code>$31</code></td><td>フィールド吸収（下4ビット、<span class="formula">$1</span>:電/<span class="formula">$2</span>:火/<span class="formula">$4</span>:毒/<span class="formula">$8</span>:水 の合計値）</td></tr>
-	<tr><td><code>$32</code></td><td>装備の回避属性（下位バイト）</td></tr>
-	<tr><td><code>$33</code></td><td>装備の回避属性（上位バイト）</td></tr>
-	<tr><td><code>$34</code></td><td>名前1文字目</td></tr>
-	<tr><td><code>$35</code></td><td>名前2文字目</td></tr>
-	<tr><td><code>$36</code></td><td>名前3文字目</td></tr>
-	<tr><td><code>$37</code></td><td>名前4文字目</td></tr>
-	<tr><td><code>$38</code></td><td>名前5文字目</td></tr>
-	<tr><td><code>$39</code></td><td>名前6文字目</td></tr>
-	<tr><td><code>$3A</code></td><td>名前7文字目</td></tr>
-	<tr><td><code>$3B</code></td><td>名前8文字目</td></tr>
-	<tr><td><code>$3C</code></td><td>名前9文字目</td></tr>
-	<tr><td><code>$3D</code></td><td>名前10文字目</td></tr>
-	<tr><td><code>$3E</code></td><td>名前11文字目</td></tr>
-	<tr><td><code>$3F</code></td><td>名前12文字目</td></tr>
-</tbody>
-</table>
-
-<p>名前の文字については、<a href="fontdata.html">文字データ</a>を参照のこと。</p>
-
-<h4>戦闘</h4>
-
-<p>戦闘中のアドレスと内容について。<br>
-<code>$00:0???</code>はバンク<code>$7E</code>ではなくバンク<code>$00</code>で呼び出されるのがほとんど。<br>
-<code>$7E:9000</code>～以降は、ほとんどの場合、計算用に他アドレスからコピーした値や、計算途中の値が入る。</p>
-
-<h5>戦闘全体に関する値</h5>
-
-<table>
-<thead>
-	<tr><th>アドレス</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00:0041</code></td><td>戦闘時の背景番号</td></tr>
-	<tr><td><code>$00:0043</code></td><td>「逃げる」が有効な戦闘は<span class="formula">$00</span>、無効な戦闘は<span class="formula">$01</span></td></tr>
-	<tr><td><code>$00:0338</code></td><td>戦闘用乱数4（新たな乱数を計算するための値）</td></tr>
-	<tr><td><code>$00:0339</code></td><td>戦闘用乱数3（新たな乱数を計算するための値）</td></tr>
-	<tr><td><code>$00:033A</code></td><td>戦闘用乱数2（新たな乱数を計算するための値）</td></tr>
-	<tr><td><code>$00:033B</code></td><td>戦闘用乱数1（現在の乱数）</td></tr>
-	<tr><td><code>$00:0344</code></td><td>コントローラ1のボタンを押した判定（合計値が入る）<br>Rボタン:<span class="formula">$10</span> / Lボタン:<span class="formula">$20</span> / Xボタン:<span class="formula">$40</span> / Aボタン:<span class="formula">$80</span></td></tr>
-	<tr><td><code>$00:0345</code></td><td>コントローラ1のボタンを押した判定（合計値が入る）<br>右:<span class="formula">$01</span> / 左:<span class="formula">$02</span> / 下:<span class="formula">$04</span> / 上:<span class="formula">$08</span> / スタートボタン:<span class="formula">$10</span> / セレクトボタン:<span class="formula">$20</span> / Yボタン:<span class="formula">$40</span> / Bボタン:<span class="formula">$80</span></td></tr>
-</td></tr>
-	<tr><td><code>$00:0348～$00:0349</code></td><td>コントローラ2のボタン状態出力先（本作未使用）</td></tr>
-	<tr><td><code>$00:034C</code></td><td><code>$00:0344</code>内ボタンの、何かを操作した時の押したボタンを記録</td></tr>
-	<tr><td><code>$00:034D</code></td><td><code>$00:0345</code>内ボタンの、何かを操作した時の押したボタンを記録</td></tr>
-	<tr><td><code>$00:0354</code></td><td>戦闘開始時にセット　<code>$00:0041</code>の上6ビット</td>
-	<tr><td><code>$00:0355</code></td><td>敵パーティレベル</td></tr>
-	<tr><td><code>$00:0356</code></td><td>操作キャラがブリキ大王かどうか（ブリキ大王操作時は<span class="formula">$01</span>、それ以外は<span class="formula">$00</span>）</td></tr>
-	<tr><td><code>$00:0358</code></td><td>上位バイトはアイテムドロップ率計算用数値、下位バイトは敵の総数</td></tr>
-	<tr><td><code>$00:035A</code>～<code>$00:035B</code></td><td>味方行動順の値（2バイト）<br>1人目から順に、<span class="formula">$1C00, $1C40, $1C80, $1CC0</span>が入る</td></tr>
-	
-	<tr><td><code>$00:0378</code>～<code>$00:0379</code></td><td>攻撃中の敵0～Eに対応したアドレス<br><span class="formula">1Bx0</span>が2バイトで入る（アドレス呼び出し用）</td></tr>
-	<tr><td><code>$00:03AE</code></td><td>行動ポイント（下位バイト）</td></tr>
-	<tr><td><code>$00:03AF</code></td><td>行動ポイント（上位バイト）</td></tr>
-	<tr><td><code>$00:036C</code></td><td>ステータス復元用計算値(Yで<span class="formula">$40</span>、向き変えで<span class="formula">$20</span>）</td></tr>
-	<tr><td><code>$00:036D</code></td><td>ステータス復元用計算値(技使用中<span class="formula">$10</span>)</td></tr>
-	<tr><td><code>$00:03E6</code></td><td>戦闘コマンドにおけるカーソル位置（初期位置<span class="formula">$00</span>、技一覧やアイテム一覧でも）</td></tr>
-	<tr><td><code>$00:047E</code></td><td>初期値<span class="formula">$00</span>、「逃げる」または「テレポート」選択時<span class="formula">$FF</span></td></tr>
-	<tr><td><code>$00:0488</code>～<code>$00:04BE</code></td><td>戦闘フィールドマスの計算用アドレス</td></tr>
-	<tr><td><code>$00:04C8</code>～<code>$00:04FF</code></td><td>戦闘フィールドマスの状態（後述）</td></tr>
-	<tr><td><code>$7E:0700</code>～<code>$7E:0920</code></td><td>OAMへ転送するスプライト用データ</td></tr>
-	<tr><td><code>$7E:8000</code>～<code>$7E:8200</code></td><td>カラーパレットのコピー先アドレス</td></tr>
-	<tr><td><code>$7E:9009</code></td><td>技使用時　技データ13　上4ビット：周囲攻撃2、反撃専用4、回復8/下4ビット：技の属性</td></tr>
-	<tr><td><code>$7E:900A</code></td><td>技使用時　技データ22　上4ビット：ダメージフィールド/下4ビット：上4ビットが8以上の時、行動異常の値</td></tr>
-	<tr><td><code>$7E:900B</code></td><td>技使用時　技データ10　上8ビット-下2ビット：LV差係数/下2ビット：敵依存ステータス・防御力依存係数</td></tr>
-	<tr><td><code>$7E:900C</code></td><td>技使用時　使用者のレベル（現在値）</td></tr>
-	<tr><td><code>$7E:9010</code>～<code>$7E:9028</code></td><td>技使用時　該当技の<a href="d5.html#waza">技データ00～24</a>が入る（次技使用直前まで値が残る）</td></tr>
-	<tr><td><code>$7E:9100</code></td><td>原始編・ざき3戦目のみ　ポゴの攻撃が命中した回数（4回目を当てた直後に戦闘が強制終了する）</td></tr>
-	<tr><td><code>$7E:9200～</code></td><td>現代編・幕末編・功夫編修行　敵が使った技または心山拳老師が使った技（命中時）のIDが順に入る。<code>$7E:9200</code>の初期値は<span class="formula">$00</span>。<br>（ラーニング判定用。敵/老師が技を使う度に、<code>$7E:9200</code>から順に<span class="formula">$00</span>が書き込まれたアドレスの値をチェックして、被っていないのなら敵/老師の使用技ID+次のアドレスに<span class="formula">$00</span>を書き込む）</td></tr>
-	<tr><td><code>$7E:A0??</code></td><td>戦闘中、各技特有の一時的な値の記録アドレス</td></tr>
-	<tr><td><code>$7E:A010</code>～<code>$7E:A011</code></td><td>現代編ワタナベイベント判定用の計算値（「カミツキ(青)」使用時のみ0以外が入る）</td></tr>
-	<tr><td><code>$7E:A01A</code></td><td>サモの「ほいこーろー」のSTEP数が蓄積される</td></tr>
-	<tr><td><code>$7E:A01D</code></td><td>現代編ワタナベイベントのエイジャの向き判定　左上向きは<span class="formula">$79</span>、それ以外は<span class="formula">$38</span></td></tr>
-	<tr><td><code>$7E:B005</code>～<code>$7E:B5FB</code></td><td>表示する文字列のビットマップデータ（文字の画像データ）コピー先</td></tr>
-	<tr><td><code>$7E:D000</code>～<code>$7E:DFFF</code></td><td>戦闘中のキャラスプライト（元データからのコピー）</td></tr>
-	<tr><td><code>$7E:F980</code>～<code>$7E:F99E</code></td><td>技用のカラーパレットコピー先</td></tr>
-	<tr><td><code>$7E:FEF0</code></td><td>戦闘中タイマー（下位バイト）</td></tr>
-	<tr><td><code>$7E:FEF1</code></td><td>戦闘中タイマー（上位バイト）</td></tr>
-	<tr><td><code>$7E:FEFA</code></td><td>通常<span class="formula">$00</span>、ハルマゲドンコマンドONの時<span class="formula">$FF</span>が入る</td></tr>
-	<tr><td><code>$7E:FEFB</code></td><td>通常<span class="formula">$00</span>、最終編ラストバトルの7つの像の部屋の7連戦のみ<span class="formula">$01</span></td></tr>
-	<tr><td><code>$7E:FEFD</code></td><td>ターン数（フィールドダメージ発動計算用。リセット時に0、メニュー開いても0、戦闘をまたいでも引き継ぎ）</td></tr>
-	<tr><td><code>$7E:FF00</code>～<code>$7E:FF60</code></td><td>表示する文字列のデータコピー先</td></tr>
-</tbody>
-</table>
-
-<h5><code>$00:04C8</code>～<code>$00:04FE</code>の戦闘フィールドについて</h5>
-
-<p>戦闘フィールドは7×7マスで構成されているが、各マスに対応したアドレスは以下の通り。<br>
-<code>$00:04??</code>の<code>??</code>の値部分のみ記している。<br>
-各アドレスに、現在居るキャラクターと、ダメージフィールド状態が記録される。</p>
-
-<table>
-<tbody>
-	<tr><td>C8</td><td>C9</td><td>CA</td><td>CB</td><td>CC</td><td>CD</td><td>CE</td><td style="background: #ccc;">CF</td></tr>
-	<tr><td>D0</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td style="background: #ccc;">D7</td></tr>
-	<tr><td>D8</td><td>D9</td><td>DA</td><td>DB</td><td>DC</td><td>DD</td><td>DE</td><td style="background: #ccc;">DF</td></tr>
-	<tr><td>E0</td><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td><td style="background: #ccc;">E7</td></tr>
-	<tr><td>E8</td><td>E9</td><td>EA</td><td>EB</td><td>EC</td><td>ED</td><td>EE</td><td style="background: #ccc;">EF</td></tr>
-	<tr><td>F0</td><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td><td style="background: #ccc;">F7</td></tr>
-	<tr><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td><td style="background: #ccc;">FF</td></tr>
-</tbody>
-</table>
-
-<p>一番右の<span style="background: #ccc;">灰色背景部分</span>は実際には戦闘フィールドではないため、<span class="formula">$00</span>が入っている。<br>
-プログラミング上、7という数字はキリが悪いので、横8×縦7でアドレスを設定しているようである。</p>
-
-<p>各アドレスに入る数値は、何もなければ<span class="formula">$00</span>、それ以外はキャラクターの数値＋ダメージフィールド状態の合計値になる。<br>
-敵が複数マスにまたがっている場合は該当マスに同じ数値が入る。</p>
-
-<table>
-<thead>
-	<tr><th>数値</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><span class="formula">$01</span></td><td>味方キャラ1</td></tr>
-	<tr><td><span class="formula">$02</span></td><td>味方キャラ2</td></tr>
-	<tr><td><span class="formula">$03</span></td><td>味方キャラ3</td></tr>
-	<tr><td><span class="formula">$04</span></td><td>味方キャラ4</td></tr>
-	<tr><td><span class="formula">$11</span></td><td>敵キャラ0</td></tr>
-	<tr><td><span class="formula">$12</span></td><td>敵キャラ1</td></tr>
-	<tr><td><span class="formula">$13</span></td><td>敵キャラ2</td></tr>
-	<tr><td><span class="formula">$14</span></td><td>敵キャラ3</td></tr>
-	<tr><td><span class="formula">$15</span></td><td>敵キャラ4</td></tr>
-	<tr><td><span class="formula">$16</span></td><td>敵キャラ5</td></tr>
-	<tr><td><span class="formula">$17</span></td><td>敵キャラ6</td></tr>
-	<tr><td><span class="formula">$18</span></td><td>敵キャラ7</td></tr>
-	<tr><td><span class="formula">$19</span></td><td>敵キャラ8</td></tr>
-	<tr><td><span class="formula">$1A</span></td><td>敵キャラ9</td></tr>
-	<tr><td><span class="formula">$1B</span></td><td>敵キャラA</td></tr>
-	<tr><td><span class="formula">$1C</span></td><td>敵キャラB</td></tr>
-	<tr><td><span class="formula">$1D</span></td><td>敵キャラC</td></tr>
-	<tr><td><span class="formula">$1E</span></td><td>敵キャラD</td></tr>
-	<tr><td><span class="formula">$1F</span></td><td>敵キャラE</td></tr>
-	<tr><td><span class="formula">$80</span></td><td>水フィールド</td></tr>
-	<tr><td><span class="formula">$A0</span></td><td>毒フィールド</td></tr>
-	<tr><td><span class="formula">$C0</span></td><td>火炎フィールド</td></tr>
-	<tr><td><span class="formula">$E0</span></td><td>電撃フィールド</td></tr>
-</tbody>
-</table>
-
-<h5>戦闘中の味方キャラデータ</h5>
-
-<p>戦闘時に読み書きされるアドレス。<br>
-最大4キャラ分のデータ領域。各64バイト。</p>
-
-<table>
-<thead>
-	<tr><th>味方キャラ番号</th><th>アドレス</th></tr>
-</thead>
-<tbody>
-	<tr><td>1</td><td><code>$7E:1C00</code>～<code>$7E:1C3F</code></td></tr>
-	<tr><td>2</td><td><code>$7E:1C40</code>～<code>$7E:1C7F</code></td></tr>
-	<tr><td>3</td><td><code>$7E:1C80</code>～<code>$7E:1CBF</code></td></tr>
-	<tr><td>4</td><td><code>$7E:1CC0</code>～<code>$7E:1CFF</code></td></tr>
-</tbody>
-</table>
-
-<p>各キャラに入る64バイト分のデータは以下の通り。<br>
-便宜上、64バイト分のデータに<span class="formula">$00</span>～<span class="formula">$3F</span>と番号を付けた。<br>
-空欄は筆者には不明な部分。</p>
-
-<table>
-<thead>
-	<tr><th>数値</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00</code></td><td>味方キャラID</td></tr>
-	<tr><td><code>$01</code></td><td>戦闘状態<br><span class="formula">$00</span>:戦闘離脱 <span class="formula">$20</span>:味方キャラ敵対 <span class="formula">$40</span>:敵操作状態 <span class="formula">$FF</span>:通常）</td></tr>
-	<tr><td><code>$02</code></td><td>　</td></tr>
-	<tr><td><code>$03</code></td><td>シナリオ別キャラデータ開始アドレス（下位バイト）</td></tr>
-	<tr><td><code>$04</code></td><td>シナリオ別キャラデータ開始アドレス（上位バイト）</td></tr>
-	<tr><td><code>$05</code></td><td>技関係状態<br><span class="formula">$00</span>:通常 <span class="formula">$40</span>:タメ時間中 <span class="formula">$F0</span>:技を出している最中</td></tr>
-	<tr><td><code>$06</code></td><td>タメ時間ありの技発動までの時間</td></tr>
-	<tr><td><code>$07</code></td><td>実行しようとしている技のタメ時間</td></tr>
-	<tr><td><code>$08</code></td><td>　</td></tr>
-	<tr><td><code>$09</code></td><td>　</td></tr>
-	<tr><td><code>$0A</code></td><td>　</td></tr>
-	<tr><td><code>$0B</code></td><td>　</td></tr>
-	<tr><td><code>$0C</code></td><td>　</td></tr>
-	<tr><td><code>$0D</code></td><td>　</td></tr>
-	<tr><td><code>$0E</code></td><td>　</td></tr>
-	<tr><td><code>$0F</code></td><td>　</td></tr>
-	<tr><td><code>$10</code></td><td>キャラの位置のX軸（ピクセル単位・後述） 下位バイト</td></tr>
-	<tr><td><code>$11</code></td><td>キャラの位置のX軸（ピクセル単位・後述） 上位バイト</td></tr>
-	<tr><td><code>$12</code></td><td>キャラの位置のY軸（ピクセル単位・後述） 下位バイト</td></tr>
-	<tr><td><code>$13</code></td><td>キャラの位置のY軸（ピクセル単位・後述） 上位バイト</td></tr>
-	<tr><td><code>$14</code></td><td>ひとつ前の技（初期値<span class="formula">$00</span>の時にXボタンで前の技を選ぶと初期技を選択）</td></tr>
-	<tr><td><code>$15</code></td><td>　</td></tr>
-	<tr><td><code>$16</code></td><td>　</td></tr>
-	<tr><td><code>$17</code></td><td>　</td></tr>
-	<tr><td><code>$18</code></td><td>キャラ位置のマス目のX座標（左から<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
-	<tr><td><code>$19</code></td><td>キャラ位置のマス目のY座標（上から<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
-	<tr><td><code>$1A</code></td><td>途中計算用X座標</td></tr>
-	<tr><td><code>$1B</code></td><td>途中計算用Y座標</td></tr>
-	<tr><td><code>$1C</code></td><td>　</td></tr>
-	<tr><td><code>$1D</code></td><td>向き（右下<span class="formula">00</span>/左下<span class="formula">01</span>/右上<span class="formula">02</span>/左上<span class="formula">03</span>）</td></tr>
-	<tr><td><code>$1E</code></td><td>　</td></tr>
-	<tr><td><code>$1F</code></td><td>　</td></tr>
-	<tr><td><code>$20</code></td><td>戦闘中に経験値が増える行動をしたかのフラグ。行動なし:<span class="formula">$00</span> 行動あり:<span class="formula">$80</span></td></tr>
-	<tr><td><code>$21</code></td><td>　</td></tr>
-	<tr><td><code>$22</code></td><td>　</td></tr>
-	<tr><td><code>$23</code></td><td>　</td></tr>
-	<tr><td><code>$24</code></td><td>　</td></tr>
-	<tr><td><code>$25</code></td><td>　</td></tr>
-	<tr><td><code>$26</code></td><td>　</td></tr>
-	<tr><td><code>$27</code></td><td>　</td></tr>
-	<tr><td><code>$28</code></td><td>技の範囲指定～使用中、キャラ位置のマス目のX座標</td></tr>
-	<tr><td><code>$29</code></td><td>技の範囲指定～使用中、キャラ位置のマス目のY座標</td></tr>
-	<tr><td><code>$2A</code></td><td>　</td></tr>
-	<tr><td><code>$2B</code></td><td>　</td></tr>
-	<tr><td><code>$2C</code></td><td>　</td></tr>
-	<tr><td><code>$2D</code></td><td>無効状態異常</td></tr>
-	<tr><td><code>$2E</code></td><td>LV(現在値) - 背面補正（減算結果が負の場合は0）</td></tr>
-	<tr><td><code>$2F</code></td><td>　</td></tr>
-	<tr><td><code>$30</code></td><td>力(通常値)</td></tr>
-	<tr><td><code>$31</code></td><td>速(通常値)</td></tr>
-	<tr><td><code>$32</code></td><td>体(通常値)</td></tr>
-	<tr><td><code>$33</code></td><td>知(通常値)</td></tr>
-	<tr><td><code>$34</code></td><td>力(現在値)</td></tr>
-	<tr><td><code>$35</code></td><td>速(現在値)</td></tr>
-	<tr><td><code>$36</code></td><td>体(現在値)</td></tr>
-	<tr><td><code>$37</code></td><td>知(現在値)</td></tr>
-	<tr><td><code>$38</code></td><td>LV(現在値)</td></tr>
-	<tr><td><code>$39</code></td><td>状態異常</td></tr>
-	<tr><td><code>$3A</code></td><td>被ダメージ/回復量のヒット数</td></tr>
-	<tr><td><code>$3B</code></td><td>ヒット数</td></tr>
-	<tr><td><code>$3C</code></td><td>被ダメージの単発値（下1バイト）</td></tr>
-	<tr><td><code>$3D</code></td><td>被ダメージの単発値（上1バイト）</td></tr>
-	<tr><td><code>$3E</code></td><td>　</td></tr>
-	<tr><td><code>$3F</code></td><td>　</td></tr>
-</tbody>
-</table>
-
-<h5>キャラのピクセル単位の位置について</h5>
-
-<p>味方キャラが戦闘フィールドのどの位置に居るかを記録しているアドレスは、上の通りに<code>$10</code>と<code>$12</code>、<code>$18～19</code>に入る。<br>
-<code>$18～19</code>は、マス目を単位としており、<code>$18</code>は横方向（X座標・左から<span class="formula">$00～$06</span>）、<code>$19</code>は縦方向（Y座標・上から<span class="formula">$00～$06</span>）である。</p>
-
-<p><code>$10</code>と<code>$12</code>だが、マス目ではなく、ゲーム画面の戦闘フィールド上のピクセル単位、つまりドット数での位置を示していると思われる。<br>
-スーパーファミコンの解像度は横256×縦224ピクセルで、戦闘フィールドは横32ピクセル×7マス（合計224ピクセル）、縦24ピクセル×7マス（合計168ピクセル）である。<br>
-16進数にすると、1マスのサイズは、横<span class="formula">$20</span>ピクセル、縦<span class="formula">$18</span>ピクセルで、戦闘フィールド全体は横<span class="formula">$E0</span>ピクセル、縦<span class="formula">$A8</span>ピクセルになる。</p>
-
-<p><img src="img/battlemap01.png" alt="戦闘フィールド" height="240px" width="320px" style="box-shadow: 0 0 5px 0px #314549;"></p>
-
-<p><code>$10</code>に入る値は、戦闘フィールド左隅からの、該当キャラのドット絵の中心位置（単位ピクセル）になる。<br>
-<code>$12</code>に入る値は、戦闘フィールド上隅からの、該当キャラのドット絵の中心位置（単位ピクセル）になる。<br>
-例えば該当キャラが、左から2マス、上から3マスの位置に居る場合は、下図のようになる。</p>
-
-<p><img src="img/battlemap02.png" alt="戦闘フィールド キャラが左から2マス、上から3マスの位置に居る" height="240px" width="320px" style="box-shadow: 0 0 5px 0px #314549;"></p>
-
-<p>キャラの中心位置までの距離なので、横は<span class="formula">$60</span>ピクセル、縦は<span class="formula">$3C</span>ピクセル。<br>
-味方キャラデータ<code>$10</code>に入る値は<span class="formula">$60</span>、味方キャラデータ<code>$12</code>に入る値は<span class="formula">$3C</span>ということになる。</p>
-
-<p>この値はピクセル単位で記録されているため、たとえばキャラが移動中、マス目とマス目の間にいる時はその値がフレーム単位（リアルタイム）で更新される。<br>
-また、ダメージをくらった時、キャラが左右に小さく動くモーションがあるが、この時にも横軸（X軸）にあたる味方キャラデータ<code>$10</code>の数値が少し動く。</p>
-
-<p>以上から、マス目単位の味方キャラデータ<code>$18</code>～<code>$19</code>は、向きや方向、位置を考慮した上でのダメージ量計算やターゲット計算などに用いられ、ピクセル単位でキャラの位置を記録する味方キャラデータ<code>$10</code>と<code>$12</code>は、キャラのドット絵、技のモーションやエフェクトなどの表示位置計算に使っているのだろう、ということが推測できる。</p>
-
-<h5>味方キャラの技ID＆関連ステータス</h5>
-
-<p>最大16種類の技、<code>$00</code>～<code>$0F</code>としておく。</p>
-
-<table>
-<thead>
-	<tr><th>味方キャラ番号</th><th>アドレス</th></tr>
-</thead>
-<tbody>
-	<tr><td>1</td><td><code>$7E:E900</code>～<code>$7E:E93F</code></td></tr>
-	<tr><td>2</td><td><code>$7E:E940</code>～<code>$7E:E97F</code></td></tr>
-	<tr><td>3</td><td><code>$7E:E980</code>～<code>$7E:E9BF</code></td></tr>
-	<tr><td>4</td><td><code>$7E:E9C0</code>～<code>$7E:E9FF</code></td></tr>
-</tbody>
-</table>
-
-<p>例えば味方キャラ1の場合、以下のようにアドレスに値が入る。<br>
-技データ08は該当技が出せなくなる状態異常、技データ14～技データ15は反撃属性2バイト。<br>
-また、ラーニングなどでも技習得が可能な、レベル順に技を習得しないキャラの場合、アドレスは低い順に詰めて記録されていく（戦闘中の技一覧と同期している）。よって技LVとアドレスが必ずしも一致しない場合があるので注意。</p>
-
-<table>
-<thead>
-	<tr><th>技LV</th><th>技ID</th><th>技データ08</th><th>技データ14</th><th>技データ15<br>＋反撃専用の値</th></tr>
-</thead>
-<tbody>
-	<tr><td>00</td><td><code>$7E:E900</code></td><td><code>$7E:E910</code></td><td><code>$7E:E920</code></td><td><code>$7E:E930</code></td></tr>
-	<tr><td>01</td><td><code>$7E:E901</code></td><td><code>$7E:E911</code></td><td><code>$7E:E921</code></td><td><code>$7E:E931</code></td></tr>
-	<tr><td>02</td><td><code>$7E:E902</code></td><td><code>$7E:E912</code></td><td><code>$7E:E922</code></td><td><code>$7E:E932</code></td></tr>
-	<tr><td>03</td><td><code>$7E:E903</code></td><td><code>$7E:E913</code></td><td><code>$7E:E923</code></td><td><code>$7E:E933</code></td></tr>
-	<tr><td>04</td><td><code>$7E:E904</code></td><td><code>$7E:E914</code></td><td><code>$7E:E924</code></td><td><code>$7E:E934</code></td></tr>
-	<tr><td>05</td><td><code>$7E:E905</code></td><td><code>$7E:E915</code></td><td><code>$7E:E925</code></td><td><code>$7E:E935</code></td></tr>
-	<tr><td>06</td><td><code>$7E:E906</code></td><td><code>$7E:E916</code></td><td><code>$7E:E926</code></td><td><code>$7E:E936</code></td></tr>
-	<tr><td>07</td><td><code>$7E:E907</code></td><td><code>$7E:E917</code></td><td><code>$7E:E927</code></td><td><code>$7E:E937</code></td></tr>
-	<tr><td>08</td><td><code>$7E:E908</code></td><td><code>$7E:E918</code></td><td><code>$7E:E928</code></td><td><code>$7E:E938</code></td></tr>
-	<tr><td>09</td><td><code>$7E:E909</code></td><td><code>$7E:E919</code></td><td><code>$7E:E929</code></td><td><code>$7E:E939</code></td></tr>
-	<tr><td>10</td><td><code>$7E:E90A</code></td><td><code>$7E:E91A</code></td><td><code>$7E:E92A</code></td><td><code>$7E:E93A</code></td></tr>
-	<tr><td>11</td><td><code>$7E:E90B</code></td><td><code>$7E:E91B</code></td><td><code>$7E:E92B</code></td><td><code>$7E:E93B</code></td></tr>
-	<tr><td>12</td><td><code>$7E:E90C</code></td><td><code>$7E:E91C</code></td><td><code>$7E:E92C</code></td><td><code>$7E:E93C</code></td></tr>
-	<tr><td>13</td><td><code>$7E:E90D</code></td><td><code>$7E:E91D</code></td><td><code>$7E:E92D</code></td><td><code>$7E:E93D</code></td></tr>
-	<tr><td>14</td><td><code>$7E:E90E</code></td><td><code>$7E:E91E</code></td><td><code>$7E:E92E</code></td><td><code>$7E:E93E</code></td></tr>
-	<tr><td>16</td><td><code>$7E:E90F</code></td><td><code>$7E:E91F</code></td><td><code>$7E:E92F</code></td><td><code>$7E:E93F</code></td></tr>
-</tbody>
-</table>
-
-<p>※「技データ15＋反撃専用の値」は、技データ15の上7ビット + 技データ13の上2ビット目に入っている反撃専用か否かの1ビット</p>
-
-<h5>味方キャラの状態</h5>
-
-<p><code>$7E:EA??</code>は、計算途中の値なども含めた、味方キャラの状態に関する値が入る。各キャラ64バイト。</p>
-
-<table>
-<thead>
-	<tr><th>味方キャラ番号</th><th>アドレス</th></tr>
-</thead>
-<tbody>
-	<tr><td>1</td><td><code>$7E:EA00</code>～</td></tr>
-	<tr><td>2</td><td><code>$7E:EA40</code>～</td></tr>
-	<tr><td>3</td><td><code>$7E:EA80</code>～</td></tr>
-	<tr><td>4</td><td><code>$7E:EAC0</code>～</td></tr>
-</tbody>
-</table>
-
-<table>
-<thead>
-	<tr><th>アドレス下2桁</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00</code></td><td>首かため継続時間</td></tr>
-	<tr><td><code>$01</code></td><td>足かため継続時間</td></tr>
-	<tr><td><code>$02</code></td><td>腕かため継続時間</td></tr>
-	<tr><td><code>$03</code></td><td>毒継続時間</td></tr>
-	<tr><td><code>$04</code></td><td>マヒ継続時間</td></tr>
-	<tr><td><code>$05</code></td><td>眠り継続時間</td></tr>
-	<tr><td><code>$06</code></td><td>酔い継続時間</td></tr>
-	<tr><td><code>$07</code></td><td>石化継続時間。0になっても石化は回復しない。</td></tr>
-	<tr><td><code>$20</code></td><td>被ダメージ/回復量のヒット数</td></tr>
-	<tr><td><code>$2E～$2F</code></td><td>被ダメージ/回復量の総ダメージ/回復量</td></tr>
-	<tr><td><code>$35</code></td><td>回避属性判定</td></tr>
-</tbody>
-</table>
-
-<h5>敵の種類</h5>
-
-<p>戦闘では最大4種類の敵が出現する。<br>
-最大4種類分のデータ領域。各64バイト。</p>
-
-<table>
-<thead>
-	<tr><th>敵種類</th><th>アドレス</th></tr>
-</thead>
-<tbody>
-	<tr><td>1</td><td><code>$7E:1A00</code>～<code>$7E:1A3F</code></td></tr>
-	<tr><td>2</td><td><code>$7E:1A40</code>～<code>$7E:1A7F</code></td></tr>
-	<tr><td>3</td><td><code>$7E:1A80</code>～<code>$7E:1ABF</code></td></tr>
-	<tr><td>4</td><td><code>$7E:1AC0</code>～<code>$7E:1AFF</code></td></tr>
-</tbody>
-</table>
-
-<table>
-<thead>
-	<tr><th>数値</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00</code></td><td>敵ID</td></tr>
-	<tr><td><code>$01</code></td><td>該当の敵が居るなら<span class="formula">$FF</span>、居ないなら<span class="formula">$00</span></td></tr>
-	<tr><td><code>$02</code></td><td>横の幅（タイル数）※8×8ピクセルが1タイル</td></tr>
-	<tr><td><code>$03</code></td><td>縦の幅（タイル数）</td></tr>
-	<tr><td><code>$04</code></td><td>横の幅（マス数）</td></tr>
-	<tr><td><code>$05</code></td><td>縦の幅（マス数）</td></tr>
-	<tr><td><code>$06</code></td><td>VRAMグラフィック読み込み開始位置（VRAM<span class="formula">$6000</span>～から入る32×32タイルを1単位として、0からナンバリング）</td></tr>
-	<tr><td><code>$07</code></td><td>VRAMグラフィックに占める行数（縦1×横4タイルを1単位としてデータに何行使用しているか）</td></tr>
-	<tr><td><code>$08</code></td><td>　</td></tr>
-	<tr><td><code>$09</code></td><td>CGRAMのカラーパレット開始アドレス（word単位）</td></tr>
-	<tr><td><code>$0A</code></td><td>　</td></tr>
-	<tr><td><code>$0B</code></td><td>レベル</td></tr>
-	<tr><td><code>$0C</code></td><td>　</td></tr>
-	<tr><td><code>$0D</code></td><td>　</td></tr>
-	<tr><td><code>$0E</code></td><td>　</td></tr>
-	<tr><td><code>$0F</code></td><td>　</td></tr>
-	<tr><td><code>$10</code></td><td rowspan="2">HP<br><code>10</code>を下位バイト、<code>11</code>を上位バイトとした4桁の値</td></tr>
-	<tr><td><code>$11</code></td>
-	<tr><td><code>$12</code></td><td>技1の反撃属性1</td></tr>
-	<tr><td><code>$13</code></td><td>技2の反撃属性1</td></tr>
-	<tr><td><code>$14</code></td><td>技3の反撃属性1</td></tr>
-	<tr><td><code>$15</code></td><td>技4の反撃属性1</td></tr>
-	<tr><td><code>$16</code></td><td>技1の反撃属性2</td></tr>
-	<tr><td><code>$17</code></td><td>技2の反撃属性2</td></tr>
-	<tr><td><code>$18</code></td><td>技3の反撃属性2</td></tr>
-	<tr><td><code>$19</code></td><td>技4の反撃属性2</td></tr>
-	<tr><td><code>$1A</code></td><td>技1が使用不可になるステータス異常</td></tr>
-	<tr><td><code>$1B</code></td><td>技2が使用不可になるステータス異常</td></tr>
-	<tr><td><code>$1C</code></td><td>技3が使用不可になるステータス異常</td></tr>
-	<tr><td><code>$1D</code></td><td>技4が使用不可になるステータス異常</td></tr>
-	<tr><td><code>$1E</code></td><td>　</td></tr>
-	<tr><td><code>$1F</code></td><td>　</td></tr>
-	<tr><td><code>$20</code></td><td>敵データ00　移動パターン</td></tr>
-	<tr><td><code>$21</code></td><td>敵データ01　上4ビット：フィールド吸収/下4ビット：移動頻度</td></tr>
-	<tr><td><code>$22</code></td><td>敵データ02　（データアドレス呼び出しの値）</td></tr>
-	<tr><td><code>$23</code></td><td>敵データ03　（データアドレス呼び出しの値）</td></tr>
-	<tr><td><code>$24</code></td><td>敵データ04　HP　＊<span class="formula">$80</span>以上の時は、<span class="formula">実際のHP = (敵データ04 & $7F) * $10</span></td></tr>
-	<tr><td><code>$25</code></td><td>敵データ05　力</td></tr>
-	<tr><td><code>$26</code></td><td>敵データ06　速</td></tr>
-	<tr><td><code>$27</code></td><td>敵データ07　体</td></tr>
-	<tr><td><code>$28</code></td><td>敵データ08　知</td></tr>
-	<tr><td><code>$29</code></td><td>敵データ09　上1ビット：使用技を敵技IDから取得するなら0、味方技IDから取得するなら1/下7ビット：レベル</td></tr>
-	<tr><td><code>$2A</code></td><td>敵データ10　無効状態異常</td></tr>
-	<tr><td><code>$2B</code></td><td>敵データ11　使用技1　技ID　敵データ09上1ビットが0なら敵技ID/1なら味方技ID、以下敵データ14まで同じ</td></tr>
-	<tr><td><code>$2C</code></td><td>敵データ12　使用技2　技ID</td></tr>
-	<tr><td><code>$2D</code></td><td>敵データ13　使用技3　技ID</td></tr>
-	<tr><td><code>$2E</code></td><td>敵データ14　使用技4　技ID</td></tr>
-	<tr><td><code>$2F</code></td><td>敵データ15　タイプ</td></tr>
-	<tr><td><code>$30</code></td><td>敵データ16　カウンター行動異常　手/足</td></tr>
-	<tr><td><code>$31</code></td><td>敵データ17　カウンター行動異常　突/鋭</td></tr>
-	<tr><td><code>$32</code></td><td>敵データ18　カウンター行動異常　鈍/締</td></tr>
-	<tr><td><code>$33</code></td><td>敵データ19　カウンター行動異常　飛/背</td></tr>
-	<tr><td><code>$34</code></td><td>敵データ20　カウンター行動異常　火/水</td></tr>
-	<tr><td><code>$35</code></td><td>敵データ21　カウンター行動異常　風/土</td></tr>
-	<tr><td><code>$36</code></td><td>敵データ22　カウンター行動異常　精/善</td></tr>
-	<tr><td><code>$37</code></td><td>敵データ23　カウンター行動異常　悪/無　※下1桁（4ビット）はそのまま種族の値</td></tr>
-	<tr><td><code>$38</code></td><td>敵データ24　ドロップアイテム1</td></tr>
-	<tr><td><code>$39</code></td><td>敵データ25　ドロップアイテム2</td></tr>
-	<tr><td><code>$3A</code></td><td>敵データ26　ドロップアイテム3</td></tr>
-	<tr><td><code>$3B</code></td><td>敵データ27　※未使用データ</td></tr>
-	<tr><td><code>$3C</code></td><td>敵データ28　※未使用データ</td></tr>
-	<tr><td><code>$3D</code></td><td>敵データ29　背後補正/側面補正</td></tr>
-	<tr><td><code>$3E</code></td><td>敵データ30　回避属性　8ビットが手足突鋭鈍締飛背に対応</td></tr>
-	<tr><td><code>$3F</code></td><td>敵データ31　回避属性　8ビットが火水風土精善悪無に対応</td></tr>
-</tbody>
-</table>
-
-
-<h5>敵0～Eのデータ</h5>
-
-<p>敵は最大で15体出現する。便宜上、0～Eと番号を振ってある。<br>
-最大15キャラ分のデータ領域。<br>
-なお、戦闘に入った時、前の敵データを消さずに上書きするだけらしく、例えば敵パーティが4体の戦闘の後に敵パーティが2体の戦闘になった時、敵0と敵1のデータは上書き更新されるが、前の戦闘の敵2と敵3のデータは残ったまま。</p>
-
-<p><code>$7E:AB??</code>～以降は、ほとんどの場合、計算用に他アドレスからコピーした値や、計算途中の値が入る。<br>
-計算途中の値であるため、数フレームの間しか値が入らない、または入ってもすぐに変動することも多い。</p>
-
-<table>
-<thead>
-	<tr><th>敵キャラ</th><th>アドレス</th></tr>
-</thead>
-<tbody>
-	<tr><td>0</td><td><code>$7E:1B00</code>～<code>$7E:1B0F</code>, <code>$7E:AA00</code>～<code>$7E:AA0F</code>, <code>$7E:AB00</code>～</td></tr>
-	<tr><td>1</td><td><code>$7E:1B10</code>～<code>$7E:1B1F</code>, <code>$7E:AA10</code>～<code>$7E:AA1F</code>, <code>$7E:AB10</code>～</td></tr>
-	<tr><td>2</td><td><code>$7E:1B20</code>～<code>$7E:1B2F</code>, <code>$7E:AA20</code>～<code>$7E:AA2F</code>, <code>$7E:AB20</code>～</td></tr>
-	<tr><td>3</td><td><code>$7E:1B30</code>～<code>$7E:1B3F</code>, <code>$7E:AA30</code>～<code>$7E:AA3F</code>, <code>$7E:AB30</code>～</td></tr>
-	<tr><td>4</td><td><code>$7E:1B40</code>～<code>$7E:1B4F</code>, <code>$7E:AA40</code>～<code>$7E:AA4F</code>, <code>$7E:AB40</code>～</td></tr>
-	<tr><td>5</td><td><code>$7E:1B50</code>～<code>$7E:1B5F</code>, <code>$7E:AA50</code>～<code>$7E:AA5F</code>, <code>$7E:AB50</code>～</td></tr>
-	<tr><td>6</td><td><code>$7E:1B60</code>～<code>$7E:1B6F</code>, <code>$7E:AA60</code>～<code>$7E:AA6F</code>, <code>$7E:AB60</code>～</td></tr>
-	<tr><td>7</td><td><code>$7E:1B70</code>～<code>$7E:1B7F</code>, <code>$7E:AA70</code>～<code>$7E:AA7F</code>, <code>$7E:AB70</code>～</td></tr>
-	<tr><td>8</td><td><code>$7E:1B80</code>～<code>$7E:1B8F</code>, <code>$7E:AA80</code>～<code>$7E:AA8F</code>, <code>$7E:AB80</code>～</td></tr>
-	<tr><td>9</td><td><code>$7E:1B90</code>～<code>$7E:1B9F</code>, <code>$7E:AA90</code>～<code>$7E:AA9F</code>, <code>$7E:AB90</code>～</td></tr>
-	<tr><td>A</td><td><code>$7E:1BA0</code>～<code>$7E:1BAF</code>, <code>$7E:AAA0</code>～<code>$7E:AAAF</code>, <code>$7E:ABA0</code>～</td></tr>
-	<tr><td>B</td><td><code>$7E:1BB0</code>～<code>$7E:1BBF</code>, <code>$7E:AAB0</code>～<code>$7E:AABF</code>, <code>$7E:ABB0</code>～</td></tr>
-	<tr><td>C</td><td><code>$7E:1BC0</code>～<code>$7E:1BCF</code>, <code>$7E:AAC0</code>～<code>$7E:AACF</code>, <code>$7E:ABC0</code>～</td></tr>
-	<tr><td>D</td><td><code>$7E:1BD0</code>～<code>$7E:1BDF</code>, <code>$7E:AAD0</code>～<code>$7E:AADF</code>, <code>$7E:ABD0</code>～</td></tr>
-	<tr><td>E</td><td><code>$7E:1BE0</code>～<code>$7E:1BEF</code>, <code>$7E:AAE0</code>～<code>$7E:AAEF</code>, <code>$7E:ABE0</code>～</td></tr>
-</tbody>
-</table>
-
-
-
-<table>
-<thead>
-	<tr><th>アドレス</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$1B00</code></td><td>敵ID</td></tr>
-	<tr><td><code>$1B01</code></td><td>戦闘状態<br><span class="formula">$00</span>:戦闘離脱 <span class="formula">$20</span>:敵キャラをプレイヤーが操作 <span class="formula">$40</span>:味方キャラが敵状態 <span class="formula">$80</span>:敵総数+1の敵番号 <span class="formula">$FF</span>:通常</td></tr>
-	<tr><td><code>$1B02</code></td><td>　</td></tr>
-	<tr><td><code>$1B03</code></td><td></td></tr>
-	<tr><td><code>$1B04</code></td><td>向き（右下<span class="formula">$00</span>/左下<span class="formula">$40</span>/右上<span class="formula">$80</span>/左上<span class="formula">$C0</span>）</td></tr>
-	<tr><td><code>$1B05</code></td><td>技関係状態<br><span class="formula">$00</span>:通常 <span class="formula">$40</span>:タメ時間中 <span class="formula">$80</span>:移動中 <span class="formula">$F0</span>:技を出している最中</td></tr>
-	<tr><td><code>$1B06</code></td><td>実行中の技のタメ時間（残り時間）</td></tr>
-	<tr><td><code>$1B07</code></td><td>行動状態</td></tr>
-	<tr><td><code>$1B08</code></td><td>途中計算用のマス目のX座標（左から<span class="formula">$00</span>～<span class="formula">$06</span>）※敵の左上マス基準</td></tr>
-	<tr><td><code>$1B09</code></td><td>途中計算用のマス目のY座標（上から<span class="formula">$00</span>～<span class="formula">$06</span>）※敵の左上マス基準</td></tr>
-	<tr><td><code>$1B0A</code></td><td>現在のキャラ位置のマス目のX座標（左から<span class="formula">$00</span>～<span class="formula">$06</span>）※敵の左上マス基準</td></tr>
-	<tr><td><code>$1B0B</code></td><td>現在のキャラ位置のマス目のY座標（上から<span class="formula">$00</span>～<span class="formula">$06</span>）※敵の左上マス基準</td></tr>
-	<tr><td><code>$1B0C</code></td><td>キャラの位置のX軸（ピクセル単位） 下位バイト</td></tr>
-	<tr><td><code>$1B0D</code></td><td>キャラの位置のX軸（ピクセル単位） 上位バイト</td></tr>
-	<tr><td><code>$1B0E</code></td><td>キャラの位置のY軸（ピクセル単位） 下位バイト</td></tr>
-	<tr><td><code>$1B0F</code></td><td>キャラの位置のY軸（ピクセル単位） 上位バイト</td></tr>
-	<tr><td><code>$AA00</code></td><td rowspan="2">現在HP<br>00を下位バイト、01を上位バイトとした4桁の値</td></tr>
-	<tr><td><code>$AA01</code></td></tr>
-	<tr><td><code>$AA02</code></td><td>行動異常</td></tr>
-	<tr><td><code>$AA03</code></td><td>力(現在値)</td></tr>
-	<tr><td><code>$AA04</code></td><td>速(現在値)</td></tr>
-	<tr><td><code>$AA05</code></td><td>体(現在値)</td></tr>
-	<tr><td><code>$AA06</code></td><td>知(現在値)</td></tr>
-	<tr><td><code>$AA07</code></td><td>状態異常</td></tr>
-	<tr><td><code>$AA08</code></td><td>首かため回復までの残り時間</td></tr>
-	<tr><td><code>$AA09</code></td><td>足かため回復までの残り時間</td></tr>
-	<tr><td><code>$AA0A</code></td><td>腕かため回復までの残り時間</td></tr>
-	<tr><td><code>$AA0B</code></td><td>毒回復までの残り時間</td></tr>
-	<tr><td><code>$AA0C</code></td><td>マヒ回復までの残り時間</td></tr>
-	<tr><td><code>$AA0D</code></td><td>眠り回復までの残り時間</td></tr>
-	<tr><td><code>$AA0E</code></td><td>酔い回復までの残り時間</td></tr>
-	<tr><td><code>$AA0F</code></td><td>石化すると値がつく</td></tr>
-	<tr><td><code>$AB00</code></td><td>LV(現在値)</td></tr>
-	<tr><td><code>$AB01</code></td><td>攻撃/回復技の対象の範囲内にいる敵には順に<span class="formula">$01</span>～が入り、範囲外だと<span class="formula">$FF</span>が入る。</td></tr>
-	<tr><td><code>$AB02</code></td><td>被ダメージ/回復量のヒット数</td></tr>
-	<tr><td><code>$AB03</code></td><td>ヒット数（倒れるか999以上の時<span class="formula">$FF</span>？）</td></tr>
-	<tr><td><code>$AB04</code>～<code>$AB05</code></td><td>被ダメージの単発値（2バイト）※被ダメージは技だけでなくフィールドダメージなども含む</td></tr>
-	<tr><td><code>$AB06</code></td><td>　</td></tr>
-	<tr><td><code>$AB07</code></td><td>　</td></tr>
-	<tr><td><code>$AB08</code></td><td>行動異常（計算用）</td></tr>
-	<tr><td><code>$AB09</code></td><td>状態異常（計算用）</td></tr>
-	<tr><td><code>$AB0A</code></td><td>レベル現在値（向き補正込みの計算値）</td></tr>
-	<tr><td><code>$AB0B</code></td><td>向き補正(正面:$00, 側面:$01, 背面:$80)</td></tr>
-	<tr><td><code>$AB0C</code></td><td>状態異常（技によって発生した値、これと既に発生している状態異常を加算する）</td></tr>
-	<tr><td><code>$AB0D</code></td><td>　</td></tr>
-	<tr><td><code>$AB0E</code></td><td>　</td></tr>
-	<tr><td><code>$AB0F</code></td><td>　</td></tr>
-	<tr><td><code>$AC00</code></td><td>使用技（決定前）</td></tr>
-	<tr><td><code>$AC02</code>～<code>$AC03</code></td><td>技の範囲指定～使用中、キャラ位置のマス目のY/X座標</td></tr>
-	<tr><td><code>$AC04</code>～<code>$AC05</code></td><td>順序ポイント(2バイト)</td></tr>
-	<tr><td><code>$AC07</code></td><td>移動または向き変え時、相対位置判定で一番近い位置の味方キャラ番号</td></tr>
-	<tr><td><code>$AD00</code>～<code>$AD01</code></td><td>被ダメージの総ダメージ量（2バイト）</td></tr>
-	
-</tbody>
-</table>
+<p><a href="datamap2.html">RAM領域は次ページ参照。</a></p>
 
 <script>//リストタイトル静的生成
-document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`captionlist_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`captionlist_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.querySelectorAll(".maincontents h3, .maincontents h4, .maincontents h5");if(0===t.length||!e)return;let l=document.createElement("ul"),n=[{ul:l,level:3}],a=[0,0,0];t.forEach(e=>{let t=parseInt(e.tagName.substring(1),10),l=t-3;a[l]++;for(let i=l+1;i<a.length;i++)a[i]=0;let h=a.slice(0,l+1),d=`c${h.join("-")}`;e.id=d;let o=n[n.length-1];if(t>o.level){let p=document.createElement("ul"),r=o.ul.lastElementChild;r?r.appendChild(p):o.ul.appendChild(p),n.push({ul:p,level:t}),o=n[n.length-1]}else if(t<o.level){for(;n.length>1&&n[n.length-1].level>t;)n.pop();o=n[n.length-1]}let c=document.createElement("li"),u=document.createElement("a");u.href=`#${d}`,u.textContent=e.textContent,c.appendChild(u),o.ul.appendChild(c)}),e.appendChild(l)});
 </script>
-
 
 <div class="pagelink">
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="datamap2.html"><span class="button">&#9654;次　RAM領域</span></a></div>
 </div>
 
 </div>
