@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; データマップ &gt; サウンド（BGM・効果音）">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; データマップ &gt; サウンド（BGM・効果音）">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; データマップ &gt; サウンド（BGM・効果音）</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+h6 {
+	font-size: 1rem;
+	line-height: 1.3;
+	border-style: solid;
+	font-weight: bold;
+	padding: 0 0 0.1rem 0.5rem;
+	margin: 1rem 0 0 1.2rem;
+	border-width: 0px 0px 0px 3px;
+  border-color: #47556e;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="here"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="datamap.html">データマップ</a> &gt; サウンド（BGM・効果音）</h1>
+<h2>「ライブ・ア・ライブ」データマップ &gt; サウンド（BGM・効果音）</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここにはBGMと効果音の一覧を掲載している。<br>
+<a href="datamap.html">データマップについての説明と、ROM領域</a>、<a href="datamap2.html">RAM領域</a>についてもご一読いただきたい。</p>
+
+<ul>
+	<li><a href="#BGMlist">BGM一覧</a></li>
+	<li><a href="#selist">効果音一覧</a></li>
+</ul>
+<!-- <div id="captiondata"></div> -->
+
+
+<h3 id="BGMlist">BGM一覧</h3>
+
+<p>ID<span class="formula">$00</span>～<span class="formula">$FF</span><br>
+ただし<span class="formula">$4E</span>以降は無音（データなし）のようである。<br>
+戦闘・マップの場合、流れているBGMは<code>$00:1D05</code>に値が入る。</p>
+
+<p>タイトルはサウンドトラックに準拠。<br>
+（「いいお天気でしょっ!」の夜バージョンなど、一部楽曲のスローテンポな曲は原曲の再生ピッチを変更して流しているらしい）</p>
+
+<table>
+<thead>
+	<tr><th>ID</th><th>タイトル</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>無音（BGMなし）</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>魔王への叙曲</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>凛然たる戦い</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>忍音</td></tr>
+	<tr><td><span class="formula">$04</span></td><td>WANDERER</td></tr>
+	<tr><td><span class="formula">$05</span></td><td>殺陣！</td></tr>
+	<tr><td><span class="formula">$06</span></td><td>THE WILDS</td></tr>
+	<tr><td><span class="formula">$07</span></td><td>UNDER THE FAKE</td></tr>
+	<tr><td><span class="formula">$08</span></td><td>UNSEEN SYNDROME</td></tr>
+	<tr><td><span class="formula">$09</span></td><td>NATIVE LIFE</td></tr>
+	<tr><td><span class="formula">$0A</span></td><td>WAIT FOR TRUTH</td></tr>
+	<tr><td><span class="formula">$0B</span></td><td>PSYCHOで夜露死苦!!</td></tr>
+	<tr><td><span class="formula">$0C</span></td><td>猛者達…</td></tr>
+	<tr><td><span class="formula">$0D</span></td><td>鳥児在天空飛翔 魚児在河里游泳</td></tr>
+	<tr><td><span class="formula">$0E</span></td><td>在中国的戦闘</td></tr>
+	<tr><td><span class="formula">$0F</span></td><td>効果音（幕末編・天井裏カラクリ音）</td></tr>
+	<tr><td><span class="formula">$10</span></td><td>KNOCK YOU DOWN!</td></tr>
+	<tr><td><span class="formula">$11</span></td><td>効果音（馬が走る音）</td></tr>
+	<tr><td><span class="formula">$12</span></td><td>効果音（ＳＦ編・宇宙船内）</td></tr>
+	<tr><td><span class="formula">$13</span></td><td>効果音（近未来編・港）</td></tr>
+	<tr><td><span class="formula">$14</span></td><td>老拳師下深山</td></tr>
+	<tr><td><span class="formula">$15</span></td><td>いいお天気でしょっ!</td></tr>
+	<tr><td><span class="formula">$16</span></td><td>KISS OF JEALOUSY</td></tr>
+	<tr><td><span class="formula">$17</span></td><td>密命</td></tr>
+	<tr><td><span class="formula">$18</span></td><td>GO!GO!ブリキ大王!!</td></tr>
+	<tr><td><span class="formula">$19</span></td><td>届かぬ翼</td></tr>
+	<tr><td><span class="formula">$1A</span></td><td>魔王山を往く</td></tr>
+	<tr><td><span class="formula">$1B</span></td><td>魔王オディオ</td></tr>
+	<tr><td><span class="formula">$1C</span></td><td>PURE ODIO</td></tr>
+	<tr><td><span class="formula">$1D</span></td><td>効果音（アキラ　レベルアップ音）</td></tr>
+	<tr><td><span class="formula">$1E</span></td><td>効果音（木魚のポクポク音）</td></tr>
+	<tr><td><span class="formula">$1F</span></td><td>効果音（風の吹く音）</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>効果音（キューブの機械音）</td></tr>
+	<tr><td><span class="formula">$21</span></td><td>効果音（オルステッド　レベルアップ音）</td></tr>
+	<tr><td><span class="formula">$22</span></td><td>効果音（おぼろ丸　レベルアップ音）</td></tr>
+	<tr><td><span class="formula">$23</span></td><td>効果音（サモ・ユン　レベルアップ音・アチョーボイス）</td></tr>
+	<tr><td><span class="formula">$24</span></td><td>効果音（レイ　レベルアップ音・ボイス）</td></tr>
+	<tr><td><span class="formula">$25</span></td><td>SELECT・A・LIVE</td></tr>
+	<tr><td><span class="formula">$26</span></td><td>効果音（ポゴ　レベルアップ音・ボイス）</td></tr>
+	<tr><td><span class="formula">$27</span></td><td>効果音（ゴリのボイス/馬のいななき　兼用）</td></tr>
+	<tr><td><span class="formula">$28</span></td><td>効果音（高原日勝　レベルアップ音・ボイス）</td></tr>
+	<tr><td><span class="formula">$29</span></td><td>効果音（サンダウン　レベルアップ音・銃声）</td></tr>
+	<tr><td><span class="formula">$2A</span></td><td>効果音（近未来編・木琴）</td></tr>
+	<tr><td><span class="formula">$2B</span></td><td>MEGALOMANIA</td></tr>
+	<tr><td><span class="formula">$2C</span></td><td>効果音（強風の吹く音）</td></tr>
+	<tr><td><span class="formula">$2D</span></td><td>効果音（ＳＦ編/近未来編・パソコン効果音）</td></tr>
+	<tr><td><span class="formula">$2E</span></td><td>効果音（近未来編・筑波研究所最奥）</td></tr>
+	<tr><td><span class="formula">$2F</span></td><td>効果音（功夫編　銅鑼）</td></tr>
+	<tr><td><span class="formula">$30</span></td><td>効果音（西部編　鐘）</td></tr>
+	<tr><td><span class="formula">$31</span></td><td>効果音（幕末編　アイテム入手時）</td></tr>
+	<tr><td><span class="formula">$32</span></td><td>効果音（原始編　ウホウホ）</td></tr>
+	<tr><td><span class="formula">$33</span></td><td>最強-VICTORY ROAD-</td></tr>
+	<tr><td><span class="formula">$34</span></td><td>LIVE・A・LIVE</td></tr>
+	<tr><td><span class="formula">$35</span></td><td>CRY・A・LIVE</td></tr>
+	<tr><td><span class="formula">$36</span></td><td>WARM・A・LIVE</td></tr>
+	<tr><td><span class="formula">$37</span></td><td>絶望の都</td></tr>
+	<tr><td><span class="formula">$38</span></td><td>Sancho・de・Los・Panchoz</td></tr>
+	<tr><td><span class="formula">$39</span></td><td>効果音（マラカス）</td></tr>
+	<tr><td><span class="formula">$3A</span></td><td>効果音（各シナリオ開始時の低い音）</td></tr>
+	<tr><td><span class="formula">$3B</span></td><td>原始編・宴（リメイク版の「生贄の宴」）</td></tr>
+	<tr><td><span class="formula">$3C</span></td><td>Silent Labyrinth</td></tr>
+	<tr><td><span class="formula">$3D</span></td><td>ARMAGEDDON</td></tr>
+	<tr><td><span class="formula">$3E</span></td><td>CAPTAIN SQUARE</td></tr>
+	<tr><td><span class="formula">$3F</span></td><td>星屑のキャプテン</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>効果音（近未来編・オルガン　むすんでひらいて）</td></tr>
+	<tr><td><span class="formula">$41</span></td><td>効果音（近未来編・オルガン　猫ふんじゃった）</td></tr>
+	<tr><td><span class="formula">$42</span></td><td>効果音（近未来編・オルガン　トッカータとフーガ）</td></tr>
+	<tr><td><span class="formula">$43</span></td><td>効果音（近未来編・オルガン　チョコボのテーマ）</td></tr>
+	<tr><td><span class="formula">$44</span></td><td>Live over Again</td></tr>
+	<tr><td><span class="formula">$45</span></td><td>Live for Live</td></tr>
+	<tr><td><span class="formula">$46</span></td><td>効果音（崩壊）</td></tr>
+	<tr><td><span class="formula">$47</span></td><td>効果音（ＳＦ編・警告音）</td></tr>
+	<tr><td><span class="formula">$48</span></td><td>効果音（功夫編・夜　虫の音）</td></tr>
+	<tr><td><span class="formula">$49</span></td><td>CAPTAIN SQUARE</td></tr>
+	<tr><td><span class="formula">$4A</span></td><td>効果音（ゲーム開始時「SQUARE SOFT」ボイス）</td></tr>
+	<tr><td><span class="formula">$4B</span></td><td>ILLUSION…</td></tr>
+	<tr><td><span class="formula">$4C</span></td><td>Versus!</td></tr>
+	<tr><td><span class="formula">$4D</span></td><td>原始編・宴　ボイスのみ</td></tr>
+	<tr><td colspan="2"><span class="formula">$4E</span>以降は無音</td></tr>
+</tbody>
+</table>
+
+<h3 id="selist">効果音一覧</h3>
+
+<p>ID<span class="formula">$00</span>～<span class="formula">$FF</span><br>
+効果音には名前がなく説明もしにくいので、技の効果音の場合は「」内に技名を記した。<br>
+効果音を流すタイミングで、IDが<code>$00:1D01</code>→<code>$00:2141</code>と経由してAPUに転送される。<br>
+技は2種類の効果音を設定可能で（技データ20と技データ24）、両方<span class="formula">$00</span>なら無音となり（「音無しの剣」「すたーばすたー」など、ただし「スピンドル」のように例外あり）、アキラの超能力系の技のように超能力効果音<span class="formula">$6A</span>と技自体の効果音と2種設定されている技、片方だけ設定されている技など様々。</p>
+
+<table>
+<thead>
+	<tr><th>ID</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>（無音）</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>「グイグイ」「ゴルゴダのイバラ」など</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>「ウキッ」</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>「液体人間呪ばく」「復元」「あまいささやき」など</td></tr>
+	<tr><td><span class="formula">$04</span></td><td>「ド根性キック」</td></tr>
+	<tr><td><span class="formula">$05</span></td><td>「ドデゲスデン」「魔力吸引」「火炎放射」「チョトイイデスカ」など</td></tr>
+	<tr><td><span class="formula">$06</span></td><td>「ウキぷぅ」「ウホぷぅ」</td></tr>
+	<tr><td><span class="formula">$07</span></td><td>「ガボラッチョ」「ンゴ」など噛みつき音</td></tr>
+	<tr><td><span class="formula">$08</span></td><td>「ウホ」</td></tr>
+	<tr><td><span class="formula">$09</span></td><td>「ドゴドゴ」</td></tr>
+	<tr><td><span class="formula">$0A</span></td><td>「ぽかぽか」「ポコポコビート」</td></tr>
+	<tr><td><span class="formula">$0B</span></td><td>「てーてー」</td></tr>
+	<tr><td><span class="formula">$0C</span></td><td>「るーるー」「ウホウホダンス」など</td></tr>
+	<tr><td><span class="formula">$0D</span></td><td>ダメージ表示時の「ピコリン」音</td></tr>
+	<tr><td><span class="formula">$0E</span></td><td>デバフなどの音</td></tr>
+	<tr><td><span class="formula">$0F</span></td><td>「風神シナツヒコ」</td></tr>
+	<tr><td><span class="formula">$10</span></td><td>「まんがんぜんせき」</td></tr>
+	<tr><td><span class="formula">$11</span></td><td>「西安破裏拳」</td></tr>
+	<tr><td><span class="formula">$12</span></td><td>「水鳥脚」</td></tr>
+	<tr><td><span class="formula">$13</span></td><td>「シマリス脚」</td></tr>
+	<tr><td><span class="formula">$14</span></td><td>殴り蹴り系</td></tr>
+	<tr><td><span class="formula">$15</span></td><td>「老狐の舞」</td></tr>
+	<tr><td><span class="formula">$16</span></td><td>「旋牙連山拳」</td></tr>
+	<tr><td><span class="formula">$17</span></td><td>「おにくまん」</td></tr>
+	<tr><td><span class="formula">$18</span></td><td>「画竜天聖の陣」</td></tr>
+	<tr><td><span class="formula">$19</span></td><td>「エリア・大回復」「自己安静息」「全体なんでも回復」「気功念斬波」など回復系</td></tr>
+	<tr><td><span class="formula">$1A</span></td><td>「暗黒球体」「ヘビーブロウ」「空破旋風手」</td></tr>
+	<tr><td><span class="formula">$1B</span></td><td>「蛇形拳」</td></tr>
+	<tr><td><span class="formula">$1C</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$1D</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$1E</span></td><td>「ふれふれー」</td></tr>
+	<tr><td><span class="formula">$1F</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$20</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$21</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$22</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$23</span></td><td>「忍法夢幻蝶」「忍法火の鳥」前半など忍法系</td></tr>
+	<tr><td><span class="formula">$24</span></td><td>「ホーリーブロウ」「パンチャマキック」「イナズマアッパー」などの締めの音</td></tr>
+	<tr><td><span class="formula">$25</span></td><td>「ぐれんの炎」「火トンの術」</td></tr>
+	<tr><td><span class="formula">$26</span></td><td>「忍法雪木がらし」など吹雪っぽい音</td></tr>
+	<tr><td><span class="formula">$27</span></td><td>「忍法火の鳥」後半</td></tr>
+	<tr><td><span class="formula">$28</span></td><td>「忍法夢幻蝶」後半</td></tr>
+	<tr><td><span class="formula">$29</span></td><td>「忍法矢車草」「忍法コママワリ」</td></tr>
+	<tr><td><span class="formula">$2A</span></td><td>「忍法コマまわし」「クモの糸」など</td></tr>
+	<tr><td><span class="formula">$2B</span></td><td>「砂ジンの術」後半、「ポイズンジェット」「ふきあれる嵐」「フケイの風」など</td></tr>
+	<tr><td><span class="formula">$2C</span></td><td>「忍び斬り」「影一文字」など</td></tr>
+	<tr><td><span class="formula">$2D</span></td><td>「十文字斬り」「忍法カマイタチ」</td></tr>
+	<tr><td><span class="formula">$2E</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$2F</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$30</span></td><td>「レッドバレット」後半</td></tr>
+	<tr><td><span class="formula">$31</span></td><td>「レッドケイジ」後半など</td></tr>
+	<tr><td><span class="formula">$32</span></td><td>「レッドコート」後半</td></tr>
+	<tr><td><span class="formula">$33</span></td><td>「水トンの術」「シルバーファング」後半など</td></tr>
+	<tr><td><span class="formula">$34</span></td><td>「シルバーウインド」後半</td></tr>
+	<tr><td><span class="formula">$35</span></td><td>「シルバーフリーズ」「フリーズイメージ」後半</td></tr>
+	<tr><td><span class="formula">$36</span></td><td>「ブルーゲイル」後半</td></tr>
+	<tr><td><span class="formula">$37</span></td><td>「電撃マッサージ」「電気ビリビリ」「電影結界」など</td></tr>
+	<tr><td><span class="formula">$38</span></td><td>「大爆走９４」「ブラウンシュガー」後半</td></tr>
+	<tr><td><span class="formula">$39</span></td><td>「毒リンプン」「サイコアルファ」「パープルミスト」後半など</td></tr>
+	<tr><td><span class="formula">$3A</span></td><td>「ドラゴンソウル」後半</td></tr>
+	<tr><td><span class="formula">$3B</span></td><td>「キャンセラレイ」「ソニックブーム」</td></tr>
+	<tr><td><span class="formula">$3C</span></td><td>「セルフヒール」「自分・中回復」など回復系</td></tr>
+	<tr><td><span class="formula">$3D</span></td><td>「全体・中回復」「めぐみの回復」後半など回復系</td></tr>
+	<tr><td><span class="formula">$3E</span></td><td>「通打」「あびせげり」「高速アナライズ」など</td></tr>
+	<tr><td><span class="formula">$3F</span></td><td>「サンクチュアリ」後半</td></tr>
+	<tr><td><span class="formula">$40</span></td><td>「エレキテル放電」「１００Ｖレーザー」など</td></tr>
+	<tr><td><span class="formula">$41</span></td><td>「ウォ～ウォ～」など雄叫び系</td></tr>
+	<tr><td><span class="formula">$42</span></td><td>「デスパースペース」</td></tr>
+	<tr><td><span class="formula">$43</span></td><td>ストレイボウ・ウラヌス　魔法効果音</td></tr>
+	<tr><td><span class="formula">$44</span></td><td>「神の祝福」「神の御加護」「いやしのいのり」後半</td></tr>
+	<tr><td><span class="formula">$45</span></td><td>「カットワンウェイ」「タキオンソード」など</td></tr>
+	<tr><td><span class="formula">$46</span></td><td>「Ｖシャイン」「北辰一刀流」など斬撃音</td></tr>
+	<tr><td><span class="formula">$47</span></td><td>戦闘開始時のターン回ってきた音、「十文字斬り」「プラスリンク」など</td></tr>
+	<tr><td><span class="formula">$48</span></td><td>「プラスリンク前半」「ななめ斬り」など</td></tr>
+	<tr><td><span class="formula">$49</span></td><td>「ムーンダウン」「グーグー」など</td></tr>
+	<tr><td><span class="formula">$4A</span></td><td>「ミラードライブ」</td></tr>
+	<tr><td><span class="formula">$4B</span></td><td>「レイザーソニック」</td></tr>
+	<tr><td><span class="formula">$4C</span></td><td>「パルサーウォーク」「忍法カマイタチ」後半など</td></tr>
+	<tr><td><span class="formula">$4D</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$4E</span></td><td>「インケイジ」</td></tr>
+	<tr><td><span class="formula">$4F</span></td><td>「土神ハニヤスビメ」</td></tr>
+	<tr><td><span class="formula">$50</span></td><td>「デストレイル」「魔道士の亡影」</td></tr>
+	<tr><td><span class="formula">$51</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$52</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$53</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$54</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$55</span></td><td>「電撃フルチャージ」「システムリカバー」後半、「ハイスピードオペ」後半</td></tr>
+	<tr><td><span class="formula">$56</span></td><td>「ヘキサフランジ」など</td></tr>
+	<tr><td><span class="formula">$57</span></td><td>「自分・大回復」「アップグレード」後半など</td></tr>
+	<tr><td><span class="formula">$58</span></td><td>「プラズマチャージ」後半</td></tr>
+	<tr><td><span class="formula">$59</span></td><td>「ヒヨコ弾」</td></tr>
+	<tr><td><span class="formula">$5A</span></td><td>「スペースファージ」後半</td></tr>
+	<tr><td><span class="formula">$5B</span></td><td>「パイ中間子弾」後半</td></tr>
+	<tr><td><span class="formula">$5C</span></td><td>「メーザーカノン」後半</td></tr>
+	<tr><td><span class="formula">$5D</span></td><td>「スピニングスター」後半</td></tr>
+	<tr><td><span class="formula">$5E</span></td><td>「スピンドライブ」</td></tr>
+	<tr><td><span class="formula">$5F</span></td><td>「プラズマスパーク」「ドラゴンフレーム」など</td></tr>
+	<tr><td><span class="formula">$60</span></td><td>「スピニングスター」</td></tr>
+	<tr><td><span class="formula">$61</span></td><td>「ノイズストリーム」後半</td></tr>
+	<tr><td><span class="formula">$62</span></td><td>「ブラックアビス」「亡者の影」</td></tr>
+	<tr><td><span class="formula">$63</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$64</span></td><td>「マザーイメージ」</td></tr>
+	<tr><td><span class="formula">$65</span></td><td>「スリートイメージ」</td></tr>
+	<tr><td><span class="formula">$66</span></td><td>「ヘルイメージ」「デーモンズダンス」など</td></tr>
+	<tr><td><span class="formula">$67</span></td><td>「シャドウイメージ」</td></tr>
+	<tr><td><span class="formula">$68</span></td><td>「ホーリーゴースト」「天使のリサーチ」</td></tr>
+	<tr><td><span class="formula">$69</span></td><td>「ホーリーイメージ」</td></tr>
+	<tr><td><span class="formula">$6A</span></td><td>アキラ超能力音</td></tr>
+	<tr><td><span class="formula">$6B</span></td><td>「ヘブンイメージ」後半、「リベンジストーム」「ステータス回復」</td></tr>
+	<tr><td><span class="formula">$6C</span></td><td>「メーザー砲」「のうてんショート」「バリアバースト」後半</td></tr>
+	<tr><td><span class="formula">$6D</span></td><td>「怒りの鉄拳」「通打」後半など</td></tr>
+	<tr><td><span class="formula">$6E</span></td><td>「ハロゲンレーザー」「破道法」など</td></tr>
+	<tr><td><span class="formula">$6F</span></td><td>「おたけび」「ケケケ」「キンギョ弾」</td></tr>
+	<tr><td><span class="formula">$70</span></td><td>「シッポはイヤーン」</td></tr>
+	<tr><td><span class="formula">$71</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$72</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$73</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$74</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$75</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$76</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$77</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$78</span></td><td>「２刀つばめ返し」「鳥形拳」</td></tr>
+	<tr><td><span class="formula">$79</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$7A</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$7B</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$7C</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$7D</span></td><td>「ホイッスル」（未使用技）</td></tr>
+	<tr><td><span class="formula">$7E</span></td><td>「スタンガン」「５万Ｖのショック」「さいみん音波」など</td></tr>
+	<tr><td><span class="formula">$7F</span></td><td>「ミサイル」「手投げ弾」「スーパーノバ」後半など</td></tr>
+	<tr><td><span class="formula">$80</span></td><td>「火トンの術」「砂ジンの術」「まどわしのひとみ」など</td></tr>
+	<tr><td><span class="formula">$81</span></td><td>「いあい抜き」「静岩くずし」など</td></tr>
+	<tr><td><span class="formula">$82</span></td><td>「水呼びの音色」「水呼び」「水神ミズハノメ」など</td></tr>
+	<tr><td><span class="formula">$83</span></td><td>「ナム～の後光」「けるる～しょうわ」後半など</td></tr>
+	<tr><td><span class="formula">$84</span></td><td>「とろけるせっぷん」「禁断のゆうわく」など</td></tr>
+	<tr><td><span class="formula">$85</span></td><td>「からくりゴマ」「のたうち」「ウェザンブレード」「狂狼拳」など</td></tr>
+	<tr><td><span class="formula">$86</span></td><td>「うらめしや」</td></tr>
+	<tr><td><span class="formula">$87</span></td><td>「念仏」「怨みの業火」「ならくの暗黒」など</td></tr>
+	<tr><td><span class="formula">$88</span></td><td>「投げナワ」「定研帥」</td></tr>
+	<tr><td><span class="formula">$89</span></td><td>「毒液」「ねばねば液」など</td></tr>
+	<tr><td><span class="formula">$8A</span></td><td>「はなムチ」など</td></tr>
+	<tr><td><span class="formula">$8B</span></td><td>「水神のヒゲむち」「シュリンピング」後半など</td></tr>
+	<tr><td><span class="formula">$8C</span></td><td>「毒手」「ナイフマジック」（いずれも未使用技）</td></tr>
+	<tr><td><span class="formula">$8D</span></td><td>「手裏剣乱糸」「尾出流手裏剣術」「高足げり」など</td></tr>
+	<tr><td><span class="formula">$8E</span></td><td>敵撃破音（ザコ敵）</td></tr>
+	<tr><td><span class="formula">$8F</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$90</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$91</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$92</span></td><td>「セントアリシア（絶叫）」</td></tr>
+	<tr><td><span class="formula">$93</span></td><td>「突撃ラッパ」</td></tr>
+	<tr><td><span class="formula">$94</span></td><td>「ＨＰドレイン」</td></tr>
+	<tr><td><span class="formula">$95</span></td><td>「とろける愛」「ハードプロテクト」後半など</td></tr>
+	<tr><td><span class="formula">$96</span></td><td>「食べてみる」「ラブヒーリング」など回復系</td></tr>
+	<tr><td><span class="formula">$97</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$98</span></td><td>「ボコボコ」「Ｍ・ボンバー」「トペ・スイシーダ」「ジャンプショット」「ブンブン」など</td></tr>
+	<tr><td><span class="formula">$99</span></td><td>「ンガ」「山猿拳」などひっかき系</td></tr>
+	<tr><td><span class="formula">$9A</span></td><td>「セメント攻撃」「石化にらみ」</td></tr>
+	<tr><td><span class="formula">$9B</span></td><td>エンカウント音</td></tr>
+	<tr><td><span class="formula">$9C</span></td><td>「パンチャマキック」「ジャンプショット」「ブンブン」などジャンプ系飛ぶ時</td></tr>
+	<tr><td><span class="formula">$9D</span></td><td>「イナズマアッパー」「アロハリテ」「アームロック」「不射の射」など</td></tr>
+	<tr><td><span class="formula">$9E</span></td><td>「しめつけ」「骨法鉄砲」など</td></tr>
+	<tr><td><span class="formula">$9F</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$A0</span></td><td>「烈風正拳づき」「ネコけり」「ヘディング」など</td></tr>
+	<tr><td><span class="formula">$A1</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$A2</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$A3</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$A4</span></td><td>「キコキコ」「不動の業火」「フレームイメージ」「引火」など</td></tr>
+	<tr><td><span class="formula">$A5</span></td><td>「忍法火炎ぼたる」「シリコンじゅし」「火神カグツチ」など</td></tr>
+	<tr><td><span class="formula">$A6</span></td><td>「凍手刀」後半、「冷たい手」など</td></tr>
+	<tr><td><span class="formula">$A7</span></td><td>「ドラゴンソウル」「かみ砕き」など</td></tr>
+	<tr><td><span class="formula">$A8</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$A9</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$AA</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$AB</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$AC</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$AD</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$AE</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$AF</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B0</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B1</span></td><td>藤兵衛のアイテム改造音</td></tr>
+	<tr><td><span class="formula">$B2</span></td><td>「バベルノンキック」前半</td></tr>
+	<tr><td><span class="formula">$B3</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B4</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B5</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B6</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B7</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B8</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$B9</span></td><td>ポクポクカーンの「カーン」</td></tr>
+	<tr><td><span class="formula">$BA</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$BB</span></td><td>水が流れる音（洗面台調べて水流れる時など）</td></tr>
+	<tr><td><span class="formula">$BC</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$BD</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$BE</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$BF</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$C0</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$C1</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$C2</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$C3</span></td><td>「インフォリサーチ」後半、「ドライブバック」「システムリカバー」など</td></tr>
+	<tr><td><span class="formula">$C4</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$C5</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$C6</span></td><td>「地震」後半、「大地震動波」（未使用技）</td></tr>
+	<tr><td><span class="formula">$C7</span></td><td>「ジョムジョム弾」「地震」前半</td></tr>
+	<tr><td><span class="formula">$C8</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$C9</span></td><td>「シングルショット」などサンダウン・マッドらの銃撃音</td></tr>
+	<tr><td><span class="formula">$CA</span></td><td>「ガトリング射撃」「バルカン砲」「短づつ発射」</td></tr>
+	<tr><td><span class="formula">$CB</span></td><td>「馬で引き回し」</td></tr>
+	<tr><td><span class="formula">$CC</span></td><td>「地上げ地ならし」</td></tr>
+	<tr><td><span class="formula">$CD</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$CE</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$CF</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D0</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D1</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D2</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D3</span></td><td>キューブやキャプテンスクウェアの技前半効果音</td></tr>
+	<tr><td><span class="formula">$D4</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D5</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D6</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D7</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D8</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$D9</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$DA</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$DB</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$DC</span></td><td>「スパイラル・ニー」</td></tr>
+	<tr><td><span class="formula">$DD</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$DE</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$DF</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$E0</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$E1</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$E2</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$E3</span></td><td>「クォ～ン」</td></tr>
+	<tr><td><span class="formula">$E4</span></td><td>「ライブイレイザー」「セントアリシア」「エッシャー空間」</td></tr>
+	<tr><td><span class="formula">$E5</span></td><td>「ねこだまし」「コノタワケせんす」</td></tr>
+	<tr><td><span class="formula">$E6</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$E7</span></td><td>「ばりたんく」</td></tr>
+	<tr><td><span class="formula">$E8</span></td><td>「爆発」「大爆発」「大ふんか」</td></tr>
+	<tr><td><span class="formula">$E9</span></td><td>「ホネ投げ」</td></tr>
+	<tr><td><span class="formula">$EA</span></td><td>「タロイモキック」「タロイモパンチ」「ボヨヨンパンチ」</td></tr>
+	<tr><td><span class="formula">$EB</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$EC</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$ED</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$EE</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$EF</span></td><td>「Ｆシュタイナー」「大激怒岩バン割り」「狂乱飛竜脚」など</td></tr>
+	<tr><td><span class="formula">$F0</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$F1</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$F2</span></td><td>「ハンマーパワー」「Ｇスープレックス」後半、「ゲキレツ弾」「なだれおこし」など</td></tr>
+	<tr><td><span class="formula">$F3</span></td><td>扉開閉音</td></tr>
+	<tr><td><span class="formula">$F4</span></td><td>「どう回し回転げり」「あびせげり」後半</td></tr>
+	<tr><td><span class="formula">$F5</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$F6</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$F7</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$F8</span></td><td>爆発音（藤兵衛改造ラスト）</td></tr>
+	<tr><td><span class="formula">$F9</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$FA</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$FB</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$FC</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$FD</span></td><td>「わいろ」「謎のしゃくはち」「けるる～しょうわ」など</td></tr>
+	<tr><td><span class="formula">$FE</span></td><td>「メタルヒット」「バベルノンキック」後半など</td></tr>
+	<tr><td><span class="formula">$FF</span></td><td>-</td></tr>
+</tbody>
+</table>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.querySelectorAll(".maincontents h3, .maincontents h4, .maincontents h5");if(0===t.length||!e)return;let l=document.createElement("ul"),n=[{ul:l,level:3}],a=[0,0,0];t.forEach(e=>{let t=parseInt(e.tagName.substring(1),10),l=t-3;a[l]++;for(let i=l+1;i<a.length;i++)a[i]=0;let h=a.slice(0,l+1),d=`c${h.join("-")}`;e.id=d;let o=n[n.length-1];if(t>o.level){let p=document.createElement("ul"),r=o.ul.lastElementChild;r?r.appendChild(p):o.ul.appendChild(p),n.push({ul:p,level:t}),o=n[n.length-1]}else if(t<o.level){for(;n.length>1&&n[n.length-1].level>t;)n.pop();o=n[n.length-1]}let c=document.createElement("li"),u=document.createElement("a");u.href=`#${d}`,u.textContent=e.textContent,c.appendChild(u),o.ul.appendChild(c)}),e.appendChild(l)});
+</script> -->
+
+
+<div class="pagelink">
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<!-- <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script><div style="display:none;"><script type="text/javascript" src="//x7.shinobi.jp/ufo/07424540r"></script></div>
+</body>
+</html>
