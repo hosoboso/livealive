@@ -1021,7 +1021,7 @@ $C1/11D1 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード デモ画面だと$
 $C1/11D4 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
 $C1/11D6 BEQ $0B    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
 $C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
-$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ） 最終編ベストエンド
 $C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
 $C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
 
@@ -1087,6 +1087,11 @@ $C3/017F RTL                     ;サブルーチン戻り
 
 $C1/11E3 RTS                     ;サブルーチン戻り
 </pre></div>
+
+<p><code><span class="r">$C1/11D1</span></code>～<code><span class="r">$C1/11DD</span></code>は、<code>[$00:0070]</code>が<span class="formula">$01</span>ではない、かつ、<code>[$00:0040]</code>が<span class="formula">$04</span>ではない場合は効果音を鳴らす処理に進む、という意味になる。<br>
+<code>[$00:0070]</code>が<span class="formula">$01</span>はタイトルデモでの戦闘のこと。<br>
+<code>[$00:0040]</code>が<span class="formula">$04</span>になるのは最終編ベストエンドで主人公たちが最強技を見せる場面。<br>
+タイトルデモ中やエンディングにて、技を出す場面で効果音が鳴らないのはここの処理のため。</p>
 
 <p>以上から、</p>
 
@@ -1187,7 +1192,7 @@ $C1/12BE RTS                     ;サブルーチン戻り
 <p>技データ24の方は、技データ20で説明した通り、繰り返し鳴らすことが可能な効果音を登録できるため、処理が分岐する。</p>
 
 <p>最初の判定が<code><span class="r">$C1/1270</span></code>の技データ19の上2ビット（Bit6）の値である。<br>
-ここが%0の場合は<code><span class="r">$C1/1296</span></code>にジャンプして、<code>$7E:FEFC</code>の値を判定する。</p>
+ここが<span class="formula">%0</span>の場合は<code><span class="r">$C1/1296</span></code>にジャンプして、<code>$7E:FEFC</code>の値を判定する。</p>
 
 <p><code>$7E:FEFC</code>が<span class="formula">$00</span>でない場合、<code>$7E:FEFC</code>を<span class="formula">+1</span>してから、技データ24が<span class="formula">$00</span>でなければ技データ24を<code>[$00:1D01]</code>に書き込み、<code>[$00:1D00]</code>に<span class="formula">$18</span>、<code>[$00:1D02]</code>に<span class="formula">$80</span>を書き込んで<code>[$C1:11D1]</code>にジャンプ、と技データ20とほぼ同じ処理である。<br>
 ローキック1ヒットの場合は技データ24の効果音を1回鳴らして、効果音処理は終了である。<br>
