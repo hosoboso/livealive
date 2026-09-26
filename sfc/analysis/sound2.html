@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; BGMIDの呼び出し">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; BGMIDの呼び出し">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; BGMIDの呼び出し</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+
+.fit-picture {
+  width: 30px;
+  height: 50px;
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの再生</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="sound.html">サウンドについて</a> &gt; BGMIDの呼び出し</h1>
+<h2>サウンドについて &gt; BGMIDの呼び出し</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="sound1.html">BGMの再生</a>では、BGMIDから実際に該当曲の演奏処理までを紹介している。<br>
+ここでは、BGMIDはどうやって呼び出しているのか？　を、状況ごとに紹介する。</p>
+
+<p>BGMIDを呼び出して、新たなBGMを演奏する場面は、</p>
+
+<ul>
+	<li>ゲーム開始時の「SQUARE SOFT」ボイス（BGMID<span class="formula">$4A</span>）</li>
+	<li>オープニングデモ中の「LIVE・A・LIVE」（BGMID<span class="formula">$34</span>）</li>
+	<li>シナリオ選択画面開始時の「SELECT・A・LIVE」（BGMID<span class="formula">$25</span>）</li>
+	<li>シナリオ開始時</li>
+	<li>LISTENING ROOM</li>
+	<li>セーブデータをロード時</li>
+	<li>フィールド移動時のマップ切り替えでBGMが変わるマップ</li>
+	<li>イベント中のBGM切り替え</li>
+	<li>通常戦闘（シナリオ毎の通常戦闘BGM）</li>
+	<li>イベント戦闘・ボス戦</li>
+</ul>
+
+<p>……などがあるが、以下では代表的なものを幾つか紹介する。<br>
+中には、「アイテム獲得時にBGMで効果音を流すが、獲得後にそれまで鳴っていたBGMの続きから流す」（BGMのレジューム機能？）といった特殊な処理をしているであろう箇所もあるが、そのあたりは省かせていただいた。</p>
+
+<p>基本的には<code>$00:1D01</code>にBGMIDをロードし、後に<code>$00:2141</code>経由でARAMに書き込まれて、SPC700が処理しBGMIDの曲を演奏するという流れになる。<br>
+このページでは、<code>$00:1D01</code>にBGMIDを書き込むまでの処理を紹介する。</p>
+
+<div id="captiondata"></div>
+
+<h3>ゲーム開始時の「SQUARE SOFT」ボイス（BGMID<span class="formula">$4A</span>）</h3>
+
+<p>オープニングデモを流していると、「SQUARE SOFT」ボイス以降のゲーム画面でも効果音のみは流れるが、BGMで流れるのは「LIVE・A・LIVE」のみ（のはず）。</p>
+
+<p>ゲーム開始（リセット）からオープニングデモにかけて、画面全体に文字が出て各シナリオの一場面、という切り替えが流れるが、この「画面全体に文字が出て各シナリオの一場面」のサブルーチンは、<code><span class="r">$C0/DACA</span></code>～<code><span class="r">$C0/DC74</span></code>が担っている（このサブルーチン内で<code><span class="r">$C0/DC75</span></code>以降にもジャンプする）。<br>
+最後の「LIVE A LIVE」ロゴが出るあたりまでも<code><span class="r">$C0/DACA</span></code>～<code><span class="r">$C0/DC74</span></code>が担当し、以下で「LIVE・A・LIVE」のBGMID<span class="formula">$34</span>が呼び出される。</p>
+
+<p>最初の「SQUARE SOFT」ボイスのID呼び出しは<code><span class="r">$C0/DAFF</span></code>から。</p>
+
+<div class="code-container"><pre>
+$C0/DAFF LDA #$4A                ;Aに$4Aをロード
+$C0/DB01 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/DB03 LDA #$FF                ;Aに$FFをロード
+$C0/DB05 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/DB07 JSR $1121  [$C0:1121]   ;[$C0:1121]へジャンプ
+
+$C0/1121 LDA #$10                ;Aに$10をロード
+$C0/1123 JSR $12CF  [$C0:12CF]   ;[$C0:12CF]へジャンプ
+
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+</pre></div>
+
+<p><code><span class="r">$C0/DAFF</span></code>～で<code>[$00:0030]</code>に<span class="formula">$4A</span>、<code>[$00:0031]</code>に<span class="formula">$FF</span>をロードし、<code><span class="r">$C0/1121</span></code>で<span class="formula">$10</span>を<code>A</code>にロードした後、<code><span class="r">$C0/12CF</span></code>から以下のように値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:1D00]</code></td><td><span class="formula">$10</span></td></tr>
+	<tr><td><code>[$00:1D01]</code></td><td><span class="formula">$4A</span></td></tr>
+	<tr><td><code>[$00:1D02]</code></td><td><span class="formula">$FF</span></td></tr>
+</tbody>
+</table>
+
+<p>ここでBGMID<span class="formula">$4A</span>が<code>[$00:1D01]</code>に入るので、「SQUARE SOFT」ボイスが呼び出される。<br>
+つまり、<code><span class="r">$C0/DAFF</span></code>～<code><span class="r">$C0/DB07</span></code>は「SQUARE SOFT」ボイス呼び出し専用処理だったことになる。</p>
+
+
+<h3>オープニングデモ中の「LIVE・A・LIVE」（BGMID<span class="formula">$34</span>）</h3>
+
+
+<p>「LIVE・A・LIVE」のID呼び出しは<code><span class="r">$C0/DF34</span></code>から。</p>
+
+<div class="code-container"><pre>
+$C0/DF34 LDA #$10                ;Aに$10をロード
+$C0/DF36 STA $212C  [$00:212C]   ;Aを[$00:212C]に書き込み TM (メインスクリーン指定) OBJ
+$C0/DF39 LDA #$34                ;Aに$34をロード
+$C0/DF3B STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/DF3D JSR $111D  [$C0:111D]   ;[$C0:111D]へジャンプ
+
+$C0/111D LDA #$FF                ;Aに$FFをロード
+$C0/111F STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1121 LDA #$10                ;Aに$10をロード
+$C0/1123 JSR $12CF  [$C0:12CF]   ;[$C0:12CF]へジャンプ
+
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/DF39</span></code>で呼び出した<span class="formula">$34</span>が、最終的に<code>[$00:1D01]</code>に書き込まれており、「LIVE・A・LIVE」のID呼び出しになっている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:1D00]</code></td><td><span class="formula">$10</span></td></tr>
+	<tr><td><code>[$00:1D01]</code></td><td><span class="formula">$34</span></td></tr>
+	<tr><td><code>[$00:1D02]</code></td><td><span class="formula">$FF</span></td></tr>
+</tbody>
+</table>
+
+
+
+<h3>ニューゲーム、またはシナリオ選択画面の「SELECT・A・LIVE」（BGMID<span class="formula">$25</span>）</h3>
+
+
+<p>シナリオ選択画面やメニュー画面のサブルーチンはバンク<span class="formula">$C2</span>に入っているが、メニュー画面から聞ける「LISTENING ROOM」と似た処理があるのでふたつ続けて紹介する。</p>
+
+<div class="code-container"><pre>
+$C2/0726 BCS $06    [$072E]      ;キャリーフラグが立っているとき[$072E]分岐
+$C2/0728 PER $0002  [$072D]      ;PCの値にオペランドとして指定した16bit値を足した値をスタックに積み[$072D]
+$C2/072B JMP ($0532)[$C2:1BAA]   ;[$C2:1BAA]へジャンプ(レジスタをスタックに積まない)
+$C2/1BAA LDA $0A00  [$7E:0A00]   ;Aに[$7E:0A01][$7E:0A00]をロード
+$C2/1BAD CMP #$FF00              ;Aと$FF00を減算比較（ステータスレジスタ変更のみ）
+$C2/1BB0 BEQ $0C    [$1BBE]      ;ゼロフラグが立っているとき[$1BBE]分岐
+$C2/1BB2 LDA #$00FF              ;Aに$00FFをロード
+$C2/1BB5 STA $1D02  [$7E:1D02]   ;Aを[$7E:1D03][$7E:1D02]に書き込み
+$C2/1BB8 LDA #$2514              ;Aに$2514をロード
+$C2/1BBB JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D01][$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/1BAA</span></code>でロードする<code>[$7E:0A00]</code>（<code>[$00:0A00]</code>、バンク<span class="formula">$7E</span>のミラーが<span class="formula">$00</span>）は本来シナリオIDが入るアドレスだが、シナリオ選択画面で各シナリオの主人公キャラの戦闘用スプライトを呼び出すために、<code>[$7E:0A00]</code>に<span class="formula">$00</span>～<span class="formula">$07</span>を書き込んでループ処理する仕組みがある（このため、一時的にバンク<span class="formula">$C1</span>の戦闘用サブルーチンを呼び出している）。<br>
+そのスプライトの呼び出しがすべて終わった状態、つまり<code>[$7E:0A00]</code>に<span class="formula">$07</span>が入った状態で上処理が入る。<br>
+結果、以下のように値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$7E:1D00]</code></td><td><span class="formula">$14</span></td></tr>
+	<tr><td><code>[$7E:1D01]</code></td><td><span class="formula">$25</span></td></tr>
+	<tr><td><code>[$7E:1D02]</code></td><td><span class="formula">$FF</span></td></tr>
+	<tr><td><code>[$7E:1D03]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>BGMID<span class="formula">$25</span>が呼び出され、「SELECT・A・LIVE」が流れる。</p>
+
+
+<h3>LISTENING ROOM</h3>
+
+<p>ここでは例として、LISTENING ROOMが全開放されている状態で、最初に表示される「LIVE・A・LIVE」（BGMID<span class="formula">$34</span>）を選択した場合を紹介する。<br>
+LISTENING ROOMでは、カーソル位置にある曲のBGM関係のデータが、<code><span class="r">$C2/2305</span></code>のMVN転送で、<code>$C2:8Bnn</code>（nnはLISTENING ROOMのページにより変動）から6バイトのデータが<code>$7E:2EB5</code>～<code>$7E:2EBA</code>に書き込まれる処理がある（サブルーチン省略）。<br>
+カーソル位置の曲を選択すると、その中の<code>[$7E:2EB5]</code>が下処理で<code>[$7E:1D01]</code>に書き込まれる仕組み。</p>
+
+<div class="code-container"><pre>
+$C2/2352 LDA #$00FF              ;Aに$00FFをロード
+$C2/2355 STA $1D02  [$7E:1D02]   ;Aを[$7E:1D03][$7E:1D02]に書き込み
+$C2/2358 LDA $2EB5  [$7E:2EB5]   ;Aに[$7E:2EB6][$7E:2EB5]をロード
+$C2/235B AND #$00FF              ;Aと$00FFで論理積
+$C2/235E XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/235F ORA #$0010              ;Aと$0010で論理和
+$C2/2362 JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D01][$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+</pre></div>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$7E:1D00]</code></td><td><span class="formula">$10</span></td></tr>
+	<tr><td><code>[$7E:1D01]</code></td><td><code>[$7E:2EB5]</code></td></tr>
+	<tr><td><code>[$7E:1D02]</code></td><td><span class="formula">$FF</span></td></tr>
+	<tr><td><code>[$7E:1D03]</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+
+<h3>シナリオ開始時</h3>
+
+
+<p>シナリオ開始時を含め、フィールドでBGMを演奏開始する時のサブルーチンは<code><span class="r">$C0/12E7</span></code>～<code><span class="r">$C0/1316</span></code>が共通処理と思われる。<br>
+<code><span class="r">$C0/12E7</span></code>までに、<code>[$00:0030]</code>にBGMIDが書き込まれた上で以下処理になる。</p>
+
+<div class="code-container"><pre>
+$C0/12E7 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/12E8 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12EA CMP $000A68[$00:0A68]   ;Aと[$00:0A68]を減算比較（ステータスレジスタ変更のみ）
+$C0/12EE BNE $06    [$12F6]      ;ゼロフラグが立っていないとき[$12F6]分岐
+$C0/12F6 CMP $000A60[$00:0A60]   ;Aと[$00:0A60]（現在のBGMID）を減算比較（ステータスレジスタ変更のみ）
+$C0/12FA BEQ $25    [$1321]      ;ゼロフラグが立っているとき[$1321]分岐
+$C0/12FC STA $000A60[$00:0A60]   ;Aを[$00:0A60]に書き込み
+$C0/1300 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/1302 BEQ $1D    [$1321]      ;ゼロフラグが立っているとき[$1321]分岐
+$C0/1304 PLA                     ;Aレジスタにスタックからプル
+$C0/1305 LDX #$1D00              ;Xに$1D00をロード
+$C0/1308 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C0/130A LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/130C STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C0/130E LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/1310 STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C0/1312 LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/1314 BNE $0A    [$1320]      ;ゼロフラグが立っていないとき[$1320]分岐
+$C0/1316 JSR $102F  [$C0:102F]   ;[$C0:102F]へジャンプ
+</pre></div>
+
+<p>フィールドでは、<code>[$00:0A60]</code>に現在のBGMIDが入っており、<code><span class="r">$C0/12F6</span></code>～<code><span class="r">$C0/12FC</span></code>の処理は<code>[$00:0030]</code>と現在のBGMIDが同値ならBGMの演奏は行わない（現在のBGMを継続）という処理。<br>
+そうでない場合、<code>[$00:0030]</code>が新たな現在のBGMIDとして<code>[$00:0A60]</code>に入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:1D00]</code></td><td><code><span class="r">$C0/12E7</span></code>の時点の<code>A</code>レジスタの値</td></tr>
+	<tr><td><code>[$00:1D01]</code></td><td><code>[$00:0030]</code></td></tr>
+	<tr><td><code>[$00:1D02]</code></td><td><code>[$00:0031]</code></td></tr>
+</tbody>
+</table>
+
+<p>では、<code>[$00:0030]</code>はどのように計算されているのか。<br>
+これはシナリオによりまったく変わってくるのだが、例えば幕末編なら、冒頭で<span class="formula">$3A</span>（低い効果音のような音）が流れる。</p>
+
+<div class="code-container"><pre>
+$C0/1C2A JMP ($429F,x)[$C0:1D4B] ;[$C0:1D4B]へジャンプ(レジスタをスタックに積まない)
+$C0/1D4B LDA $8E00,y[$7F:9021]   ;Aに[$7F:9021]をロード
+$C0/1D4E STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1D50 LDA #$20                ;Aに$20をロード
+$C0/1D52 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1D54 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1D55 JSR $10D8  [$C0:10D8]   ;[$C0:10D8]へジャンプ
+
+$C0/10D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/10DA STA $000A61[$00:0A61]   ;Aを[$00:0A61]に書き込み
+$C0/10DE LDA #$10                ;Aに$10をロード
+$C0/10E0 JSR $12E7  [$C0:12E7]   ;[$C0:12E7]へジャンプ
+</pre></div>
+
+<p><code>[$7F:9021]</code>にロードしたシナリオ用の値が入っている。<br>
+一方功夫編だと開始直後からBGMID<span class="formula">$14</span>「老拳師下深山」が流れるが、</p>
+
+<div class="code-container"><pre>
+$C0/1C2A JMP ($429F,x)[$C0:1CBC] ;[$C0:1CBC]へジャンプ(レジスタをスタックに積まない)
+$C0/1CBC LDA $8E00,y[$7F:900D]   ;Aに[$7F:900D]をロード
+$C0/1CBF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1CC1 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1CC2 LDA #$FF                ;Aに$FFをロード
+$C0/1CC4 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1CC6 JSR $10D8  [$C0:10D8]   ;[$C0:10D8]へジャンプ
+
+$C0/10D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/10DA STA $000A61[$00:0A61]   ;Aを[$00:0A61]に書き込み
+$C0/10DE LDA #$10                ;Aに$10をロード
+$C0/10E0 JSR $12E7  [$C0:12E7]   ;[$C0:12E7]へジャンプ
+</pre></div>
+
+<p><code>[$7F:900D]</code>が入っている。<br>
+<code>$7F:9000</code>～は、シナリオで固定の値であり、シナリオ進行に関する定数のようなものなので、各シナリオで処理が変わってくる。</p>
+
+
+
+<h3>セーブデータをロード時</h3>
+
+
+<p>セーブデータをロードする場合、セーブデータ内に<code>[$00:0A60]</code>（セーブした時点での現在のフィールドBGMのID）が保存されているため、それを<code>[$00:0030]</code>に書き込んでいる。</p>
+
+<div class="code-container"><pre>
+$C0/06FA LDA $10E7  [$00:10E7]   ;Aに[$00:10E7]をロード
+$C0/06FD BNE $35    [$0734]      ;ゼロフラグが立っていないとき[$0734]分岐
+$C0/06FF LDA $0A60  [$00:0A60]   ;Aに[$00:0A60]をロード
+$C0/0702 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/0704 BEQ $0A    [$0710]      ;ゼロフラグが立っているとき[$0710]分岐
+$C0/0706 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/0708 LDA #$FF                ;Aに$FFをロード
+$C0/070A STA $0A60  [$00:0A60]   ;Aを[$00:0A60]に書き込み
+$C0/070D JSR $10CC  [$C0:10CC]   ;[$C0:10CC]へジャンプ
+
+$C0/10CC LDA $000A61[$00:0A61]   ;Aに[$00:0A61]をロード
+$C0/10D0 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/10D2 LDA #$10                ;Aに$10をロード
+$C0/10D4 JSR $12E7  [$C0:12E7]   ;[$C0:12E7]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/10CC</span></code>～<code><span class="r">$C0/10D4</span></code>の処理は、この後のマップでのBGM切り替え時の処理と兼用。</p>
+
+<h3>フィールド移動時のマップ切り替えでBGMが変わるマップ</h3>
+
+
+<p>マップ切り替え時、切り替え先（移動先）のマップのBGMIDが<code>[$00:0119]</code>に入るのだが、<code>[$00:0119]</code>と、それまでのマップのBGMID<code>[$00:0A60]</code>の値が一致しない場合はマップ切り替えでBGMが変動し、新たなBGMを演奏する処理が入る。<br>
+<code>[$00:0119]</code>の計算は<code><span class="r">$C0/48B0</span></code>～<code><span class="r">$C0/4A47</span></code>の中の<code><span class="r">$C0/49A5</span></code>～<code><span class="r">$C0/49C0</span></code>で行われている。<br>
+サブルーチン冒頭の<code><span class="r">$C0/48B8</span></code>で<code>[$00:0A02]</code>（マップ番号）を呼び出しており、ここから各種パラメータを計算している。<br>
+マップのBGMIDもそうだし、<code><span class="r">$C0/4A47</span></code>の後は<code><span class="r">$CE/D47E</span></code>にジャンプしグラフィックデータの処理が始まるのでマップのグラフィックデータ関係のパラメータも呼び出しているようである。</p>
+
+<p>以下は一例として、最終編でルクレチアの森から力のダンジョンに入った時の処理を紹介する。</p>
+
+<div class="code-container"><pre>
+$C0/48B0 STZ $011C  [$00:011C]   ;[$00:011C]に$00を書き込み
+$C0/48B3 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/48B4 LDA #$7F                ;Aに$7Fをロード
+$C0/48B6 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/48B7 PLB                     ;DBレジスタにスタックからプル
+$C0/48B8 LDA $000A02[$00:0A02]   ;Aに[$00:0A02]（マップ番号）をロード
+$C0/48BC REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+（中略）
+$C0/49A5 LDA $000C,x[$7F:65AF]   ;Aに[$7F:65AF]をロード
+$C0/49A8 AND #$40                ;Aと$40で論理積
+$C0/49AA LSR A                   ;Aを論理右シフト　(/2)
+$C0/49AB LSR A                   ;Aを論理右シフト　(/2)
+$C0/49AC LSR A                   ;Aを論理右シフト　(/2)
+$C0/49AD LSR A                   ;Aを論理右シフト　(/2)
+$C0/49AE ORA $00011A[$00:011A]   ;Aと[$00:011A]で論理和
+$C0/49B2 STA $00011A[$00:011A]   ;Aを[$00:011A]に書き込み
+$C0/49B6 LDA $000F,x[$7F:65B2]   ;Aに[$7F:65B2]をロード
+$C0/49B9 STA $000123[$00:0123]   ;Aを[$00:0123]に書き込み
+$C0/49BD LDA $000E,x[$7F:65B1]   ;Aに[$7F:65B1]をロード
+$C0/49C0 STA $000119[$00:0119]   ;Aを[$00:0119]に書き込み
+（中略）
+$C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/49BD</span></code>で呼び出す<code>[$7F:65B1]</code>が、最終編だと<span class="formula">$3C</span>（BGMID<span class="formula">$3C</span>「Silent Labyrinth」）である。</p>
+
+<p>その後、まず<code><span class="r">$C0/06B5</span></code>～<code><span class="r">$C0/070D</span></code>の処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/06B5 LDA $010F  [$00:010F]   ;Aに[$00:010F]をロード
+$C0/06B8 BNE $25    [$06DF]      ;ゼロフラグが立っていないとき[$06DF]分岐
+$C0/06BA LDA $010E  [$00:010E]   ;Aに[$00:010E]をロード
+$C0/06BD BNE $38    [$06F7]      ;ゼロフラグが立っていないとき[$06F7]分岐
+$C0/06BF LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/06C2 BEQ $0F    [$06D3]      ;ゼロフラグが立っているとき[$06D3]分岐
+;$C0/06C2 ゼロフラグOFF　[$00:0200]が$00以外
+$C0/06C4 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/06C6 BEQ $48    [$0710]      ;ゼロフラグが立っているとき[$0710]分岐
+$C0/06C8 LDA $0A60  [$00:0A60]   ;Aに[$00:0A60]をロード
+$C0/06CB CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/06CD BEQ $41    [$0710]      ;ゼロフラグが立っているとき[$0710]分岐
+$C0/06CF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/06D1 BRA $3A    [$070D]      ;フラグにかかわりなく常に分岐[$070D]
+;$C0/06C2 ゼロフラグON　[$00:0200]が$00
+$C0/06D3 LDA $0A6A  [$00:0A6A]   ;Aに[$00:0A6A]をロード
+$C0/06D6 BNE $38    [$0710]      ;ゼロフラグが立っていないとき[$0710]分岐
+$C0/06D8 LDA $0119  [$00:0119]   ;Aに[$00:0119]をロード
+$C0/06DB STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/06DD BRA $2E    [$070D]      ;フラグにかかわりなく常に分岐[$070D]
+;$C0/06DF～$C0/070A省略
+;処理合流
+$C0/070D JSR $10CC  [$C0:10CC]   ;[$C0:10CC]へジャンプ
+</pre></div>
+
+<p><code>[$00:0200]</code>の値によって分岐するのだが、</p>
+
+<p><code>[$00:0200]</code>が<span class="formula">$00</span>の場合：<br>
+<code>[$00:0119]</code>→<code>[$00:0030]</code></p>
+
+<p><code>[$00:0200]</code>が<span class="formula">$00</span>以外の場合：<br>
+<code>[$00:0A60]</code>→<code>[$00:0030]</code></p>
+
+<p><code>[$00:0200]</code>の値により<code>[$00:0030]</code>に入る値が変わる。<br>
+<code>[$00:0200]</code>が<span class="formula">$00</span>以外だとBGMが変動することがある、らしい。</p>
+
+<p>つまり、<code>[$00:0200]</code>の値は、BGM切り替えの判定に使っていることがわかる。<br>
+ちなみにマップ切り替えだけではなく、メニュー画面切り替え時や、プレイヤーが操作できないイベント中も<span class="formula">$00</span>以外の値が入ることがある（詳細は未調査）<br>
+<code>[$00:0200]</code>自体はBGM切り替えの判定も含め他にも様々な判定に使っている。</p>
+
+<p>なお、<code><span class="r">$C0/06B5</span></code>～<code><span class="r">$C0/070D</span></code>の中には他にも分岐があるが、<code>[$00:0119]</code>→<code>[$00:0030]</code>の処理は<code>[$00:0200]</code>が<span class="formula">$00</span>の場合のみである。</p>
+
+
+<p>その後、<code>[$00:0200]</code>が<span class="formula">$00</span>以外だと以下処理で<code>[$00:0119]</code>が<code>[$00:0030]</code>に入る。</p>
+
+<div class="code-container"><pre>
+$C0/40C8 LDA $0A6A  [$00:0A6A]   ;Aに[$00:0A6A]をロード
+$C0/40CB BNE $0C    [$40D9]      ;ゼロフラグが立っていないとき[$40D9]分岐
+$C0/40CD LDA $0119  [$00:0119]   ;Aに[$00:0119]をロード　$3C	Silent Labyrinth
+$C0/40D0 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/40D2 BEQ $05    [$40D9]      ;ゼロフラグが立っているとき[$40D9]分岐
+$C0/40D4 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/40D6 JSR $10CC  [$C0:10CC]   ;[$C0:10CC]へジャンプ
+</pre></div>
+
+<p>結果として<code>[$00:0200]</code>が何であろうと<code>[$00:0119]</code>→<code>[$00:0030]</code>とコピーするのだが、<code>[$00:0030]</code>が移動前のマップのBGMIDと同一でない場合のみ、BGMが変更されることになる。<br>
+あとはセーブデータのロード時と同じく、<code><span class="r">$C0/10CC</span></code>～<code><span class="r">$C0/10D4</span></code>、<code><span class="r">$C0/12E7</span></code>～と処理が進む。</p>
+
+
+<h3>通常戦闘（シナリオ毎の通常戦闘BGM）</h3>
+
+<p>シナリオ毎の通常戦闘BGMIDは、シナリオ開始時、以下処理で計算されて<code>[$00:10E5]</code>に書き込まれる。<br>
+<code>[$00:10E5]</code>はセーブデータに記録される領域内のアドレスなので、何かしらのシナリオをプレイしている間はずっと同じ値が入っている。</p>
+
+<div class="code-container"><pre>
+$C0/046C LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]（シナリオID）をロード
+$C0/046F TAX                     ;Aの値をXレジスタに転送
+$C0/0470 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/0471 LDA #$C0                ;Aに$C0をロード
+$C0/0473 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/0474 PLB                     ;DBレジスタにスタックからプル
+$C0/0475 LDA $1353,x             ;Aに[$1353,x]をロード
+$C0/0478 PLB                     ;DBレジスタにスタックからプル
+$C0/0479 STA $10E5  [$00:10E5]   ;Aを[$00:10E5]に書き込み
+$C0/047C JSR $119B  [$C0:119B]   ;[$C0:119B]へジャンプ
+</pre></div>
+
+<p>「<span class="formula"><code>$C0:1353</code> + シナリオID</span>」のアドレスに通常戦闘BGMIDが入っている、ということである。</p>
+
+<p>ただし、通常戦闘BGMを使うイベント戦闘の場合は、<code>[$00:10E5]</code>の値をBGMIDとして使うことはない。<br>
+幕末編の場合、雑魚戦であっても、ほとんどの戦闘で戦闘前に会話イベントがあるため、だいたいがイベント戦闘扱いのようである。</p>
+
+<p>シンボルエンカウントでシンボルに接触するとすぐ戦闘になる場合や、ランダムエンカウント時には以下処理でシナリオ毎の通常戦闘BGMIDが読み込まれる。</p>
+
+<div class="code-container"><pre>
+$C0/1B7B LDA #$01                ;Aに$01をロード
+$C0/1B7D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/1B80 STZ $0214  [$00:0214]   ;[$00:0214]に$00を書き込み
+$C0/1B83 STZ $021A  [$00:021A]   ;[$00:021A]に$00を書き込み
+$C0/1B86 STZ $0202  [$00:0202]   ;[$00:0202]に$00を書き込み
+$C0/1B89 STZ $0203  [$00:0203]   ;[$00:0203]に$00を書き込み
+;（中略）
+$C0/31A6 LDA $0010E5[$00:10E5]   ;Aに[$00:10E5]をロード
+$C0/31AA STA $44    [$00:0044]   ;Aを[$00:0044]に書き込み
+$C0/31AC PHY                     ;Yレジスタをスタックへプッシュ
+$C0/31AD PHB                     ;DBレジスタをスタックにプッシュ
+$C0/31AE LDA #$00                ;Aに$00をロード
+$C0/31B0 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/31B1 PLB                     ;DBレジスタにスタックからプル
+$C0/31B2 JSR $181B  [$C0:181B]   ;[$C0:181B]へジャンプ
+</pre></div>
+
+<p>まず<code><span class="r">$C0/31A6</span></code>～<code><span class="r">$C0/31AA</span></code>で、<code>[$00:10E5]</code>が<code>[$00:0044]</code>にコピーされる。</p>
+
+<div class="code-container"><pre>
+$C1/12C8 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード
+$C1/12CB CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/12CD BNE $01    [$12D0]      ;ゼロフラグが立っていないとき[$12D0]分岐
+$C1/12D0 LDA $0044  [$00:0044]   ;Aに[$00:0044]（通常戦闘BGMID）をロード
+$C1/12D3 BNE $29    [$12FE]      ;ゼロフラグが立っていないとき[$12FE]分岐
+$C1/12FE STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/1300 LDA $AA    [$00:03AA]   ;Aに[$00:03AA]をロード
+$C1/1302 BEQ $04    [$1308]      ;ゼロフラグが立っているとき[$1308]分岐
+$C1/1308 LDA #$86                ;Aに$86をロード
+$C1/130A STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/130D LDA #$00                ;Aに$00をロード
+$C1/130F STA $1D01  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C1/1312 STA $1D02  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C1/1315 JSR $11D8  [$C1:11D8]   ;[$C1:11D8]へジャンプ
+</pre></div>
+
+<p>更に、<code>[$00:0044]</code>→<code>[$00:0310]</code>とコピーされる。<br>
+このタイミングで<code>[$00:1D01]</code>に<span class="formula">$00</span>が入るのは戦闘突入時の効果音が終わるため。</p>
+
+<div class="code-container"><pre>
+$C1/1342 LDA #$14                ;Aに$14をロード
+$C1/1344 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/1347 LDA $10    [$00:0310]   ;Aに[$00:0310]（通常戦闘BGMID）をロード
+$C1/1349 AND #$7F                ;Aと$7Fで論理積
+$C1/134B STA $1D01  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C1/134E LDA #$FF                ;Aに$FFをロード
+$C1/1350 STA $1D02  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C1/1353 JSR $11D8  [$C1:11D8]   ;[$C1:11D8]へジャンプ
+
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+</pre></div>
+
+<p>最終的に<span class="formula"><code>[$00:0310]</code> &amp; $7F</span>が<code>[$00:1D01]</code>に入る。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:1D00]</code></td><td><span class="formula">$14</span></td></tr>
+	<tr><td><code>[$00:1D01]</code></td><td><span class="formula"><code>[$00:0310]</code> &amp; $7F</span>（通常戦闘BGMID）</td></tr>
+	<tr><td><code>[$00:1D02]</code></td><td><span class="formula">$FF</span></td></tr>
+</tbody>
+</table>
+
+<p>BGMIDは<span class="formula">$4D</span>以下にしかBGMが入っていないので、<span class="formula">$7F</span>(<span class="formula">%0111 1111</span>)と論理積を取る意味がなさそうに思えるが、実際にはこの後に紹介するイベント戦闘で関係してくる。</p>
+
+
+<h3>イベント戦闘・ボス戦</h3>
+
+<p>イベント戦闘は通常戦闘BGMが流れる・流れないに関わらず、以下処理で戦闘BGMIDが計算されている。</p>
+
+<div class="code-container"><pre>
+$C0/30C5 LDA $8E00,y             ;Aに[$8E00,y]をロード
+$C0/30C8 STA $40    [$00:0040]   ;Aを[$00:0040]に書き込み
+$C0/30CA LDA #$01                ;Aに$01をロード
+$C0/30CC STA $43    [$00:0043]   ;Aを[$00:0043]に書き込み
+$C0/30CE LDA $8E01,y             ;Aに[$8E01,y]をロード
+$C0/30D1 STA $44    [$00:0044]   ;Aを[$00:0044]に書き込み
+$C0/30D3 INY                     ;Yをインクリメント +1
+$C0/30D4 INY                     ;Yをインクリメント +1
+$C0/30D5 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/30D6 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/30D7 LDA #$00                ;Aに$00をロード
+$C0/30D9 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/30DA PLB                     ;DBレジスタにスタックからプル
+$C0/30DB JSR $181B  [$C0:181B]   ;[$C0:181B]へジャンプ
+</pre></div>
+
+<p>以上で計算された<code>[$00:0044]</code>が、通常戦闘BGMと同じく、</p>
+
+<p><code>[$00:0044]</code>→<code>[$00:0310]</code>→<span class="formula"><code>[$00:0310]</code> &amp; $7F</span>が<code>[$00:1D01]</code>に入る</p>
+
+<p>となる。<br>
+<code>[$00:0044]</code>は<code>[$8E01,y]</code>で、バンク<span class="formula">$7F</span>の何かしらの値になるが、各シナリオの進行度合いなどフラグで決まる値なので割愛。</p>
+
+<p>例えばブリキ大王を操作しての戦闘（近未来編ラストバトル除く）だと、</p>
+
+<div class="code-container"><pre>
+$C0/30C5 LDA $8E00,y[$7F:D664]   ;Aに[$7F:D664]をロード
+$C0/30C8 STA $40    [$00:0040]   ;Aを[$00:0040]に書き込み
+$C0/30CA LDA #$01                ;Aに$01をロード
+$C0/30CC STA $43    [$00:0043]   ;Aを[$00:0043]に書き込み
+$C0/30CE LDA $8E01,y[$7F:D665]   ;Aに[$7F:D665]をロード
+$C0/30D1 STA $44    [$00:0044]   ;Aを[$00:0044]に書き込み
+$C0/30D3 INY                     ;Yをインクリメント +1
+$C0/30D4 INY                     ;Yをインクリメント +1
+$C0/30D5 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/30D6 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/30D7 LDA #$00                ;Aに$00をロード
+$C0/30D9 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/30DA PLB                     ;DBレジスタにスタックからプル
+$C0/30DB JSR $181B  [$C0:181B]   ;[$C0:181B]へジャンプ
+</pre></div>
+
+<p><code>[$7F:D665]</code>(<span class="formula">$98</span>)が<code>[$00:0044]</code>に入る。<br>
+<span class="formula">$98</span>はBGMIDには存在しないが、最終的に<code>[$00:0310]</code> &amp; <span class="formula">$7F</span>を計算すると<span class="formula">$98 &amp; $7F = $18</span>（GO!GO!ブリキ大王!!）である。</p>
+
+<p>ＳＦ編ラストバトルなら、<code>[$00:0044]</code>にＳＦ編での<code>[$7F:DF72]</code>(<span class="formula">$2B</span>)が入って、そのままBGMID<span class="formula">$2B</span>「MEGALOMANIA」が呼び出される。<br>
+幕末編の5忍者戦だと、幕末編の<code>[$7F:AAEE]</code>(<span class="formula">$05</span>)が入って、通常戦闘BGMの「殺陣！」が呼び出される。通常戦闘BGMIDが入っている<code>[$00:10E5]</code>は関係ない。</p>
+
+<p>BGMIDを指定する特殊な戦闘は、最終編のオディオアイ・オディオマウス・オディオモール戦、そして戦闘途中でBGMが切り替わって開始になるピュアオディオ戦である。<br>
+<a href="program33.html">オディオ戦の解説</a>も参照していただきたい。</p>
+
+<h5>オディオ戦（開始時）</h5>
+<br>
+<div class="code-container"><pre>
+$C1/833C LDA $50    [$00:0350]   ;Aに[$00:0350]をロード
+$C1/833E CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C1/8340 BNE $03    [$8345]      ;ゼロフラグが立っていないとき[$8345]分岐
+$C1/8342 BRL $FB59  [$7E9E]      ;フラグにかかわりなく常に分岐[$7E9E]
+$C1/7E9E LDA #$4B                ;Aに$4Bをロード（BGMID$4B「ILLUSION…」）
+$C1/7EA0 JSR $12FE  [$C1:12FE]   ;[$C1:12FE]へジャンプ
+
+$C1/12FE STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+（中略）
+$C1/1353 JSR $11D8  [$C1:11D8]   ;[$C1:11D8]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/7E9E</span></code>以降で、<span class="formula">$4B</span>が<code>[$00:0310]</code>に直接書き込まれ、後は<code><span class="r">$C1/1342</span></code>以降で共通処理である。</p>
+
+
+<h5>オディオ戦（ピュアオディオ移行）</h5>
+<br>
+<div class="code-container"><pre>
+$C1/7BDE LDA #$1C                ;Aに$1Cをロード（BGMID$1C「PURE ODIO」）
+$C1/7BE0 JSR $12FE  [$C1:12FE]   ;[$C1:12FE]へジャンプ
+
+$C1/12FE STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+（中略）
+$C1/1353 JSR $11D8  [$C1:11D8]   ;[$C1:11D8]へジャンプ
+</pre></div>
+
+<p>ピュアオディオ出現時には<code><span class="r">$C1/7BDE</span></code>以降で、<span class="formula">$1C</span><code>[$00:0310]</code>に直接書き込まれ、後は<code><span class="r">$C1/1342</span></code>以降で共通処理。</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="sound1.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<!--  <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

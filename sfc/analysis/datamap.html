@@ -201,6 +201,13 @@ table {
 		<li><a href="mode7.html">背景拡大縮小回転</a></li>
 	</ul>
 </li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの再生</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+	</ul>
+</li>
 </ul>
 </nav>
 </div>
@@ -324,6 +331,7 @@ table {
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:712A</code>～<code>$C2:7133</code></td><td>メニュー画面コマンドの半透明位置を指定するHDMAテーブルの値</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:73C8</code>～<code>$C2:7407</code></td><td>GDMA転送用 I/Oポート定数</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:7438</code>～<code>$C2:7453</code></td><td>メニュー画面のセリフ吹き出し形状のBGマップデータ</td></tr>
+	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:8B2B</code>～<code>$C2:8BC0</code></td><td>メニュー画面 LISTENING ROOMのBGMIDなどのリスト</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:9380</code>～<code>$C2:A695</code></td><td>メニュー画面、セーブ・ロード画面、シナリオ選択画面、名前入力画面、現代編関係のテキストデータ</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:D2A0</code>～<code>$C2:D49F</code></td><td>メニュー画面のセリフ吹き出し部分画像</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:D4A0</code>～<code>$C2:D5BF</code></td><td>メニュー画面のコマンド枠画像</td></tr>
@@ -416,6 +424,8 @@ table {
 	<tr><td><code>$C0:00FC</code>～<code>$C0:01CB</code></td><td>リセット時初期処理　画像関係（PPU)<code>$00:2100</code>～<code>$00:2133</code>及び<code>$00:4200</code>～<code>$00:420D</code>、<code>$00:4016</code>、<code>$00:4200</code>の初期化</td></tr>
 	<tr><td><code>$C0:0308</code>～<code>$C0:032C</code></td><td>セーブデータからのセーブ用データ解凍（<code>$00:13xx</code>用）</td></tr>
 	<tr><td><code>$C0:03EF</code>～<code>$C0:047C</code></td><td>シナリオ開始時処理　<code>$00:0A??</code>の初期化、シナリオIDから<code>[$00:10E5]</code>に通常戦闘BGMのID書き込み</td></tr>
+	<tr><td><code>$C0:06B5</code>～<code>$C0:070D</code></td><td><code>[$00:0200]</code>の値により、<code>[$00:0119]</code>か<code>[$00:0A60]</code>の値をBGMIDとして<code>[$00:0030]</code>に書き込み</td></tr>
+	<tr><td><code>$C0:06FA</code>～<code>$C0:070D</code></td><td>セーブデータをロードする時、セーブ時のBGMID<code>[$00:0A60]</code>を<code>[$00:0030]</code>に書き込んでサウンド処理<code>$C0/10CC</code>へ</td></tr>
 	<tr><td><code>$C0:0CAC</code>～<code>$C0:0DC2</code></td><td>マップ上移動速度<code>[$00:01AE]</code>から<code>[$00:0A38]</code>～<code>[$00:0A3F]</code>計算（BG1・BG2の水平/垂直スクロール量用）</td></tr>
 	<tr><td><code>$C0:0EDC</code>～<code>$C0:0F7C</code></td><td>タイトル画面の初期設定</td></tr>
 	<tr><td><code>$C0:0E1A</code>～<code>$C0:0ED7</code></td><td>マップ切り替え時などにウィンドウ関係のI/Oレジスタ<code>$00:21??</code>に初期値書き込み</td></tr>
@@ -423,17 +433,27 @@ table {
 	<tr><td><code>$C0:0F80</code>～<code>$C0:0FB0</code></td><td>BGモードをMode7（背景の回転・拡大・縮小モード）に変更</td></tr>
 	<tr><td><code>$C0:1051</code>～<code>$C0:1069</code></td><td><code>[$00:4200]</code>に<span class="formula">$81</span>を書き込んでNMI割り込みと自動ジョイパッド読み取り機能をONにする</td></tr>
 	<tr><td><code>$C0:106A</code>～<code>$C0:1074</code></td><td><code>[$00:4200]</code>に<span class="formula">$01</span>を書き込んで自動ジョイパッド読み取り機能をONにする</td></tr>
+	<tr><td><code>$C0:10CC</code>～<code>$C0:10D4</code></td><td><code>[$00:0031]</code>を<code>[$00:0A61]</code>に書き込み、<code>A</code>に$10をロードして、サウンド処理<code>$C0/12E7</code>へジャンプ</td></tr>
+	<tr><td><code>$C0:10D8</code>～<code>$C0:10E0</code></td><td><code>[$00:0031]</code>を<code>[$00:0A61]</code>に書き込み、<code>A</code>に$10をロードして、サウンド処理<code>$C0/12E7</code>へジャンプ</td></tr>
+	<tr><td><code>$C0:111D</code>～<code>$C0:1123</code></td><td><code>[$00:0031]</code>に<span class="formula">$FF</span>、<code>A</code>に<span class="formula">$10</span>をロードして<code>$C0/12CF</code>にジャンプ（<code>[$00:1D00]</code>に<span class="formula">$10</span>書き込み）</td></tr>
 	<tr><td><code>$C0:1183</code>～<code>$C0:12E6</code></td><td><code>[$00:0031]</code><code>[$00:0A63]</code>に<span class="formula">$80</span>を書き込み、<code>[$00:1D00]</code>に<span class="formula">$18</span>、<code>[$00:1D01]</code>に<code>[$00:0030]</code>、<code>[$00:1D02]</code>に<span class="formula">$80</span>を書き込んでサウンド<code>$C3/0004</code>～<code>$C3/017F処理</code></td></tr>
+	<tr><td><code>$C0:12CF</code>～<code>$C0:12E2</code></td><td><code>$00:1D00</code>～<code>$00:1D02</code>を書き込んでサウンド処理<code>$C3/0004</code>にジャンプ</td></tr>
+	<tr><td><code>$C0:12E7</code>～<code>$C0:1316</code></td><td><code>[$00:0030]</code>にロードされたBGMIDを<code>[$00:0A60]</code>に書き込み</td></tr>
 	<tr><td><code>$C0:1A69</code>～<code>$C0:1ADB</code></td><td>マップタイマーのカウントダウン計算</td></tr>
+	<tr><td><code>$C0:1D4B</code>～<code>$C0:1D55</code></td><td>BGMIDをロードして<code>[$00:0030]</code>に書き込み</td></tr>
 	<tr><td><code>$C0:24D3</code>～<code>$C0:2546</code></td><td>功夫編ラストバトル前に弟子のデータをシナリオ別キャラデータにコピー</td></tr>
 	<tr><td><code>$C0:263E</code>～<code>$C0:266B</code></td><td>カウントアップ処理</td></tr>
 	<tr><td><code>$C0:302B</code>～<code>$C0:304D</code></td><td>固定色の輝度<code>[$00:0A04]</code>～<code>[$00:0A07]</code>を設定</td></tr>
+	<tr><td><code>$C0:30C5</code>～<code>$C0:30DB</code></td><td>イベント戦闘時のサウンドデータを<code>[$00:0043]</code>, <code>[$00:0044]</code>に書き込み</td></tr>
 	<tr><td><code>$C0:31A0</code>～<code>$C0:31B2</code></td><td>戦闘前処理 <code>[$00:0040]</code>に<span class="formula">$03</span>、<code>[$00:0043]</code>に<span class="formula">$00</span>、<code>[$00:0044]</code>に<code>[$00:10E5]</code>（シナリオの通常戦闘BGMID）を書き込み<code>$C0:181B</code>にジャンプ</td></tr>
 	<tr><td><code>$C0:328A</code>～<code>$C0:32AF</code></td><td>マップタイマー初期値読み込み</td></tr>
 	<tr><td><code>$C0:378F</code>～<code>$C0:37BE</code></td><td>マップでの乱数イベント関連（戦闘中のテレポート飛び先判定も含む）</td></tr>
 	<tr><td><code>$C0:37D8</code>～<code>$C0:3806</code></td><td>持ち物一覧を開いて何かのアイテムを選ぶことで進行するイベント</td></tr>
+	<tr><td><code>$C0:40C8</code>～<code>$C0:40D6</code></td><td><code>[$00:0119]</code>の値をBGMIDとして<code>[$00:0030]</code>に書き込み</td></tr>
 	<tr><td><code>$C0:47E8</code>～<code>$C0:482C</code></td><td>アイテム取得時に持ち物欄の空欄に該当アイテムを入れ個数を<span class="formula">+1</span>する、または既に所持しているなら該当アイテムの個数を+1する処理</td></tr>
 	<tr><td><code>$C0:4839</code>～<code>$C0:4853</code></td><td>アイテム使用時に持ち物欄から指定アイテム個数を<span class="formula">-1</span>する処理</td></tr>
+	<tr><td><code>$C0:48B0</code>～<code>$C0:4A47</code></td><td>マップ移動時　<code>[$00:0A02]</code>（マップ番号）からマップのグラフィックデータやBGMID計算など</td></tr>
+	
 	<tr><td><code>$C0:4A4B</code>～<code>$C0:4B6D</code></td><td>バンク<code>$7F</code>のアドレス<code>$2800</code>→<code>$3800</code>コピー、<code>$7F:2000～2FFF</code>を<code>$00</code>で初期化</td></tr>
 	<tr><td><code>$C0:4D17</code>～<code>$C0:4D9C</code></td><td>バンク<code>$DE</code>からバンク<code>$7E</code>にタイル（画像）のデータコピー</td></tr>
 	<tr><td><code>$C0:4D9F</code>～<code>$C0:4EE1</code></td><td>スプライトのデータをVRAMへGDMA転送</td></tr>
@@ -485,6 +505,7 @@ table {
 	<tr><td><code>$C0:D6E2</code>～<code>$C0:D6DF</code></td><td>三角関数表の乗算処理から値を更新</td></tr>
 	<tr><td><code>$C0:D721</code>～<code>$C0:D829</code></td><td>ラスタースクロール用HDMAチャネル3, 4, 5設定</td></tr>
 	<tr><td><code>$C0:D9DC</code>～<code>$C0:DAC9</code></td><td>ラスタースクロール用HDMA転送の前準備＋HDMA転送開始処理</td></tr>
+	<tr><td><code>$C0:DACA</code>～<code>$C0:DC74</code></td><td>オープニングデモ前半 画面全体にロゴの文字が出て各シナリオの一場面が流れるシーン
 	<tr><td><code>$C0:DCD1</code>～<code>$C0:DFA7</code></td><td>デモ画面用BGMode7</td></tr>
 	<tr><td><code>$C0:E017</code>～<code>$C0:E02F</code></td><td>タイトル画面の初期設定（メインスクリーン指定、画面サイズ、多重スクロール位置計算値）</td></tr>
 	<tr><td><code>$C0:E083</code>～<code>$C0:E08D</code></td><td>タイトル画面のHDMA転送開始</td></tr>
@@ -500,7 +521,7 @@ table {
 	<tr><td><code>$C0:F37D</code>～<code>$C0:F38F</code></td><td>キャプテンスクウェア用BGMode7 <code>[$00:02A1]</code>～<code>[$00:02A6]</code>に初期値を書き込み</td></tr>
 	<tr><td><code>$C0:F392</code>～<code>$C0:F39A</code></td><td>キャプテンスクウェア用BGMode7の表示開始 <code>[$00:212C]</code>（メインスクリーン指定）に<span class="formula">$11</span>を書き込みBG1とOBJを表示させる</td></tr>
 	<tr><td><code>$C0:F39D</code>～<code>$C0:F3A7</code></td><td>キャプテンスクウェア用BGMode7用の座標計算値<code>[$00:210D]</code>書き込み</td></tr>
-	<tr><td><code>$C0:F3AA</code>～<code>$C0:F3B7</code></td><td>キャプテンスクウェア用BGMode7 <code>[$00:02A5]</code>～<code>[$00:02A6]<code>、</code>[$00:0030]<code>～</code>[$00:0033]<code>初期化</code></td></tr>
+	<tr><td><code>$C0:F3AA</code>～<code>$C0:F3B7</code></td><td>キャプテンスクウェア用BGMode7 <code>[$00:02A5]</code>～<code>[$00:02A6]</code>、<code>[$00:0030]</code>～<code>[$00:0033]</code>初期化</td></tr>
 	<tr><td><code>$C0:F3BA</code>～<code>$C0:F3CD</code></td><td>キャプテンスクウェア用BGMode7 <code>[$00:0030]</code>～<code>[$00:0033]</code>から<code>[$00:02A0]</code>～<code>[$00:02A3]</code>更新</td></tr>
 	<tr><td><code>$C0:F3D0</code>～<code>$C0:F430</code></td><td>キャプテンスクウェア用BGMode7 <code>[$00:02An]</code>更新ループ処理</td></tr>
 	<tr><td><code>$C0:F439</code>～<code>$C0:F467</code></td><td>キャプテンスクウェア用BGMode7 拡大縮小回転中心座標決定その2</td></tr>
@@ -590,7 +611,7 @@ table {
 	<tr><td><code>$C1:21E1</code>～<code>$C1:21ED</code></td><td>味方キャラ 力・速・体・知の復元</td></tr>
 	<tr><td><code>$C1:2239</code>～<code>$C1:227B</code></td><td>中世編ラストバトル　ストレイボウのステータス判定</td></tr>
 	<tr><td><code>$C1:230E</code>～<code>$C1:234F</code></td><td>功夫編修行 修行場所によるステータスアップ処理</td></tr>
-	<tr><td><code>$C1:2363</code>～<code>$C1:243D</code></td><td>戦闘終了時 取得経験値計算</td></tr></td></tr>
+	<tr><td><code>$C1:2363</code>～<code>$C1:243D</code></td><td>戦闘終了時 取得経験値計算</td></tr>
 	<tr><td><code>$C1:2451</code>～<code>$C1:2476</code></td><td>レベルアップ時のHPアップ処理</td></tr>
 	<tr><td><code>$C1:248B</code>～<code>$C1:24C5</code></td><td>レベルアップ時の力・速・体・知アップ処理</td></tr>
 	<tr><td><code>$C1:24C8</code>～<code>$C1:253E</code></td><td>レベルアップ時の技習得処理</td></tr>
@@ -912,6 +933,9 @@ table {
 	<tr><td><code>$C2:08A0</code>～<code>$C2:08A7</code></td><td>メニュー画面用・コマンド判定</td></tr>
 	<tr><td><code>$C2:091E</code>～<code>$C2:0971</code></td><td>隊形・キャラ入れ替えのキャラ選択状態・空欄判定</td></tr>
 	<tr><td><code>$C2:0BB9</code>～<code>$C2:0C15</code></td><td>メニュー画面用・カーソル位置をAボタンで選択～もう一か所をカーソル位置指定しAボタンで選択して入れ替え</td></tr>
+	<tr><td><code>$C2:1BAA</code>～<code>$C2:1BBB</code></td><td><code>[$7E:1D03]</code><code>[$7E:1D02]</code>に<span class="formula">$00FF</span>、<code>A</code>に<span class="formula">$2514</span>をロードして<code>$C2/3CAC</code>にジャンプ（シナリオ選択画面で「SELECT・A・LIVE」を流す前処理）</td></tr>
+	<tr><td><code>$C2:22E8</code>～<code>$C2:232A</code></td><td>LISTENING ROOMでカーソル位置にある曲のBGM関係のデータ6バイトを<code>$7E:2EB5</code>～<code>$7E:2EBA</code>に書き込み</td></tr>
+	<tr><td><code>$C2:2352</code>～<code>$C2:2362</code></td><td>LISTENING ROOMでカーソル位置のBGMIDを<code>A</code>にロード</td></tr>
 	<tr><td><code>$C2:2DBC</code>～<code>$C2:2DCA</code></td><td><code>$7E:A000</code>～<code>$7E:BBFE</code>の初期化（<span class="formula">$00</span>で埋める）</td></tr>
 	<tr><td><code>$C2:2DCB</code>～<code>$C2:2E6B</code></td><td>キャラ名などテキストデータを<code>$7E:2000</code>～から<code>$00:05xx</code>～にコピー</td></tr>
 	<tr><td><code>$C2:2F16</code>～<code>$C2:2FA4</code></td><td>BG3の<code>$00:05xx</code>～のデータをタイルデータの配置に合わせて分割、<code>$7E:A5C0</code>～<code>$7E:BA1F</code>にコピー</td></tr>
@@ -939,6 +963,7 @@ table {
 	<tr><td><code>$C2:35F5</code>～<code>$C2:360E</code></td><td>BGマップ4バイト転送</td></tr>
 	<tr><td><code>$C2:3620</code>～<code>$C2:3665</code></td><td>BGマップ反転処理</td></tr>
 	<tr><td><code>$C2:3966</code>～<code>$C2:398C</code></td><td>各シナリオの主人公（＋最終編で功夫編主人公になるユン、レイ、サモ）の、フィールドの16×16サイズスプライトをVRAMアドレス<code>$A400</code>～<code>$BBFF</code>にGDMA転送</td></tr>
+	<tr><td><code>$C2:3CAC</code>～<code>$C2:3CAF</code></td><td><code>A</code>を<code>[$7E:1D01]</code><code>[$7E:1D00]</code>に書き込んでサウンド処理<code>$C3/0004</code>にジャンプ</td></tr>
 	<tr><td><code>$C2:3CB4</code>～<code>$C2:3CCE</code></td><td>セーブデータからのロード</td></tr>
 	<tr><td><code>$C2:3D4D</code>～<code>$C2:3D98</code></td><td>セーブデータへのセーブ</td></tr>
 	<tr><td><code>$C2:42D9</code>～<code>$C2:43B5</code></td><td>指定テキストを<code>$7E:2000</code>～にロードする</td></tr>
@@ -990,10 +1015,13 @@ table {
 	<tr><td><code>$C3:0131</code>～<code>$C3:017F</code></td><td>サウンドデータ転送判定</td></tr>
 	<tr><td><code>$C3:0180</code>～<code>$C3:01C2</code></td><td>戦闘BGMデータ読み込み前に<code>[$00:1D00]</code>と<code>[$00:1D01]</code>処理</td></tr>
 	<tr><td><code>$C3:01C5</code>～<code>$C3:02E4</code></td><td><code>$00:1D10</code>～<code>$00:1E3F</code>に値設定</td></tr>
-	<tr><td><code>$C3:0311</code>～<code>$C3:031A</code></td><td><code>A</code>を<code>[$00:1D1E]</code>に書き込み, <code>Y</code>を<span class="formula">+2</span>, <code>Y</code>が<span class="formula">$0040</span>でなければ<code>$C3/02C1</code>にジャンプ</td></tr>
-	<tr><td><code>$C3:031C</code>～<code>$C3:036A</code></td><td><code>[$C33FC9,x]</code>～<code>[$C33FC9,x+2]</code>を<code>[$00:1D10]</code>～<code>[$00:1D12]</code>に書き込み<br><span class="formula">x = (<code>[$00:1D2E]</code>-1)*3</span></td></tr>
+	<tr><td><code>$C3:01DA</code>～<code>$C3:01E2</code></td><td>演奏曲に使用する音波形データIDを<code>$00:1E00</code>～<code>$00:1E1F</code>に書き込み＆ARAMと被っていない音波形データIDをチェック</td></tr>
+	<tr><td><code>$C3:02C1</code>～<code>$C3:02D4</code></td><td>音波形データIDの値が<span class="formula">$00</span>ではないかチェック</td></tr>
+	<tr><td><code>$C3:0311</code>～<code>$C3:031A</code></td><td>音波形データの開始アドレス計算 <code>A</code>を<code>[$00:1D1E]</code>に書き込み, <code>Y</code>を<span class="formula">+2</span>, <code>Y</code>が<span class="formula">$0040</span>でなければ<code>$C3/02C1</code>にジャンプ</td></tr>
+	<tr><td><code>$C3:031C</code>～<code>$C3:036A</code></td><td>音波形データの開始アドレス計算 <code>[$C33FC9,x]</code>～<code>[$C33FC9,x+2]</code>を<code>[$00:1D10]</code>～<code>[$00:1D12]</code>に書き込み<br><span class="formula">x = (<code>[$00:1D2E]</code>-1)*3</span></td></tr>
 	<tr><td><code>$C3:037A</code>～<code>$C3:03DF</code></td><td><code>[$00:1DAE]</code>を<code>[$00:2142]</code>、<br><code>[$00:1DAF]</code>を<code>[$00:2143]</code>、<br><span class="formula">$03</span>を<code>[$00:2141]</code>、<br><code>[$00:1D1E]</code>を<code>[$00:2140]</code>に書き込みARAM転送<br><code>[$10],y</code>以降を<code>[$00:1D1C]</code><code>[$00:1D1D]</code><code>[$00:2141]</code><code>[$00:2142]</code><code>[$00:2143]</code>に書き込み<br><span class="formula">y</span>は<code>$C3/031C</code>～<code>$C3/036A</code>で計算した<code>[$C33FC9,x]</code><code>[$C33FC9,x+1]</code></td></tr>
 	<tr><td><code>$C3:03E2</code>～<code>$C3:03DF</code></td><td>サウンドデータサイズを<code>$00:2141</code>に、転送先アドレスを<code>$00:2143</code>～<code>$00:2142</code>に書き込み</td></tr>
+	<tr><td><code>$C3:04F1</code>～<code>$C3:0587</code></td><td>楽譜データの開始アドレス計算</td></tr>
 	<tr><td><code>$C3:062F</code>～<code>$C3:064F</code></td><td><code>[$00:1D00]</code>が<span class="formula">$14</span>以上の時、<span class="formula">$04</span>と<code>[$00:1D00]</code>で論理和を取って<code>[$00:1D00]</code>に書き込み</td></tr>
 	<tr><td><code>$C3:06BD</code>～<code>$C3:06CC</code></td><td><code>A</code>を<code>[$00:2140]</code>に書き込みARAMにデータ転送</td></tr>
 	<tr><td><code>$C3:06CD</code>～<code>$C3:06F2</code></td><td><code>[$00:1D02]</code>を<code>[$00:2142]</code>、<code>[$00:1D01]</code>を<code>[$00:2141]</code>、<code>[$00:1D00]</code>を<code>[$00:2140]</code>に書き込み<code>[$00:2140]</code>をロードしてARAM転送待ち、<code>A</code>と<span class="formula">$7F</span>で論理積をとって<code>[$00:1D1E]</code>に書き込み</td></tr>
