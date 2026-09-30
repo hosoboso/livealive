@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; シーケンスデータ">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; シーケンスデータ">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; シーケンスデータ</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+
+.fit-picture {
+  width: 30px;
+  height: 50px;
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="here"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの再生</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; シーケンスデータ</h1>
+<h2>シーケンスデータ</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><span class="tri"><a href="sound.html">サウンドについて</a></span>及び、<span class="tri"><a href="sounddata.html">サウンドデータ</a></span>も参照のこと。</p>
+
+<p>このページには、シーケンスデータ（BGM・効果音の楽譜データ）における、シーケンスデータの構造と、シーケンスコマンドの一覧・説明を掲載している。<br>
+調査過程や実際のシーケンスデータの例などは<span class="tri"><a href="sound3.html">シーケンスデータ調査</a></span>にあるので合わせて参照していただきたい。</p>
+
+<div id="captiondata"></div>
+
+
+<h3>シーケンスデータの構造</h3>
+
+<p><a href="sounddata.html#BGMlist_2">BGM用 シーケンスデータ一覧</a>も参照のこと。</p>
+
+<p>シーケンスデータは、BGMだとバンク<code>$C5</code>・<code>$C6</code>に格納されていて、演奏時にARAMのアドレス<code>$1C00</code>～に転送される。<br>
+曲によりシーケンスデータ量は変動するが、ARAMのアドレス<code>$1C00</code>～<code>$2BFF</code>がBGM用シーケンスデータ領域なので、サイズは<span class="formula">$1000</span>バイト以下でなければならない。<br>
+ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用シーケンスデータの領域であり、タイトル画面をロードした時点で書き込まれている。<br>
+だが、エンディング曲の「Live for Live」だけ容量が<span class="formula">$2AB7</span>バイトで、サイズが<span class="formula">$1000</span>バイトを越えている。<br>
+この場合どうなるかというと、ARAMのアドレス<code>$1C00</code>を転送開始位置として、ARAMのアドレス<code>$2C00</code>を越えて上書きする。<br>
+「Live for Live」の後は各キャラの効果音を鳴らして終了となりタイトル画面に戻るため、効果音関係のデータを上書きしても問題ないようである。</p>
+
+<p>シーケンスデータはヘッダ部分とシーケンスコマンド部分に分かれる。<br>
+ヘッダはすべて2バイトのデータ。<br>
+バンク<span class="formula">$C5</span>・<span class="formula">$C6</span>に格納されている時は最初に2バイト分、容量を記したデータがついているが、ARAMアドレス<code>$1C00</code>～に転送されるのは下表の<span class="formula">$02</span>以降なので、ARAMでのヘッダは<span class="formula">$24</span>バイト（<span class="formula">36</span>バイト）。</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span>～<span class="formula">$01</span></td><td>容量</td></tr>
+	<tr><td><span class="formula">$02</span>～<span class="formula">$03</span></td><td>シーケンスコマンド開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$04</span>～<span class="formula">$05</span></td><td>シーケンスコマンド終了位置アドレス</td></tr>
+	<tr><td><span class="formula">$06</span>～<span class="formula">$07</span></td><td>チャネル0開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$08</span>～<span class="formula">$09</span></td><td>チャネル1開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$0A</span>～<span class="formula">$0B</span></td><td>チャネル2開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$0C</span>～<span class="formula">$0D</span></td><td>チャネル3開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$0E</span>～<span class="formula">$0F</span></td><td>チャネル4開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$00</span>～<span class="formula">$11</span></td><td>チャネル5開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$12</span>～<span class="formula">$13</span></td><td>チャネル6開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$14</span>～<span class="formula">$15</span></td><td>チャネル7開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$16</span>～<span class="formula">$17</span></td><td>チャネル0開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$18</span>～<span class="formula">$19</span></td><td>チャネル1開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$1A</span>～<span class="formula">$1B</span></td><td>チャネル2開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$1C</span>～<span class="formula">$1D</span></td><td>チャネル3開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$1E</span>～<span class="formula">$1F</span></td><td>チャネル4開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$10</span>～<span class="formula">$21</span></td><td>チャネル5開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$22</span>～<span class="formula">$23</span></td><td>チャネル6開始位置アドレス</td></tr>
+	<tr><td><span class="formula">$24</span>～<span class="formula">$25</span></td><td>チャネル7開始位置アドレス</td></tr>
+</tbody>
+</table>
+
+<p>アドレスはバンク<code>$C5</code>・<code>$C6</code>に格納されている時のアドレス（2バイト）で、ARAMのアドレスではない。</p>
+
+<p>スーパーファミコンでは8音まで同時に演奏できるので、これらをチャネル0～チャネル7としている。楽譜でいえば8段。<br>
+開始位置アドレスがシーケンスコマンド終了位置アドレスと同じである場合、そのチャネルのシーケンスデータはなしということであり、該当チャネルは演奏しない。</p>
+
+<p>ヘッダ以降はすべてシーケンスコマンドのデータである。<br>
+詳細は以下項目を参照。</p>
+
+<h3>シーケンスコマンド</h3>
+
+<p>本作のシーケンスコマンドは、スーパーファミコンソフト「ロマンシング・サガ2」のシーケンスコマンドとほとんど同一のようである。<br>
+また、「ロマンシング・サガ2」のシーケンスコマンドについては、詳細な解説サイト様が既に存在している。</p>
+
+<ul>
+	<li><a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+	<li><a href="https://gnilda.cloudfree.jp/spc/supplementary_information.html" target="_blank">補足説明 (シーケンスコマンド・サウンドドライバファンクション) - スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+</ul>
+
+<p>上ウェブサイト様の解説は専門的で詳しいので参考にしていただいた方が良いのだが、デジタルサウンドやMIDIの知識がないとややわかりにくい箇所があるため、MIDIの素人の筆者がほどほどに頑張って説明してみたのが当ページである。<br>
+他にも、<br>
+<a href="https://kurohane.net/wiki_gimic/?MIDI%E6%A9%9F%E8%83%BD/%E9%9F%B3%E8%89%B2%E3%82%92%E4%BD%9C%E3%82%8B/SPC%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF" target="_blank">MIDI機能/音色を作る/SPCエディタ - PukiWiki</a><br>
+なども参考にさせていただいた。<br>
+感謝する次第である。</p>
+
+
+<div class="box-title"><span id="tick">ティック（Tick）数について</span></div>
+<div class="commentbox">
+デジタルサウンド・MIDIにおける音の長さの単位。分解能。<br>
+「4分音符の長さを何ティックに分割するか」で定義される数値で、分割数が大きいほど、より小さな時間で音を変化させられ、複雑な音の表現ができる。<br>
+とりあえず、音の演奏時間のことを考えて差し支えない。<br>
+ティック数一覧表は、<code>$C3:1D8C</code>～<code>$C3:1D99</code>→ARAMアドレス<code>$1846</code>～<code>$1853</code>にコピーされて使われている。<br>
+音符の長さ（4分音符とか）は、ティック（Tick）数で決められている。
+</div>
+<br>
+<div class="box-title">引数について</div>
+<div class="commentbox">
+シーケンスコマンドの中には、コマンドの後に引数（パラメータ）で何らかの数値を指定するものがある。<br>
+例えばトラック音量設定はコマンド<span class="formula">$C4</span>で、引数に<span class="formula">xx</span>（1バイト値）が必要。<br>
+引数は音量で、<span class="formula">$00</span>～<span class="formula">$FF</span>を設定を設定する。<br>
+シーケンスデータ内に「<span class="formula">C4 80</span>」という記述があったら、「トラック音量を<span class="formula">$80</span>に設定」ということである。
+</div>
+
+
+<h4><span class="formula">$00</span>～<span class="formula">$C3</span> サウンド演奏（音符、休符、タイ）</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>指定サウンド（Note）の演奏、サウンドを伸ばす、休符</dd>
+</dl>
+
+<table>
+<thead>
+	<tr><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span>～<span class="formula">$0D</span></td><td>C（ド）を演奏</td></tr>
+	<tr><td><span class="formula">$0E</span>～<span class="formula">$1B</span></td><td>C#（ド#）を演奏</td></tr>
+	<tr><td><span class="formula">$1C</span>～<span class="formula">$29</span></td><td>D（レ）を演奏</td></tr>
+	<tr><td><span class="formula">$2A</span>～<span class="formula">$37</span></td><td>D#（レ#）を演奏</td></tr>
+	<tr><td><span class="formula">$38</span>～<span class="formula">$45</span></td><td>E（ミ）を演奏</td></tr>
+	<tr><td><span class="formula">$46</span>～<span class="formula">$53</span></td><td>F（ファ）を演奏</td></tr>
+	<tr><td><span class="formula">$54</span>～<span class="formula">$61</span></td><td>F#（ファ#）を演奏</td></tr>
+	<tr><td><span class="formula">$62</span>～<span class="formula">$6F</span></td><td>G（ソ）を演奏</td></tr>
+	<tr><td><span class="formula">$70</span>～<span class="formula">$7D</span></td><td>G#（ソ#）を演奏</td></tr>
+	<tr><td><span class="formula">$7E</span>～<span class="formula">$8B</span></td><td>A（ラ）を演奏</td></tr>
+	<tr><td><span class="formula">$8C</span>～<span class="formula">$99</span></td><td>A#（ラ#）を演奏</td></tr>
+	<tr><td><span class="formula">$9A</span>～<span class="formula">$A7</span></td><td>B（シ）を演奏</td></tr>
+	<tr><td><span class="formula">$A8</span>～<span class="formula">$B5</span></td><td>タイ（前の音を伸ばす）</td></tr>
+	<tr><td><span class="formula">$B6</span>～<span class="formula">$C3</span></td><td>休符（音演奏なし）</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+	<tr><th>ティック数</th><th><span class="formula">$C0</span></th><th><span class="formula">$60</span></th><th><span class="formula">$40</span></th><th><span class="formula">$48</span></th><th><span class="formula">$30</span></th><th><span class="formula">$20</span></th><th><span class="formula">$24</span></th><th><span class="formula">$18</span></th><th><span class="formula">$10</span></th><th><span class="formula">$0C</span></th><th><span class="formula">$08</span></th><th><span class="formula">$06</span></th><th><span class="formula">$04</span></th><th><span class="formula">$03</span></th></tr>
+	<tr><th>音符名</th><th>全音符</th><th>2分音符</th><th>-</th><th>付点<br>4分音符</th><th>4分音符</th><th>-</th><th>付点<br>8分音符</th><th>8分音符</th><th>-</th><th>16分音符</th><th>-</th><th>32分音符</th><th>-</th><th>64分音符</th></tr>
+</thead>
+<tbody>
+	<tr><td>ド</td><td><span class="formula">$00</span></td><td><span class="formula">$01</span></td><td><span class="formula">$02</span></td><td><span class="formula">$03</span></td><td><span class="formula">$04</span></td><td><span class="formula">$05</span></td><td><span class="formula">$06</span></td><td><span class="formula">$07</span></td><td><span class="formula">$08</span></td><td><span class="formula">$09</span></td><td><span class="formula">$0A</span></td><td><span class="formula">$0B</span></td><td><span class="formula">$0C</span></td><td><span class="formula">$0D</span></td></tr>
+	<tr><td>ド#</td><td><span class="formula">$0E</span></td><td><span class="formula">$0F</span></td><td><span class="formula">$10</span></td><td><span class="formula">$11</span></td><td><span class="formula">$12</span></td><td><span class="formula">$13</span></td><td><span class="formula">$14</span></td><td><span class="formula">$15</span></td><td><span class="formula">$16</span></td><td><span class="formula">$17</span></td><td><span class="formula">$18</span></td><td><span class="formula">$19</span></td><td><span class="formula">$1A</span></td><td><span class="formula">$1B</span></td></tr>
+	<tr><td>レ</td><td><span class="formula">$1C</span></td><td><span class="formula">$1D</span></td><td><span class="formula">$1E</span></td><td><span class="formula">$1F</span></td><td><span class="formula">$20</span></td><td><span class="formula">$21</span></td><td><span class="formula">$22</span></td><td><span class="formula">$23</span></td><td><span class="formula">$24</span></td><td><span class="formula">$25</span></td><td><span class="formula">$26</span></td><td><span class="formula">$27</span></td><td><span class="formula">$28</span></td><td><span class="formula">$29</span></td></tr>
+	<tr><td>レ#</td><td><span class="formula">$2A</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$2C</span></td><td><span class="formula">$2D</span></td><td><span class="formula">$2E</span></td><td><span class="formula">$2F</span></td><td><span class="formula">$30</span></td><td><span class="formula">$31</span></td><td><span class="formula">$32</span></td><td><span class="formula">$33</span></td><td><span class="formula">$34</span></td><td><span class="formula">$35</span></td><td><span class="formula">$36</span></td><td><span class="formula">$37</span></td></tr>
+	<tr><td>ミ</td><td><span class="formula">$38</span></td><td><span class="formula">$39</span></td><td><span class="formula">$3A</span></td><td><span class="formula">$3B</span></td><td><span class="formula">$3C</span></td><td><span class="formula">$3D</span></td><td><span class="formula">$3E</span></td><td><span class="formula">$3F</span></td><td><span class="formula">$40</span></td><td><span class="formula">$41</span></td><td><span class="formula">$42</span></td><td><span class="formula">$43</span></td><td><span class="formula">$44</span></td><td><span class="formula">$45</span></td></tr>
+	<tr><td>ファ</td><td><span class="formula">$46</span></td><td><span class="formula">$47</span></td><td><span class="formula">$48</span></td><td><span class="formula">$49</span></td><td><span class="formula">$4A</span></td><td><span class="formula">$4B</span></td><td><span class="formula">$4C</span></td><td><span class="formula">$4D</span></td><td><span class="formula">$4E</span></td><td><span class="formula">$4F</span></td><td><span class="formula">$50</span></td><td><span class="formula">$51</span></td><td><span class="formula">$52</span></td><td><span class="formula">$53</span></td></tr>
+	<tr><td>ファ#</td><td><span class="formula">$54</span></td><td><span class="formula">$55</span></td><td><span class="formula">$56</span></td><td><span class="formula">$57</span></td><td><span class="formula">$58</span></td><td><span class="formula">$59</span></td><td><span class="formula">$5A</span></td><td><span class="formula">$5B</span></td><td><span class="formula">$5C</span></td><td><span class="formula">$5D</span></td><td><span class="formula">$5E</span></td><td><span class="formula">$5F</span></td><td><span class="formula">$60</span></td><td><span class="formula">$61</span></td></tr>
+	<tr><td>ソ</td><td><span class="formula">$62</span></td><td><span class="formula">$63</span></td><td><span class="formula">$64</span></td><td><span class="formula">$65</span></td><td><span class="formula">$66</span></td><td><span class="formula">$67</span></td><td><span class="formula">$68</span></td><td><span class="formula">$69</span></td><td><span class="formula">$6A</span></td><td><span class="formula">$6B</span></td><td><span class="formula">$6C</span></td><td><span class="formula">$6D</span></td><td><span class="formula">$6E</span></td><td><span class="formula">$6F</span></td></tr>
+	<tr><td>ソ#</td><td><span class="formula">$70</span></td><td><span class="formula">$71</span></td><td><span class="formula">$72</span></td><td><span class="formula">$73</span></td><td><span class="formula">$74</span></td><td><span class="formula">$75</span></td><td><span class="formula">$76</span></td><td><span class="formula">$77</span></td><td><span class="formula">$78</span></td><td><span class="formula">$79</span></td><td><span class="formula">$7A</span></td><td><span class="formula">$7B</span></td><td><span class="formula">$7C</span></td><td><span class="formula">$7D</span></td></tr>
+	<tr><td>ラ</td><td><span class="formula">$7E</span></td><td><span class="formula">$7F</span></td><td><span class="formula">$80</span></td><td><span class="formula">$81</span></td><td><span class="formula">$82</span></td><td><span class="formula">$83</span></td><td><span class="formula">$84</span></td><td><span class="formula">$85</span></td><td><span class="formula">$86</span></td><td><span class="formula">$87</span></td><td><span class="formula">$88</span></td><td><span class="formula">$89</span></td><td><span class="formula">$8A</span></td><td><span class="formula">$8B</span></td></tr>
+	<tr><td>ラ#</td><td><span class="formula">$8C</span></td><td><span class="formula">$8D</span></td><td><span class="formula">$8E</span></td><td><span class="formula">$8F</span></td><td><span class="formula">$90</span></td><td><span class="formula">$91</span></td><td><span class="formula">$92</span></td><td><span class="formula">$93</span></td><td><span class="formula">$94</span></td><td><span class="formula">$95</span></td><td><span class="formula">$96</span></td><td><span class="formula">$97</span></td><td><span class="formula">$98</span></td><td><span class="formula">$99</span></td></tr>
+	<tr><td>シ</td><td><span class="formula">$9A</span></td><td><span class="formula">$9B</span></td><td><span class="formula">$9C</span></td><td><span class="formula">$9D</span></td><td><span class="formula">$9E</span></td><td><span class="formula">$9F</span></td><td><span class="formula">$A0</span></td><td><span class="formula">$A1</span></td><td><span class="formula">$A2</span></td><td><span class="formula">$A3</span></td><td><span class="formula">$A4</span></td><td><span class="formula">$A5</span></td><td><span class="formula">$A6</span></td><td><span class="formula">$A7</span></td></tr>
+	<tr><td>タイ</td><td><span class="formula">$A8</span></td><td><span class="formula">$A9</span></td><td><span class="formula">$AA</span></td><td><span class="formula">$AB</span></td><td><span class="formula">$AC</span></td><td><span class="formula">$AD</span></td><td><span class="formula">$AE</span></td><td><span class="formula">$AF</span></td><td><span class="formula">$B0</span></td><td><span class="formula">$B1</span></td><td><span class="formula">$B2</span></td><td><span class="formula">$B3</span></td><td><span class="formula">$B4</span></td><td><span class="formula">$B5</span></td></tr>
+	<tr><td>休符</td><td><span class="formula">$B6</span></td><td><span class="formula">$B7</span></td><td><span class="formula">$B8</span></td><td><span class="formula">$B9</span></td><td><span class="formula">$BA</span></td><td><span class="formula">$BB</span></td><td><span class="formula">$BC</span></td><td><span class="formula">$BD</span></td><td><span class="formula">$BE</span></td><td><span class="formula">$BF</span></td><td><span class="formula">$C0</span></td><td><span class="formula">$C1</span></td><td><span class="formula">$C2</span></td><td><span class="formula">$C3</span></td></tr>
+</tbody>
+</table>
+
+<p>ティック（Tick）数については上の「<a href="#tick">ティック（Tick）数について</a>」参照。</p>
+
+<h4><span class="formula">$C4</span> <span class="formula">xx</span> トラック音量設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルの音量を<span class="formula">xx</span>に設定する。</dd>
+</dl>
+
+<h4><span class="formula">$C5</span> <span class="formula">xx</span> <span class="formula">yy</span> トラック音量変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：変化処理回数 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルの音量を<span class="formula">xx</span>ティックかけて<span class="formula">yy</span>に設定する。</dd>
+</dl>
+
+<h4><span class="formula">$C6</span> <span class="formula">xx</span> パン（音の定位）設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：パン <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルの左右のサウンドボリュームを調節して音の中心位置を変更する。<br>
+	音楽用語でいうところのパン（音の定位）設定。<br>
+	引数に設定する値は、<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)。</dd>
+</dl>
+
+<h4><span class="formula">$C7</span> <span class="formula">xx</span> <span class="formula">yy</span> パン（音の定位）変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：変化処理回数 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：パン <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのパン（音の定位）を<span class="formula">xx</span>ティックかけて<span class="formula">yy</span>に設定する。
+	引数に設定する値は、<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)。</dd>
+</dl>
+
+<h4><span class="formula">$C8</span> <span class="formula">xx</span> <span class="formula">yy</span> ピッチスライド</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：変化処理回数 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：ピッチ（音の高さ）変化 <span class="formula">$00</span>～<span class="formula">$FF</span> ※符号あり8ビット整数（<span class="formula">-127～0～+127</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのピッチ（音の高さ）を<span class="formula">xx</span>ティックかけて<span class="formula">yy</span>ぶんだけ変動させる。<br>
+	カラオケでいうところのキーの上げ下げのこと（ただし時間をかけてゆるやかに変える）。<br>
+	<span class="formula">+1</span>すれば半音上がり、<span class="formula">-1</span>すれば半音下がる。</dd>
+</dl>
+
+<h4><span class="formula">$C9</span> <span class="formula">xx</span> <span class="formula">yy</span> <span class="formula">zz</span> ビブラート設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：実行前待機時間 及び 揺れ方 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：周期 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">zz</span>：揺れ方 及び 揺れの大きさ <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルにビブラート（音の高さを細かく揺らす）をかける。<br>
+	<span class="formula">xx</span>ティック待機してから、<span class="formula">xx</span>と<span class="formula">zz</span>の上位2ビット（合計<span class="formula">10</span>ビット）で揺れ方設定。<br>
+	<span class="formula">zz</span>の下位<span class="formula">6</span>ビットで揺れの大きさを設定。
+	<span class="formula">4.5*(<span class="formula">yy</span>+1)</span>ミリ秒で1周期揺らす。</dd>
+</dl>
+
+<p>※細かい計算は<br>
+<a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html#C9" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a><br>
+を参照してください。<br>
+「ライブ・ア・ライブ」でも計算方法が同一かは未確認。</p>
+
+<h4><span class="formula">$CA</span> ビブラート解除</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのビブラートを解除する。</dd>
+</dl>
+
+<h4><span class="formula">$CB</span> <span class="formula">xx</span> <span class="formula">yy</span> <span class="formula">zz</span> トレモロ設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：実行前待機時間 及び 揺れ方 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：周期 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">zz</span>：揺れ方 及び 揺れの大きさ <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルにトレモロ（音の大きさを細かく揺らす＝小刻みに演奏する）をかける。<br>
+	ビブラートの音量バージョン。</dd>
+</dl>
+
+<p>※細かい計算は<br>
+<a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html#CB" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a><br>
+を参照してください。<br>
+「ライブ・ア・ライブ」でも計算方法が同一かは未確認。</p>
+
+
+<h4><span class="formula">$CC</span> トレモロ解除</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのトレモロを解除する。</dd>
+</dl>
+
+<h4><span class="formula">$CD</span> <span class="formula">xx</span> <span class="formula">yy</span> オートパン設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：周期 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：揺れ方 及び 揺れの大きさ <span class="formula">$00</span>～<span class="formula">$FF</span> ※符号あり8ビット整数（<span class="formula">-127～0～+127</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのパン（音の定位）が<span class="formula">0 ～ yy ～ 0 ～ -yy</span>……と、<span class="formula">xx</span>から計算する値のティック数で周期的に左右に揺れ続ける。</dd>
+</dl>
+
+<p>※細かい計算は<br>
+<a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html#CD" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a><br>
+を参照してください。<br>
+「ライブ・ア・ライブ」でも計算方法が同一かは未確認。</p>
+
+<h4><span class="formula">$CE</span> オートパン解除</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのオートパンを解除する。</dd>
+</dl>
+
+<h4><span class="formula">$CF</span> <span class="formula">xx</span> ノイズクロック設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：ノイズクロック <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>S-DSPのI/Oポートアドレス<code>$006C</code> FLG（リセット・ミュート・エコー書き込みフラグとノイズクロック）におけるBit0～4、ノイズ発生器のクロック数の設定。<br>
+	（要するにザーザーという感じの雑音っぽいノイズを発生させる周波数みたいなものの設定）</dd>
+</dl>
+
+<h4><span class="formula">$D0</span> ノイズ オン</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルにそれまでに設定されていた音を停止し、ノイズを発声する。</dd>
+</dl>
+
+<h4><span class="formula">$D1</span> ノイズ オフ</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルにそれまでに設定されていたノイズを停止し、コマンド<span class="formula">$DC</span>で指定していたサンプリングデータ音に切り替える。</dd>
+</dl>
+
+
+<h4><span class="formula">$D2</span> ピッチモジュレーション オン</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルに、一つ前のチャネルのS-DSP内部の値 (OUTX) を用いてピッチ（音の高さ）変調をかける。<br>
+	（性質上、チャネル0の前はないからこの動作はチャネル0には無効）</dd>
+</dl>
+
+<p>※ OUTX：<br>
+S-DSPのI/Oポートアドレス<span class="formula">$00</span>X9（Xはチャネル数）に設定される、現在、S-DSPを通して各チャネルで出しているピッチ変調前の音のこと。</p>
+
+<h4><span class="formula">$D3</span> ピッチモジュレーション オフ</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのピッチ変調の停止。</dd>
+</dl>
+
+<h4><span class="formula">$D4</span> エコー オン</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルにエコーをかける。</dd>
+</dl>
+
+<h4><span class="formula">$D5</span> エコー オフ  トラック</h4> 
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのエコーの停止。</dd>
+</dl>
+
+<h4><span class="formula">$D6</span> <span class="formula">xx</span> オクターブ設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：オクターブ <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのオクターブの値を<span class="formula">xx</span>に変更する。</dd>
+</dl>
+
+<h4><span class="formula">$D7</span> オクターブ+1</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのオクターブの値を<span class="formula">+1</span>する。</dd>
+</dl>
+
+<h4><span class="formula">$D8</span> オクターブ-1</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのオクターブの値を<span class="formula">-1</span>する。</dd>
+</dl>
+
+<h4><span class="formula">$D9</span> <span class="formula">xx</span> キートランスポーズ値設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：トランスポーズ値 <span class="formula">$00</span>～<span class="formula">$FF</span> ※符号あり8ビット整数（<span class="formula">-127～0～+127</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのトランスポーズ値（キー）を<span class="formula">xx</span>に設定する。既定値は<span class="formula">$00</span>。</dd>
+</dl>
+
+<h4><span class="formula">$DA</span> <span class="formula">xx</span> キートランスポーズ値相対設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：トランスポーズ値変化量 <span class="formula">$00</span>～<span class="formula">$FF</span> ※符号あり8ビット整数（<span class="formula">-127～0～+127</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのトランスポーズ値（キー）を「現在値+<span class="formula">xx</span>」に設定する。</dd>
+</dl>
+
+<h4><span class="formula">$DB</span> <span class="formula">xx</span> ディチューン </h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：ピッチ調整 <span class="formula">$00</span>～<span class="formula">$FF</span> ※符号あり8ビット整数（<span class="formula">-127～0～+127</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルの音またはタイ用コマンド処理で計算されるピッチの値を調整する。既定値は<span class="formula">$00</span>。</dd>
+</dl>
+
+<p>※細かい計算は<br>
+<a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html#DB" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a><br>
+を参照してください。<br>
+「ライブ・ア・ライブ」でも計算方法が同一かは未確認。</p>
+
+<h4><span class="formula">$DC</span> <span class="formula">xx</span> サンプリングデータ選択</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：ARAMにセットされたサンプリングデータNo（<span class="formula">$00</span>～<span class="formula">$1F</span>は効果音用サンプリングデータID、<span class="formula">$20</span>～<span class="formula">$2F</span>はBGMに設定されたBGM用サンプリングデータID）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのサンプリングデータ（音色）を<span class="formula">xx</span>にする。</dd>
+</dl>
+
+<a href="sounddata.html#BGMlist_1">BGMに使用されているサンプリングデータID一覧</a>も参照のこと。
+
+
+<h4><span class="formula">$DD</span> <span class="formula">xx</span> アタックレート(Attack Rate)設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：アタックレート（<span class="formula">$00</span>～<span class="formula">$0F</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのアタックレート（音の立ち上がりの速さ）を<span class="formula">xx</span>に設定。<br>
+	S-DSPのI/Oポートアドレス<code>$00x5</code> VxADSR1 (音声xのアタック・ディケイ・サスティン・リリース設定 1)と、アドレス<code>$00X6</code> VxADSR2 (音声xのアタック・ディケイ・サスティン・リリース設定 2)の該当チャネル値が更新される。</dd>
+</dl>
+
+<h4><span class="formula">$DE</span> <span class="formula">xx</span> ディケイレート(Decay Rate)設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：ディケイレート（<span class="formula">$00</span>～<span class="formula">$07</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのディケイレート（アタックで最大音量に達した後、サスティンレベルまで音量が減衰する速さ）を<span class="formula">xx</span>に設定。<br>
+	S-DSPのI/Oポートアドレス<code>$00x5</code> VxADSR1 (音声xのアタック・ディケイ・サスティン・リリース設定 1)と、アドレス<code>$00X6</code> VxADSR2 (音声xのアタック・ディケイ・サスティン・リリース設定 2)の該当チャネル値が更新される。</dd>
+</dl>
+
+<h4><span class="formula">$DF</span> <span class="formula">xx</span> サスティンレベル(Sustain Level)設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：サスティンレベル（<span class="formula">$00</span>～<span class="formula">$07</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのサスティンレベル（ディケイが落ち着いた後に持続する音量レベル）を<span class="formula">xx</span>に設定。<br>
+	S-DSPのI/Oポートアドレス<code>$00x5</code> VxADSR1 (音声xのアタック・ディケイ・サスティン・リリース設定 1)と、アドレス<code>$00X6</code> VxADSR2 (音声xのアタック・ディケイ・サスティン・リリース設定 2)の該当チャネル値が更新される。</dd>
+</dl>
+
+<h4><span class="formula">$E0</span> <span class="formula">xx</span> サスティンレート(Sustain Rate)設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：サスティンレート（<span class="formula">$00</span>～<span class="formula">$1F</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのサスティンレート（サスティンレベル）に達した後、音量が<span class="formula">0</span>に向かう（音量の減衰する）速さを<span class="formula">xx</span>に設定。<br>
+	S-DSPのI/Oポートアドレス<code>$00x5</code> VxADSR1 (音声xのアタック・ディケイ・サスティン・リリース設定 1)と、アドレス<code>$00X6</code> VxADSR2 (音声xのアタック・ディケイ・サスティン・リリース設定 2)の該当チャネル値が更新される。</dd>
+</dl>
+
+<h4><span class="formula">$E1</span> ADSR初期化</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルの<span class="formula">DD</span>・<span class="formula">DE</span>・<span class="formula">DF</span>・<span class="formula">E0</span>コマンドでトラックに設定された値を「<span class="formula">DC</span>コマンドで自動的に設定される音色に対応した値」に初期化する。</dd>
+</dl>
+
+<h4><span class="formula">$E2</span> <span class="formula">xx</span> ループ開始位置</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：カウントダウンカウンタの初期値（<span class="formula">$00</span>～<span class="formula">$FF</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルのループ開始位置を設定する。ループの中にもループを設定できる（最大4個まで）。<br>
+	コマンド<span class="formula">$E3</span>と合わせて使うため、次項目の<span class="formula">$E3</span>の解説も参照のこと。</dd>
+</dl>
+
+<p>カウントダウンカウンタ値は、<span class="formula">$00</span>または<span class="formula">$FF</span>を設定するとループ内を無限ループ。<br>
+<span class="formula">$01</span>～<span class="formula">$FE</span>を設定すると、<span class="formula">xx + 1</span>がループ上限回数になる。<br>
+※<span class="formula">xx = $00</span>の時、<span class="formula">E3</span>・<span class="formula">F6</span>コマンドで最も内側のループを抜ける処理を実行しない。</p> 
+
+<h4><span class="formula">$E3</span> 繰り返し・ループ終了</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのループ処理を行う。<span class="formula">$E2</span>で決定した引数<span class="formula">xx</span>で処理が変わる。</dd>
+</dl>
+
+<ul>
+	<li><span class="formula">$E2</span>の引数<span class="formula">xx</span> = <span class="formula">$00</span><br>最も内側のループ開始位置へジャンプする（無限ループ）</li>
+	<li><span class="formula">$E2</span>の引数<span class="formula">xx</span> = <span class="formula">$01</span><br>最も内側のループを抜ける。</li>
+	<li><span class="formula">$E2</span>の引数<span class="formula">xx</span>が<span class="formula">$02</span>以上<br>引数<span class="formula">xx</span>を<span class="formula">-1</span>して、最も内側のループ開始位置へジャンプする。</li>
+</ul>
+
+<h4><span class="formula">$E4</span> スラー開始</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルの音を伸ばす。<br>
+	コマンド<span class="formula">$DC</span>・<span class="formula">$E6</span>・<span class="formula">$E5</span>、休符で解除される。</dd>
+</dl>
+
+<h4><span class="formula">$E5</span> スラー終了</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのスラーを終了する。</dd>
+</dl>
+
+<h4><span class="formula">$E6</span> レガート開始</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルをレガートで演奏する（音を途切れさせずに滑らかに演奏する）。<br>
+	コマンド<span class="formula">$DC</span>・<span class="formula">$E4</span>・<span class="formula">$E7</span>、休符で解除される。</dd>
+</dl>
+
+
+<h4><span class="formula">$E7</span> レガート終了</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルのレガートを終了する。</dd>
+</dl>
+
+<h4><span class="formula">$E8</span> <span class="formula">xx</span> 音長(待機時間)設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音長（<span class="formula">$00</span>～<span class="formula">$FF</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルの音符、タイ、休符で適用する待機ティック数を<span class="formula">xx</span>に設定する。<br>
+	つまり次の音を鳴らす、休符を入れるまでの待機時間を設定する。</dd>
+</dl>
+
+<h4><span class="formula">$E9</span> <span class="formula">xx</span> 効果音演奏 1</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>-</dd>
+</dl>
+
+<h4><span class="formula">$EA</span> 効果音演奏 2</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>-</dd>
+</dl>
+
+<h4><span class="formula">$EB</span> 演奏終了</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>対象チャネルの演奏を終了する。<br>
+	<span class="formula">$EB</span>（または<span class="formula">$E3</span>ループ終了）を区切りとして次のチャネルの値を設定していく。<br>
+（最後のチャネルには区切りはいらないため、最後に<span class="formula">$EB</span>を記す必要はない）</dd>
+</dl>
+
+<h4><span class="formula">$EC</span>～<span class="formula">$EF</span>, <span class="formula">$F8</span>, <span class="formula">$FB</span>～<span class="formula">$FF</span> 割り当てなし</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>指示の割り当てなし。何もしない。<br>
+	もしかすると<span class="formula">$F9</span>や<span class="formula">$FA</span>も割り当てなしかもしれない（要調査）</dd>
+</dl>
+
+<h4><span class="formula">$F0</span> <span class="formula">xx</span> 音楽演奏速度基本値設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音楽演奏速度基本値（<span class="formula">$01</span>～<span class="formula">$FF</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>全てのチャネルの演奏速度（テンポ）を設定する。</dd>
+</dl>
+
+<p>※「ロマサガ2」だと、BPM（beats per minute, 1分間に刻まれる拍の数で表現された、拍の速度）は、<br>
+<span class="formula">BPM = (8000/36)*60/(256/xx)/48</span><br>
+と、計算されるとのこと。<br>
+値が小さいとテンポが遅く、値が大きいとテンポが速い。<br>
+<span class="formula">xx</span>に<span class="formula">$00</span>を設定してしまうと、<span class="formula">256/0</span>はゼロ除算になり計算できないので、コマンド処理が無効になるようである。</p>
+
+<h4><span class="formula">$F1</span> <span class="formula">xx</span> <span class="formula">yy</span> 音楽演奏速度基本値変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：変化処理回数（<span class="formula">$01</span>～<span class="formula">$FF</span>）<br>
+	<span class="formula">yy</span>：音楽演奏速度基本値（<span class="formula">$01</span>～<span class="formula">$FF</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>全てのチャネルの音楽演奏速度基本値を<span class="formula">xx</span>ティックかけて<span class="formula">yy</span>で計算されるBPMに変化させる。</dd>
+</dl>
+
+<h4><span class="formula">$F2</span> <span class="formula">xx</span> エコーボリューム設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：エコーボリューム（<span class="formula">$00</span>～<span class="formula">$FE</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>全てのチャネルのエコーボリュームを(<span class="formula">xx&gt;&gt;1</span>)に設定する。<br>
+	※<span class="formula">xx&gt;&gt;1</span>は符号なし8ビット整数の論理右シフト1回分（<span class="formula">/2</span>）</dd>
+</dl>
+
+<h4><span class="formula">$F3</span> <span class="formula">xx</span> <span class="formula">yy</span> エコーボリューム変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：変化処理回数（<span class="formula">$00</span>～<span class="formula">$FF</span>）<br>
+	<span class="formula">yy</span>：エコーボリューム（<span class="formula">$00</span>～<span class="formula">$FE</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>全てのチャネルのエコーボリュームを<span class="formula">xx</span>ティックかけて(<span class="formula">yy&gt;&gt;1</span>)に設定する。<br>
+	※<span class="formula">yy&gt;&gt;1</span>は符号なし8ビット整数の論理右シフト1回分（<span class="formula">/2</span>）</dd>
+</dl>
+
+
+<h4><span class="formula">$F4</span> <span class="formula">xx</span> <span class="formula">yy</span> エコーフィードバック設定・FIRフィルタ係数テーブル選択</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：エコーフィードバック（<span class="formula">$00</span>～<span class="formula">$FF</span>） ※符号あり8ビット整数（<span class="formula">-127～0～+127</span>）<br>
+	<span class="formula">yy</span>：FIRフィルタ係数テーブル番号（<span class="formula">$00</span>～<span class="formula">$03</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>全てのチャネルに対し、S-DSPのI/Oポートアドレス<code>$00XF</code> FIRx (エコーFIRフィルター係数x)に、下表のテーブル番号<span class="formula">yy</span>の値を設定する。<br>
+	S-DSPのI/Oポートアドレス<code>$000D</code> EFB (エコーフィードバックボリューム)に<span class="formula">xx</span>を設定する。</dd>
+</dl>
+
+<p>※FIR（Finite Impulse Response, 有限インパルス応答）フィルタとは、特定の周波数成分を除去してノイズを消したり信号の平滑化に使うもの、と思っていただきたい。<br>
+本作においては特定の値の表を使うことでFIRフィルタをかけている、らしい。<br>
+詳しい説明は専門ウェブサイトを検索するなどしていただきたい（筆者もよくわかっていないので）。</p>
+
+<p>「ロマサガ2」のFIRフィルタ係数テーブルは「ライブ・ア・ライブ」にも共通して存在している。</p>
+
+<p>「ライブ・ア・ライブ」の場合、FIRフィルタ係数テーブルデータは<code>$C3:1D6C</code>～<code>$C3:1D8B</code>→ARAMアドレス<code>$1826</code>～<code>$1845</code>に転送されて使われている。</p>
+
+<table>
+<thead>
+	<tr><th rowspan="2">テーブル番号</th><th colspan="8">FIRフィルタ係数</th></tr>
+	<tr><th>FIR0</th><th>FIR1</th><th>FIR2</th><th>FIR3</th><th>FIR4</th><th>FIR5</th><th>FIR6</th><th>FIR7</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td><span class="formula">$7F</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><span class="formula">$01</span></td><td><span class="formula">$0C</span></td><td><span class="formula">$21</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$2B</span></td><td><span class="formula">$13</span></td><td><span class="formula">$FE</span></td><td><span class="formula">$F3</span></td><td><span class="formula">$F9</span></td></tr>
+	<tr><td><span class="formula">$02</span></td><td><span class="formula">$58</span></td><td><span class="formula">$BF</span></td><td><span class="formula">$DB</span></td><td><span class="formula">$F0</span></td><td><span class="formula">$FE</span></td><td><span class="formula">$07</span></td><td><span class="formula">$0C</span></td><td><span class="formula">$0C</span></td></tr>
+	<tr><td><span class="formula">$03</span></td><td><span class="formula">$34</span></td><td><span class="formula">$33</span></td><td><span class="formula">$00</span></td><td><span class="formula">$D9</span></td><td><span class="formula">$E5</span></td><td><span class="formula">$01</span></td><td><span class="formula">$FC</span></td><td><span class="formula">$EB</span></td></tr>
+</tbody>
+</table>
+
+<h4><span class="formula">$F5</span> <span class="formula">xx</span> 音楽音量設定</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：ボリューム（<span class="formula">$00</span>～<span class="formula">$FF</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>全てのチャネルのボリュームを<span class="formula">xx</span>に設定する。<br>
+	既定値は<span class="formula">$FF</span>。</dd>
+</dl>
+
+
+<h4><span class="formula">$F6</span> <span class="formula">xx</span> <span class="formula">yyyy</span> ループ内条件ジャンプ</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：処理回数（<span class="formula">$00</span>～<span class="formula">$FF</span>）<br>
+	<span class="formula">yyyy</span>：ジャンプ先アドレス（<span class="formula">$0000</span>～<span class="formula">$FFFF</span>）<br>※2バイト値なので、<span class="formula">F6 aa bb cc</span>なら、<span class="formula">ccbb</span>と読むこと。</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルにおいて、<span class="formula">xx</span>が最も内側のループでこのコマンドを処理した回数と等しい場合、アドレス<span class="formula">yyyy</span>へジャンプする。</dd>
+</dl>
+
+<p>※アドレスは、シーケンスデータが格納されているバンク<span class="formula">$C5</span>・<span class="formula">$C6</span>におけるアドレス基準で計算されている。<br>
+シーケンスデータのヘッダにバンク<span class="formula">$C5</span>・<span class="formula">$C6</span>におけるアドレスが記述されているので、ARAM内ではそこから計算しているようである。</p>
+
+<h4><span class="formula">$F7</span> <span class="formula">xxxx</span> ジャンプ</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xxxx</span>：ジャンプ先アドレス（<span class="formula">$0000</span>～<span class="formula">$FFFF</span>）<br>※2バイト値なので、<span class="formula">F7 aa bb</span>なら、<span class="formula">bbaa</span>と読むこと。</dd>
+
+	<dt>内容</dt>
+	<dd>対象チャネルにおいて、アドレス<span class="formula">xxxx</span>へジャンプする。</dd>
+</dl>
+
+<p>※アドレスの計算はコマンド<span class="formula">$F6</span>と同じ。</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<!-- <script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script> -->
+
+<div class="pagelink">
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<!--  <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -102,6 +102,7 @@ table {
 		<li><a href="flag.html">フラグ</a></li>
 		<li><a href="d5.html">各種データアドレス</a></li>
 		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
 		<li><a href="program1.html">ボタン判定</a></li>
 		<li><a href="memo.html">雑多メモ</a></li>
@@ -197,6 +198,7 @@ table {
 		<li><a href="sound.html">サウンドについて</a></li>
 		<li><a href="sound1.html">BGMの再生</a></li>
 		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
 	</ul>
 </li>
 </ul>
@@ -223,24 +225,24 @@ table {
 また、シナリオによる通常戦闘曲のIDは<code>[$00:10E5]</code>に入っており、そのシナリオのプレイ中は変動しない。<br>
 その他、マップ移動やイベントによるBGM切り替え、メニュー画面でのLISTENING ROOMなど、BGMを演奏開始する場面は多々あるが、長くなるので諸々は<a href="sound2.html">BGMIDの呼び出し</a>で紹介する。</p>
 
-<p>最終的には<code>$00:1D01</code>にBGMIDが書き込まれて、音波形データと楽譜データが呼び出されることになるのだが、実際のサブルーチンでは、サウンド処理中、<code>$00:1D01</code>には途中計算の値も入る。<br>
+<p>最終的には<code>$00:1D01</code>にBGMIDが書き込まれて、サンプリングデータとシーケンスデータが呼び出されることになるのだが、実際のサブルーチンでは、サウンド処理中、<code>$00:1D01</code>には途中計算の値も入る。<br>
 曲の再生中は<code>$00:1D01</code>にBGMIDが入るが、戦闘中などでは効果音が流れた時に効果音IDが入ることもあるので、常に「演奏中のBGMID＝<code>$00:1D01</code>」ではない。<br>
 そのあたりの細かい話は省く。</p>
 
 <div id="captiondata"></div>
 
-<h3>音波形データの処理</h3>
+<h3>サンプリングデータの処理</h3>
 
-<p>効果音用の音波形データはゲーム開始の時点で読み込まれている。<br>
-効果音専用ではなくBGMにも使われていることがあり、例えば「CAPTAIN SQUARE」は効果音用の正弦波などが使われているため、「CAPTAIN SQUARE」の曲がゲーム内で流れる時、楽譜データの転送しかしていない。<br>
-ここではそれ以外の音波形データについて記す。</p>
+<p>効果音用のサンプリングデータはゲーム開始の時点で読み込まれている。<br>
+効果音専用ではなくBGMにも使われていることがあり、例えば「CAPTAIN SQUARE」は効果音用の正弦波などが使われているため、「CAPTAIN SQUARE」の曲がゲーム内で流れる時、シーケンスデータの転送しかしていない。<br>
+ここではそれ以外のサンプリングデータについて記す。</p>
 
-<p>演奏曲の音波形データのIDは<code>$00:1E00</code>～<code>$00:1E1F</code>から2バイトずつの値で入る。<br>
-更に、ARAMに既にその音波形データが存在している場合は、<code>$00:1E00</code>～<code>$00:1E1F</code>からその値だけ抜いた分、つまり、これから演奏する曲に不足している音波形データIDだけ、<code>$00:1E20</code>～<code>$00:1E3F</code>に入る。<br>
+<p>演奏曲のサンプリングデータのIDは<code>$00:1E00</code>～<code>$00:1E1F</code>から2バイトずつの値で入る。<br>
+更に、ARAMに既にそのサンプリングデータが存在している場合は、<code>$00:1E00</code>～<code>$00:1E1F</code>からその値だけ抜いた分、つまり、これから演奏する曲に不足しているサンプリングデータIDだけ、<code>$00:1E20</code>～<code>$00:1E3F</code>に入る。<br>
 これにより、実際にARAMへ転送する時は、<code>$00:1E20</code>～<code>$00:1E3F</code>から計算したアドレスを使うことになる、という仕組み。<br>
-以上から、1曲あたりに使える音波形データの種類は最大16種ということになる（これはあくまでも本作の仕組みで、他ゲームでは異なるだろう）。<br>
-ただし本作で実際に使用している曲の設定を見ると、音波形データの種類は最大でも13種である。<br>
-実際の演奏では最大16種の音波形データから8種を選ぶ、という話は上でもした通り。</p>
+以上から、1曲あたりに使えるサンプリングデータの種類は最大16種ということになる（これはあくまでも本作の仕組みで、他ゲームでは異なるだろう）。<br>
+ただし本作で実際に使用している曲の設定を見ると、サンプリングデータの種類は最大でも13種である。<br>
+実際の演奏では最大16種のサンプリングデータから8種を選ぶ、という話は上でもした通り。</p>
 
 <p>では、<code>$00:1E00</code>～<code>$00:1E1F</code>に入る値はどういうサブルーチンで処理しているのか。<br>
 <code>$00:1D01</code>にBGMIDが入った後の処理になる。</p>
@@ -266,7 +268,7 @@ $C3/01E2 TAX                     ;Aの値をXレジスタに転送
 $C3/01E3 ADC #$0020              ;A + $0020
 $C3/01E6 STA $1C    [$00:1D1C]   ;Aを[$00:1D1C]に書き込み
 ;ループ処理
-$C3/01E8 LDA $C343A4,x[$C3:4504] ;Aに[$C343A4,x+1][$C343A4,x]をロード　音波形データID
+$C3/01E8 LDA $C343A4,x[$C3:4504] ;Aに[$C343A4,x+1][$C343A4,x]をロード　サンプリングデータID
 $C3/01EC STA ($10)  [$00:1E00]   ;Aを[$00:1E00 + n+1][$00:1E00 + n]に書き込み
 $C3/01EE INC $10    [$00:1D10]   ;[$00:1D11][$00:1D10]をインクリメント +1
 $C3/01F0 INC $10    [$00:1D10]   ;[$00:1D11][$00:1D10]をインクリメント +1
@@ -300,30 +302,30 @@ $C3/02E4 JSR $06BD  [$C3:06BD]   ;[$C3:06BD]へジャンプ
 <span class="formula">= BGMID * $20</span></p>
 
 <p>である。<br>
-<code><span class="r">$C3/01E8</span></code>から<code><span class="r">$C3/0208</span></code>までが外側のループ処理で、ここで呼び出しているのが<code>[$C343A4,x+1]</code><code>[$C343A4,x]</code>なのだが、これが演奏曲の音波形データIDの1番目の値である。<br>
+<code><span class="r">$C3/01E8</span></code>から<code><span class="r">$C3/0208</span></code>までが外側のループ処理で、ここで呼び出しているのが<code>[$C343A4,x+1]</code><code>[$C343A4,x]</code>なのだが、これが演奏曲のサンプリングデータIDの1番目の値である。<br>
 この値が<code>[$00:1E00 + n+1]</code><code>[$00:1E00 + n]</code>（nはループ回数）に書き込まれるから、<code>[$00:1E00]</code>から順に2バイトずつ書き込まれていく。<br>
 つまり、</p>
 
 <p><span class="formula">$C343A4 + </span>BGMID<span class="formula"> * $20</span></p>
 
 <p>でアドレスが計算できる。<br>
-更に、ループ回数は<code><span class="r">$C3/01E3</span></code>～<code><span class="r">$C3/01E6</span></code>の処理とループ処理後半からして、<span class="formula">$10</span>回＝16回であり、16種類の音波形データIDを<code>$00:1E00</code>～<code>$00:1E1F</code>へ20バイト分書き込むということがわかる。</p>
+更に、ループ回数は<code><span class="r">$C3/01E3</span></code>～<code><span class="r">$C3/01E6</span></code>の処理とループ処理後半からして、<span class="formula">$10</span>回＝16回であり、16種類のサンプリングデータIDを<code>$00:1E00</code>～<code>$00:1E1F</code>へ20バイト分書き込むということがわかる。</p>
 
-<p>先に述べたが、実際には、ARAMに既に該当の音波形データIDのデータがある場合、後で音波形データのARAMへの転送はスキップされる。<br>
-処理は省くが、<code>$00:1D20</code>～<code>$00:1D5F</code>の<span class="formula">$40</span>バイト分の領域に、現在ARAMに入っている音波形データ最大32種類が2バイトデータで記録されている。<br>
+<p>先に述べたが、実際には、ARAMに既に該当のサンプリングデータIDのデータがある場合、後でサンプリングデータのARAMへの転送はスキップされる。<br>
+処理は省くが、<code>$00:1D20</code>～<code>$00:1D5F</code>の<span class="formula">$40</span>バイト分の領域に、現在ARAMに入っているサンプリングデータ最大32種類が2バイトデータで記録されている。<br>
 <code>$00:1D20</code>～<code>$00:1D5F</code>に被りがないかどうかは、内側のループ処理<code><span class="r">$C3/01F5</span></code>～<code><span class="r">$C3/01FC</span></code>でチェックしている。<br>
-<code>[$00:1D5F]</code><code>[$00:1D5E]</code>～<code>[$00:1D21]</code><code>[$00:1D20]</code>まで2バイトずつ<span class="formula">$40</span>バイト分のデータが、今回ロードした音波形データIDと一致しているかどうかのチェックであり、一致していた場合はARAMへの転送をスキップする。<br>
-つまり、<code>$00:1D20</code>～<code>$00:1D5F</code>は、現在ARAMに入っている音波形データIDを記録している領域なのである。<br>
-2バイトずつ<span class="formula">$40</span>バイト分の領域があるということは、ARAMにおいておける音波形データは最大<span class="formula">$20</span>種類＝32種類だということがわかる。</p>
+<code>[$00:1D5F]</code><code>[$00:1D5E]</code>～<code>[$00:1D21]</code><code>[$00:1D20]</code>まで2バイトずつ<span class="formula">$40</span>バイト分のデータが、今回ロードしたサンプリングデータIDと一致しているかどうかのチェックであり、一致していた場合はARAMへの転送をスキップする。<br>
+つまり、<code>$00:1D20</code>～<code>$00:1D5F</code>は、現在ARAMに入っているサンプリングデータIDを記録している領域なのである。<br>
+2バイトずつ<span class="formula">$40</span>バイト分の領域があるということは、ARAMにおいておけるサンプリングデータは最大<span class="formula">$20</span>種類＝32種類だということがわかる。</p>
 
-<p>さて、音波形データ開始アドレスの計算方法がわかったから、「<span class="formula">$C343A4 + </span>BGMID<span class="formula"> * $20</span>」をBGMID<span class="formula">$01</span>～<span class="formula">$4D</span>の分計算して、実際の値を見てみよう。<br>
+<p>さて、サンプリングデータ開始アドレスの計算方法がわかったから、「<span class="formula">$C343A4 + </span>BGMID<span class="formula"> * $20</span>」をBGMID<span class="formula">$01</span>～<span class="formula">$4D</span>の分計算して、実際の値を見てみよう。<br>
 ちなみに後々の計算の都合で、音色1種あたり2バイトの値になるものの上1バイトは必ず<span class="formula">$00</span>である。<br>
 このため下表では、上1バイトの<span class="formula">$00</span>は省略し、下1バイトの値だけ掲載した。</p>
 
 
 <table>
 <thead>
-	<tr><th rowspan="2">BGMID</th><th rowspan="2">曲名</th><th rowspan="2">音波形データ<br>開始アドレス</th><th colspan="16">音波形データID</th></tr>
+	<tr><th rowspan="2">BGMID</th><th rowspan="2">曲名</th><th rowspan="2">サンプリングデータ<br>開始アドレス</th><th colspan="16">サンプリングデータID</th></tr>
 	<tr><th>$0</th><th>$1</th><th>$2</th><th>$3</th><th>$4</th><th>$5</th><th>$6</th><th>$7</th><th>$8</th><th>$9</th><th>$A</th><th>$B</th><th>$C</th><th>$D</th><th>$E</th><th>$F</th></tr>
 </thead>
 <tbody>
@@ -408,19 +410,19 @@ $C3/02E4 JSR $06BD  [$C3:06BD]   ;[$C3:06BD]へジャンプ
 </table>
 
 
-<p>先に記したが、「CAPTAIN SQUARE」は音波形データの転送はなく楽譜データのみ転送される。<br>
-上表を見ると、ID<span class="formula">$3E</span>の「CAPTAIN SQUARE」の音波形データはすべて<span class="formula">$00</span>で埋まっている。<br>
-つまりBGM用に転送する音波形データはないということである。<br>
-他にもID<span class="formula">$1F</span>「効果音（風の吹く音）」なども音波形データなしで、効果音用の音波形データだけで鳴らしているのだということが推測できる。<br>
-無音である<span class="formula">$00</span>以外の数値を見ると、音波形データIDは<span class="formula">$01</span>～<span class="formula">$4B</span>までの75種類と見て良いようだ。</p>
+<p>先に記したが、「CAPTAIN SQUARE」はサンプリングデータの転送はなくシーケンスデータのみ転送される。<br>
+上表を見ると、ID<span class="formula">$3E</span>の「CAPTAIN SQUARE」のサンプリングデータはすべて<span class="formula">$00</span>で埋まっている。<br>
+つまりBGM用に転送するサンプリングデータはないということである。<br>
+他にもID<span class="formula">$1F</span>「効果音（風の吹く音）」などもサンプリングデータなしで、効果音用のサンプリングデータだけで鳴らしているのだということが推測できる。<br>
+無音である<span class="formula">$00</span>以外の数値を見ると、サンプリングデータIDは<span class="formula">$01</span>～<span class="formula">$4B</span>までの75種類と見て良いようだ。</p>
 
 
-<h3>音波形データのアドレス・容量</h3>
+<h3>サンプリングデータのアドレス・容量</h3>
 
-<p>どの曲が何の音波形データを使うのか、ということは上処理の内容でわかった。<br>
-では、具体的に音波形データID<span class="formula">$01</span>～<span class="formula">$4B</span>、75種類のデータはどのアドレスにあるのか。</p>
+<p>どの曲が何のサンプリングデータを使うのか、ということは上処理の内容でわかった。<br>
+では、具体的にサンプリングデータID<span class="formula">$01</span>～<span class="formula">$4B</span>、75種類のデータはどのアドレスにあるのか。</p>
 
-<p>音波形データの開始アドレスは以下サブルーチンで計算される。</p>
+<p>サンプリングデータの開始アドレスは以下サブルーチンで計算される。</p>
 
 <div class="code-container"><pre>
 $C3/0311 STA $1E    [$00:1D1E]   ;Aを[$00:1D1E]に書き込み
@@ -462,7 +464,7 @@ $C3/0330 BNE $F5    [$0327]      ;ゼロフラグが立っていないとき[$03
 ;$C3/0329ゼロフラグ分岐
 $C3/0339 LDY #$0000              ;Yに$0000をロード
 $C3/033C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
-$C3/033E LDA $1E20,y             ;Aに[$00:1E21+y][$00:1E20+y]をロード　音波形データID
+$C3/033E LDA $1E20,y             ;Aに[$00:1E21+y][$00:1E20+y]をロード　サンプリングデータID
 $C3/0341 BEQ $34    [$0377]      ;ゼロフラグが立っているとき[$0377]分岐
 $C3/0343 STA $20,x  [$00:1D2E]   ;Aを[$00:1D2F][$00:1D2E]に書き込み
 $C3/0345 PHY                     ;Yレジスタをスタックへプッシュ
@@ -487,17 +489,17 @@ $C3/0369 PLX                     ;Xレジスタにスタックからプル
 $C3/036A JSR $037A  [$C3:037A]   ;[$C3:037A]へジャンプ
 </pre></div>
 
-<p><code><span class="r">$C3/033E</span></code>で、ARAMにはない、被りなしの音波形データIDがロードされ、値が00でなければアドレス計算に進む。<br>
-<code><span class="r">$C3/0351</span></code>～<code><span class="r">$C3/0361</span></code>でロードされる3バイト<code>[$C33FC9,x]</code><code>[$C33FCA,x]</code><code>[$C33FCB,x]</code>を逆から読むと、<code><span class="r">$C3/033E</span></code>で読み込まれた音波形データのデータ開始アドレスになる。<br>
+<p><code><span class="r">$C3/033E</span></code>で、ARAMにはない、被りなしのサンプリングデータIDがロードされ、値が00でなければアドレス計算に進む。<br>
+<code><span class="r">$C3/0351</span></code>～<code><span class="r">$C3/0361</span></code>でロードされる3バイト<code>[$C33FC9,x]</code><code>[$C33FCA,x]</code><code>[$C33FCB,x]</code>を逆から読むと、<code><span class="r">$C3/033E</span></code>で読み込まれたサンプリングデータのデータ開始アドレスになる。<br>
 <code><span class="r">$C3/0351</span></code>の時点の<code>X</code>は、</p>
 
-<p><span class="formula"><code>X</code> = (音波形データID - 1) *2 + (音波形データID - 1)</span><br>
-<span class="formula">= (音波形データID - 1) * 3</span></p>
+<p><span class="formula"><code>X</code> = (サンプリングデータID - 1) *2 + (サンプリングデータID - 1)</span><br>
+<span class="formula">= (サンプリングデータID - 1) * 3</span></p>
 
 <p>である。<br>
-つまり、<code>$C3:3FC9</code>から3バイトずつ値を取ってひっくり返せば音波形データのデータ開始アドレスである。<br>
-ただし、上で計算したアドレスは、音波形データのデータ容量<span class="formula">2</span>バイトの開始位置になる。<br>
-実際の音波形データは<span class="formula">+2</span>バイトしたアドレスから。</p>
+つまり、<code>$C3:3FC9</code>から3バイトずつ値を取ってひっくり返せばサンプリングデータのデータ開始アドレスである。<br>
+ただし、上で計算したアドレスは、サンプリングデータのデータ容量<span class="formula">2</span>バイトの開始位置になる。<br>
+実際のサンプリングデータは<span class="formula">+2</span>バイトしたアドレスから。</p>
 
 <p>そのため、開始アドレスがわかれば、容量と終了アドレスもわかる。<br>
 実際のデータを見てみると、以下のようになる。<br>
@@ -506,7 +508,7 @@ $C3/036A JSR $037A  [$C3:037A]   ;[$C3:037A]へジャンプ
 
 <table>
 <thead>
-	<tr><th>音波形<br>データID</th><th>アドレス<br>計算値</th><th>音波形データ<br>アドレス</th><th>容量</th></tr>
+	<tr><th>音波形<br>データID</th><th>アドレス<br>計算値</th><th>サンプリングデータ<br>アドレス</th><th>容量</th></tr>
 </thead>
 <tbody>
 	<tr><td><span class="formula">$01</span></td><td><code>$C3:3FC9</code></td><td><code>$C3:4D64</code></td><td><span class="formula">$03A8</span></td></tr>
@@ -587,27 +589,27 @@ $C3/036A JSR $037A  [$C3:037A]   ;[$C3:037A]へジャンプ
 </tbody>
 </table>
 
-<p>音波形データは<code>$C2:DC00</code>～<code>$C2:FFE9</code>, <code>$C3:4D64</code>～<code>$C5:7E37</code>, <code>$CC:F000</code>～<code>$CC:FFF8</code>に入っていることがわかる。<br>
+<p>サンプリングデータは<code>$C2:DC00</code>～<code>$C2:FFE9</code>, <code>$C3:4D64</code>～<code>$C5:7E37</code>, <code>$CC:F000</code>～<code>$CC:FFF8</code>に入っていることがわかる。<br>
 サウンド関係のプログラムはバンク<span class="formula">$C3</span>の前半に入っているので、できるだけプログラムに近い位置にデータを格納しているのかもしれない。<br>
 また、波形データのサイズは<span class="formula">$0144</span>バイト～<span class="formula">$1C0E</span>バイトとまちまち。</p>
 
 <p>バンク<span class="formula">$CC</span>に入っているのはID<span class="formula">$25</span>と<span class="formula">$3F</span>だけ。<br>
 ID<span class="formula">$25</span>を使っているのは曲<span class="formula">$08</span>「UNSEEN SYNDROME」と曲<span class="formula">$12</span>「効果音（ＳＦ編・宇宙船内）」、ID<span class="formula">$3F</span>を使っているのは曲<span class="formula">$21</span>「効果音（オルステッド　レベルアップ音）」のみであり、楽器音というよりは効果音なのだろう。</p>
 
-<p>音波形データアドレス位置がわかれば、後は必要な分をARAMに転送することになる。<br>
-転送先はARAMアドレス<code>$4C50</code>～からなのだが、音波形データ1つ目はARAMアドレスのここから、2つめはARAMアドレスのここから……というように指定されているのではない。<br>
-転送するデータは複数の音波形データを連続して送る。</p>
+<p>サンプリングデータアドレス位置がわかれば、後は必要な分をARAMに転送することになる。<br>
+転送先はARAMアドレス<code>$4C50</code>～からなのだが、サンプリングデータ1つ目はARAMアドレスのここから、2つめはARAMアドレスのここから……というように指定されているのではない。<br>
+転送するデータは複数のサンプリングデータを連続して送る。</p>
 
-<p>ARAMに送った音波形データにはナンバリングがなされ、BGMデータだと<span class="formula">$20</span>（<span class="formula">32</span>）から順に番号がつく。<br>
+<p>ARAMに送ったサンプリングデータにはナンバリングがなされ、BGMデータだと<span class="formula">$20</span>（<span class="formula">32</span>）から順に番号がつく。<br>
 演奏中、ナンバリングの数値は、S-DSPのアドレス<code>$00n4</code>（V0SRCN～V7SRCN, nはチャネル0～7）に入る。<br>
 ここではソース番号としておく。<br>
-なぜ<span class="formula">$20</span>からなのかというと、<span class="formula">$00</span>～<span class="formula">$1F</span>には既にARAMにアップロード済みの効果音用の音波形データが入っているからである。<br>
-効果音用の音波形データしか使っていない「CAPTAIN SQUARE」は、<span class="formula">$03</span>, <span class="formula">$06</span>, <span class="formula">$08</span>, <span class="formula">$05</span>を使って演奏をしている。<br>
+なぜ<span class="formula">$20</span>からなのかというと、<span class="formula">$00</span>～<span class="formula">$1F</span>には既にARAMにアップロード済みの効果音用のサンプリングデータが入っているからである。<br>
+効果音用のサンプリングデータしか使っていない「CAPTAIN SQUARE」は、<span class="formula">$03</span>, <span class="formula">$06</span>, <span class="formula">$08</span>, <span class="formula">$05</span>を使って演奏をしている。<br>
 <span class="formula">$05</span>は打楽器っぽい音で、<span class="formula">$03</span>と<span class="formula">$06</span>は正弦波っぽい音、<span class="formula">$08</span>はややピアノっぽい音のようであるが、筆者は音楽の専門家ではないので実際に何の音かはよくわからない。<br>
-<span class="formula">$06</span>はキャンセル音、<span class="formula">$0A</span>はカーソル移動音、<span class="formula">$02</span>は決定音、<span class="formula">$00</span>は装備変更音、<span class="formula">$04</span>は装備を外す音……などの元となっている音波形データになるが、それらは別途効果音の話で紹介する。</p>
+<span class="formula">$06</span>はキャンセル音、<span class="formula">$0A</span>はカーソル移動音、<span class="formula">$02</span>は決定音、<span class="formula">$00</span>は装備変更音、<span class="formula">$04</span>は装備を外す音……などの元となっているサンプリングデータになるが、それらは別途効果音の話で紹介する。</p>
 
 <p>BGMの話に戻す。<br>
-例えば「魔王への叙曲」（BGMID<span class="formula">$01</span>）は、音波形データ16枠に、ID<span class="formula">$12</span>, <span class="formula">$13</span>, <span class="formula">$20</span>, <span class="formula">$07</span>……と値が入っている。ID順ではない。</p>
+例えば「魔王への叙曲」（BGMID<span class="formula">$01</span>）は、サンプリングデータ16枠に、ID<span class="formula">$12</span>, <span class="formula">$13</span>, <span class="formula">$20</span>, <span class="formula">$07</span>……と値が入っている。ID順ではない。</p>
 
 <table>
 <thead>
@@ -633,18 +635,18 @@ ID<span class="formula">$25</span>を使っているのは曲<span class="formul
 </tbody>
 </table>
 
-<p>このようにソース番号<span class="formula">$20</span>～<span class="formula">$2F</span>に音波形データが割り振られる。<br>
+<p>このようにソース番号<span class="formula">$20</span>～<span class="formula">$2F</span>にサンプリングデータが割り振られる。<br>
 <span class="formula">$0B</span>はフルート、<span class="formula">$0E</span>はクラリネット、<span class="formula">$0C</span>はピアノ、<span class="formula">$19</span>や<span class="formula">$20</span>、<span class="formula">$34</span>は太鼓系、　というようなことがなんとなくわかるが、筆者は音楽の専門家ではないので、これがどの楽器の音と断言できないのは申し訳なく思う。<br>
-うさんくさい一覧表は<a href="sounddata.html#BGMlist_0">サウンド（BGM・効果音） &#x3e; BGM用 音波形データID</a>にある。参考程度にしていただきたい。</p>
+うさんくさい一覧表は<a href="sounddata.html#BGMlist_0">サウンド（BGM・効果音） &#x3e; BGM用 サンプリングデータID</a>にある。参考程度にしていただきたい。</p>
 
-<p>音波形データの転送にそこそこの時間がかかるのは、LISTENING ROOMで曲を聞く時になんとなくわかると思う。<br>
-曲を決定してから実際に再生されるまで、曲にもよるが長いと1～2秒はあるような感じがするかもしれないが、おそらく音波形データがARAMにない時に大量にデータを送る必要があるからである。<br>
-逆に、一度聞いた曲をキャンセルしてすぐにもう一度聞く時は、再生までの時間が短くなる。これはARAMに音波形データが残っているため。</p>
+<p>サンプリングデータの転送にそこそこの時間がかかるのは、LISTENING ROOMで曲を聞く時になんとなくわかると思う。<br>
+曲を決定してから実際に再生されるまで、曲にもよるが長いと1～2秒はあるような感じがするかもしれないが、おそらくサンプリングデータがARAMにない時に大量にデータを送る必要があるからである。<br>
+逆に、一度聞いた曲をキャンセルしてすぐにもう一度聞く時は、再生までの時間が短くなる。これはARAMにサンプリングデータが残っているため。</p>
 
 
-<h3>楽譜データの処理</h3>
+<h3>シーケンスデータの処理</h3>
 
-<p>楽譜データの開始位置は、以下処理で計算されている。</p>
+<p>シーケンスデータの開始位置は、以下処理で計算されている。</p>
 
 <div class="code-container"><pre>
 $C3/04F1 STA $1E    [$00:1D1E]   ;Aを[$00:1D1E]に書き込み
@@ -725,22 +727,22 @@ $C3/0587 JSR $06BD  [$C3:06BD]   ;[$C3:06BD]へジャンプ
 アドレス：<code>[$C3426C,x]</code><code>[$C3426D,x]</code><br>
 <span class="formula">x = 曲ID * 3</span></p>
 
-<p>これが、楽譜データの開始位置である。<br>
-ただしこのアドレスから2バイト分は楽譜データの容量（単位：バイト）で、その次からがARAMに転送される実際の楽譜データになる。<br>
+<p>これが、シーケンスデータの開始位置である。<br>
+ただしこのアドレスから2バイト分はシーケンスデータの容量（単位：バイト）で、その次からがARAMに転送される実際のシーケンスデータになる。<br>
 例えば曲ID<span class="formula">$01</span>（魔王への叙曲）なら、</p>
 
 <p>バンク：<code>[$C3426E,3]</code><br>
 アドレス：<code>[$C3426C,3]</code><code>[$C3426D,3]</code><br>
 <span class="formula">x = $01 * 3</span></p>
 
-<p>なので、<code>$C3:426F</code>～<code>$C3:4271</code>を逆から読み、<span class="formula">+2</span>した値が楽譜データ開始位置である。</p>
+<p>なので、<code>$C3:426F</code>～<code>$C3:4271</code>を逆から読み、<span class="formula">+2</span>した値がシーケンスデータ開始位置である。</p>
 
 <p>曲ID（<span class="formula">$01</span>～<span class="formula">$4D</span>）から計算してみると、以下のようになる。</p>
 
 
 <table>
 <thead>
-	<tr><th>曲ID</th><th>曲名</th><th>アドレス計算値</th><th>楽譜データ開始位置</th><th>楽譜データ容量</th></tr>
+	<tr><th>曲ID</th><th>曲名</th><th>アドレス計算値</th><th>シーケンスデータ開始位置</th><th>シーケンスデータ容量</th></tr>
 </thead>
 <tbody>
 	<tr><td><span class="formula">$01</span></td><td>魔王への叙曲</td><td><code>$C3:426F</code>～<code>$C3:4271</code></td><td><code>$C5:7E5F</code></td><td><span class="formula">$0FF8</span></td></tr>
@@ -826,8 +828,8 @@ $C3/0587 JSR $06BD  [$C3:06BD]   ;[$C3:06BD]へジャンプ
 
 <p>このようになる。</p>
 
-<p>曲により楽譜データのサイズはまったく異なるのだが、ARAMのアドレス<code>$1C00</code>～<code>$2BFF</code>が楽譜データ転送位置のため、サイズは<span class="formula">$1000</span>バイト以下でなければならない。<br>
-ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用楽譜データの領域であり、タイトル画面をロードした時点で書き込まれている。<br>
+<p>曲によりシーケンスデータのサイズはまったく異なるのだが、ARAMのアドレス<code>$1C00</code>～<code>$2BFF</code>がシーケンスデータ転送位置のため、サイズは<span class="formula">$1000</span>バイト以下でなければならない。<br>
+ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用シーケンスデータの領域であり、タイトル画面をロードした時点で書き込まれている。<br>
 だが、エンディング曲の「Live for Live」だけ<span class="formula">$2AB7</span>バイトとサイズがはみ出している。<br>
 「Live for Live」はどうなるかというと、ARAMのアドレス<code>$1C00</code>を転送開始位置として、ARAMのアドレス<code>$2C00</code>を越えて上書きするのである。<br>
 エンディング曲の後は各キャラの効果音を鳴らして終了となりタイトル画面に戻るため、効果音関係のデータを上書きしても問題ないということであろう。</p>
@@ -844,14 +846,14 @@ ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用楽�
 	<tr><td><code>$0000</code>～<code>$00EF</code></td><td>メモリ領域（0ページ）</td></tr>
 	<tr><td><code>$00F0</code>～<code>$00FF</code></td><td>SPC700レジスタ（I/Oポートアドレス）</td></tr>
 	<tr><td><code>$0200</code>～<code>$19C8</code></td><td>SPC700用プログラム（<code>$C3:0746</code>～<code>$C3:1F0E</code>）</td></tr>
-	<tr><td><code>$1A00</code>～<code>$1A17</code></td><td>効果音用音波形データ（<code>$C3:23AE</code>～<code>$C3:23C5</code>）</td></tr>
-	<tr><td><code>$1A80</code>～<code>$1A97</code></td><td>効果音用音波形データ（<code>$C3:2394</code>～<code>$C3:23AB</code>）</td></tr>
-	<tr><td><code>$1B00</code>～<code>$1B2B</code></td><td>効果音用音波形データ（<code>$C3:2366</code>～<code>$C3:2390</code>）</td></tr>
+	<tr><td><code>$1A00</code>～<code>$1A17</code></td><td>効果音用サンプリングデータ（<code>$C3:23AE</code>～<code>$C3:23C5</code>）</td></tr>
+	<tr><td><code>$1A80</code>～<code>$1A97</code></td><td>効果音用サンプリングデータ（<code>$C3:2394</code>～<code>$C3:23AB</code>）</td></tr>
+	<tr><td><code>$1B00</code>～<code>$1B2B</code></td><td>効果音用サンプリングデータ（<code>$C3:2366</code>～<code>$C3:2390</code>）</td></tr>
 	<tr><td><code>$1B80</code>～<code>$1BBF</code></td><td>WRAM<code>$00:1E80</code>～<code>$00:1EBF</code>と同値</td></tr>
-	<tr><td><code>$1C00</code>～<code>$2BFF</code></td><td>演奏中のBGM用楽譜データ</td></tr>
-	<tr><td><code>$2C00</code>～<code>$47FF</code></td><td>効果音用楽譜データ（<code>$C3:23C8</code>～<code>$C3:3FC7</code>）</td></tr>
-	<tr><td><code>$4800</code>～<code>$4C34</code></td><td>効果音用音波形データ（<code>$C3:1F11</code>～<code>$C3:2365</code>）</td></tr>
-	<tr><td><code>$4C50</code>～<code>$????</code></td><td>演奏中のBGM用音波形データ</td></tr>
+	<tr><td><code>$1C00</code>～<code>$2BFF</code></td><td>演奏中のBGM用シーケンスデータ</td></tr>
+	<tr><td><code>$2C00</code>～<code>$47FF</code></td><td>効果音用シーケンスデータ（<code>$C3:23C8</code>～<code>$C3:3FC7</code>）</td></tr>
+	<tr><td><code>$4800</code>～<code>$4C34</code></td><td>効果音用サンプリングデータ（<code>$C3:1F11</code>～<code>$C3:2365</code>）</td></tr>
+	<tr><td><code>$4C50</code>～<code>$????</code></td><td>演奏中のBGM用サンプリングデータ</td></tr>
 	<tr><td><code>$FFC0</code>～<code>$FFFF</code></td><td>IPL ROM 64バイト（初期化用プログラム）</td></tr>
 </tbody>
 </table>

@@ -109,6 +109,7 @@ table {
 		<li><a href="flag.html">フラグ</a></li>
 		<li><a href="d5.html">各種データアドレス</a></li>
 		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
 		<li><a href="sprite.html">スプライト</a></li>
 		<li><a href="bg.html">背景グラフィックと効果</a></li>
@@ -206,6 +207,7 @@ table {
 		<li><a href="sound.html">サウンドについて</a></li>
 		<li><a href="sound1.html">BGMの再生</a></li>
 		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
 	</ul>
 </li>
 </ul>
@@ -375,6 +377,7 @@ table {
 	<tr><td><code>$00:010B</code>～<code>$00:01FF</code></td><td>（※スタック領域。<code>PHX</code>や<code>PHY</code>などのニーモニックで値を一時的に記録するアドレス。詳細：<a href="https://donkeyhacks.zouri.jp/databank/65C816/stack.html" target="_blank">65C816のスタック</a>）</td></tr>
 	<tr><td><code>$00:0114</code></td><td>BG1のサイズ決定値</td></tr>
 	<tr><td><code>$00:0116</code></td><td>BG2のサイズ決定値　兼　背景（BG2）が多重スクロールするマップでは<span class="formula">$01</span>～<span class="formula">$03</span>, それ以外は<span class="formula">$00</span></td></tr>
+	<tr><td><code>$00:0119</code></td><td>BGMIDコピー先</td></tr>
 	<tr><td><code>$00:011F</code></td><td>ランダムエンカウント時　エリア危険度</td></tr>
 	<tr><td><code>$00:0134</code></td><td>BG1タイルマップアドレスとサイズ<code>[$00:2107]</code>の下2ビット（マップサイズ）の値</td></tr>
 	<tr><td><code>$00:0135</code></td><td>BG2タイルマップアドレスとサイズ<code>[$00:2108]</code>の下2ビット（マップサイズ）の値</td></tr>
@@ -464,8 +467,7 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 <!-- 	<tr><td><code>$00:0A45</code></td><td>各シナリオの仲間1人目ID　最終編以外</td></tr>
 	<tr><td><code>$00:0A46</code></td><td>各シナリオの仲間2人目ID　最終編以外</td></tr>
 	<tr><td><code>$00:0A47</code></td><td>各シナリオの仲間3人目ID　最終編以外</td></tr> -->
-	<tr><td><code>$00:0A60</code></td><td>フィールド上
-	　サウンドルームBGMとは異なる　<a href="sounddata.html#BGMlist">BGM一覧表</a></td></tr>
+	<tr><td><code>$00:0A60</code></td><td>BGMID [$00:1D01]経由でAPU通信レジスタ$00:2140へ　<a href="sounddata.html#BGMlist">BGM一覧表</a></td></tr>
 	<tr><td><code>$00:0A61</code></td><td>BGMの再生ピッチ？（通常<span class="formula">$FF</span>、「いいお天気でしょっ!」の夜バージョンは<span class="formula">$60</span>）</td></tr>
 	<tr><td><code>$00:0AB0</code></td><td>主人公の行動順-1<br>（以下<code>$00:0AB3</code>まで入る数値は<span class="formula">$00</span>～<span class="formula">$03</span>のいずれか、味方キャラ順は加入順）</td></tr>
 	<tr><td><code>$00:0AB1</code></td><td>味方キャラ1の行動順-1</td></tr>
@@ -542,11 +544,11 @@ $00:01D0～D1　セリフ吹き出しの下の▽の位置？ -->
 	<tr><td><code>$00:1D01</td><td>【戦闘・マップ共通】サウンドデータID<code>$00:2141</code>記録用<br>現在のBGMまたは効果音ID</td></tr>
 	<tr><td><code>$00:1D02</code>～<code>$00:1D03</code></td><td>【戦闘・マップ共通】ARAM転送先アドレス2バイト（<code>$00:2142</code>～<code>$00:2143</code>）記録用</td></tr>
 	<tr><td><code>$00:1D05</code></td><td>現在のBGMID【戦闘・マップ共通】　<a href="sounddata.html#BGMlist">BGM一覧表</a></td></tr>
-	<tr><td><code>$00:1D20</code>～<code>$00:1D5F</code></td><td>【戦闘・マップ共通】現在ARAMに入っている音波形データID（2バイト区切り、最大32種類）</td></tr>
-	<tr><td><code>$00:1D60</code>～<code>$00:1D7F</code></td><td>【戦闘・マップ共通】現在のBGMの音波形データの最初の2バイト=波形データ量（2バイト区切り、単位バイト）<br>※曲演奏時、前の曲のデータ部分はリセットされず（<span class="formula">$00</span>が入らず）残る</td></tr>
+	<tr><td><code>$00:1D20</code>～<code>$00:1D5F</code></td><td>【戦闘・マップ共通】現在ARAMに入っているサンプリングデータID（2バイト区切り、最大32種類）</td></tr>
+	<tr><td><code>$00:1D60</code>～<code>$00:1D7F</code></td><td>【戦闘・マップ共通】現在のBGMのサンプリングデータの最初の2バイト=波形データ量（2バイト区切り、単位バイト）<br>※曲演奏時、前の曲のデータ部分はリセットされず（<span class="formula">$00</span>が入らず）残る</td></tr>
 	<tr><td><code>$00:1DE2</code></td><td>現在のBGM【戦闘・マップ共通】　<a href="sounddata.html#BGMlist">BGM一覧表</a></td></tr>
-	<tr><td><code>$00:1E00</code>～<code>$00:1E1F</code></td><td>【戦闘・マップ共通】現在のBGMの音波形データID16種（2バイト区切り）</td></tr>
-	<tr><td><code>$00:1E20</code>～<code>$00:1E3F</code></td><td>【戦闘・マップ共通】現在のBGMの音波形データID（2バイト区切り、ARAMに入っているデータと被っていない分）</td></tr>
+	<tr><td><code>$00:1E00</code>～<code>$00:1E1F</code></td><td>【戦闘・マップ共通】現在のBGMのサンプリングデータID16種（2バイト区切り）</td></tr>
+	<tr><td><code>$00:1E20</code>～<code>$00:1E3F</code></td><td>【戦闘・マップ共通】現在のBGMのサンプリングデータID（2バイト区切り、ARAMに入っているデータと被っていない分）</td></tr>
 	<tr><td><code>$00:1E80</code>～<code>$00:1EBF</code></td><td>【戦闘・マップ共通】ARAM<code>$1B80</code>～<code><code>1BBF</code>と同値
 	<tr><td><code>$7E:2A00</code>～<code>$7E:2A3F</code></td><td>メニュー→装備で、該当キャラのシナリオ別キャラデータがそのまま入る（<span class="formula">$23</span>のみ例外、異なる値が入る）</td></tr>
 	<tr><td><code>$7E:2F3C</code></td><td>文字入力画面　ページ数（<span class="formula">$00</span>～、シナリオなどにより最大ページ数は変動）</td></tr>

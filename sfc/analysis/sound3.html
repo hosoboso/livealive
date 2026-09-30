@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; シーケンスデータ調査">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; シーケンスデータ調査">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; シーケンスデータ調査</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+
+.fit-picture {
+  width: 30px;
+  height: 50px;
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの再生</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="sound.html">サウンドについて</a> &gt; シーケンスデータ調査</h1>
+<h2>サウンドについて &gt; シーケンスデータ調査</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>本作のシーケンスデータの仕様については不明であるが、色々と調べてみた結果は<br>
+<span class="tri"><a href="sequence.html">シーケンスデータ</a></span><br>
+にまとめてある。<br>
+ここでは、シーケンスデータ一覧を調べた経緯などを記してある。</p>
+
+<p>シーケンスデータはMIDIと似たようなものだと前に<a href="sound.html">記した</a>が、MIDIとの大きな相違点は、統一された規格はないということである。<br>
+シーケンスデータ（と、サンプリングデータ）はSPC700用のプログラムが処理してS-DSPにデータを送る。<br>
+ゲーム毎にSPC700用のプログラムがあり（本作なら<code>$C3:0746</code>～<code>$C3:1F0E</code>からARAM<code>$0200</code>～<code>$19C8</code>に入るデータ）、シーケンスデータはSPC700用のプログラムで処理できるように作られている。<br>
+では本作の仕様はどうなっているのか。<br>
+まったくヒントがないわけではなく、同時期に発売されたスクウェアのRPGの中で幾つかは先達による研究により、シーケンスデータの内容を解説したウェブサイトもいくつかある。</p>
+
+<p>スクウェアのスーパーファミコンのRPGのシーケンスデータ・コマンドの詳細は、ありがたいことに下に一覧があった。<br>
+（しかも日本語である、スーファミのデータといえば海外の英語のデータが大半なので本当に助かる……）</p>
+
+<ul>
+	<li><a href="https://gnilda.cloudfree.jp/spc/" target="_blank">スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+	<li>用語説明ページ：<a href="https://gnilda.cloudfree.jp/spc/supplementary_information.html" target="_blank">補足説明 (シーケンスコマンド・サウンドドライバファンクション)</a></li>
+</ul>
+
+<p>上ウェブサイト様には、「ファイナルファンタジー」4～6（ファイナルファンタジーは以降「FF」と省略する）、「クロノ・トリガー」、「ロマンシング・サガ」1～3（ロマンシング・サガは以降「ロマサガ」と省略する）のシーケンスデータの解説がある。<br>
+これらのゲームのサウンド・プログラムを手掛けた赤尾実氏（<a href="https://ja.wikipedia.org/wiki/%E8%B5%A4%E5%B0%BE%E5%AE%9F" target="_blank">赤尾実 - Wikipedia</a>）は「ライブ・ア・ライブ」のサウンド・プログラム担当でもあるため、ある程度までは共通した仕様があるようだ。</p>
+
+<p>なお、上ウェブサイト様の解説は、かなり専門的な部分まで踏み込んだ内容なので、やや難解な部分については、以下で筆者が個人的にわかりやすいような表記にした（つもり）。</p>
+
+<p>では、「ライブ・ア・ライブ」は上で紹介されているゲームの中で、どのゲームのサウンドプログラムに近いのだろうか。<br>
+「ライブ・ア・ライブ」発売前後について、FF、ロマサガ、クロノトリガーの発売順と、データ容量を並べてみると、以下のようになる。<br>
+参照：<a href="https://ja.wikipedia.org/wiki/%E3%82%B9%E3%82%AF%E3%82%A6%E3%82%A7%E3%82%A2_(%E3%82%B2%E3%83%BC%E3%83%A0%E4%BC%9A%E7%A4%BE)" target="_blank">スクウェア (ゲーム会社) - Wikipedia</a>　他</p>
+
+<table>
+<thead>
+	<tr><th>発売日</th><th>タイトル</th><th>容量</th></tr>
+</thead>
+<tbody>
+	<tr><td>1992年12月6日</td><td>ファイナルファンタジーV</td><td>16メガビット</td></tr>
+	<tr><td>1993年12月10日</td><td>ロマンシング サ・ガ2</td><td>16メガビット</td></tr>
+	<tr><td>1994年4月2日</td><td>ファイナルファンタジーVI</td><td>24メガビット</td></tr>
+	<tr><td>1994年9月2日</td><td>ライブ・ア・ライブ</td><td>16メガビット</td></tr>
+	<tr><td>1995年3月11日</td><td>クロノ・トリガー</td><td>32メガビット</td></tr>
+</tbody>
+</table>
+
+<p>「ライブ・ア・ライブ」は「FF6」と「クロノ・トリガー」の間だから、この2作品に近いシーケンスの構造だろう。<br>
+ただ、「FF6」と「クロノ・トリガー」は、「ライブ・ア・ライブ」よりもゲームデータの容量が大きいので、「ライブ・ア・ライブ」よりサウンドプログラムも大きい可能性がある。つまり、仕様がそこそこ違うかもしれない。<br>
+「ライブ・ア・ライブ」の前年発売、かつ容量が同じ16メガビットの「ロマサガ2」の方に近い可能性も考えられる。</p>
+
+<ul>
+	<li><a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+	<li><a href="https://gnilda.cloudfree.jp/spc/f6/sound_commands.html" target="_blank">シーケンスコマンド一覧 - FINAL FANTASY VI - スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+	<li><a href="https://gnilda.cloudfree.jp/spc/actj/sound_commands.html" target="_blank">シーケンスコマンド一覧 - CHRONO TRIGGER - スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+</ul>
+
+<p>3作品のシーケンスデータの内容を比較してみると、実はあまり大きな違いはない。<br>
+シーケンスデータに使えるコマンドは<span class="formula">$00</span>～<span class="formula">$FF</span>の<span class="formula">256</span>種類割り振られているのだが、<span class="formula">$00</span>～<span class="formula">$E9</span>までは3作品で共通であることがわかる。<br>
+その後の<span class="formula">$EA</span>以降には差がある（コマンド指定値が異なるだけで内容は同じものもあるが）。</p>
+
+<p>後々で説明していくが、おそらく本作は「ロマサガ2」とほぼ共通のシーケンスコマンドを使っている。<br>
+容量が同一なこともあり、仕様がかなり近いのだろう。<br>
+余談だが、「FF5」と「ロマサガ2」では、シーケンスコマンドの配置がかなり変更されており、「FF5」と「ロマサガ2」の間でサウンドプログラムにはそれなりに仕様変更が行われたようだ。<br>
+（仕様が変わったといってもスーパーファミコンのハード自体に変更はないので、メーカー側でスーパーファミコンのサウンドに関する研究が進み、サウンドプログラムもより洗練されていった、という意味である）</p>
+
+<p>その他のウェブサイトも参考にさせていただいた。<br>
+まとめてみるとだいたい以下のようになる。</p>
+
+<div id="captiondata"></div>
+
+<h3>ヘッダ</h3>
+
+<p>本作の場合、シーケンスデータの頭の2バイトは容量（バイト）で、それ以降の値がARAMに入るが、データの冒頭、つまりヘッダはだいたい、</p>
+
+<ul>
+	<li>シーケンスデータのサイズ（<span class="formula">2</span>バイト）</li>
+	<li>チャネル0～7の開始アドレス（各<span class="formula">2</span>バイト）</li>
+</ul>
+
+<p>が、入るようである。<br>
+ここの「開始アドレス」は、元々のシーケンスデータの入っているアドレスのことで、ARAMに転送後のことではない。<br>
+「ライブ・ア・ライブ」ならバンク<span class="formula">$C5</span>～<span class="formula">$C6</span>にBGMのシーケンスデータが入っているが、このシーケンスデータのアドレス部にあたる。<br>
+つまり、シーケンスデータの中で、チャネル0のデータはここから、チャネル1のデータはここから、……という指示がヘッダに入っている。</p>
+
+<h3>シーケンスコマンド</h3>
+
+<p>「シーケンスコマンド」とは、シーケンスデータ内に記された、「この値ならこの音をこの時間鳴らせ」とか、「ここからエコーをかけろ」といったコマンドのこと。ある種のプログラムである。<br>
+シーケンスコマンドはゲーム毎にプログラマーが独自に決めているが、先に記したとおり、「ライブ・ア・ライブ」の頃のスクウェアのRPGのサウンドプログラムは赤尾実氏が多数担当していたため（Wikipediaによれば、氏は「スクウェアの黎明期から同社作品においてほとんどのサウンドプログラムを一手に引き受けていた」そうである）、氏がサウンドプログラムを担当したゲームのシーケンスコマンドには共通点が多い。</p>
+
+<p>シーケンスコマンドは大きく2種類あると考えて良い。<br>
+ひとつは楽譜でいうところの音符や休符にあたる演奏記号。<br>
+もうひとつはそれ以外、S-DSPでかけられるエフェクト（エコー、ノイズ）、ピッチ変更、ループ位置の指示、演奏停止指示……などなど。</p>
+
+<h4>音符・休符・スラー</h4>
+
+<p>「ロマサガ2」「FF6」「クロノ・トリガー」なら、音符の記述方法は以下のようになる。<br>
+（「ライブ・ア・ライブ」も共通と見てよいようだ）</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span>～<span class="formula">$0D</span></td><td>C（ド）を演奏</td></tr>
+	<tr><td><span class="formula">$0E</span>～<span class="formula">$1B</span></td><td>C#（ド#）を演奏</td></tr>
+	<tr><td><span class="formula">$1C</span>～<span class="formula">$29</span></td><td>D（レ）を演奏</td></tr>
+	<tr><td><span class="formula">$2A</span>～<span class="formula">$37</span></td><td>D#（レ#）を演奏</td></tr>
+	<tr><td><span class="formula">$38</span>～<span class="formula">$45</span></td><td>E（ミ）を演奏</td></tr>
+	<tr><td><span class="formula">$46</span>～<span class="formula">$53</span></td><td>F（ファ）を演奏</td></tr>
+	<tr><td><span class="formula">$54</span>～<span class="formula">$61</span></td><td>F#（ファ#）を演奏</td></tr>
+	<tr><td><span class="formula">$62</span>～<span class="formula">$6F</span></td><td>G（ソ）を演奏</td></tr>
+	<tr><td><span class="formula">$70</span>～<span class="formula">$7D</span></td><td>G#（ソ#）を演奏</td></tr>
+	<tr><td><span class="formula">$7E</span>～<span class="formula">$8B</span></td><td>A（ラ）を演奏</td></tr>
+	<tr><td><span class="formula">$8C</span>～<span class="formula">$99</span></td><td>A#（ラ#）を演奏</td></tr>
+	<tr><td><span class="formula">$9A</span>～<span class="formula">$A7</span></td><td>B（シ）を演奏</td></tr>
+	<tr><td><span class="formula">$A8</span>～<span class="formula">$B5</span></td><td>タイ（前の音を伸ばす）</td></tr>
+	<tr><td><span class="formula">$B6</span>～<span class="formula">$C3</span></td><td>休符（音演奏なし）</td></tr>
+</tbody>
+</table>
+
+<p>音符や休符1個につき1バイトの値ということなのだが、なぜ同じ「C（ド）」の音なのに値が<span class="formula">$00</span>～<span class="formula">$0D</span>と14段階分の幅があるのか？<br>
+それは、値が音の演奏の長さになるからである。休符なら休符の長さで、スラーの音の演奏長さも同じ。<br>
+（なお、タイの指示をする場合、ひとつ前に何かの音を出していなければ何の意味もない）</p>
+
+<p>例えば「C（ド）」なら、<span class="formula">$00</span>～<span class="formula">$0D</span>は以下を示す。<br>
+ティック数はデジタルサウンド・MIDIにおける音の長さの単位のこと。詳しくは後述。<br>
+分数は1小節に占める長さ（相対比）のようなものと思っていただきたい。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>ティック数</th><th>相対比</th><th>音符名</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td><span class="formula">$C0</span></td><td><span class="formula">1/1</span></td><td>全音符</td></tr>
+	<tr><td><span class="formula">$01</span></td><td><span class="formula">$60</span></td><td><span class="formula">1/2</span></td><td>2分音符</td></tr>
+	<tr><td><span class="formula">$02</span></td><td><span class="formula">$40</span></td><td><span class="formula">1/3</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$03</span></td><td><span class="formula">$48</span></td><td><span class="formula">3/8</span></td><td>付点4分音符</td></tr>
+	<tr><td><span class="formula">$04</span></td><td><span class="formula">$30</span></td><td><span class="formula">1/4</span></td><td>4分音符&#9833;</td></tr>
+	<tr><td><span class="formula">$05</span></td><td><span class="formula">$20</span></td><td><span class="formula">1/6</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$06</span></td><td><span class="formula">$24</span></td><td><span class="formula">3/16</span></td><td>付点8分音符</td></tr>
+	<tr><td><span class="formula">$07</span></td><td><span class="formula">$18</span></td><td><span class="formula">1/8</span></td><td>8分音符&#9834;</td></tr>
+	<tr><td><span class="formula">$08</span></td><td><span class="formula">$10</span></td><td><span class="formula">1/12</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$09</span></td><td><span class="formula">$0C</span></td><td><span class="formula">1/16</span></td><td>16分音符</td></tr>
+	<tr><td><span class="formula">$0A</span></td><td><span class="formula">$08</span></td><td><span class="formula">1/24</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$0B</span></td><td><span class="formula">$06</span></td><td><span class="formula">1/32</span></td><td>32分音符</td></tr>
+	<tr><td><span class="formula">$0C</span></td><td><span class="formula">$04</span></td><td><span class="formula">1/48</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$0D</span></td><td><span class="formula">$03</span></td><td><span class="formula">1/64</span></td><td>64分音符</td></tr>
+</tbody>
+</table>
+
+<p>値が小さいほど演奏する時間は長い、ということである。<br>
+<span class="formula">1/3</span>や<span class="formula">1/6</span>、<span class="formula">1/12</span>といった長さの音符は三連符などに使うのだろう。</p>
+
+<p>ティック（Tick）数は、デジタルサウンド・MIDIにおける音の長さの単位というか、分解能。<br>
+「4分音符の長さを何ティックに分割するか」で定義される数値で、分割数が大きいほど、より小さな時間で音を変化させられ、複雑な音の表現ができる。<br>
+詳しいことは何かしらで検索していただきたい。<br>
+とりあえず音の長さの単位と思っていただければ良い。</p>
+
+<p>また、音の範囲は1オクターブ分ということになる。<br>
+オクターブを上げる、または下げる場合は後述のコマンドで行っている。</p>
+
+<h4>効果など</h4>
+
+<p>「ロマサガ2」「FF6」「クロノ・トリガー」いずれも、シーケンスコマンド<span class="formula">$C4</span>以降は効果など各種演奏の指示である。<br>
+色々と調べた結果、「ライブ・ア・ライブ」のコマンド<span class="formula">$C4</span>以降は「ロマサガ2」とほぼ共通のようである。</p>
+
+<p>シーケンスコマンドの内容によっては引数がある。<br>
+例えば、シーケンスコマンド<span class="formula">$C4</span>はトラック音量設定（演奏曲全体の音量設定ではない）で、</p>
+
+<p><code>C4 xx</code></p>
+
+<p>のように、設定したい音量を引数として<code>xx</code>に続ける。</p>
+
+<p><code>xx</code> : トラック音量 (<span class="formula">$00</span>～<span class="formula">$7F</span>)</p>
+
+<p>となる。<br>
+一方、シーケンスコマンド<span class="formula">$C5</span>はトラック音量変化。音量設定と同じように見えるが内容は変わり、</p>
+
+<p><code>C5 xx yy</code><br>
+<code>xx</code> : 変化処理回数 (<span class="formula">$00</span>～<span class="formula">$FF</span>)<br>
+<code>yy</code> : トラック音量 (<span class="formula">$00</span>～<span class="formula">$7F</span>)</p>
+
+<p>引数が2種類ある。要するに処理回数分滑らかに音量を変化させるためのコマンドである。<br>
+その他のシーケンスコマンドについての詳細な説明は、<br>
+<a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a><br>
+にあるので参照していただきたい。</p>
+
+<h3>本作の例</h3>
+
+<p>実際に「ライブ・ア・ライブ」のシーケンスデータについて調べてみよう。<br>
+まず、一番簡単そうなシーケンスデータである、近未来編のオルガン関係をあたってみることにする。<br>
+1曲だけでは比較対象もなくわかりにくいため、まずは、</p>
+
+<ul>
+	<li>BGMID<span class="formula">$40</span>「効果音（近未来編・オルガン　むすんでひらいて）」</li>
+	<li>BGMID<span class="formula">$43</span>「効果音（近未来編・オルガン　チョコボのテーマ）」</li>
+</ul>
+
+<p>を見てみよう。<br>
+どちらの曲もサンプリングデータはオルガンのみで単音が続き、曲の長さもたった2小節である。<br>
+筆者が聞いた感じだと以下のような楽譜になる、と思う。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bgm40.png" class="modal-link">
+		<img src="img/bgm40.png" alt="BGMID40「効果音（近未来編・オルガン　むすんでひらいて）」" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bgm43.png" class="modal-link">
+		<img src="img/bgm43.png" alt="BGMID43「効果音（近未来編・オルガン　チョコボのテーマ）」" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<ul>
+	<li>BGMID<span class="formula">$40</span>は「ラ ラ ソ ファ ファ ソ ソ ファ」</li>
+	<li>BGMID<span class="formula">$43</span>は「レ シ ソ ミ レ シ ソ ソ ソ ラ ソ ファ ソ」</li>
+</ul>
+
+<p>で合っていると思う。リズムはズレているかもしれない。<br>
+休符が挟まる可能性もあるが、音符の総数は合っているはずだ。</p>
+
+<p>BGMID<span class="formula">$40</span>のシーケンスデータは<code>$C6:BD2B</code>～<code>$C6:BD72</code>で、最初の2バイトはデータ容量（<span class="formula">$0046</span>バイト）。<br>
+BGMID<span class="formula">$43</span>のシーケンスデータは<code>$C6:BE13</code>～<code>$C6:BE63</code>で、最初の2バイトはデータ容量（<span class="formula">$004F</span>バイト）。<br>
+16バイト区切りで並べると以下のようになる。</p>
+
+<div class="code-container"><pre>
+;BGMID$40
+46 00 51 BD 73 BD 51 BD 73 BD 73 BD 73 BD 73 BD
+73 BD 73 BD 73 BD 51 BD 73 BD 73 BD 73 BD 73 BD
+73 BD 73 BD 73 BD F0 96 F2 28 F4 46 00 D4 C6 80
+D9 F9 DC 20 C4 F0 D6 05 3F BD 3D 24 07 BD 07 BD
+23 BD 23 BD 03 BD F8 EB 
+</pre></div>
+<br>
+<div class="code-container"><pre>
+;BGMID$43
+4F 00 39 BE 64 BE 39 BE 64 BE 64 BE 64 BE 64 BE
+64 BE 64 BE 64 BE 39 BE 64 BE 64 BE 64 BE 64 BE
+64 BE 64 BE 64 BE F0 8A F2 28 F4 46 00 D4 C6 80
+DC 20 C4 D2 D6 05 23 BD D8 A1 6A C0 3F D7 24 C0
+D8 A2 C0 6A C0 6B BF 6B 87 6B BF 4F BF 65 BD F8
+EB 
+</pre></div>
+
+<p>前半部分に明らかな共通点が見られる。<br>
+ヘッダとして最初の<span class="formula">2</span>バイトはデータ容量、以降がチャネル0～7の開始アドレス（各<span class="formula">2</span>バイト）と仮定して、最初のデータ容量部分は除いて4バイト区切りで並べてみる。</p>
+
+<div class="code-container"><pre>
+;BGMID$40
+51 BD 73 BD
+51 BD 73 BD
+73 BD 73 BD
+73 BD 73 BD
+73 BD 73 BD
+51 BD 73 BD
+73 BD 73 BD
+73 BD 73 BD
+73 BD 73 BD
+;…… 
+</pre></div>
+<br>
+<div class="code-container"><pre>
+;BGMID$43
+39 BE 64 BE
+39 BE 64 BE
+64 BE 64 BE
+64 BE 64 BE
+64 BE 64 BE
+39 BE 64 BE
+64 BE 64 BE
+64 BE 64 BE
+64 BE 64 BE
+;…… 
+</pre></div>
+
+<p>サンプリングデータはオルガンの1種類しか使っていないから、チャネル0～7の開始アドレスが<span class="formula">16</span>バイト続くとしたら、チャネル0（オルガン）の開始位置は、</p>
+<ul>
+	<li>BGMID<span class="formula">$40</span>：アドレス<code>$BD51</code>から開始</li>
+	<li>BGMID<span class="formula">$43</span>：アドレス<code>$BE64</code>から開始</li>
+</ul>
+<p>と、いうことだと思う。<br>
+最初の<span class="formula">2</span>バイトはアドレス開始位置、次の<span class="formula">2</span>バイトはアドレス終了位置として、次からの<span class="formula">16</span>バイトはチャネル0～7の開始アドレス。ただしなぜか2セットある。</p>
+
+<div class="code-container"><pre>
+;BGMID$40
+51 BD 73 BD ;データ開始・終了位置指定
+
+51 BD 73 BD ;チャネル0～7の開始アドレス
+73 BD 73 BD ;
+73 BD 73 BD ;
+73 BD 73 BD ;ここまで
+
+51 BD 73 BD ;チャネル0～7の開始アドレス
+73 BD 73 BD ;
+73 BD 73 BD ;
+73 BD 73 BD ;ここまで
+</pre></div>
+
+<p>こう区切れば、まあまあわからなくはないのだが……<br>
+これは他の曲のデータも見なければ、なぜアドレスをこれだけの容量を割いて指定しているのやら、よくわからない。</p>
+
+<h4>シーケンスデータ</h4>
+
+<p>では、チャネル0開始位置以降を見てみよう。<br>
+実質、ここからデータ終わりまで、チャネル0のデータのみのはずだ。<br>
+「ロマサガ2」のシーケンスコマンドをそのまま当てはめてみると、うまくいくかどうか？　の確認をしてみた。<br>
+用語も<br>
+<a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a><br>
+を、そのまま流用させていただいた。<br>
+ただ、音階だけは筆者の耳コピの値を書き入れている。後で説明していく。</p>
+
+<div class="code-container"><pre>
+;BGMID$40
+F0 96      ;音楽演奏速度基本値設定 ($01～$FF)
+F2 28      ;エコーボリューム設定 ($00～$FE)
+F4 46 00   ;エコーフィードバック設定
+D4         ;エコー オン
+C6 80      ;パン（左右の音）設定 $00 (左) ～ $80 (中央・モノラル) ～ $FF (右) 
+D9 F9      ;キートランスポーズ値設定($80～$7F)
+DC 20      ;サンプリングデータ選択（ARAMに入ったサンプリングデータの位置の番号）
+C4 F0      ;トラック音量 ($00～$FF)
+D6 05      ;オクターブ設定 ($00～$0F)
+;チャネル0演奏（音符）
+3F         ;ラ 8分音符
+BD         ;8分休符
+3D         ;ラ
+24         ;ソ
+07         ;ファ 8分音符
+BD         ;8分休符
+07         ;ファ 8分音符
+BD         ;8分休符
+23         ;ソ 8分音符
+BD         ;8分休符
+23         ;ソ 8分音符
+BD         ;8分休符
+03         ;ファ
+BD         ;8分休符
+F8         ;？
+EB         ;演奏終了
+</pre></div>
+<br>
+<div class="code-container"><pre>
+;BGMID$43
+F0 8A      ;音楽演奏速度基本値設定 ($01～$FF)
+F2 28      ;エコーボリューム設定 ($00～$FE)
+F4 46 00   ;エコーフィードバック設定
+D4         ;エコー オン 
+C6 80      ;パン（左右の音）設定 $00 (左) ～ $80 (中央・モノラル) ～ $FF (右) 
+DC 20      ;サンプリングデータ選択（ARAMに入ったサンプリングデータの位置の番号）
+C4 D2      ;トラック音量 ($00～$FF)
+D6 05      ;オクターブ設定 ($00～$0F)
+;チャネル0演奏（音符）
+23         ;レ 8分音符
+BD         ;8分休符
+D8         ;オクターブ-1
+A1         ;シ 8分音符
+6A         ;ソ
+C0         ;休符
+3F         ;ミ 8分音符
+D7         ;オクターブ+1
+24         ;レ
+C0         ;休符
+D8         ;オクターブ-1
+A2         ;シ
+C0         ;休符
+6A         ;ソ
+C0         ;休符
+6B         ;ソ 16分音符
+BF         ;16分休符
+6B         ;ソ 16分音符
+87         ;ラ 16分音符
+6B         ;ソ 16分音符
+BF         ;16分休符
+4F         ;ファ 16分音符
+BF         ;16分休符
+65         ;ソ 付点4分音符
+BD         ;8分休符
+F8         ;？
+EB         ;演奏終了
+</pre></div>
+
+
+<p>筆者の見た限り、「ロマサガ2」のシーケンスコマンドはほぼそのまま使えているようである。<br>
+「<code>DC 20</code>」で指定されたサンプリングデータの位置の番号は、BGMの場合<span class="formula">$20</span>からナンバリングされ、どちらもサンプリングデータが同一（オルガン）であることを示しているし、音符や休符については、メロディは耳コピと同じで（後述）、音を途切れさせるために音と音の間に休符が入っていることがわかる。<br>
+ちなみにこのデータを「FF6」のシーケンスコマンドで読んでいくと、コマンド<span class="formula">$F4</span>でつまずくことになる。</p>
+
+<ul>
+	<li>ロマサガ2：<br><code>F4 xx yy</code> エコーフィードバック設定・FIR フィルタ係数テーブル選択</li>
+	<li>FF6：<br><code>F4 xx</code> 音楽音量設定</li>
+</ul>
+
+<p>と、内容も引数の種類も異なる。<br>
+「<code>F4 46 00 D4</code>」を「FF6」のシーケンスコマンドで読むと「<code>F4 46</code>」が音楽音量設定で、次が「<code>00</code>」だから「ド」の音になってしまうのだが、どちらの曲も最初の音は「ド」ではない。<br>
+このため、この時点で、コマンド<span class="formula">$F4</span>について「FF6」のシーケンスコマンドとは内容が異なることが確定である。</p>
+
+<p>問題は、コマンド<span class="formula">$F8</span>という、「ロマサガ2」一覧にはなかったシーケンスコマンドが最後にあるという点。<br>
+どちらも「<code>F8 EB</code>」で終了しているのだが、これだけでは、</p>
+
+<ul>
+	<li>コマンド<span class="formula">$F8</span>が<span class="formula">EB</span>という引数を取っているのか？</li>
+	<li>コマンド<span class="formula">$F8</span>, コマンド<span class="formula">$EB</span>（演奏終了）という2つのコマンドに分かれるのか？</li>
+</ul>
+
+<p>がわからない。<br>
+他のシーケンスデータと比較して判断するより他なさそうだ。</p>
+
+<p>ということで、以降もひとまずは、「ロマサガ2」のシーケンスコマンドで読み進めていく。</p>
+
+<p>その他についても説明していく。</p>
+
+<h4>音符</h4>
+
+<p>音符についてだが、BGMID<span class="formula">$43</span>（チョコボの曲）については音階が「ロマサガ2」のシーケンスコマンドと一致する。<br>
+BGMID<span class="formula">$40</span>（むすんでひらいて）は耳コピとズレている。<br>
+例えば筆者が「ラ」と聞き取った<span class="formula">$3F</span>は、実際には「ミ」の8分音符である。<br>
+このズレはBGMID<span class="formula">$40</span>だけ設定されている、</p>
+
+<div class="code-container"><pre>
+D9 F9      ;キートランスポーズ値設定($80～$7F)
+</pre></div>
+
+<p>ここに起因している。<br>
+キートランスポーズ値というのは、カラオケでいうところのキー設定のことだと考えていただきたい。<br>
+調（キー）の変更で音階自体を上げ下げしているのである。</p>
+
+<p><code>D9</code>の引数に<span class="formula">$F9</span>が設定されているが、キートランスポーズ値設定の値が<span class="formula">$80</span>～<span class="formula">$7F</span>なのは、引数に設定できるのが符号付き8ビット整数（10進数の<span class="formula">-127</span>から<span class="formula">+127</span>）だからであって、<span class="formula">$F9</span>は<span class="formula">-7</span>にあたる。<br>
+「ミ」から半音ずつ下げていくと「#レ」→「レ」→「#ド」→「ド」→「シ」→「#ラ」→「ラ」と、<span class="formula">-7</span>した時点で「ラ」になる。<br>
+ということで、本来より半音ずつ-7したキーで演奏した結果が耳コピの音になっていたのである。<br>
+また、キートランスポーズ値を設定しない場合は自動的に「<code>D9 00</code>」、つまりキー変化なしという設定になるそうである。</p>
+
+<p>シーケンスコマンドの仕様上、ド～シの1オクターブ分の範囲外の音を演奏したい場合は、まずオクターブ変更（コマンド<span class="formula">$D7</span>か<span class="formula">$D8</span>）を使わなければならない。<br>
+BGMID<span class="formula">$40</span>（むすんでひらいて）は、楽譜のままだと、演奏中にド～シの1オクターブ分をはみ出すのでオクターブ変更が必要になるが、「調（キー）を予め変更した楽譜を作って、実際の演奏では調（キー）を最初の楽譜通りに設定する」ことでオクターブ変更を回避しているのだと思う。この方がデータ量が少なくて済む。</p>
+
+<h4>ループする曲</h4>
+
+<p>次は、比較的データ量は少ないがループする曲を見てみよう。<br>
+ここでは、BGMID<span class="formula">$0C</span>「猛者達…」（<code>$C5:EE73</code>～<code>$C5:F0BE</code>, <span class="formula">$024B</span>バイト）を見てみることにした。<br>
+現代編の対戦相手セレクト画面の曲で、4小節（8小節？）でループする。<br>
+楽譜の構造でいえば8小節だと下のような感じ（楽譜1段分）。<br>
+（実際は4小節の気がするが、8小節の方がループをわかりやすくできそうなので……）</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bgm0c.png" class="modal-link">
+		<img src="img/bgm0c.png" alt="BGMID0C「猛者達…」楽譜構造" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>ループが短いためか、8音すべて使っているにも関わらずシーケンスデータ量は少なめの方である。<br>
+こちらでも、「ロマサガ2」のシーケンスコマンドをそのまま使ってみることにする。<br>
+ループのジャンプ先をわかりやすくするため、ループ位置に&#x2460;～&#x2463;と丸数字をつけている。</p>
+
+<div class="code-container"><pre>
+;ヘッダ
+4B 02       ;容量$024Bバイト
+99 EE C0 F0 ;データ位置
+
+99 EE 32 EF ;チャネル0設定$C5:EE99, チャネル1設定$C5:EF32
+76 EF 89 EF ;チャネル2設定$C5:EF76, チャネル3設定$C5:EF89
+AF EF D5 EF ;チャネル4設定$C5:EFAF, チャネル5設定$C5:EFD5
+0E F0 4E F0 ;チャネル6設定$C5:F00E, チャネル7設定$C5:F04E
+
+99 EE 32 EF ;
+76 EF 89 EF ;
+AF EF D5 EF ;
+0E F0 4E F0 ;
+
+;チャネル0設定$C5:EE99
+F5 B8       ;音楽音量設定
+F0 80       ;音楽演奏速度基本値設定
+C6 80       ;パン（左右の音）設定
+F2 50       ;エコーボリューム設定
+F4 5A 00    ;エコーフィードバック設定
+;$C5:EEA4&#x2460;
+E2 01       ;ループ開始位置
+DC 20       ;サンプリングデータ選択
+C4 DE       ;トラック音量設定
+D6 06       ;オクターブ設定
+
+;チャネル0演奏$C5:EEAC
+07          ;ド 8分音符
+C4 C2       ;トラック音量設定
+07          ;ド 8分音符
+DC 21       ;サンプリングデータ選択
+C4 F6       ;トラック音量設定
+07          ;ド 8分音符
+DC 20       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+DC 21       ;サンプリングデータ選択
+C4 B2       ;トラック音量設定
+09          ;ド 16分音符
+DC 20       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+DC 21       ;サンプリングデータ選択
+C4 B2       ;トラック音量設定
+09          ;ド 16分音符
+DC 20       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+07          ;ド 8分音符
+DC 21       ;サンプリングデータ選択
+C4 F6       ;トラック音量設定
+07          ;ド 8分音符
+DC 20       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+C4 DE       ;トラック音量設定
+09          ;ド 16分音符
+BF          ;16分休符
+DC 21       ;サンプリングデータ選択
+C4 B2       ;トラック音量設定
+09          ;ド 16分音符
+DC 20       ;サンプリングデータ選択
+C4 DE       ;トラック音量設定
+07          ;ド 8分音符
+DC 21       ;サンプリングデータ選択
+C4 F6       ;トラック音量設定
+07          ;ド 8分音符
+DC 20       ;サンプリングデータ選択
+C4 B2       ;トラック音量設定
+09          ;ド 16分音符
+DC 21       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+F6 02 12 EF ;&#x2461;ループ内条件ジャンプ 処理回数$02 ジャンプ先$EF12
+DC 20       ;サンプリングデータ選択
+07          ;ド 8分音符
+DC 21       ;サンプリングデータ選択
+09          ;ド 16分音符
+DC 20       ;サンプリングデータ選択
+C4 B2       ;トラック音量設定
+09          ;ド 16分音符
+DC 21       ;サンプリングデータ選択
+C4 F6       ;トラック音量設定
+07          ;ド 8分音符
+DC 20       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+DC 21       ;サンプリングデータ選択
+09          ;ド 16分音符
+E3          ;&#x2462;繰り返し・ループ終了
+;$C5:EF12
+DC 20       ;サンプリングデータ選択
+C4 DE       ;トラック音量設定
+09          ;ド 16分音符
+DC 21       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+C4 92       ;トラック音量設定
+09          ;ド 16分音符
+DC 20       ;サンプリングデータ選択
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+DC 21       ;サンプリングデータ選択
+C4 F6       ;トラック音量設定
+07          ;ド 8分音符
+C4 92       ;トラック音量設定
+09          ;ド 16分音符
+C4 C2       ;トラック音量設定
+09          ;ド 16分音符
+F7 A4 EE    ;&#x2463;$EEA4へジャンプ
+</pre></div>
+
+<p>まず、ヘッダとチャネル0の演奏部分だけ取り上げる。<br>
+ヘッダは容量やチャネル0～チャネル7の開始アドレスなど、オルガンの曲と同じなので、やはり「ライブ・ア・ライブ」においてヘッダは<span class="formula">38</span>バイト（そのうち容量を記した冒頭<span class="formula">2</span>バイトを除く<span class="formula">36</span>バイトをARAMに転送）と考えて良いようである。</p>
+
+<p><code>$C5:EE99</code>からチャネル0設定で、オルガンの曲にはなかった設定がいくつかある。</p>
+
+<div class="code-container"><pre>
+;チャネル0設定$C5:EE99
+F5 B8       ;音楽音量設定
+F0 80       ;音楽演奏速度基本値設定
+C6 80       ;パン（左右の音）設定
+F2 50       ;エコーボリューム設定
+F4 5A 00    ;エコーフィードバック設定
+;$C5:EEA4&#x2460;
+E2 01       ;ループ開始位置
+DC 20       ;サンプリングデータ選択
+C4 DE       ;トラック音量設定
+D6 06       ;オクターブ設定
+</pre></div>
+
+<p>まず、シーケンスコマンド<span class="formula">$F5</span>の音楽音量設定がある。<br>
+これは曲に使う8チャネル全体の音量設定になる。<br>
+「ロマサガ2」だと、シーケンスコマンド<span class="formula">$F5</span>を設定しない場合、デフォルト値として<span class="formula">$FF</span>が音量設定になるそうである。</p>
+
+<p>もうひとつはシーケンスコマンド<span class="formula">$E2</span>、ループ開始位置の指定。<br>
+<span class="formula">$E2</span>が書き込まれたアドレスが開始位置指定で、引数は「カウントダウンカウンタの初期値 (<span class="formula">$00</span>～<span class="formula">$FF</span>)」。<br>
+シーケンスコマンド<span class="formula">$E2</span>は<span class="formula">$E3</span>, <span class="formula">$F6</span>, <span class="formula">$F7</span>と合わせて使うのだが（演奏順により使う必要のないコマンドもある）、「猛者達…」は以下のような構造になっている。</p>
+
+<div class="code-container"><pre>
+E2 xx       ;&#x2460;ループ開始位置
+            ;xx : カウントダウンカウンタ初期値
+            ;コマンドF6のカウントアップカウンタ値 (コマンド処理回数) を 0 に初期化する
+;（処理1）
+F6 aa bbbb  ;&#x2461;ループ内条件ジャンプ
+            ;aa : 処理回数, bbbb : ジャンプ先
+;（処理2）
+E3          ;&#x2462;ループ終了位置
+            ;カウントダウンカウンタが0なら無限ループ、1ならループ抜ける、2以上ならカウンタを-1してループ開始位置ジャンプ
+;（処理3）
+F7 zzzz     ;&#x2463;ジャンプ　zzzz : ジャンプ先
+</pre></div>
+
+<p>「猛者達…」だと、</p>
+
+<div class="code-container"><pre>
+E2 01       ;&#x2460;EEA4 ループ開始位置 カウントダウンカウンタ初期値$01
+;（処理1）
+F6 02 12 EF ;&#x2461;ループ内条件ジャンプ 処理回数$02 ジャンプ先$EF12
+;（処理2）
+E3          ;&#x2462;繰り返し・ループ終了
+;$EF12～（処理3）
+F7 A4 EE    ;&#x2463;$EEA4へジャンプ
+</pre></div>
+
+<p>こうなっている。<br>
+演奏順は、</p>
+
+<ol>
+	<li>&#x2460;</li>
+	<li>処理1</li>
+	<li>&#x2461;ループ内条件ジャンプの1回目通過（処理回数<span class="formula">$02</span>のため、通過させる）</li>
+	<li>処理2</li>
+	<li>&#x2462;ループ抜けて&#x2460;戻る</li>
+	<li>処理1</li>
+	<li>&#x2461;ループ内条件ジャンプの2回目ジャンプ（処理回数<span class="formula">$02</span>のため、処理3にジャンプさせる）</li>
+	<li>処理3</li>
+	<li>&#x2463;ループ頭に戻り処理1から無限ループ</li>
+</ol>
+
+<p>こうなる。<br>
+さきほどの楽譜の、</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bgm0c.png" class="modal-link">
+		<img src="img/bgm0c.png" alt="BGMID0C「猛者達…」楽譜構造" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>処理1が楽譜でいうところの<span class="r">&#x2460;</span>～<span class="r">&#x2462;</span>で、処理2が楽譜<span class="r">&#x2463;</span>、処理3が楽譜<span class="r">&#x2464;</span>になる。丸数字が混ざりまくって申し訳ない。</p>
+
+<p>ということで、ループ関係の処理も、「ロマサガ2」のシーケンスコマンドがそのまま使えるようだ。</p>
+
+<p>音符部分だが、サンプリングデータNo.20と21を切り替えながら、8分音符または16分音符の「ド」をひたすら演奏している。<br>
+「猛者達…」サンプリングデータNo.20と21だが、サンプリングデータID<span class="formula">$35</span>と<span class="formula">$34</span>にあたり、ドラムセットの何かしらのドラムの音2種である（スネアドラムとかバスドラムとか）。筆者がドラムに詳しくないので、何がどれなのかわからないのは申し訳ない。</p>
+
+<p>以降、チャネル1～7の演奏データが続くことになる。<br>
+なのだが、チャネル1～7にはシーケンスコマンド<span class="formula">$E2</span>, <span class="formula">$E3</span>, <span class="formula">$F6</span>によるループ位置の指定がない。<br>
+唯一<span class="formula">$F7</span>だけは指定がある。</p>
+
+<p>例えばチャネル2は以下である。</p>
+
+<div class="code-container"><pre>
+;チャネル2設定$C5:EF76
+DC 24       ;サンプリングデータ選択 ID$28低音のベース系？
+C6 1C       ;パン設定
+C4 8C       ;トラック音量設定
+D6 04       ;オクターブ設定
+D4          ;エコー オン
+;チャネル2演奏 $EF7F
+7E          ;ラ 全音符
+AB          ;タイ 付点4分
+B1          ;タイ 16分
+89          ;ラ 32分音符
+C1          ;32分休符
+3C          ;ミ 4分音符
+66          ;ソ 4分音符
+F7 7F EF    ;$EF7Fへジャンプ
+</pre></div>
+
+<p>さきほどの楽譜の、</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/bgm0c.png" class="modal-link">
+		<img src="img/bgm0c.png" alt="BGMID0C「猛者達…」楽譜構造" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p><span class="r">&#x2460;</span>～<span class="r">&#x2461;</span>で流す部分が、<span class="r">&#x2462;</span>～<span class="r">&#x2463;</span>も<span class="r">&#x2462;</span>～<span class="r">&#x2464;</span>でも共通だから、<span class="r">&#x2460;</span>～<span class="r">&#x2461;</span>をひたすらループ演奏しているので演奏部分がとても短いのである。<br>
+ただ、どのチャネルもループだけはするので、最後にシーケンスコマンド<span class="formula">$F7</span>で冒頭にジャンプする処理が必ず入っている。</p>
+
+<p>……と、すべてのチャネル処理を見ても、先程のオルガンの曲で謎だったコマンド<span class="formula">$F8</span>が見当たらない。<br>
+どのチャネルも必ずコマンド<span class="formula">$F7</span>で終わっている。<br>
+コマンド<span class="formula">$F8</span>はループ処理のない曲でのみの何かしらなのだろうか？</p>
+
+<p>他にループのない曲だと、同じく現代編に、BGMID<span class="formula">$4C</span>「Versus!」がある。<br>
+戦闘開始前のジングル的に使われている曲である。<br>
+アドレスは<code>$C6:FA16</code>～<code>$C6:FBEC</code>なのだが、確認したところ、コマンド<span class="formula">$F8</span>はない。<br>
+ただ、コマンド<span class="formula">$EB</span>（演奏終了）はチャネル7以外の終わりに必ずついているので、コマンド<span class="formula">$F8</span>は引数を取らない単独コマンドである可能性が考えられる。</p>
+
+<p>色々と調べてみたが、結局、コマンド<span class="formula">$F8</span>は「何も割り振られていない」か、効果音用の何かしら？　という可能性がある。<br>
+<a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a><br>
+にある、コマンド<span class="formula">$EC</span>～<span class="formula">$EF</span>, <span class="formula">$FB</span>～<span class="formula">$FF</span>の「演奏終了 2」も、実際には「何もしないコマンド」なのである。<br>
+おそらくだが<span class="formula">$F8</span>もそれではないだろうか。<br>
+例えば「開発中には何かを割り振っていたが使わなくなった」とか、「何かの指示を入れていたがやめたため、変更した場所に印をつけるために入れた」とか。<br>
+実際のところはわからないが。</p>
+
+<p>ということで、まとめると、やはり「ライブ・ア・ライブでは、ロマサガ2のシーケンスコマンドがほぼそのまま使える」と考えて良い、と思う。<br>
+ここまでのまとめや一覧は、<span class="tri"><a href="sequence.html#tick">シーケンスデータ</a></span>に整理したので参照していただきたい。</p>
+
+<p>※当ページの楽譜画像の作成・編集は、<a href="https://scoretail.com/" target="_blank">ScoreTail</a>様を使用しました。</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="sound2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="bg2.html"><span class="button">&#9654;次 サブルーチン</span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
