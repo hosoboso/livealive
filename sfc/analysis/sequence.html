@@ -231,8 +231,11 @@ ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用シ�
 この場合どうなるかというと、ARAMのアドレス<code>$1C00</code>を転送開始位置として、ARAMのアドレス<code>$2C00</code>を越えて上書きする。<br>
 「Live for Live」の後は各キャラの効果音を鳴らして終了となりタイトル画面に戻るため、効果音関係のデータを上書きしても問題ないようである。</p>
 
-<p>シーケンスデータはヘッダ部分とシーケンスコマンド部分に分かれる。<br>
-ヘッダはすべて2バイトのデータ。<br>
+<p>シーケンスデータはヘッダ部分とシーケンスコマンド部分に分かれる。</p>
+
+<h4>BGMのヘッダ</h4>
+
+<p>BGMのヘッダはすべて2バイトのデータ。<br>
 バンク<span class="formula">$C5</span>・<span class="formula">$C6</span>に格納されている時は最初に2バイト分、容量を記したデータがついているが、ARAMアドレス<code>$1C00</code>～に転送されるのは下表の<span class="formula">$02</span>以降なので、ARAMでのヘッダは<span class="formula">$24</span>バイト（<span class="formula">36</span>バイト）。</p>
 
 <table>
@@ -267,8 +270,12 @@ ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用シ�
 <p>スーパーファミコンでは8音まで同時に演奏できるので、これらをチャネル0～チャネル7としている。楽譜でいえば8段。<br>
 開始位置アドレスがシーケンスコマンド終了位置アドレスと同じである場合、そのチャネルのシーケンスデータはなしということであり、該当チャネルは演奏しない。</p>
 
-<p>ヘッダ以降はすべてシーケンスコマンドのデータである。<br>
-詳細は以下項目を参照。</p>
+<h4>効果音のヘッダ</h4>
+
+<p>ゲーム開始時（リセット時）に、効果音のシーケンスデータ<code>$C3:23C8</code>～<code>$C3:3FC7</code>はARAMアドレス<code>$2C00</code>～<code>$47FF</code>にコピーされるが、この中で<code>$C3:23C8</code>～<code>$C3:27C7</code>（ARAMアドレス<code>$2C00</code>～<code>$3000</code>）がヘッダ部分で、効果音256個のARAMでのアドレスが記されている。<br>
+効果音はチャネル6とチャネル7の2チャネルで演奏されるため、ヘッダ部を<span class="formula">4</span>バイトずつ区切ると、効果音ID<span class="formula">$00</span>～<span class="formula">$FF</span>のチャネル6とチャネル7のアドレスが<span class="formula">2</span>バイトずつ入っている。<br>
+実際の値は、<a href="sounddata.html#selist">サウンド（BGM・効果音） &gt; 効果音一覧</a>に掲載している。<br>
+シーケンスコマンド開始位置はARAMアドレス<code>$3000</code>だが、アドレスに<code>$0000</code>が書き込まれている場合、該当チャネルの演奏は「なし」の意味。</p>
 
 <h3>シーケンスコマンド</h3>
 
@@ -301,7 +308,8 @@ ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用シ�
 シーケンスコマンドの中には、コマンドの後に引数（パラメータ）で何らかの数値を指定するものがある。<br>
 例えばトラック音量設定はコマンド<span class="formula">$C4</span>で、引数に<span class="formula">xx</span>（1バイト値）が必要。<br>
 引数は音量で、<span class="formula">$00</span>～<span class="formula">$FF</span>を設定を設定する。<br>
-シーケンスデータ内に「<span class="formula">C4 80</span>」という記述があったら、「トラック音量を<span class="formula">$80</span>に設定」ということである。
+シーケンスデータ内に「<span class="formula">C4 80</span>」という記述があったら、「トラック音量を<span class="formula">$80</span>に設定」ということである。<br>
+引数でアドレスが指定されている場合、BGMは、シーケンスデータが格納されているバンク$C5・$C6におけるアドレス基準で計算されている。効果音はARAMでのアドレス値。
 </div>
 
 
@@ -462,7 +470,6 @@ ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用シ�
 を参照してください。<br>
 「ライブ・ア・ライブ」でも計算方法が同一かは未確認。</p>
 
-
 <h4><span class="formula">$CC</span> トレモロ解除</h4>
 
 <dl>
@@ -528,7 +535,7 @@ ARAMのアドレス<code>$2C00</code>～<code>$47FF</code>は、効果音用シ�
 </dl>
 
 <p>※ OUTX：<br>
-S-DSPのI/Oポートアドレス<span class="formula">$00</span>X9（Xはチャネル数）に設定される、現在、S-DSPを通して各チャネルで出しているピッチ変調前の音のこと。</p>
+S-DSPのI/Oポートアドレス<span class="formula">$00X9</span>（Xはチャネル数）に設定される、現在、S-DSPを通して各チャネルで出しているピッチ変調前の音のこと。</p>
 
 <h4><span class="formula">$D3</span> ピッチモジュレーション オフ</h4>
 
@@ -544,7 +551,7 @@ S-DSPのI/Oポートアドレス<span class="formula">$00</span>X9（Xはチャ�
 	<dd>対象チャネルにエコーをかける。</dd>
 </dl>
 
-<h4><span class="formula">$D5</span> エコー オフ  トラック</h4> 
+<h4><span class="formula">$D5</span> エコー オフ</h4> 
 
 <dl>
 	<dt>内容</dt>
@@ -561,14 +568,14 @@ S-DSPのI/Oポートアドレス<span class="formula">$00</span>X9（Xはチャ�
 	<dd>対象チャネルのオクターブの値を<span class="formula">xx</span>に変更する。</dd>
 </dl>
 
-<h4><span class="formula">$D7</span> オクターブ+1</h4>
+<h4><span class="formula">$D7</span> オクターブ +1</h4>
 
 <dl>
 	<dt>内容</dt>
 	<dd>対象チャネルのオクターブの値を<span class="formula">+1</span>する。</dd>
 </dl>
 
-<h4><span class="formula">$D8</span> オクターブ-1</h4>
+<h4><span class="formula">$D8</span> オクターブ -1</h4>
 
 <dl>
 	<dt>内容</dt>
@@ -888,9 +895,6 @@ S-DSPのI/Oポートアドレス<span class="formula">$00</span>X9（Xはチャ�
 	<dd>対象チャネルにおいて、<span class="formula">xx</span>が最も内側のループでこのコマンドを処理した回数と等しい場合、アドレス<span class="formula">yyyy</span>へジャンプする。</dd>
 </dl>
 
-<p>※アドレスは、シーケンスデータが格納されているバンク<span class="formula">$C5</span>・<span class="formula">$C6</span>におけるアドレス基準で計算されている。<br>
-シーケンスデータのヘッダにバンク<span class="formula">$C5</span>・<span class="formula">$C6</span>におけるアドレスが記述されているので、ARAM内ではそこから計算しているようである。</p>
-
 <h4><span class="formula">$F7</span> <span class="formula">xxxx</span> ジャンプ</h4>
 
 <dl>
@@ -901,7 +905,6 @@ S-DSPのI/Oポートアドレス<span class="formula">$00</span>X9（Xはチャ�
 	<dd>対象チャネルにおいて、アドレス<span class="formula">xxxx</span>へジャンプする。</dd>
 </dl>
 
-<p>※アドレスの計算はコマンド<span class="formula">$F6</span>と同じ。</p>
 
 <script>//リストタイトル静的生成
 document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});

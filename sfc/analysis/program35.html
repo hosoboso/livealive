@@ -221,6 +221,10 @@ table {
 「ライブ・ア・ライブ」はHiROMという規格を採用している。<br>
 HiROMにおけるSRAMは、バンク<code>$30</code>～<code>$3F</code>のアドレス<code>$6000</code>～<code>$7FFF</code>に割り当てられている。</p>
 
+<div id="captiondata"></div>
+
+<h3>セーブデータの仕様</h3>
+
 <p>「ライブ・ア・ライブ」では、セーブデータ領域にバンク<code>$30</code>のみ使用している。<br>
 セーブデータは4個あるが、データ領域は以下のように割り振られている。</p>
 
@@ -237,7 +241,7 @@ HiROMにおけるSRAMは、バンク<code>$30</code>～<code>$3F</code>のアド
 </table>
 
 <p>1つのセーブデータに<span class="formula">$7F8</span>バイトの領域が割り振られていることがわかる。<br>
-（これらとは別に、各シナリオをクリアすると対応した楽曲がサウンドルームで聞けるようになり、それらは4つのセーブデータで共有だが、ここでは触れない）</p>
+後述するが、これらとはまた別に6バイト分の領域がセーブデータの共有部として使われている。</p>
 
 <p>また、サブルーチンを見るとわかるのだが、1つのセーブデータにセーブされるのは、<code>$00:0A00</code>～<code>$00:11F7</code>の領域にあたる。<br>
 <code>$00:0A00</code>はプレイ中のシナリオIDが記録されており、以降、キャラのいる座標、マップタイマーイベント、持ち物欄、シナリオ別キャラデータなどが続く。<br>
@@ -257,6 +261,8 @@ HiROMにおけるSRAMは、バンク<code>$30</code>～<code>$3F</code>のアド
 
 <p>以上のデータはセーブデータに記録しておかなければならないが、<code>$00:0A00</code>～<code>$00:11F7</code>の中にはない。<br>
 どのようにして、データを格納しているのか。</p>
+
+
 
 <h3>データの圧縮</h3>
 
@@ -388,8 +394,12 @@ $C2/3D64 STA $0AB4  [$7E:0AB4]   ;Aを[$7E:0AB5][$7E:0AB4]に書き込み
 </pre></div>
 
 <p>上はセーブ回数の処理である。<br>
-本作はセーブデータにセーブ回数を記録しており、セーブ回数は<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>の2バイトで記録している。<br>
-セーブ回数は<span class="formula">999</span>回（<span class="formula">$03E7</span>）まで記録されるが、1000回セーブするとリセットされて0回に戻る仕組みなので、セーブ回数を<span class="formula">+1</span>した後、<span class="formula">$03E8</span>(10進数<span class="formula">1000</span>)と減算比較し、ネガティブフラグ判定で分岐させて、<span class="formula">$03E8</span>を越えていたら<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>に<span class="formula">$0000</span>を書き込む、という仕組みになる。</p>
+本作はセーブデータにセーブ回数を記録しており、セーブ回数は<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>の<span class="formula">2</span>バイトで記録している。<br>
+ただし、<code>[$7E:0AB5]</code>の上<span class="formula">1</span>ビット（Bit7）のみ、メニュー→音声の設定で切り替えできる、音声のステレオ・モノラルのON・OFF値が入る。<br>
+（なので、厳密にいえば、セーブ回数は<span class="formula">2</span>バイトではなく<span class="formula">15</span>ビットで記録している）<br>
+<code><span class="r">$C2/3D50</span></code>で、<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>と<span class="formula">$7FFF</span>で論理積を取るのは、ステレオ・モノラルの設定値を取り除くため（セーブ回数の値だけにするため）である。</p>
+
+<p>セーブ回数は<span class="formula">999</span>回（<span class="formula">$03E7</span>）まで記録されるが、1000回セーブするとリセットされて0回に戻る仕組みなので、セーブ回数を<span class="formula">+1</span>した後、<span class="formula">$03E8</span>(10進数<span class="formula">1000</span>)と減算比較し、ネガティブフラグ判定で分岐させて、<span class="formula">$03E8</span>を越えていたら<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>に<span class="formula">$0000</span>を書き込む、という仕組みになる。</p>
 
 <div class="code-container"><pre>
 $C2/3D67 LDA #$E41B              ;Aに$E41Bをロード
@@ -397,6 +407,27 @@ $C2/3D6A STA $307FF0[$30:7FF0]   ;A($E41B)を[$30:7FF1][$30:7FF0]に書き込み
 $C2/3D6E LDA $65    [$00:0565]   ;Aに[$00:0566][$00:0565](セーブデータの番号$00～$03)をロード
 $C2/3D70 AND #$0003              ;A(セーブデータ番号)と$0003で論理積
 $C2/3D73 STA $307FF2[$30:7FF2]   ;A(セーブデータ番号)を[$30:7FF3][$30:7FF2]に書き込み
+</pre></div>
+
+<p>4つのセーブデータを書き込む領域は、<code>$30:6000</code>～<code>$30:7FEF</code>だから、<code><span class="r">$C2/3D67</span></code>～<code><span class="r">$C2/3D73</span></code>の処理はバンク<code>$30</code>内だがセーブデータ範囲外である。<br>
+<code>[$30:7FF0]</code>～<code>[$30:7FF3]</code>に入る値は、全セーブデータ共通値になる。<br>
+後で説明するが、<code>[$30:7FFE]</code><code>[$30:7FFF]</code>も全セーブデータ共通値である。<br>
+ニューゲーム開始時、または各シナリオ開始時に、<code>[$30:7FF0]</code>～<code>[$30:7FF3]</code>はすべて<span class="formula">$FF</span>が書き込まれるが、セーブした時点で、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$30:7FF1]</code><code>[$30:7FF0]</code></td><td><span class="formula">$E41B</span></td></tr>
+	<tr><td><code>[$30:7FF3]</code><code>[$30:7FF2]</code></td><td>最後にセーブしたセーブデータ番号<span class="formula">$0000</span>～<span class="formula">$0003</span><br>（セーブ・ロード画面の初期カーソル位置判定に使う）</td></tr>
+</tbody>
+</table>
+
+<p>と、書き込まれる。<br>
+ゲームをリセットしても、セーブ画面に移行すると最後にセーブしたスロットにカーソルが合っているのは、<code>[$30:7FF3]</code><code>[$30:7FF2]</code>を読み込むからである。</p>
+
+<div class="code-container"><pre>
 $C2/3D77 ASL A                   ;Aを算術左シフト *2 (セーブデータ番号*2)
 $C2/3D78 TAX                     ;A(セーブデータ番号*2)の値をXレジスタに転送
 $C2/3D79 LDA #$E41B              ;Aに$E41Bをロード
@@ -583,7 +614,44 @@ $CE/CF13 RTL                     ;サブルーチン戻り
 </pre></div>
 
 <p>以上が大まかな処理である。<br>
-シナリオによりまだ処理が続くが、とりあえず紹介はここまで。</p>
+シナリオによりまだ処理が続くが、とりあえず紹介はここまで。<br>
+最後にクリアデータについて記しておく。</p>
+
+<h3>クリアデータについて</h3>
+
+<p><code>[$30:7FFE]</code><code>[$30:7FFF]</code>は全セーブデータ共通値で、ゲームに何のデータもない状態だと<span class="formula">$0000</span>が入っている。<br>
+最終編でベストエンドを見ると<span class="formula">$E41B</span>が書き込まれる。<br>
+厳密に言えば、スタッフロールが流れる「Live over Again」が流れ始めるタイミングで書き込まれる。</p>
+
+<div class="code-container"><pre>
+$C0/EA8E REP #$20                  ;Aを16bit幅に変更、Mフラグをクリア
+$C0/EA90 LDA #$E41B                ;Aに$E41Bをロード
+$C0/EA93 STA $307FFE[$30:7FFE]     ;Aを[$30:7FFF][$30:7FFE]に書き込み
+$C0/EA97 SEP #$20                  ;MフラグON　Aレジスタは8bit幅
+$C0/EA99 JSR $119B  [$C0:119B]     ;[$C0:119B]へジャンプ
+;（後略）
+</pre></div>
+
+<p>これによりゲームクリアデータ扱いとなり、メニュー→音声→LISTENING ROOMで最終編の曲が聞けるようになる。<br>
+全データ共通なので、この処理後にニューゲームを開始しても、メニュー→音声→LISTENING ROOMで全シナリオの曲が聞ける、ということになる。</p>
+
+<p>以上から、セーブデータの共有部は以下のようになっていることがわかる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$30:7FF1]</code><code>[$30:7FF0]</code></td><td>初期値<span class="formula">$FFFF</span>、セーブすると<span class="formula">$E41B</span>が入る</td></tr>
+	<tr><td><code>[$30:7FF3]</code><code>[$30:7FF2]</code></td><td>初期値<span class="formula">$FFFF</span>、最後にセーブしたセーブデータ番号<span class="formula">$0000</span>～<span class="formula">$0003</span><br>（セーブ・ロード画面の初期カーソル位置判定に使う）</td></tr>
+	<tr><td><code>[$30:7FFE]</code><code>[$30:7FFF]</code></td><td>最終編ベストエンドクリア判定値<br>（クリア前は<span class="formula">$0000</span>、クリア後は<span class="formula">$E41B</span></td></tr>
+</tbody>
+</table>
+
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
 
 <script>//ソースコード色分け処理
 window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
