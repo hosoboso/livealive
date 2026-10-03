@@ -181,6 +181,7 @@ table {
 		<li><a href="program21.html">文字入力と判定</a></li>
 		<li><a href="program42.html">アイテム並び替え</a></li>
 		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
 <li><a href="program35.html">セーブ・ロード</a></li>
 	</ul>
 </li>
@@ -316,8 +317,6 @@ table {
 	<tr><td><code>$00</code></td><td><code>$80</code></td><td>-</td><td>プログラム他</td></tr>
 	<tr><td><code>$00</code></td><td><code>$80</code></td><td><code>$00:FFC0</code>～<code>$00:FFDF</code></td><td>カートリッジヘッダ</td></tr>
 	<tr><td><code>$02</code></td><td><code>$82</code></td><td><code>$02:9380</code>～<code>$02:A695</code></td><td>バンク$42のミラーリング（テキストデータ）</td></tr>
-	<tr><td><code>$03</code></td><td><code>$83</code></td><td>-</td><td>
-	関連のデータ（音源？）</td></tr>
 	<tr><td><code>$10</code></td><td><code>$90</code></td><td>-</td><td>テキストデータ（シナリオ関連）</td></tr>
 	<tr><td><code>$11</code></td><td><code>$91</code></td><td>-</td><td>テキストデータ（シナリオ関連）</td></tr>
 	<tr><td><code>$16</code></td><td><code>$96</code></td><td>-</td><td>テキストデータ（敵の名前・技名・技説明　など）</td></tr>
@@ -330,6 +329,8 @@ table {
 	<tr><td><code>$41</code></td><td><code>$C1</code></td><td><code>$C1:A606</code>～<code>$C1:A665</code></td><td><code>$C1/B00C</code>用技モーションサブルーチン呼び出しアドレス値（2バイト）（<code>$C1/A8E2</code>～<code>$C1/B421</code>呼び出し）</td></tr>
 	<tr><td><code>$41</code></td><td><code>$C1</code></td><td><code>$C1:FDA6</code>～<code>$C1:FFFF</code></td><td>戦闘コマンドと戦闘終了時メッセージのテキスト（デバッグテキスト含む）</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:0000</code>～<code>$C2:6B4C</code></td><td>プログラム（主にメニュー画面関係, 後述）</td></tr>
+	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:6D5D</code>～<code>$C2:6D7C</code></td><td>押したボタン判定用数値</td></tr>
+	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:6D7D</code>～<code>$C2:6DDF</code></td><td>押したボタンからアドレス呼び出し</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:712A</code>～<code>$C2:7133</code></td><td>メニュー画面コマンドの半透明位置を指定するHDMAテーブルの値</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:73C8</code>～<code>$C2:7407</code></td><td>GDMA転送用 I/Oポート定数</td></tr>
 	<tr><td><code>$42</code></td><td><code>$C2</code></td><td><code>$C2:7438</code>～<code>$C2:7453</code></td><td>メニュー画面のセリフ吹き出し形状のBGマップデータ</td></tr>
@@ -396,12 +397,6 @@ table {
 	<tr><td><code>$5F</code></td><td><code>$DF</code></td><td><code>$DF:0000</code>～<code>$DF:05FF</code></td><td>戦闘 ダメージフィールドのタイルデータ</td></tr>
 </tbody>
 </table>
-
-<p>サウンドデータのサイズ＆転送先アドレスについて：<br>
-3バイト区切りで、サウンドデータのサイズと転送先アドレス2バイトを記述している。サウンド用CPU（SPUとかSPC700、またはAPUと呼ばれている）とやりとりをするためのアドレス<code>$00:2141</code>～<code>$00:2143</code>転送用。<br>
-バンク<code>$C2</code>～<code>$CC</code>の各所に散らばっている。</p>
-
-<p>プログラム関係はバンク<code>$C0</code>～<code>$C3</code>、各種データはバンク<code>$D5</code>～<code>$D6</code>からロードすることが多いようである。つまりミラーリングから読み込みしている。</p>
 
 <p>以下は各種データアドレスページに解説を載せているので参照のこと。</p>
 <ul>
@@ -934,12 +929,22 @@ table {
 	<tr><td><code>$C2:04FE</code>～<code>$C2:0525</code></td><td>OAM用の<code>$00:0700</code>～<code>$00:091F</code>の初期化（<span class="formula">$00</span>で埋める）</td></tr>
 	<tr><td><code>$C2:0526</code>～<code>$C2:052F</code></td><td><code>[$00:4200]</code>(割り込み有効化レジスタ)判定</td></tr>
 	<tr><td><code>$C2:05B2</code>～<code>$C2:05D2</code></td><td>バンク<code>$C2</code>の値を<code>$0000,y</code>にループ処理で転送</td></tr>
+	<tr><td><code>$C2:0602</code>～<code>$C2:0653</code></td><td>押したボタンからコマンド呼び出し</td></tr>
+	<tr><td><code>$C2:0677</code>～<code>$C2:06DA</code></td><td>コマンドカーソル初期位置設定</td></tr>
+	<tr><td><code>$C2:0680</code>～<code>$C2:06DA</code></td><td>カーソル位置設定</td></tr>
+	<tr><td><code>$C2:0770</code>～<code>$C2:077B</code></td><td><span class="formula"><code>A</code>レジスタ*8</span>の値を<code>X</code>レジスタに転送</td></tr>
 	<tr><td><code>$C2:0782</code>～<code>$C2:07A0</code></td><td>カーソル位置のOAMデータを<code>$00:0700</code>～<code>$00:0703</code>に書き込み</td></tr>
+	<tr><td><code>$C2:07B1</code>～<code>$C2:07DD</code></td><td>カーソル移動のサウンド演奏＋コマンドカーソル初期位置判定</td></tr>
+	<tr><td><code>$C2:07D1</code>～<code>$C2:07D4</code></td><td>メニュー→「装備」, 「技」, 「隊形」選択時 選択音後のコマンド処理開始</td></tr>
+	<tr><td><code>$C2:07E0</code>～<code>$C2:07E3</code></td><td>メニュー→「音声」選択時 選択音後のコマンド処理開始</td></tr>
+	<tr><td><code>$C2:07ED</code>～<code>$C2:07F3</code></td><td>メニュー→「持ち物」選択時 選択音後のコマンド処理開始</td></tr>
+	<tr><td><code>$C2:0802</code>～<code>$C2:0808</code></td><td>メニュー→「セーブ」選択時 選択音後のコマンド処理開始</td></tr>
 	<tr><td><code>$C2:0893</code>～<code>$C2:089F</code></td><td>メニュー画面コマンドカーソル位置から、HDMAテーブル<code>[$7E:3105]</code><code>[$7E:3104]</code>を書き換えて、半透明（カラーマス）部分位置を変更</td></tr>
 	<tr><td><code>$C2:08A0</code>～<code>$C2:08A7</code></td><td>メニュー画面用・コマンド判定</td></tr>
 	<tr><td><code>$C2:091E</code>～<code>$C2:0971</code></td><td>隊形・キャラ入れ替えのキャラ選択状態・空欄判定</td></tr>
 	<tr><td><code>$C2:0BB9</code>～<code>$C2:0C15</code></td><td>メニュー画面用・カーソル位置をAボタンで選択～もう一か所をカーソル位置指定しAボタンで選択して入れ替え</td></tr>
 	<tr><td><code>$C2:1BAA</code>～<code>$C2:1BBB</code></td><td><code>[$7E:1D03]</code><code>[$7E:1D02]</code>に<span class="formula">$00FF</span>、<code>A</code>に<span class="formula">$2514</span>をロードして<code>$C2/3CAC</code>にジャンプ（シナリオ選択画面で「SELECT・A・LIVE」を流す前処理）</td></tr>
+	<tr><td><code>$C2:20B7</code>～<code>$C2:20C7</code></td><td>メニュー→音声で「ステレオ」または「モノラル」選択時、<code>[$7E:0AB5]</code>の上1ビット更新</td></tr>
 	<tr><td><code>$C2:22E8</code>～<code>$C2:232A</code></td><td>LISTENING ROOMでカーソル位置にある曲のBGM関係のデータ6バイトを<code>$7E:2EB5</code>～<code>$7E:2EBA</code>に書き込み</td></tr>
 	<tr><td><code>$C2:2352</code>～<code>$C2:2362</code></td><td>LISTENING ROOMでカーソル位置のBGMIDを<code>A</code>にロード</td></tr>
 	<tr><td><code>$C2:2DBC</code>～<code>$C2:2DCA</code></td><td><code>$7E:A000</code>～<code>$7E:BBFE</code>の初期化（<span class="formula">$00</span>で埋める）</td></tr>
@@ -969,6 +974,8 @@ table {
 	<tr><td><code>$C2:35F5</code>～<code>$C2:360E</code></td><td>BGマップ4バイト転送</td></tr>
 	<tr><td><code>$C2:3620</code>～<code>$C2:3665</code></td><td>BGマップ反転処理</td></tr>
 	<tr><td><code>$C2:3966</code>～<code>$C2:398C</code></td><td>各シナリオの主人公（＋最終編で功夫編主人公になるユン、レイ、サモ）の、フィールドの16×16サイズスプライトをVRAMアドレス<code>$A400</code>～<code>$BBFF</code>にGDMA転送</td></tr>
+	<tr><td><code>$C2:3C35</code>～<code>$C2:3C40</code></td><td>カーソル選択のサウンド演奏</td></tr>
+	<tr><td><code>$C2:3C95</code>～<code>$C2:3CAB</code></td><td>「ステレオ」または「モノラル」切り替え時、ARAMに切り替え指示送信</td></tr>
 	<tr><td><code>$C2:3CAC</code>～<code>$C2:3CAF</code></td><td><code>A</code>を<code>[$7E:1D01]</code><code>[$7E:1D00]</code>に書き込んでサウンド処理<code>$C3/0004</code>にジャンプ</td></tr>
 	<tr><td><code>$C2:3CB4</code>～<code>$C2:3CCE</code></td><td>セーブデータからのロード</td></tr>
 	<tr><td><code>$C2:3D4D</code>～<code>$C2:3D98</code></td><td>セーブデータへのセーブ</td></tr>

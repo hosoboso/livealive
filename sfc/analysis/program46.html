@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 音声">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 音声">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 音声</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.apu_code-container,
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.apu_code-container pre,
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの再生</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 音声</h1>
+<h2>音声</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>メニュー画面→音声についての仕様やサブルーチンを紹介する。<br>
+性質上、サウンドについても触れるので、<span class="tri"><a href="sound.html">サウンドについて</a></span>も合わせて参照のこと。</p>
+
+<p>メニュー画面→音声を選ぶと、</p>
+
+<ul>
+	<li>ステレオ</li>
+	<li>モノラル</li>
+	<li>&#x2669;</li>
+</ul>
+
+<p>とコマンドが並ぶ。<br>
+ただし一番下の「&#x2669;」、つまりBGMを聞ける「LISTENING ROOM」は、ひとつ以上シナリオをクリアしなければ出現しない。<br>
+また、「LISTENING ROOM」のデータは全セーブデータで共有されている。</p>
+
+<p>「&#x2669;」があってもなくても、「音声」を選んだ時、現在のステレオ・モノラル状態を反映し、ステレオならステレオに（初期設定でもある）、モノラルならモノラルにカーソル位置があっている、というのも特徴である。これにより現在出力されているサウンドがステレオなのかモノラルなのかが判断できるようになっている。</p>
+
+<ul>
+	<li><a href="#01">メモリアドレス</a></li>
+	<ul>
+		<li><a href="#01_1">メニュー画面のコマンド番号</a></li>
+		<li><a href="#01_2">メニュー画面のカーソル位置</a></li>
+	</ul>
+	<li><a href="#02">サブルーチン</a></li>
+	<ul>
+		<li><a href="#02_1">カーソル位置処理</a></li>
+		<li><a href="#02_2">&#x2669;（LISTENING ROOM）コマンドの有無</a></li>
+	</ul>
+	<li><a href="#03">ステレオ・モノラル切り替え</a></li>
+</ul>
+
+<h3 id="01">メモリアドレス</h3>
+
+<p>ステレオ・モノラルの値は<code>$00:0AB5</code>の上1ビット（Bit7）に入っており、初期値は<span class="formula">%0</span>（ステレオ）、モノラルだと<span class="formula">%1</span>。<br>
+また、ARAMのアドレス<code>$0085</code>がステレオ・モノラルの値を記録するメモリアドレスになっており、<span class="formula">$00</span>だとステレオ、<span class="formula">$01</span>だとモノラルで、<code>$00:0AB5</code>の上1ビット（Bit7）と同期して変動する。</p>
+
+<p>「LISTENING ROOM」が表示されるかどうかはシナリオのクリア状況が関係してくるが、シナリオのクリア状況が入る<code>$00:0A01</code>の値及び、セーブデータ共有値の<code>$30:7FFE</code>～<code>$30:7FFF</code>に入る値で決まる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>セーブデータ</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:0A00</code></td><td>プレイ中のシナリオ</td></tr>
+	<tr><td><code>$00:0A01</code></td><td>シナリオのクリア状況<br>（8ビットが各シナリオ対応。<br>上の桁から順に中世、原始、ＳＦ、功夫、西部、現代、近未来、幕末）</td></tr>
+	<tr><td><code>$00:0AB4</code></td><td>セーブ回数 下位バイト<br>セーブ回数が999回（<span class="formula">$03E7</span>）を越えると0に戻る</td></tr>
+	<tr><td><code>$00:0AB5</code></td><td>Bit0～6：セーブ回数 上位バイト<br>Bit7：<span class="formula">%0</span>だとステレオ、<span class="formula">%1</span>だとモノラル　メニュー→音声の設定で切り替え</td></tr>
+</tbody>
+</table>
+
+<p>ただしメニュー画面だと、バンク<code>$7E</code>で呼び出されることが多いようだ。</p>
+
+<p>セーブデータはバンク<code>$30</code>に入っており、今回の処理で重要なのは<code>$30:7FFE</code><code>$30:7FFF</code>の2バイト。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>セーブデータ</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$30:6000</code>～<code>$30:67F7</code></td><td>セーブデータ1</td></tr>
+	<tr><td><code>$30:67F8</code>～<code>$30:6FEF</code></td><td>セーブデータ2</td></tr>
+	<tr><td><code>$30:6FF0</code>～<code>$30:77E7</code></td><td>セーブデータ3</td></tr>
+	<tr><td><code>$30:77E8</code>～<code>$30:7FEF</code></td><td>セーブデータ4</td></tr>
+	<tr><td><code>$30:7FF1</code><code>$30:7FF0</code></td><td>初期値<span class="formula">$FFFF</span>、セーブすると<span class="formula">$E41B</span>が入る</td></tr>
+	<tr><td><code>$30:7FF3</code><code>$30:7FF2</code></td><td>初期値<span class="formula">$FFFF</span>、最後にセーブしたセーブデータ番号<span class="formula">$0000</span>～<span class="formula">$0003</span><br>（セーブ・ロード画面の初期カーソル位置判定に使う）</td></tr>
+	<tr><td><code>$30:7FFE</code><code>$30:7FFF</code></td><td>最終編ベストエンドクリア判定値<br>（クリア前は<span class="formula">$0000</span>、クリア後は<span class="formula">$E41B</span>）<br>（LISTENING ROOMの曲判定）</td></tr>
+</tbody>
+</table>
+
+
+<h4 id="01_1">メニュー画面のコマンド番号</h4>
+
+<p>メニュー画面は左から順に装備、持ち物、技、隊形、音声、セーブとコマンドが並ぶが、各コマンドを選択すると、左から順に01からナンバリングを振った値が、<code>[$00:056A]</code><code>[$00:0569]</code>に入る。</p>
+
+<table>
+<thead>
+	<tr><th>コマンド</th><th><code>[$00:056A]</code><code>[$00:0569]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>装備</td><td><span class="formula">$0001</span></td></tr>
+	<tr><td>持ち物</td><td><span class="formula">$0002</span></td></tr>
+	<tr><td>技</td><td><span class="formula">$0003</span></td></tr>
+	<tr><td>隊形</td><td><span class="formula">$0004</span></td></tr>
+	<tr><td>音声</td><td><span class="formula">$0005</span></td></tr>
+	<tr><td>セーブ</td><td><span class="formula">$0006</span></td></tr>
+</tbody>
+</table>
+
+<h4 id="01_2">メニュー画面のカーソル位置</h4>
+
+<p><code>[$00:0544]</code><code>[$00:0545]</code>の2バイトで、現在のカーソル位置の値が入る。<br>
+<code>[$00:0544]</code>はメニュー画面ならどの階層（ページ）でもカーソルの位置が入る。</p>
+
+
+<h3 id="02">サブルーチン</h3>
+
+<p><a href="program42.html">アイテム並び替え</a>のサブルーチンで、まず、メニュー画面を開いた時の処理を紹介しているので合わせて参照していただきたい。<br>
+この時に、<br>
+<code>[$7E:0A00]</code>(シナリオID)→<code>[$00:054D]</code><br>
+と書き込まれている。</p>
+
+<h4 id="02_1">カーソル位置処理</h4>
+
+<p>メニュー画面が開いた後、「音声」を選択すると、まずは選択時の効果音を鳴らす処理が入る（<code><span class="r">$C2/3C35</span></code>～<code><span class="r">$C2/3C40</span></code>）。<br>
+続いてカーソル位置<code>[$00:0544]</code>の値が入る。<br>
+通常なら、メニュー画面で何かしらを選んだ直後は一番最初の項目にカーソルが合うから、<code>[$00:0544]</code>に<span class="formula">$00</span>が書き込まれる。<br>
+だが、「音声」の場合、現在の音声出力がステレオなら「ステレオ」、モノラルなら「モノラル」にカーソルが合う、という他項目にはない処理が入る。<br>
+順に見ていくと、現在の音声出力がステレオであってもモノラルであっても、まずは<code>[$00:0544]</code>に<span class="formula">$00</span>が書き込まれる。</p>
+
+<p><code><span class="r">$C2/07E0</span></code>がメニュー→「音声」選択時専用処理のようだが、カーソル位置書き込みの<code><span class="r">$C2/0680</span></code>～から紹介する。</p>
+
+<div class="code-container"><pre>
+$C2/0680 LDA $7E8E01,x[$7E:8E51] ;Aに[$7E:8E51]($00)をロード
+$C2/0684 STA $4A    [$00:054A]   ;Aを[$00:054A]に書き込み
+$C2/0686 LDA $7E8E00,x[$7E:8E50] ;Aに[$7E:8E50]($10)をロード
+$C2/068A STA $48    [$00:0548]   ;Aを[$00:0548]に書き込み
+$C2/068C BMI $22    [$06B0]      ;ネガティブフラグが立っているとき[$06B0]分岐
+$C2/068E CMP $42    [$00:0542]   ;Aと[$00:0542]を減算比較（ステータスレジスタ変更のみ）
+$C2/0690 BEQ $04    [$0696]      ;ゼロフラグが立っているとき[$0696]分岐
+$C2/0692 LDA #$40                ;Aに$40をロード
+$C2/0694 TSB $4C    [$00:054C]   ;Aと[$00:054C]で論理和を取り、メモリに書き戻し
+$C2/0696 LDA $40    [$00:0540]   ;Aに[$00:0540]をロード
+$C2/0698 STA $3A    [$00:053A]   ;Aを[$00:053A]に書き込み
+$C2/069A LDA $42    [$00:0542]   ;Aに[$00:0542]をロード
+$C2/069C STA $3C    [$00:053C]   ;Aを[$00:053C]に書き込み
+$C2/069E LDA $44    [$00:0544]   ;Aに[$00:0544](カーソル位置)をロード
+$C2/06A0 STA $3E    [$00:053E]   ;Aを[$00:053E]に書き込み
+$C2/06A2 LDA $46    [$00:0546]   ;Aに[$00:0546]をロード
+$C2/06A4 STA $40    [$00:0540]   ;Aを[$00:0540]に書き込み
+$C2/06A6 LDA $48    [$00:0548]   ;Aに[$00:0548]をロード
+$C2/06A8 STA $42    [$00:0542]   ;Aを[$00:0542]に書き込み
+$C2/06AA LDA $4A    [$00:054A]   ;Aに[$00:054A]($00)をロード
+$C2/06AC STA $44    [$00:0544]   ;A($00)を[$00:0544]に書き込み カーソル位置：ステレオ
+$C2/06AE BRA $04    [$06B4]      ;フラグにかかわりなく常に分岐[$06B4]
+$C2/06B4 BIT $4C    [$00:054C]   ;Aと[$00:054C]で論理積（ステータスフラグ変更のみ）
+$C2/06B6 BMI $13    [$06CB]      ;ネガティブフラグが立っているとき[$06CB]分岐
+$C2/06B8 BVS $1B    [$06D5]      ;オーバーフローフラグON時[$06D5]分岐
+$C2/06D5 LDX #$6FC3              ;Xに$6FC3をロード
+$C2/06D8 LDA $3C    [$00:053C]   ;Aに[$00:053C]をロード
+$C2/06DA JSR $0723  [$C2:0723]   ;[$C2:0723]へジャンプ
+</pre></div>
+
+<p>カーソル位置<code>[$00:0544]</code>には、<code>[$7E:8E51]</code>(<span class="formula">$00</span>)→<code>[$00:054A]</code>→<code>[$00:0544]</code>という順で<span class="formula">$00</span>が書き込まれている。<br>
+これは、現在の音声出力がステレオでもモノラルでも関係なく共通処理である。<br>
+このままだと、モノラル設定でも初期カーソル位置がステレオになってしまう。</p>
+
+<p>ということで、この先で分岐処理がある。</p>
+
+<div class="code-container"><pre>
+$C2/0726 BCS $06    [$072E]      ;キャリーフラグが立っているとき[$072E]分岐
+$C2/0728 PER $0002  [$072D]      ;PCの値にオペランド16bit値を足した値をスタックに積み[$072D]
+$C2/072B JMP ($0532)[$C2:210F]   ;[$C2:210F]へジャンプ(レジスタをスタックに積まない)
+$C2/210F LDA #$000A              ;Aに$000Aをロード
+$C2/2112 BIT $0AB4  [$7E:0AB4]   ;Aと[$7E:0AB5][$7E:0AB4]で論理積（ステータスフラグ変更のみ）
+$C2/2115 BPL $01    [$2118]      ;ネガティブフラグが立っていないとき[$2118]分岐
+;ネガティブフラグON（モノラル）
+$C2/2117 INC A                   ;Aをインクリメント（$000B）
+;ネガティブフラグOFF（ステレオ）
+$C2/2118 STA $40    [$00:0540]   ;Aを[$00:0541][$00:0540]に書き込み
+$C2/211A JSR $077C  [$C2:077C]   ;[$C2:077C]へジャンプ
+
+$C2/077C PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/077D SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/077F JSR $076E  [$C2:076E]   ;[$C2:076E]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/2112</span></code>で、<code>BIT</code>による<code>A</code>と<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>の論理積のステータスフラグ判定がある。<br>
+<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>は、2バイトで見た場合、一番上のビット（Bit15）にサウンド出力（ステレオ・モノラル）の値が入り、それ以外のBit14～Bit0はセーブ回数の値が入る。<br>
+つまり、<code>[$7E:0AB5]</code>の一番上のビットがサウンド出力の値で、<span class="formula">%0</span>ならステレオ、<span class="formula">%1</span>ならモノラルである。<br>
+<code><span class="r">$C2/2112</span></code>のニーモニック、<code>BIT</code>だが、</p>
+
+<ul>
+	<li>ネガティブフラグとオーバーフローフラグの判定は、<code>BIT</code>で読み込んだメモリの値に対して行う</li>
+	<li>ゼロフラグの判定は、<code>A</code>レジスタと<code>BIT</code>で読み込んだメモリの論理積の値に対して行う</li>
+</ul>
+
+<p>という仕様なので、<code><span class="r">$C2/2115</span></code>のネガティブフラグ判定は、<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>に対して行う。<br>
+ネガティブフラグは一番上のビットが<span class="formula">1</span>ならON、<span class="formula">0</span>ならOFFだから、ネガティブフラグが立つのは現在のサウンド出力がモノラルの場合。<br>
+ネガティブフラグが立たないのはステレオの場合ということになって、処理が分岐する。<br>
+すると、<code><span class="r">$C2/2118</span></code>で<code>[$00:0541]</code><code>[$00:0540]</code>に書き込む値が変わり、</p>
+
+<table>
+<thead>
+	<tr><th>サウンド出力</th><th><code>[$00:0541]</code><code>[$00:0540]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>ステレオ</td><td><span class="formula">$000A</span></td></tr>
+	<tr><td>モノラル</td><td><span class="formula">$000B</span></td></tr>
+</tbody>
+</table>
+
+<p>このようになる。</p>
+
+<div class="code-container"><pre>
+$C2/076E LDA $40    [$00:0540]   ;Aに[$00:0540]（$0Aか$0B）をロード
+$C2/0770 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/0771 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/0773 AND #$00FF              ;Aと$00FFで論理積
+$C2/0776 ASL A                   ;Aを算術左シフト *2
+$C2/0777 ASL A                   ;Aを算術左シフト *2
+$C2/0778 ASL A                   ;Aを算術左シフト *2
+$C2/0779 TAX                     ;Aの値をXレジスタに転送
+$C2/077A PLP                     ;Pレジスタにスタックからプル
+$C2/077B RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>すると、上のサブルーチンで、<code><span class="r">$C2/077B</span></code>の時に<code>A</code>及び<code>X</code>レジスタに入る値が変わる。<br>
+<code><span class="r">$C2/0779</span></code>までで、<span class="formula"><code>[$00:0540]</code>*8</span>を計算しているから、<code><span class="r">$C2/077B</span></code>の時点の<code>X</code>は、</p>
+
+<table>
+<thead>
+	<tr><th>サウンド出力</th><th><code>X</code></th></tr>
+</thead>
+<tbody>
+	<tr><td>ステレオ</td><td><span class="formula">$0050</span></td></tr>
+	<tr><td>モノラル</td><td><span class="formula">$0058</span></td></tr>
+</tbody>
+</table>
+
+<p>となる。</p>
+
+<div class="code-container"><pre>
+$C2/0782 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/0784 LDA $7E8E02,x[$7E:8E52] ;Aに[$7E:8E53][$7E:8E52]($32AC)または[$7E:8E5B][$7E:8E5A]($42AC)をロード
+$C2/0788 STA $000700[$00:0700]   ;Aを[$00:0701][$00:0700]に書き込み
+$C2/078C LDA $34    [$00:0534]   ;Aに[$00:0535][$00:0534]($3E04)をロード
+$C2/078E STA $000702[$00:0702]   ;Aを[$00:0703][$00:0702]に書き込み
+$C2/0792 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/0794 LDA $7E8E00,x[$7E:8E50] ;Aに[$7E:8E50]($10)または[$7E:8E58]($10)をロード
+$C2/0798 STA $42    [$00:0542]   ;Aを[$00:0542]に書き込み
+$C2/079A LDA $7E8E01,x[$7E:8E51] ;Aに[$7E:8E51]($00)または[$7E:8E59]($01)をロード
+$C2/079E STA $44    [$00:0544]   ;Aを[$00:0544](カーソル位置)に書き込み
+$C2/07A0 JSR $4D35  [$C2:4D35]   ;[$C2:4D35]へジャンプ
+</pre></div>
+
+<p>ここで、サウンド出力状況を考慮したカーソル位置の値の更新が行われる。<br>
+<code>$7E8E02,x</code>, <code>$7E8E00,x</code>, <code>$7E8E01,x</code>は、<code>X</code>レジスタの値により呼び出される値が変わる。<br>
+結果、<code><span class="r">$C2/079A</span></code>で呼び出した<code>$7E8E01,x</code>が、新たな<code>[$00:0544]</code>、つまりカーソル位置の値になるのだが、</p>
+
+<table>
+<thead>
+	<tr><th>サウンド出力</th><th><code>$7E8E01,x</code></th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>ステレオ</td><td><code>$7E:8E51</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>モノラル</td><td><code>$7E:8E59</code></td><td><span class="formula">$01</span></td></tr>
+</tbody>
+</table>
+
+<p>モノラルの場合のみ、カーソルが初期位置からひとつ下にずれて、「モノラル」が初期位置に設定されるのである。<br>
+これが、「音声」を選択した時のカーソル位置設定処理になる。</p>
+
+<h4 id="02_2">&#x2669;（LISTENING ROOM）コマンドの有無</h4>
+
+<p>カーソル初期位置が決まった後で、3番目のコマンド「&#x2669;」こと、「LISTENING ROOM」が表示されるかどうかの判定を行う。<br>
+OAM転送処理（<code><span class="r">$C2/4D35</span></code>～<code><span class="r">$C2/4D54</span></code>）を挟んで、<code><span class="r">$C2/211D</span></code>～からが判定になる。</p>
+
+<div class="code-container"><pre>
+$C2/211D LDX #$7CD3              ;Xに$7CD3をロード
+$C2/2120 LDA $0A01  [$7E:0A01]   ;Aに[$7E:0A02][$7E:0A01]をロード
+$C2/2123 AND #$00FF              ;Aと$00FFで論理積
+$C2/2126 BNE $09    [$2131]      ;ゼロフラグが立っていないとき[$2131]分岐
+;ゼロフラグON シナリオを1つもクリアしていない
+$C2/2128 LDA $307FFE[$30:7FFE]   ;Aに[$30:7FFF][$30:7FFE]をロード
+$C2/212C CMP #$E41B              ;Aと$E41Bを減算比較（ステータスレジスタ変更のみ）
+$C2/212F BNE $03    [$2134]      ;ゼロフラグが立っていないとき[$2134]分岐
+;ゼロフラグON 最終編ベストエンドのクリアデータあり
+$C2/2131 LDX #$7CE5              ;Xに$7CE5をロード
+;処理合流
+$C2/2134 JSR $35AD  [$C2:35AD]   ;[$C2:35AD]へジャンプ
+</pre></div>
+
+<p>まず、<code><span class="r">$C2/2126</span></code>のゼロフラグ判定だが、処理を追っていくと実質、<code>[$7E:0A01]</code>が<span class="formula">$00</span>かどうかの判定である。<br>
+<code>[$7E:0A01]</code>には最終編以外のクリア済みのシナリオの値が各ビットに入る。<br>
+上の桁、つまりBit7から順に中世、原始、ＳＦ、功夫、西部、現代、近未来、幕末である。<br>
+クリアしたシナリオがひとつもないのなら<span class="formula">$00</span>であるから、ゼロフラグが立って<code><span class="r">$C2/2128</span></code>に進む。</p>
+
+<p><code><span class="r">$C2/212F</span></code>でのゼロフラグ判定は、<code>[$30:7FFF]</code><code>[$30:7FFE]</code>（2バイト値）が、<span class="formula">$E41B</span>かどうかの判定と等しい。<br>
+<code>[$30:7FFF]</code><code>[$30:7FFE]</code>は、<a href="program35.html">セーブデータのセーブ・ロード</a>で記してある通り、セーブデータの共有部のアドレスで、最終編ベストエンドクリア判定値である。<br>
+<code>[$30:7FFF]</code><code>[$30:7FFE]</code>は初期値<span class="formula">$0000</span>だが、最終編ベストエンドの「Live over Again」が流れるタイミングで<span class="formula">$E41B</span>を書き込む処理がある。<br>
+つまり、<code><span class="r">$C2/212F</span></code>のゼロフラグ判定は、最終編ベストエンドのクリアデータを見たことがあるかどうかである。<br>
+（仮に、一度ベストエンドを見たデータがすべて上書きされて消えたとしても、セーブデータの共有部の値なので変更されない）</p>
+
+<p>以上の分岐処理から、</p>
+
+<ul>
+	<li>何らかのシナリオをクリアしている</li>
+	<li>クリアしたシナリオがひとつもない場合でも、一度最終編ベストエンドを見たことがある</li>
+</ul>
+
+<p>このいずれかであれば、<code><span class="r">$C2/2131</span></code>にジャンプして、<code>X</code>に<span class="formula">$7CE5</span>をロードする。<br>
+そうでない場合、つまり「クリアしたシナリオがひとつもなくて、最終編ベストエンドを見たこともない」場合は、<code><span class="r">$C2/211D</span></code>で<code>X</code>に<span class="formula">$7CD3</span>をロードしたままである。<br>
+最終的に<code><span class="r">$C2/2134</span></code>で合流し、<code><span class="r">$C2/35AD</span></code>へジャンプするが、<code>X</code>の値によりこの先の処理が分岐する。<br>
+結局、コマンド「&#x2669;」こと、「LISTENING ROOM」が表示される条件が、</p>
+
+<ul>
+	<li>何らかのシナリオをクリアしている</li>
+	<li>クリアしたシナリオがひとつもない場合でも、一度最終編ベストエンドを見たことがある</li>
+</ul>
+
+<p>これだった、ということになる。<br>
+実際の表示の処理などは省略する。</p>
+
+
+<h3 id="03">ステレオ・モノラル切り替え</h3>
+
+<p>「音声」でステレオ・モノラル切り替えを行った時の処理を見てみよう。<br>
+上のカーソル初期位置判定で述べた通り、現在のステレオ・モノラルの状態は、<code>$7E:0AB5</code>の一番上のビットに入っており、<span class="formula">%0</span>ならステレオ、<span class="formula">%1</span>ならモノラルである。</p>
+
+<p>ステレオを選択した場合、カーソル位置は一番上だから<code>[$00:0545]</code><code>[$00:0544]</code>に$0000が入るし、モノラルを選択した場合、カーソル位置は2番目だから<code>[$00:0545]</code><code>[$00:0544]</code>に$0001が入る。<br>
+カーソル位置書き換え処理は省略するとして、<code>[$00:0545]</code><code>[$00:0544]</code>の更新後の処理を見てみる。</p>
+
+<div class="code-container"><pre>
+$C2/20B7 LDA #$8000              ;Aに$8000をロード
+$C2/20BA TRB $0AB4  [$7E:0AB4]   ;Aのビット反転値と[$7E:0AB5][$7E:0AB4]で論理積を取り書き戻し
+$C2/20BD LDX $44    [$00:0544]   ;Xに[$00:0545][$00:0544]（カーソル位置）をロード
+$C2/20BF BEQ $03    [$20C4]      ;ゼロフラグが立っているとき[$20C4]分岐
+;ゼロフラグOFF モノラル選択
+$C2/20C1 TSB $0AB4  [$7E:0AB4]   ;Aと[$7E:0AB5][$7E:0AB4]で論理和を取り、メモリに書き戻し
+;ゼロフラグON ステレオ選択
+$C2/20C4 LDA $0AB4  [$7E:0AB4]   ;Aに[$7E:0AB5][$7E:0AB4]をロード
+$C2/20C7 JSR $3C95  [$C2:3C95]   ;[$C2:3C95]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/20BA</span></code>のTRBは「Aのビット反転値とメモリアドレスの値でで論理積を取りメモリアドレスに書き戻し」という命令である。<br>
+<code><span class="r">$C2/20B7</span></code>で、<code>A</code>に<span class="formula">$8000</span>（<span class="formula">%1000 0000 0000 0000</span>）をロードしているから、このすべてのビットを反転させると、<span class="formula">%0111 1111 1111 1111</span>、つまり<span class="formula">$7FFF</span>のことである。<br>
+よって、<span class="formula">$7FFF &amp; <code>[$7E:0AB5]</code><code>[$7E:0AB4]</code></span>と論理積を計算して、<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>に書き戻せばよい。<br>
+結局、<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>の上1ビットを取り除いて（<span class="formula">0</span>にして）、残り下15ビット分（セーブ回数）のみにしろ、ということである。</p>
+
+<p><code><span class="r">$C2/20BD</span></code>で<code>X</code>にロードするのは<code>[$00:0545]</code><code>[$00:0544]</code>（カーソル位置）で、ステレオを選択した時は<span class="formula">$0000</span>、モノラルを選択した時は<span class="formula">$0001</span>が入っている。<br>
+よって、<code><span class="r">$C2/20BF</span></code>でゼロフラグが立つのはステレオ選択時である。<br>
+ゼロフラグOFFはモノラル選択で、<code><span class="r">$C2/20C1</span></code>で、<span class="formula">$8000</span>と<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>で論理和を取り、<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>に書き戻す。<br>
+ということは実質、<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>の一番上のビットに<span class="formula">1</span>を立てる、つまり<code>[$7E:0AB5]</code>の一番上のビットに<span class="formula">1</span>を立てることになる。<br>
+<code><span class="r">$C2/20C4</span></code>に進んで、<code>A</code>に<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>をロードする。</p>
+
+<p>一方、ゼロフラグONのステレオ選択は、<code><span class="r">$C2/20C1</span></code>の処理をスキップするのみ。<br>
+<code><span class="r">$C2/20C4</span></code>に進みそのまま<code>A</code>に<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>をロードしている。つまり、つまり<code>[$7E:0AB5]</code>の一番上のビットは<span class="formula">0</span>のままである。<br>
+これがステレオ・モノラル切り替え時に、<code>[$7E:0AB5]</code>の一番上のビットを更新する処理ということになる。<br>
+現在の設定がステレオで再びステレオを選ぶ、またはモノラルの時にモノラルを選んでも、処理がスキップされるということはないようである。</p>
+
+<p>以上の処理の後は、サウンドの処理として、ARAMにも値を転送する必要がある。</p>
+
+<div class="code-container"><pre>
+$C2/3C95 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3C96 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3C98 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/3C99 AND #$8000              ;Aと$8000で論理積
+$C2/3C9C BEQ $05    [$3CA3]      ;ゼロフラグが立っているとき[$3CA3]分岐
+;ゼロフラグOFF モノラル選択
+$C2/3C9E LDA #$00F4              ;Aに$00F4をロード
+$C2/3CA1 BRA $03    [$3CA6]      ;[$C2:3CA6]へジャンプ
+;ゼロフラグON ステレオ選択
+$C2/3CA3 LDA #$00F3              ;Aに$00F3をロード
+;処理合流
+$C2/3CA6 JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D01][$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+</pre></div>
+
+<p><code>A</code>に新たな<code>[$7E:0AB5]</code><code>[$7E:0AB4]</code>が入った状態で、<code><span class="r">$C2/3C99</span></code>にて<span class="formula">$8000</span>と論理積を取ってゼロフラグ分岐である。<br>
+結論としては、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>ステレオ</th><th>モノラル</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$7E:1D00]</code></td><td><span class="formula">$F3</span></td><td><span class="formula">$F4</span></td></tr>
+	<tr><td><code>[$7E:1D01]</code></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>となって、ステレオなら<span class="formula">$F3</span>が、モノラルなら<span class="formula">$F4</span>が、この後の<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/017F</span></code>でARAMに転送されることになる。<br>
+スーパーファミコンのCPU側の処理はそこまでである。</p>
+
+<p>一応APU（SPC700）の処理も見てみよう。<br>
+ARAMアドレス<code>$0085</code>に、ステレオ・モノラルのフラグがあり、初期値<span class="formula">$00</span>（ステレオ）、<span class="formula">$01</span>（モノラル）が入る。<br>
+<a href="https://donkeyhacks.zouri.jp/html/Ja-jp/snes/apu/spc700/index.html" target="_blank">SPC700 プログラミング リファレンス</a><br>
+も参照していただきたいが、SPC700用ニーモニックはスーファミCPUの65C816用ニーモニックと似ているもののそれなりに違いもある。<br>
+<code>A</code>, <code>X</code>, <code>Y</code>レジスタは1バイト値のみ、2バイト値を扱いたい時は<code>Y</code>と<code>A</code>レジスタを上位バイト・下位バイトとして<code>YA</code>として扱う、プロセッサステータスレジスタはプログラムステータスワードという名称で内容がそこそこ異なる、などなど、違いはあるが、65C816の知識があればなんとか読める……ような気がする。<br>
+とりあえず、I/Oポートアドレスで、</p>
+
+<ul>
+	<li>CPUの<code>$00:2140</code>&#x2194;APUの<code>$00F4</code></li>
+	<li>CPUの<code>$00:2141</code>&#x2194;APUの<code>$00F5</code></li>
+	<li>CPUの<code>$00:2142</code>&#x2194;APUの<code>$00F6</code></li>
+	<li>CPUの<code>$00:2143</code>&#x2194;APUの<code>$00F7</code></li>
+</ul>
+
+<p>と通信しているから、ここを手がかりにして中身を見てみる。<br>
+つまり、APUの<code>$00F4</code>に、ステレオ切り替え時は<span class="formula">$F3</span>、モノラル切り替え時は<span class="formula">$F4</span>が送信されて、SPC700は何らかの形でこの値をロードしているはずだ。<br>
+それが下処理である。</p>
+
+<div class="apu_code-container"><pre>
+$09B3 MOV X,$F4            ;Xに[$00F4]($F3または$F4)をロード
+$09B5 BEQ $09EC            ;ゼロフラグがONのとき[$09EC]分岐
+$09B7 MOV X,$F4            ;Xに[$00F4]をロード
+$09B9 CMP X,$F4            ;Xと[$00F4]を減算比較（ステータスレジスタ変更のみ）
+$09BB BNE $09B7            ;ゼロフラグがOFFのとき$09B7分岐
+$09BD MOVW YA,$F6          ;YAに[$00F7][$00F6]($00FF)をロード　※CPU側の値
+$09BF MOVW $8D,YA          ;[$008E][$008D]にYAをロード
+$09C1 MOVW YA,$F4          ;YAに[$00F6][$00F5]($00F3または$00F4)をロード　※CPU側の値
+$09C3 MOVW $8B,YA          ;[$008C][$008B]にYAをロード [$008B]に$F3または$F4書き込み
+$09C5 CALL !$0619          ;[$0619]へジャンプ
+
+$0619 MOV $F1,#$17         ;[$00F1]に$17をロード
+$061C MOV $F1,#$07         ;[$00F1]に$07をロード
+$061F RET                  ;サブルーチン戻り
+
+$09C8 MOV $F4,A            ;[$00F4]にA($F3または$F4)をロード（CPU$00:2140に送信）
+$09CA MOV X,A              ;XにAをロード
+$09CB BPL $09D0            ;ネガティブフラグOFFのとき[$09D0]分岐
+$09CD JMP !$0C2C           ;[$0C2C]へジャンプ
+
+$0C2C CMP X,#$F0           ;X($F3または$F4)と$F0を減算比較（ステータスレジスタ変更のみ）
+$0C2E BCS $0C34            ;キャリーONのとき$0C34分岐
+$0C34 MOV A,X              ;AにXをロード
+$0C35 AND A,#$1F           ;Aと$1Fで論理積($13または$14)
+$0C37 ASL A                ;Aを算術左シフト*2($26または$28)
+$0C38 MOV Y,A              ;YにAをロード
+$0C39 MOV A,!$1976+Y       ;Aに[$1976+Y]をロード Y:$26または$28
+$0C3C PUSH A               ;Aをスタックにプッシュ A:$0D
+$0C3D MOV A,!$1975+Y       ;Aに[$1975+Y]をロード Y:$39
+$0C40 PUSH A               ;Aをスタックにプッシュ
+$0C41 RET                  ;サブルーチン戻り
+
+$0D39 BBC $8B.0,$0D40      ;[$008B]のBit0が0なら[$0D40]分岐
+;[$008B]にはステレオは$F3(%1111 0011)、モノラルはF4(%1111 0100)が入っている
+;分岐なし　ステレオ処理
+$0D3C CLR1 $85.0           ;[$0085]のBit0を0にクリア
+$0D3E BRA $0D42            ;[$0D42]へジャンプ
+;[$0D40]分岐 モノラル処理
+$0D40 SET1 $85.0           ;[$0085]のBit0を1にセット
+;処理合流
+$0D42 MOV $DB,#$FF         ;[$00DB]に$FFをロード
+$0D45 RET                  ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$09B3で</span></code>、<code>[$00F4]</code>を<code>X</code>にロードしている。<br>
+CPUの<code>$00:2140</code>から<span class="formula">$F3</span>または<span class="formula">$F4</span>が送られてきたら、<code>X</code>に<span class="formula">$F3</span>または<span class="formula">$F4</span>が入って、<code><span class="r">$09B5</span></code>でゼロフラグがOFFの分岐になる。<br>
+次に<code>[$00F5]</code>経由で<span class="formula">$F3</span>または<span class="formula">$F4</span>が送られるので（<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/017F</span></code>の処理で）<code>[$00F6]</code><code>[$00F5]</code>→<code>YA</code>レジスタ→<code>[$008C]</code><code>[$008B]</code>と経由して、<code>[$008B]</code>に<span class="formula">$F3</span>または<span class="formula">$F4</span>が書き込まれる。</p>
+
+<p><code><span class="r">$09C8</span></code>の<code>MOV $F4,A</code>は、逆に<code>$00F4</code>→<code>$00:2140</code>の送信（送信した値がARAMに入ったことをCPU側に通信）。</p>
+
+<p>少し処理を飛ばして、<code><span class="r">$0D39</span></code>～<code><span class="r">$0D45</span></code>がステレオ・モノラル切り替え処理になる。<br>
+<code><span class="r">$0D39</span></code>は、<code>[$008B]</code>に入っている値のBit0が<span class="formula">0</span>なら<code>[$0D40]</code>にジャンプ、という分岐処理。<br>
+<code>[$008B]</code>にはステレオは<span class="formula">$F3</span>(<span class="formula">%1111 0011</span>)、モノラルは<span class="formula">$F4</span>(<span class="formula">%1111 0100</span>)が入っているから、ステレオだと分岐なしで<code><span class="r">$0D3C</span></code>に進む。<br>
+この場合は<code>[$0085]</code>の値のBit0を<span class="formula">0</span>にクリアする。<br>
+一方、モノラルだと<code><span class="r">$0D40</span></code>にジャンプして、<code>[$0085]</code>の値のBit0を<span class="formula">1</span>にセットする。<br>
+これがステレオ・モノラル設定の処理で、結果として、ARAMの<code>[$0085]</code>が<span class="formula">$00</span>ならステレオ出力、<span class="formula">$01</span>ならモノラル出力することになる。</p>
+
+<p>以上はあくまでも設定で、結局サウンドのステレオ・モノラル出力は何が変わるのかというと、左右の音のボリュームである。<br>
+スーファミのサウンドは8音同時に鳴らすことができ（チャネル0～7）、SPC700で計算後、S-DSPでエフェクトをかけて演奏するのだが、S-DSPにはチャネル0～7それぞれの左ボリューム用I/Oポートアドレス<code>$0xX0</code> VxVOLL, 右ボリューム用I/Oポートアドレス<code>$0xX1</code> VxVOLRがある。<br>
+ステレオ出力の時は、左右のボリュームを変えることで立体的な音を鳴らすことができる。<br>
+モノラル出力にすると、全チャネルの左右のボリュームを均等な値に変える。左右のボリュームの平均値がどちらにも入るようである。<br>
+テレビがモノラル出力にしか対応していない場合でも、特定のチャネルの音が聞こえにくいということがなくなる。<br>
+逆に、ステレオ出力できる環境でモノラル出力に変更すると、すべての音がスピーカーの中央あたりから聞こえるようになる。</p>
+
+<hr>
+
+<p>余談になるが、スーパーファミコンの時代、ほとんどの家庭で、スーパーファミコンはブラウン管テレビ（アナログテレビ）にRFスイッチという接続機器で繋いでいた。<br>
+ファミコンに同梱されていたRFスイッチ及び接続ケーブルが、スーパーファミコンでもそのまま使えたからである。<br>
+スーパーファミコン本体にはRFスイッチなどの接続機器が同梱されていなかったので、所持していない場合は別売り品を購入する必要があった。<br>
+ただ、RFスイッチでテレビに接続すると、テレビがステレオ出力対応であっても、サウンドをモノラル出力しかできない。<br>
+スーパーファミコンの音をステレオ出力したいのなら、対応したテレビを用意し（当時のテレビ自体はステレオ出力も対応していた）、赤・白・黄の3個の端子がついているRCA端子ケーブルかS端子ケーブルを別途購入して、スーパーファミコンと接続する必要があったが、スーパーファミコンのために別売りのケーブルをわざわざ購入する小中学生は当時あまり居なかったのではなかろうか。<br>
+初めて購入した家庭用ゲーム機がスーパーファミコンという場合は話が別だが。</p>
+
+<p>余談の余談で、赤・白・黄の3個の端子がついているRCA端子でのテレビ接続は、任天堂だとWiiU、ソニーだとPlayStation3までは使用可能だった。現在では古い仕様となってしまったが、ゲーム機においては息の長い接続方法であった。</p>
+
+<p>ということで、当時のスーパーファミコンのゲームにステレオ・モノラル出力切り替え機能がよくついていたのは、RFスイッチでサウンドをモノラル出力してプレイする家庭が多かったからであろう。<br>
+なお、ファミコンはハード自体がステレオ出力に対応していない（モノラル出力しかできない）。</p>
+
+<script>//ソースコード色分け処理
+{
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+}
+</script>
+
+<script>//APUソースコード色分け処理
+{
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".apu_code-container pre"),n=RegExp("\\b(MOV|MOVW|ADC|SBC|CMP|INCW|DECW|ADDW|SUBW|CMPW|MUL|DIV|AND|OR|EOR|INC|DEC|ASL|LSR|ROL|ROR|XCN|BRA|BEQ|BNE|BCS|BCC|BVS|BVC|BMI|BPL|BBS|BBC|CBNE|DBNZ|JMP|CALL|PCALLTCALLBRK|RET|RETI|DAA|DAS|PUSH|POP|SET1|CLR1|TSET1TCLR1AND1|OR1|EOR1|NOT1|MOV1|CLRC|SETC|NOTC|CLRV|CLRP|SETP|DI|NOP|SLEEP|STOP)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+}
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program42.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program44.html"><span class="button">&#9654;次 戦闘コマンド</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
