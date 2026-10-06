@@ -197,7 +197,7 @@ table {
 <li class="here"><button type="button">音</button>
 	<ul>
 		<li><a href="sound.html">サウンドについて</a></li>
-		<li><a href="sound1.html">BGMの再生</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
 		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
 		<li><a href="sound3.html">シーケンスデータ調査</a></li>
 	</ul>
@@ -552,7 +552,10 @@ $C3/00D8 BRA $9B    [$0075]      ;フラグにかかわりなく常に分岐[$00
 <code>A</code>レジスタの上位バイトと下位バイトを交換しているから、<code><span class="r">$C3/00A0</span></code>で<code>[$00:2140]</code>に書き込むのは<span class="formula">$00</span>である。<br>
 <code><span class="r">$C3/00A3</span></code>～<code><span class="r">$C3/00A6</span></code>のループ処理は、<code>[$00:2140]</code>をロードして、<code>[$00:2140]</code>に書き込んだ<span class="formula">$00</span>を返すかどうか待機するための処理。<br>
 というのは、先に述べた通りに<code>$00:2140</code>～<code>$00:2143</code>はARAMに値を転送するだけではなく、ロードすることでARAMから値を受け取ることもできるレジスタである。<code>[$00:2140]</code>に書き込んだ値と同じ値が<code>[$00:2140]</code>をロードした時に戻ってきたのなら、SPC700側のCPU通信レジスタ<code>[$00F4]</code>に転送を終えたという意味である。<br>
-これで、<code>[$00:2141]</code>に書き込んだ値が、まずはARAMアドレス<code>$0200</code>に書き込まれたことになる（<code><span class="r">$C3/005E</span></code>～<code><span class="r">$C3/0065</span></code>で設定された開始位置アドレス）。<br>
+APU側は音の演奏も行うので、演奏していないタイミング、（おそらく）1フレームに1回、<code>[$00:2140]</code>に送られた値をチェックし、何か書き込まれていたら受け取り、受け取ったという合図を逆に<code>[$00:2140]</code>に返してくる。<br>
+このように、CPU側の転送タイミングとAPU側のデータ受取にタイムラグがあるため、ループ処理が設けられているのである。</p>
+
+<p>これで、<code>[$00:2141]</code>に書き込んだ値が、まずはARAMアドレス<code>$0200</code>に書き込まれたことになる（<code><span class="r">$C3/005E</span></code>～<code><span class="r">$C3/0065</span></code>で設定された開始位置アドレス）。<br>
 ループは<code>Y:0002</code>から開始して、1回ループでインクリメントされて<span class="formula">$17CB</span>までなので、<code>$C3:1F0E</code>まで転送することになる。</p>
 
 <p>ループを抜けると<code><span class="r">$C3/00AF</span></code>に進むのだが、ここで一度転送先のアドレスを変更する。<br>

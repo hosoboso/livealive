@@ -206,7 +206,7 @@ table {
 <li class="other"><button type="button">音</button>
 	<ul>
 		<li><a href="sound.html">サウンドについて</a></li>
-		<li><a href="sound1.html">BGMの再生</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
 		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
 		<li><a href="sound3.html">シーケンスデータ調査</a></li>
 	</ul>
@@ -235,6 +235,10 @@ table {
 		<li><a href="#BGMlist_2">BGM用 シーケンスデータ一覧</a></li>
 	</ul>
 	<li><a href="#selist">効果音一覧</a></li>
+	<ul>
+		<li><a href="#selist_1">カーソル系効果音</a></li>
+		<li><a href="#selist_2">ID<span class="formula">$00</span>～<span class="formula">$FF</span>効果音</a></li>
+	</ul>
 	<li><a href="#arammap">ARAMメモリマッピング</a></li>
 </ul>
 <!-- <div id="captiondata"></div> -->
@@ -247,10 +251,7 @@ table {
 戦闘・マップの場合、流れているBGMは<code>$00:1D05</code>に値が入る。</p>
 
 <p>タイトルはサウンドトラックに準拠。<br>
-（「いいお天気でしょっ!」の夜バージョンなど、一部楽曲のスローテンポな曲は原曲の再生ピッチを変更して流しているらしい）</p>
-
-「UNSEEN SYNDROME」はＳＦ編の中で、8音の中で一部のみを演奏する処理を各所で行っている（オープニングの時点で「UNSEEN SYNDROME」が流れている）
-西部編でサンチョ・デロス・パンチョの誰かが罠仕掛けに行くと「Sancho・de・Los・Panchoz」の担当楽器の一部を再生停止にするなども同じ処理。
+（「いいお天気でしょっ!」の夜バージョンなど、一部楽曲のスローテンポな曲を流す方法は<a href="sound1.html">サウンドについて &gt; BGMの演奏</a>に掲載している）</p>
 
 <table>
 <thead>
@@ -639,13 +640,56 @@ table {
 
 <h3 id="selist">効果音一覧</h3>
 
-<p>ID<span class="formula">$00</span>～<span class="formula">$FF</span><br>
-効果音には名前がなく説明もしにくいので、技の効果音の場合は「」内に技名を記した。<br>
-効果音のサンプリングデータとシーケンスデータはゲーム開始時にARAMに読み込まれており、効果音を流すタイミングで、IDのみが<code>$00:1D01</code>→<code>$00:2141</code>と経由してAPUに転送される。このためBGM再生時より、音が鳴るのが速い（BGMはサンプリングデータとシーケンスデータをARAMに転送してから演奏開始するため）。<br>
-技は2種類の効果音を設定可能で（技データ20と技データ24）、両方<span class="formula">$00</span>なら無音となり（「音無しの剣」「すたーばすたー」など、ただし「スピンドル」のように例外あり）、アキラの超能力系の技のように超能力効果音<span class="formula">$6A</span>と技自体の効果音と2種設定されている技、片方だけ設定されている技など様々。</p>
-
-<p>スーパーファミコンでは同時に8音まで音を出力でき（音声チャネルが0～7ある）、効果音には音声チャネル6, 7の2チャネル分を使う。<br>
+<p>効果音は、メニューや戦闘においてカーソル操作時に鳴るカーソル系効果音4種と、それ以外の場面で使われるID<span class="formula">$00</span>～<span class="formula">$FF</span>効果音に分かれる。<br>
+スーパーファミコンでは同時に8音まで音を出力でき（音声チャネルが0～7ある）、効果音には音声チャネル6, 7の2チャネル分を使う。<br>
+片方のみ使用する効果音もある。<br>
 （つまり、BGMは一時的に音声チャネル6, 7を停止して音声チャネル0～5のみ流している）</p>
+
+<p>効果音のサンプリングデータとシーケンスデータはゲーム開始時にARAMに読み込まれており、効果音を流すタイミングで、以下のように値を書き込む。</p>
+
+<table>
+<thead>
+	<tr><th colspan="2">内容</th><th><code>$00:1D00</code></th><th><code>$00:1D01</code></th></tr>
+</thead>
+<tbody>
+	<tr><td colspan="2">効果音ID<span class="formula">$00</span>～<span class="formula">$FF</span></td><td><span class="formula">$18</span></td><td>効果音ID</td></tr>
+	<tr><td rowspan="4">カーソル系<br>効果音</td><td>決定</td><td><span class="formula">$20</span></td><td>-</td></tr>
+	<tr><td>キャンセル</td><td><span class="formula">$21</span></td><td>-</td></tr>
+	<tr><td>ブザー音</td><td><span class="formula">$22</span></td><td>-</td></tr>
+	<tr><td>カーソル移動</td><td><span class="formula">$23</span></td><td>-</td></tr>
+</tbody>
+</table>
+
+<p>更に、<code>$00:1D00</code>→<code>$00:2140</code>, <code>$00:1D01</code>→<code>$00:2141</code>とI/Oレジスタ経由でARAMに値を転送することで効果音が鳴る。<br>
+（カーソル系効果音は<code>$00:2140</code>に1バイトのデータを送るのみ）<br>
+つまり、カーソル系効果音は専用コマンドがあり1バイトデータを送るだけで鳴り、ID<span class="formula">$00</span>～<span class="formula">$FF</span>効果音は2バイトデータを送る必要がある。<br>
+いずれにしても、BGMはサンプリングデータとシーケンスデータをARAMに転送してから演奏開始するが、効果音は上の処理だけなので、BGM演奏時より音が鳴るのが速い。</p>
+
+<h4 id="selist_1">カーソル系効果音</h4>
+
+<p>4種類あり、いずれもチャネル7のみ演奏、サンプリングデータも1種のみ使用。</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>シーケンス<br>開始アドレス<br>（ARAM）</th><th>サンプリング<br>データNo.</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">1</span></td><td><code>$1875</code></td><td><span class="formula">$02</span></td><td>決定</td></tr>
+	<tr><td><span class="formula">2</span></td><td><code>$1880</code></td><td><span class="formula">$06</span></td><td>キャンセル</td></tr>
+	<tr><td><span class="formula">3</span></td><td><code>$188B</code></td><td><span class="formula">$00</span></td><td>ブザー音</td></tr>
+	<tr><td><span class="formula">4</span></td><td><code>$1894</code></td><td><span class="formula">$0A</span></td><td>カーソル移動</td></tr>
+</tbody>
+</table>
+
+<h4 id="selist_2">ID<span class="formula">$00</span>～<span class="formula">$FF</span>効果音</h4>
+
+<p>ID<span class="formula">$00</span>～<span class="formula">$FF</span><br>
+効果音には名前がなく説明もしにくいので、技の効果音の場合は「」内に技名を記した。</p>
+
+<p>技は2種類の効果音を設定可能で（技データ20と技データ24）、両方<span class="formula">$00</span>なら無音となり（「音無しの剣」「すたーばすたー」など、ただし「スピンドル」のように例外あり）、アキラの超能力系の技のように超能力効果音<span class="formula">$6A</span>と技自体の効果音と2種設定されている技、片方だけ設定されている技など様々。</p>
+
+<p>シーケンス開始アドレスに<span class="formula">$0000</span>が設定されている場合、そのチャネルは演奏しない。<br>
+両方に<span class="formula">$0000</span>が設定されている効果音は未使用ということであり、指定しても何の音も鳴らない。</p>
 
 <table>
 <thead>
@@ -676,7 +720,7 @@ table {
 	<tr><td><span class="formula">$14</span></td><td><code>$315A</code></td><td><code>$315C</code></td><td>殴り蹴り系</td></tr>
 	<tr><td><span class="formula">$15</span></td><td><code>$3168</code></td><td><code>$316A</code></td><td>「老狐の舞」</td></tr>
 	<tr><td><span class="formula">$16</span></td><td><code>$3176</code></td><td><code>$319B</code></td><td>「旋牙連山拳」</td></tr>
-	<tr><td><span class="formula">$17</span></td><td><code>$31CA</code></td><td><code>$31CD</code></td><td>「おにくまん」</td></tr>
+	<tr><td><span class="formula">$17</span></td><td><code>$31CA</code></td><td><code>$31CD</code></td><td>被ダメージ音, 「おにくまん」</td></tr>
 	<tr><td><span class="formula">$18</span></td><td><code>$31DD</code></td><td><code>$31E0</code></td><td>「画竜天聖の陣」</td></tr>
 	<tr><td><span class="formula">$19</span></td><td><code>$31EF</code></td><td><code>$31F1</code></td><td>「エリア・大回復」「自己安静息」「全体なんでも回復」「気功念斬波」など回復系</td></tr>
 	<tr><td><span class="formula">$1A</span></td><td><code>$31FE</code></td><td><code>$3200</code></td><td>「暗黒球体」「ヘビーブロウ」「空破旋風手」</td></tr>
@@ -736,7 +780,7 @@ table {
 	<tr><td><span class="formula">$50</span></td><td><code>$3704</code></td><td><code>$3726</code></td><td>「デストレイル」「魔道士の亡影」</td></tr>
 	<tr><td><span class="formula">$51</span></td><td><code>$0000</code></td><td><code>$0000</code></td><td>-</td></tr>
 	<tr><td><span class="formula">$52</span></td><td><code>$0000</code></td><td><code>$0000</code></td><td>-</td></tr>
-	<tr><td><span class="formula">$53</span></td><td><code>$3751</code></td><td><code>$3762</code></td><td>-</td></tr>
+	<tr><td><span class="formula">$53</span></td><td><code>$3751</code></td><td><code>$3762</code></td><td>ピュアオディオ撃破時の悲鳴のような効果音</td></tr>
 	<tr><td><span class="formula">$54</span></td><td><code>$0000</code></td><td><code>$0000</code></td><td>-</td></tr>
 	<tr><td><span class="formula">$55</span></td><td><code>$3780</code></td><td><code>$3783</code></td><td>「電撃フルチャージ」「システムリカバー」後半、「ハイスピードオペ」後半</td></tr>
 	<tr><td><span class="formula">$56</span></td><td><code>$3799</code></td><td><code>$379B</code></td><td>「ヘキサフランジ」など</td></tr>
@@ -922,7 +966,11 @@ table {
 	<tr><td><code>$0000</code>～<code>$00EF</code></td><td>メモリ領域（0ページ）</td></tr>
 	<tr><td><code>$0085</code></td><td>初期値<span class="formula">$00</span>（ステレオ）、<span class="formula">$01</span>（モノラル）　メニュー→音声の設定で切り替え</td></tr>
 	<tr><td><code>$00F0</code>～<code>$00FF</code></td><td>SPC700レジスタ（I/Oポートアドレス）</td></tr>
-	<tr><td><code>$0200</code>～<code>$19C8</code></td><td>SPC700用プログラム（<code>$C3:0746</code>～<code>$C3:1F0E</code>）</td></tr>
+	<tr><td><code>$0200</code>～<code>$180B</code></td><td>SPC700用プログラム（<code>$C3:0746</code>～<code>$C3:1D0F</code>）</td></tr>
+	<tr><td><code>$180C</code>～<code>$19C8</code></td><td>SPC700用プログラム計算用変数など（<code>$C3:1D10</code>～<code>$C3:1F0E</code>）</td></tr>
+	<tr><td><code>$1826</code>～<code>$1845</code></td><td>SPC700プログラム内 サウンド・シーケンスにおけるFIRフィルタ係数一覧表（<code>$C3:1D6C</code>～<code>$C3:1D8B</code>）</td></tr>
+	<tr><td><code>$1846</code>～<code>$1853</code></td><td>SPC700プログラム内 サウンド・シーケンスにおける音符や休符のティック数（演奏長さ）一覧表（<code>$C3:1D8C</code>～<code>$C3:1D99</code>）</td></tr>
+	<tr><td><code>$1855</code>～<code>$18A0</code></td><td>SPC700プログラム内 カーソル系効果音4種のシーケンスデータ（<code>$C3:1D9B</code>～<code>$C3:1DE7</code>）</td></tr>
 	<tr><td><code>$1A00</code>～<code>$1A17</code></td><td>効果音用サンプリングデータ（<code>$C3:23AE</code>～<code>$C3:23C5</code>）</td></tr>
 	<tr><td><code>$1A80</code>～<code>$1A97</code></td><td>効果音用サンプリングデータ（<code>$C3:2394</code>～<code>$C3:23AB</code>）</td></tr>
 	<tr><td><code>$1B00</code>～<code>$1B2B</code></td><td>効果音用サンプリングデータ（<code>$C3:2366</code>～<code>$C3:2390</code>）</td></tr>
