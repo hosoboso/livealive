@@ -267,7 +267,7 @@ table {
 </tbody>
 </table>
 
-<p>近未来編のバーはBGMID<span class="formula">$0B</span>「PSYCHOで夜露死苦!!」を転調＆スローテンポで流しているのだが、バーに入った時は以下のように処理が入る。</p>
+<p>近未来編のバーはBGMID<span class="formula">$0B</span>「PSYCHOで夜露死苦!!」を演奏パート削減＆スローテンポで流しているのだが、バーに入った時は以下のように処理が入る。</p>
 
 <table>
 <thead>
@@ -281,20 +281,33 @@ table {
 </tbody>
 </table>
 
-<p>この後に呼び出すBGMIDは<span class="formula">$0B</span>で共通なので、上で転調＆スローテンポを設定しているのである。<br>
-結論を言ってしまうと、<code>$00:1D00</code>に<span class="formula">$F5</span>を書き込んで<code>$00:2140</code>から転送した場合、<code>$00:1D01</code>に書き込み<code>$00:2141</code>から転送する値が、キー（調）の変動値になる。<br>
-シーケンスデータで設定したキーの通りに演奏する場合は<code>$00:1D01</code>に<span class="formula">$00</span>を書き込むのだが、変える場合は上の通りに<span class="formula">$00</span>以外の値が入る。</p>
+<p>この後に呼び出すBGMIDは<span class="formula">$0B</span>で共通なので、上でテンポやキー、演奏パートを設定を変えている。<br>
+どれで何が変更できるか、筆者もすべて把握はできていないが、重要なあたりは以下である。</p>
 
-<p>また、<code>$00:1D00</code>に<span class="formula">$86</span>を設定した場合、<code>$00:1D02</code>に<span class="formula">$00</span>以外の値が入ると演奏のテンポ（演奏速度）が変動する。</p>
+<table>
+<thead>
+	<tr><th rowspan="2">設定</th><th colspan="4"><code>$00:1DXX</code></th><th rowspan="2">内容</th></tr>
+	<tr><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
+</thead>
+<tbody>
+	<tr><td>演奏速度（テンポ）変更</td><td><span class="formula">$86</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span>: <span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
+	<tr><td>ピッチ（キー）変更</td><td><span class="formula">$89</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span>: <span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
+	<tr><td>演奏パートミュート設定</td><td><span class="formula">$F5</span></td><td><span class="formula">$zz</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td>Bit0～7がチャネル0～7に対応しており、<br><span class="formula">1</span>が立っているチャネルはミュート（無音）処理される</td></tr>
+</tbody>
+</table>
 
-<p>というように、元々シーケンスデータで設定した値とは異なる演奏を行う時に、初期設定で変更できるようになっているようだ。<br>
-ただ、どの数値でどれが変更になるのかまでは未確認。</p>
+<p>近未来編のバーなら、演奏パートミュート設定<span class="formula">$F5</span>に<span class="formula">$85(%1000 0101)</span>が設定されており、Bit0, 2, 7に<span class="formula">1</span>が立っているから、チャネル0, 2, 7は演奏はするがボリュームは<span class="formula">0</span>、無音処理される。つまりチャネル1, 3, 4, 5, 6の音しか出ていない。<br>
+更に、演奏速度（テンポ）変更<span class="formula">$86</span>に<span class="formula">$8C</span>が入っているので通常より演奏速度が下がる（スローテンポでの演奏）。</p>
 
-<p>他には、いずれかのチャネルの演奏だけ停止するといった場合も（西部編の罠仕掛けで、サンチョ・デロス・パンチョがバーから居なくなる時など）、以上で設定をしているはずである。</p>
+<p>演奏パートミュート設定を使えば、西部編の罠仕掛けでサンチョ・デロス・パンチョがバーから居なくなる時や、ＳＦ編の「Unseen Syndrome」のパート毎の演奏、「CRY・A・LIVE」のハープのみの演奏なども可能だし、上3種の組み合わせ次第で「届かぬ翼」のスローテンポ版や「いいお天気でしょ！」の夜バージョンも演奏できる。</p>
+
+<p>演奏速度やキーは、各曲のシーケンスデータ内の<a href="sequence.html#no_1">シーケンスコマンド</a>で決まっているのだが、演奏前に上のデータを送ることで変更されるということになる。<br>
+シーケンスコマンドとは異なる方法（コマンド？）で変更しているようなので、どれで何を指定しているのかがわかりにくい。（SPC700側の処理を確認すれば良いのだろうが……）</p>
 
 <h4>BGMのデータ転送</h4>
 
 <p>以上の設定後に、演奏するBGMIDの計算・呼び出しを行う。<br>
+また、ここで全体ボリュームの設定も行うことが可能。<br>
 詳細は<a href="sound2.html">サウンドについて &gt; BGMIDの呼び出し</a>を参照。</p>
 
 <p>演奏するBGMIDが<span class="formula">$NN</span>だとする。<br>
@@ -306,11 +319,17 @@ table {
 	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
 </thead>
 <tbody>
-	<tr><td>値</td><td><span class="formula">$10</span></td><td><span class="formula">$NN</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>値</td><td><span class="formula">$10</span>または<span class="formula">$14</span></td><td><span class="formula">$NN</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
 </tbody>
 </table>
 
-<p>この後に、<code><span class="r">$C3/06CD</span></code>～で、</p>
+<p>（<code>$00:1D00</code>に<span class="formula">$10</span>, <span class="formula">$11</span>, <span class="formula">$14</span>がセットされていると全データ送信後に演奏を行うが、相違点はよくわからない）</p>
+
+<p>この後に全体ボリュームを設定可能。<br>
+通常のボリュームを<span class="formula">$FF</span>として、ボリューム<span class="formula">$00</span>～<span class="formula">$FF</span>の値を、下の<span class="formula">$VV</span>にセットする。<br>
+つまりボリュームを通常より下げたい場合は<span class="formula">$00</span>～<span class="formula">$FE</span>を書き込む。<br>
+（例えば、原始編におけるポゴの集落の夜のBGMは、<span class="formula">$VV</span>に<span class="formula">$60</span>をセットすることで、ボリュームを下げている）<br>
+<code><span class="r">$C3/06CD</span></code>～で、</p>
 
 <table>
 <thead>
@@ -318,9 +337,10 @@ table {
 	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
 </thead>
 <tbody>
-	<tr><td>値</td><td><span class="formula">$10</span></td><td><span class="formula">$NN</span></td><td><span class="formula">$FF</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>値</td><td><span class="formula">$10</span>または<span class="formula">$14</span></td><td><span class="formula">$NN</span></td><td><span class="formula">$VV</span></td><td><span class="formula">$00</span></td></tr>
 </tbody>
 </table>
+
 
 <p>とセットしてから、</p>
 
