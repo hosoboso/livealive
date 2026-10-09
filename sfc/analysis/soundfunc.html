@@ -7,25 +7,26 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="msapplication-TileImage" content="../img/social.png">
 <meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
-<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 行動異常 &gt; カウンター行動異常">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドドライバファンクション">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livealive.client.jp/sfc/">
 <meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
 <meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="Summary">
-<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 行動異常 &gt; カウンター行動異常">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; サウンドドライバファンクション">
 <meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
 <meta name="twitter:url" content="https://livealive.client.jp/sfc/">
 <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
 <link rel="icon alternate" href="../img/social.png" type="image/png">
-<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 行動異常 &gt; カウンター行動異常</title>
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドドライバファンクション</title>
 <link href="../../css/main.min.css?20260714" rel="stylesheet">
 <link href="../../css/sfc.css?20260301" rel="stylesheet">
 <link href="../../css/cssmenu.css?20240801" rel="stylesheet">
 <link href="../../css/GEsubset.css?20231001" rel="stylesheet">
 <link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
 <style>
 .code-container {
   border: 1px solid #ccc;
@@ -60,15 +61,19 @@ code {
 }
 
 #captiondata {
-	border: 1px solid #CCC;
 	padding: .1em;
-	background: #f5f5f5;
+	box-shadow: 2px 2px 5px #bbb;
 }
 
 @media (max-width: 768px) {
 table {
 	font-size:smaller;
 	}
+}
+
+.fit-picture {
+  width: 30px;
+  height: 50px;
 }
 </style>
 </head>
@@ -91,7 +96,7 @@ table {
 <nav class="droplinetabs">
 <ul>
 <li class="other"><a href="index.html">TOP</a></li>
-<li class="other"><button type="button">データ一覧</button>
+<li class="here"><button type="button">データ一覧</button>
 	<ul>
 		<li><a href="datamap.html">データマップ</a></li>
 		<li><a href="flag.html">フラグ</a></li>
@@ -100,13 +105,11 @@ table {
 		<li><a href="sequence.html">シーケンスデータ</a></li>
 		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
-		<li><a href="sprite.html">スプライト</a></li>
-		<li><a href="bg.html">背景グラフィックと効果</a></li>
 		<li><a href="program1.html">ボタン判定</a></li>
 		<li><a href="memo.html">雑多メモ</a></li>
 	</ul>
 </li>
-<li class="here"><button type="button">戦闘・基本</button>
+<li class="other"><button type="button">戦闘・基本</button>
 	<ul>
 		<li><a href="program4.html">ダメージ計算式</a></li>
 		<li><a href="program5.html">戦闘用乱数計算</a></li>
@@ -171,7 +174,7 @@ table {
 		<li><a href="program42.html">アイテム並び替え</a></li>
 		<li><a href="program43.html">隊形</a></li>
 		<li><a href="program46.html">音声</a></li>
-<li><a href="program35.html">セーブ・ロード</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -205,230 +208,287 @@ table {
 </div>
 
 <div class="maincontents">
-<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program17.html">行動異常</a> &gt; カウンター行動異常</h1>
-<h2>特定の属性の技で発生するカウンター行動異常</h2>
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; シーケンスデータ</h1>
+<h2>サウンドドライバファンクション</h2>
 
 <div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
 まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
 
-<p><a href="program17.html">前ページ</a>の続き。<br>
-前ページでは技自体に設定されている行動異常の説明を行ったが、特定の属性の技で発生するカウンター行動異常について説明する。</p>
+<p><span class="tri"><a href="sound.html">サウンドについて</a></span>及び、<span class="tri"><a href="sounddata.html">サウンドデータ</a></span>、<span class="tri"><a href="sequence.html">シーケンスデータ</a></span>も参照のこと。</p>
 
-<p>技自体に行動異常の効果がない、つまり技データ22に行動異常の値が入っていない場合でも、敵に特定の属性の技を当てることで行動異常が発生することがある。<br>
-<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様の敵データでは「カウンター行動異常」として掲載されているが、すべての敵には、各属性に対しどの行動異常が発生するかが設定されている。<br>
-敵データでいうと、敵データ16～敵データ23が該当する。<br>
-各属性で行動異常8種類分のデータが必要なので、1バイト分の上8ビットと下8ビットに2種の属性、合計で8バイトの容量を使っている。</p>
+<p>このページには、サウンド演奏の命令であるサウンドドライバファンクションの一覧・説明を掲載している。<br>
+ARAMに設置したサンプリングデータとシーケンスデータに対し、実際に「演奏しろ」「演奏終了しろ」「フェードインしながら演奏開始しろ」「フェードアウトしながら演奏終了しろ」「一部パートをミュートして演奏しろ」……などなどといった指示を出すコマンドがサウンドドライバファンクションである、と考えていただきたい。<br>
+以下コマンドは、CPUからI/Oレジスタ<code>$00:2140</code>～<code>$00:2143</code>の4バイトを通してAPUへ送信する。<br>
+ほとんどの場合で、<code>$00:1D00</code>～<code>$00:1D03</code>に書き込んだ数値を<code>$00:2140</code>～<code>$00:2143</code>へコピーする、という手順で送信をする。<br>
+名称は<a href="https://gnilda.cloudfree.jp/" target="_blank">Gnilda のページ</a>様からお借りした。またデータも多数参考にさせていただいている。</p>
 
-<table>
-<thead>
-	<tr><th>敵データ</th><th>内容（上8ビット/下8ビット）</th></tr>
-</thead>
-<tbody>
-	<tr><td>16</td><td>カウンター行動異常　手/足属性</td></tr>
-	<tr><td>17</td><td>カウンター行動異常　突/鋭属性</td></tr>
-	<tr><td>18</td><td>カウンター行動異常　鈍/締属性</td></tr>
-	<tr><td>19</td><td>カウンター行動異常　飛/背属性</td></tr>
-	<tr><td>20</td><td>カウンター行動異常　火/水属性</td></tr>
-	<tr><td>21</td><td>カウンター行動異常　風/土属性</td></tr>
-	<tr><td>22</td><td>カウンター行動異常　精/善属性</td></tr>
-	<tr><td>23</td><td>カウンター行動異常　悪/無属性</td></tr>
-</tbody>
-</table>
+<p>以下は筆者が確認した分であり、他にもコマンドがある可能性もある。更に間違いが含まれているかもしれないことをご了承いただきたい。</p>
 
-<p>カウンター行動異常は、味方キャラが敵に何かしらの技を当てた時、技の属性から該当のカウンター行動異常の敵データ番号を取り出し、該当の属性のカウンター行動異常に0以外の値が入っていたら行動異常の値がつく、という形で行われる。<br>
-処理は以下の通り。</p>
+<div id="captiondata"></div>
 
-<div class="code-container"><pre>
-$C1/D570 LDA $D50016,x           ;Aに[$D50016,x]（技データ22）をロード
-$C1/D574 STA $7E900A[$7E:900A]   ;Aを[$7E:900A]に書き込み
-$C1/D578 LDA $D5000D,x           ;Aに[$D5000D,x]（技データ13）をロード
-$C1/D57C STA $7E9009[$7E:9009]   ;Aを[$7E:9009]に書き込み
-</pre></div>
+<h3>サウンドドライバファンクション</h3>
 
-<p>行動異常発生処理では、<code><span class="r">$C1/D570</span></code>で行動異常の値が格納されている技データ22をロードし、<code>[$7E:900A]</code>に格納していたが、実はこの直後に技データ13をロードして<code>[$7E:9009]</code>に格納している。<br>
-技データ13の下1桁が、カウンター行動異常判定に必要となる、技の属性の値である。</p>
+<h4><span class="formula">$10</span> <span class="formula">xx</span> <span class="formula">yy</span> BGM演奏開始（演奏中断設定込）</h4>
 
-<table>
-<thead>
-	<tr><th>属性</th><th>数値</th></tr>
-</thead>
-<tbody>
-	<tr><td>手</td><td><span class="formula">$0</span></td></tr>
-	<tr><td>足</td><td><span class="formula">$1</span></td></tr>
-	<tr><td>突</td><td><span class="formula">$2</span></td></tr>
-	<tr><td>鋭</td><td><span class="formula">$3</span></td></tr>
-	<tr><td>鈍</td><td><span class="formula">$4</span></td></tr>
-	<tr><td>締</td><td><span class="formula">$5</span></td></tr>
-	<tr><td>飛</td><td><span class="formula">$6</span></td></tr>
-	<tr><td>背</td><td><span class="formula">$7</span></td></tr>
-	<tr><td>火</td><td><span class="formula">$8</span></td></tr>
-	<tr><td>水</td><td><span class="formula">$9</span></td></tr>
-	<tr><td>風</td><td><span class="formula">$A</span></td></tr>
-	<tr><td>土</td><td><span class="formula">$B</span></td></tr>
-	<tr><td>精</td><td><span class="formula">$C</span></td></tr>
-	<tr><td>善</td><td><span class="formula">$D</span></td></tr>
-	<tr><td>悪</td><td><span class="formula">$E</span></td></tr>
-	<tr><td>無</td><td><span class="formula">$F</span></td></tr>
-</tbody>
-</table>
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：BGMID <span class="formula">$00</span>～<span class="formula">$4D</span><br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
 
-<p>ちなみに技データ13の上1桁は、技のタイプ関係の値が入っている。カウンター行動異常には関係ないが一応紹介しておく。</p>
+	<dt>内容</dt>
+	<dd>BGMID<span class="formula">xx</span>を音量<span class="formula">yy</span>で演奏開始する。<br>
+	コマンド<span class="formula">$14</span>で他の曲を割り込ませた場合、その曲の演奏停止後にレジューム演奏ができる。</dd>
+</dl>
+
+<h4><span class="formula">$11</span> <span class="formula">xx</span> <span class="formula">yy</span> BGM演奏開始（バージョン違い）</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：BGMID <span class="formula">$00</span>～<span class="formula">$4D</span><br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>BGMID<span class="formula">xx</span>を音量<span class="formula">yy</span>で演奏開始する。<br>
+	特定のBGMIDはバージョン違いの曲が演奏される（下表参照）。他にも対象曲があるかもしれない。</dd>
+</dl>
 
 <table>
 <thead>
-	<tr><th>技データ13<br>上1桁</th><th>内容</th></tr>
+	<tr><th>BGMID</th><th>曲名</th><th>内容</th></tr>
 </thead>
 <tbody>
-	<tr><td><span class="formula">$0</span></td><td>通常</td></tr>
-	<tr><td><span class="formula">$2</span></td><td>範囲が周囲</td></tr>
-	<tr><td><span class="formula">$4</span></td><td>反撃専用</td></tr>
-	<tr><td><span class="formula">$8</span></td><td>回復</td></tr>
+	<tr><td><span class="formula">$04</span></td><td>WANDERER</td><td>前奏なしバージョン</td></tr>
+	<tr><td><span class="formula">$08</span></td><td>UNSEEN SYNDROME</td><td>チャネル2と3のみのバージョン（ＳＦ編オープニング）</td></tr>
+	<tr><td><span class="formula">$19</span></td><td>届かぬ翼</td><td>回想などで流れるスローバージョン（リメイクにおける「届かぬ翼 (回想)」）</td></tr>
 </tbody>
 </table>
 
-<p>周囲かつ回復技だと<span class="formula">$2 + $8</span>で<span class="formula">$A</span>が入ることになる。</p>
+<h4><span class="formula">$14</span> <span class="formula">xx</span> <span class="formula">yy</span> BGM演奏開始（演奏中断割り込み用）</h4>
 
-<p>以下、処理の続き。</p>
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：BGMID <span class="formula">$00</span>～<span class="formula">$4D</span><br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
 
-<div class="code-container"><pre>
-$C1/D9DA LDA $7E9009[$7E:9009]   ;Aに[$7E:9009]（技データ13）をロード
-$C1/D9DE BIT #$0F                ;Aと$0Fで論理積（ステータスフラグのみ変更）
-$C1/D9E0 JSR $D9F8  [$C1:D9F8]   ;[$C1:D9F8]へジャンプ
-;
-$C1/D9F8 STA $12    [$00:0312]   ;A（技データ13）を[$00:0312]に書き込み
-$C1/D9FA LSR A                   ;Aを論理右シフト（/2）
-$C1/D9FB STA $13    [$00:0313]   ;A（「技データ13」/2）を[$00:0313]に書き込み
-$C1/D9FD LDA $7E900B,x           ;Aに[$7E900B,x]（初期値$00）をロード
-$C1/DA01 BPL $07    [$DA0A]      ;ネガティブフラグが立っていないとき[$DA0A]分岐
-$C1/DA0A LDA $13    [$00:0313]   ;Aに[$00:0313]（「技データ13」/2）をロード
-$C1/DA0C REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
-$C1/DA0E AND #$0007              ;Aと$0007で論理積
-$C1/DA11 ADC $0002,x             ;A + [$0002,x]
-$C1/DA14 TAY                     ;Aレジスタの値をYレジスタに転送
-$C1/DA15 SEP #$20                ;MフラグON　Aレジスタは8bit幅
-$C1/DA17 LDA $0030,y             ;Aに[$0030,y]（敵データXX　カウンター行動異常）をロード
-</pre></div>
+	<dt>内容</dt>
+	<dd>BGMID<span class="formula">xx</span>を音量<span class="formula">yy</span>で演奏開始する。<br>
+	コマンド<span class="formula">$10</span>で演奏中の曲に割り込む時に使う（フィールド曲をレジュームで演奏している最中のザコ戦や、アイテム獲得でボイス効果音を流す時など）。</dd>
+</dl>
 
-<p>技データ13（下1桁に技の属性）は、<code>[$7E:9009]</code>→<code>[$00:0312]</code>と読み込まれている。<br>
-<code><span class="r">$C1/D9F8</span></code>以降は、技を当てられた敵の、該当属性のカウンター行動異常のアドレス計算である。<br>
-<code><span class="r">$C1/D9FA</span></code>～で、技データ13を論理右シフト（÷2）し、<code>[$00:0313]</code>に書き込んでいるが、敵のカウンター行動異常は1つのアドレスに2つ分の属性が記録されているため、アドレス計算用に2で割っている。小数点以下切り捨てなので、<span class="formula">trunc(技データ13 / 2)</span>である。</p>
+<h4><span class="formula">$18</span> <span class="formula">xx</span> <span class="formula">yy</span> 効果音ID<span class="formula">$00</span>～<span class="formula">$FF</span> 演奏開始</h4>
 
-<table>
-<thead>
-	<tr><th>属性</th><th>数値</th><th>数値/2</th></tr>
-</thead>
-<tbody>
-	<tr><td>手</td><td><span class="formula">$0</span></td><td><span class="formula">$0</span></td></tr>
-	<tr><td>足</td><td><span class="formula">$1</span></td><td><span class="formula">$0</span></td></tr>
-	<tr><td>突</td><td><span class="formula">$2</span></td><td><span class="formula">$1</span></td></tr>
-	<tr><td>鋭</td><td><span class="formula">$3</span></td><td><span class="formula">$1</span></td></tr>
-	<tr><td>鈍</td><td><span class="formula">$4</span></td><td><span class="formula">$2</span></td></tr>
-	<tr><td>締</td><td><span class="formula">$5</span></td><td><span class="formula">$2</span></td></tr>
-	<tr><td>飛</td><td><span class="formula">$6</span></td><td><span class="formula">$3</span></td></tr>
-	<tr><td>背</td><td><span class="formula">$7</span></td><td><span class="formula">$3</span></td></tr>
-	<tr><td>火</td><td><span class="formula">$8</span></td><td><span class="formula">$4</span></td></tr>
-	<tr><td>水</td><td><span class="formula">$9</span></td><td><span class="formula">$4</span></td></tr>
-	<tr><td>風</td><td><span class="formula">$A</span></td><td><span class="formula">$5</span></td></tr>
-	<tr><td>土</td><td><span class="formula">$B</span></td><td><span class="formula">$5</span></td></tr>
-	<tr><td>精</td><td><span class="formula">$C</span></td><td><span class="formula">$6</span></td></tr>
-	<tr><td>善</td><td><span class="formula">$D</span></td><td><span class="formula">$6</span></td></tr>
-	<tr><td>悪</td><td><span class="formula">$E</span></td><td><span class="formula">$7</span></td></tr>
-	<tr><td>無</td><td><span class="formula">$F</span></td><td><span class="formula">$7</span></td></tr>
-</tbody>
-</table>
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：効果音ID <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：	音のパン（音の定位） <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
 
-<p>例えば手と足属性のカウンター行動異常は、同じアドレス（敵データ16）に入っているから、<span class="formula">trunc(技データ13 / 2)</span>で同値が計算されている。</p>
+	<dt>内容</dt>
+	<dd>効果音ID<span class="formula">xx</span>を演奏する。音のパンの設定は<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)、中央に<span class="formula">$7F</span>を設定することもあり。</dd>
+</dl>
 
-<p><span class="formula">trunc(技データ13 / 2)</span>により、技データ13の上1桁が何の値であれ、下1桁は上のように<span class="formula">$0</span>～<span class="formula">$7</span>のいずれかになるはずだ。<br>
-<code><span class="r">$C1/DA0E</span></code>では16bitモードで<span class="formula">$0007</span>と論理積を取っているから、技データ13の上1桁がカットされて、<span class="formula">$0000</span>～<span class="formula">$0007</span>と、<span class="formula">技の属性/2</span>のみの値になる。<br>
-<code><span class="r">$C1/DA11</span></code>で、この値と<code>[$0002,x]</code>を加算し<code>Y</code>レジスタに送り、更に<code><span class="r">$C1/DA17</span></code>で<code>[$0030,y]</code>を呼び出しているが、これが敵データ16～敵データ23のいずれか、カウンター行動異常の値である。先に算出した<span class="formula">$0000</span>～<span class="formula">$0007</span>で、属性によりどのデータを呼び出すかが決まる。</p>
+<h4><span class="formula">$20</span> カーソル系効果音 決定 演奏開始</h4>
 
-<div class="code-container"><pre>
-$C1/DA1A LSR $12    [$00:0312]   ;[$00:0312]（技データ13）を論理右シフト（/2）
-$C1/DA1C BCS $04    [$DA22]      ;キャリーフラグが立っているとき[$DA22]分岐
-$C1/DA1E LSR A                   ;Aを論理右シフト（/2）
-$C1/DA1F LSR A                   ;Aを論理右シフト（/2）
-$C1/DA20 LSR A                   ;Aを論理右シフト（/2）
-$C1/DA21 LSR A                   ;Aを論理右シフト（/2）
-$C1/DA22 AND #$0F                ;Aと$0Fで論理積
-$C1/DA24 RTS                     ;サブルーチン戻り
-</pre></div>
+<dl>
+	<dt>内容</dt>
+	<dd>カーソル系効果音の決定音を演奏する。</dd>
+</dl>
 
-<p><code><span class="r">$C1/DA1A</span></code>で、技データ13が入っている<code>[$00:0312]</code>を論理右シフトで<span class="formula">÷2</span>している。<br>
-論理右シフトの際、割り算なので余りが出ることがあるが（2進法で見た時、一番下の位が<span class="formula">1</span>だと余りが出る）、この余りはキャリーフラグとして記録される。つまり、余りが出るとキャリーフラグが立つ。</p>
 
-<table>
-<thead>
-	<tr><th>属性</th><th>数値</th><th>数値/2</th><th>Cフラグ</th></tr>
-</thead>
-<tbody>
-	<tr><td>手</td><td><span class="formula">$0</span></td><td><span class="formula">$0</span></td><td>OFF</td></tr>
-	<tr><td>足</td><td><span class="formula">$1</span></td><td><span class="formula">$0</span></td><td>ON</td></tr>
-	<tr><td>突</td><td><span class="formula">$2</span></td><td><span class="formula">$1</span></td><td>OFF</td></tr>
-	<tr><td>鋭</td><td><span class="formula">$3</span></td><td><span class="formula">$1</span></td><td>ON</td></tr>
-	<tr><td>鈍</td><td><span class="formula">$4</span></td><td><span class="formula">$2</span></td><td>OFF</td></tr>
-	<tr><td>締</td><td><span class="formula">$5</span></td><td><span class="formula">$2</span></td><td>ON</td></tr>
-	<tr><td>飛</td><td><span class="formula">$6</span></td><td><span class="formula">$3</span></td><td>OFF</td></tr>
-	<tr><td>背</td><td><span class="formula">$7</span></td><td><span class="formula">$3</span></td><td>ON</td></tr>
-	<tr><td>火</td><td><span class="formula">$8</span></td><td><span class="formula">$4</span></td><td>OFF</td></tr>
-	<tr><td>水</td><td><span class="formula">$9</span></td><td><span class="formula">$4</span></td><td>ON</td></tr>
-	<tr><td>風</td><td><span class="formula">$A</span></td><td><span class="formula">$5</span></td><td>OFF</td></tr>
-	<tr><td>土</td><td><span class="formula">$B</span></td><td><span class="formula">$5</span></td><td>ON</td></tr>
-	<tr><td>精</td><td><span class="formula">$C</span></td><td><span class="formula">$6</span></td><td>OFF</td></tr>
-	<tr><td>善</td><td><span class="formula">$D</span></td><td><span class="formula">$6</span></td><td>ON</td></tr>
-	<tr><td>悪</td><td><span class="formula">$E</span></td><td><span class="formula">$7</span></td><td>OFF</td></tr>
-	<tr><td>無</td><td><span class="formula">$F</span></td><td><span class="formula">$7</span></td><td>ON</td></tr>
-</tbody>
-</table>
+<h4><span class="formula">$21</span> カーソル系効果音 キャンセル 演奏開始</h4>
 
-<p>カウンター行動異常の値は上1桁と下1桁で別の属性の値が記されているが、2で割った時に余りが1、つまりキャリーフラグが立つ時は、カウンター行動異常の値下1桁に該当属性が入っているということになる。<br>
-逆に、キャリーフラグが立たない場合は、カウンター行動異常の値上1桁に該当属性が入っている。<br>
-という判断をするための、キャリーフラグでの分岐である。<br>
-キャリーフラグが立たない場合は、カウンター行動異常の値から上1桁を取り出さなければならないので、<code><span class="r">$C1/DA1E</span></code>～<code><span class="r">$C1/DA21</span></code>で論理右シフトを4回繰り返し、上の桁を下の桁に移動させているのである。キャリーフラグが立つ場合はこの処理は必要がないので、<code>[$DA22]</code>にジャンプしている。<br>
-最終的に<code><span class="r">$C1/DA24</span></code>にて、<span class="formula">$0F</span>と論理積を取ったことで、実際のカウンター行動異常の値が算出できたことになる。</p>
+<dl>
+	<dt>内容</dt>
+	<dd>カーソル系効果音のキャンセルを演奏する。</dd>
+</dl>
 
-<div class="code-container"><pre>
-$C1/D9E3 AND #$0F                ;Aと$0Fで論理積
-$C1/D9E5 BNE $08    [$D9EF]      ;ゼロフラグが立っていないとき[$D9EF]分岐
-$C1/D9EF ORA #$80                ;Aと$80で論理和
-$C1/D9F1 AND #$8F                ;Aと$8Fで論理積
-$C1/D9F3 STA $7E9008,x           ;Aを[$7E9008,x]に書き込み（下1桁が行動異常）
-$C1/D9F7 RTS                     ;サブルーチン戻り
-;
-$C1/CC29 PLX                     ;Xにスタックから値をプル
-$C1/CC2A PLY                     ;Yにスタックから値をプル
-$C1/CC2B STY $10    [$00:0310]   ;Yを[$00:0310]に書き込み
-$C1/CC2D LDA $7E9008,x           ;Aに[$7E9008,x]（下1桁が行動異常）をロード
-$C1/CC31 BPL $0F    [$CC42]      ;ネガティブフラグが立っていないとき[$CC42]分岐
-$C1/CC33 AND #$0F                ;Aと$0Fで論理積
-$C1/CC35 CMP $7E8F02,x           ;Aと[$7E8F02,x]（敵の行動異常）を比較（ステータスフラグのみ変更）
-$C1/CC39 BEQ $07    [$CC42]      ;ゼロフラグが立っているとき[$CC42]分岐
-$C1/CC3B STA $7E8F02,x           ;Aを[$7E8F02,x]（敵の行動異常）に書き込み
-$C1/CC3F JSR $1C8E  [$C1:1C8E]   ;[$C1:1C8E]へジャンプ
-</pre></div>
 
-<p><code><span class="r">$C1/DA24</span></code>までで実際のカウンター行動異常の値が計算できたのだが、実際にはその後に<span class="formula">$80</span>と論理和、<span class="formula">$8F</span>と論理積を<code>[$7E9008,x]</code>に入れ、更にそれを<code><span class="r">$C1/CC33</span></code>で<span class="formula">$0F</span>と論理積を取ってカウンター行動異常の値に戻す、という作業を行っている。<br>
-何かしらの判定のための計算になるだろうが、とりあえず、<code><span class="r">$C1/CC35</span></code>でようやく、敵の行動異常の値<code>[$7E8F02,x]</code>と減算比較している。<br>
-ゼロフラグが立つのは、現在の敵の行動異常の値と、カウンター行動異常の値が同一の時であるから、それ以外だとカウンター行動異常の値で上書きされる。<br>
-これでカウンター行動異常が発生である。<br>
-行動異常が発生していなくても、または既に何らかの行動異常が発生していた場合でも、カウンター行動異常で上書きされていることがわかる。<br>
-また、乱数などの計算もないので、カウンター行動異常は必ず発生することもわかる。</p>
+<h4><span class="formula">$22</span> カーソル系効果音 ブザー音 演奏開始</h4>
 
-<p>この後は、先に紹介した行動異常データの呼び出し及び該当の行動異常の処理が行われることになる。</p>
+<dl>
+	<dt>内容</dt>
+	<dd>カーソル系効果音のブザー音を演奏する。</dd>
+</dl>
 
-<p>なお、技により発生する行動異常と、カウンター行動異常が同時に発生する状況下では、技により発生する行動異常が優先のようである。<br>
-例えばアキラの「マザーイメージ」は技自体に行動異常<span class="formula">$9</span>の効果がついているが、精属性の技でもあるので、敵が精属性に対しカウンター行動異常を持っている場合、「マザーイメージ」を当てると、「マザーイメージ」の行動異常<span class="formula">$9</span>の効果が優先してつくようになっている。</p>
 
-<p><a href="program17_4.html">次ページ</a>では、装備品による戦闘開始時の行動異常について説明する。</p>
+<h4><span class="formula">$23</span> カーソル系効果音 カーソル移動 演奏開始</h4>
 
-<script>//ソースコード色分け処理
-window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+<dl>
+	<dt>内容</dt>
+	<dd>カーソル系効果音のカーソル移動を演奏する。</dd>
+</dl>
+
+<h4><span class="formula">$80</span> <span class="formula">xx</span> <span class="formula">yy</span> フェード用音量倍率 設定/変化</h4>
+
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音量変化時間 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で音量変化時間なし）<br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で無音、<span class="formula">$FF</span>がデフォルト音量）</dd>
+
+	<dt>内容</dt>
+	<dd>BGMと効果音の音量を、音量変化時間<span class="formula">yy</span>かけて音量<span class="formula">xx</span>に設定する。</dd>
+</dl>
+
+<h4><span class="formula">$81</span> <span class="formula">xx</span> <span class="formula">yy</span> BGMフェード用音量倍率 設定/変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音量変化時間 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で音量変化時間なし）<br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で無音、<span class="formula">$FF</span>がデフォルト音量）</dd>
+
+	<dt>内容</dt>
+	<dd>BGMの音量を、音量変化時間<span class="formula">yy</span>かけて音量<span class="formula">xx</span>に設定する。</dd>
+</dl>
+
+<h4><span class="formula">$82</span> <span class="formula">xx</span> <span class="formula">yy</span> 効果音フェード用音量倍率 設定/変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音量変化時間 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で音量変化時間なし）<br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で無音、<span class="formula">$FF</span>がデフォルト音量）</dd>
+
+	<dt>内容</dt>
+	<dd>効果音の音量を、音量変化時間<span class="formula">yy</span>かけて音量<span class="formula">xx</span>に設定する。<br>
+	※音量変化時間を設定しても効果なし？</dd>
+</dl>
+
+<!-- <h4><span class="formula">$83</span> ？</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>？</dd>
+</dl>
+
+ -->
+<h4><span class="formula">$86</span> <span class="formula">xx</span> <span class="formula">yy</span> BGM演奏速度倍率 設定/変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：処理時間 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：演奏速度（倍率） <span class="formula">$00</span>～<span class="formula">$FF</span>（符号付き8ビット整数, 通常<span class="formula">$00</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>処理時間<span class="formula">xx</span>かけて演奏速度を<span class="formula">yy</span>に変更する。演奏速度が負なら速度低下、正なら速度上昇。</dd>
+</dl>
+
+<h4><span class="formula">$89</span> <span class="formula">xx</span> <span class="formula">yy</span> BGMピッチ倍率 設定/変化</h4>
+
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：処理時間 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：ピッチ（倍率） <span class="formula">$00</span>～<span class="formula">$FF</span>（符号付き8ビット整数, 通常<span class="formula">$00</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>処理時間<span class="formula">xx</span>かけてピッチを<span class="formula">yy</span>に変更する。ピッチが負ならピッチ低下、正ならピッチ上昇。</dd>
+</dl>
+
+<h4><span class="formula">$8C</span> ？</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>（<code>$00:0A6B</code>にON・OFFが書き込まれるパラメータ、内容不明）</dd>
+</dl>
+
+
+<h4><span class="formula">$8F</span> ？</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>（<code>$00:0A6C</code>にON・OFFが書き込まれるパラメータ、内容不明）</dd>
+</dl>
+
+
+<h4><span class="formula">$F0</span> 演奏停止</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>BGMと効果音の演奏を停止する。</dd>
+</dl>
+
+
+<h4><span class="formula">$F1</span> BGM演奏停止</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>BGMの演奏を停止する。</dd>
+</dl>
+
+
+<h4><span class="formula">$F2</span> 効果音演奏停止</h4>
+
+
+<dl>
+	<dt>内容</dt>
+	<dd>効果音の演奏を停止する。</dd>
+</dl>
+
+<h4><span class="formula">$F3</span> サウンド出力ステレオ設定</h4>
+
+
+<dl>
+	<dt>内容</dt>
+	<dd>サウンド出力をステレオに設定する。</dd>
+</dl>
+
+<h4><span class="formula">$F4</span> サウンド出力モノラル設定</h4>
+
+
+<dl>
+	<dt>内容</dt>
+	<dd>サウンド出力をモノラルに設定する。</dd>
+</dl>
+
+<h4><span class="formula">$F5</span> <span class="formula">xx</span> BGMミュート設定 (チャネル選択)</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：ミュートするチャネル <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>Bit0～7がチャネル0～7に対応しており、1が立っているチャネルはミュート（無音）処理される。</dd>
+</dl>
+
+<h4><span class="formula">$F6</span> サウンド全ミュート</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>BGMと効果音をミュート（無音）にする。</dd>
+</dl>
+
+
+<h4><span class="formula">$F8</span> ？</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>（<code>$00:0A67</code>にON・OFFが書き込まれるパラメータ、内容不明）</dd>
+</dl>
+
+<!-- 
+<h4><span class="formula">$FA</span> ？</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>？</dd>
+</dl> -->
+
+<h4><span class="formula">$FB</span> ループ停止してコーダ部へ</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>指定後、ループ処理せずコーダ部へ移行して演奏終了する。<br>BGMID<span class="formula">$18</span>「GO!GO!ブリキ大王!!」用と思われる（近未来編オープニング）。</dd>
+</dl>
+
+
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
 </script>
 
+<!-- <script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script> -->
+
 <div class="pagelink">
-	<div id="pageprev"><a href="program17.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-	<div id="pagenext"><a href="program17_4.html"><span class="button">&#9654;次　戦闘開始時行動異常</span></a></div>
 </div>
 
 </div>
@@ -438,6 +498,9 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 <div class="innertube">
 
 <!-- sidebar -->
+
+<!--  <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
 
 <div class="accordion">
 
