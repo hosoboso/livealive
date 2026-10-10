@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; サウンドの演奏 (2) 効果音演奏">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; サウンドの演奏 (2) 効果音演奏">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; サウンドの演奏 (2) 効果音演奏</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	padding: .1em;
+	box-shadow: 2px 2px 5px #bbb;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+
+.fit-picture {
+  width: 30px;
+  height: 50px;
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="sound.html">サウンドについて</a> &gt; サウンドの演奏 (2) 効果音演奏</h1>
+<h2>サウンドについて &gt; サウンドの演奏 (2) 効果音演奏</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="sound1.html">BGMの演奏</a>に続いて、効果音の演奏についてここで説明する。<br>
+戦闘における技の効果音については、<a href="program45.html">技モーション・エフェクト</a>の最後で少し触れているが、合わせて説明していく。</p>
+
+<p>効果音のサンプリングデータとシーケンスデータは、ゲームを開始（リセット）した時点でARAMに転送され、ゲームプレイ中は常にデータが置かれたままである、と<a href="sound.html">サウンドについて</a>のゲーム開始時（リセット時）処理で説明した。<br>
+このため、効果音を鳴らす場合、BGMのようにサンプリングデータとシーケンスデータのARAMへの転送は行われない。</p>
+
+<p>色々と確認してみたが、効果音は大きく2種類に分かれる。</p>
+
+<ul>
+	<li>カーソル関係の効果音（以下、「カーソル系効果音」とする）4種類</li>
+	<li>汎用で使われるID<span class="formula">$00</span>～<span class="formula">$FF</span>効果音256種類</li>
+</ul>
+
+<p>汎用で使われるID<span class="formula">$00</span>～<span class="formula">$FF</span>効果音256種類は、音量やパン（音の定位）も別途サウンドドライバファンクションで設定できる。<br>
+一方、カーソル関係の効果音はなるべく速く鳴らすため、サウンドドライバファンクションに専用コマンドが4種存在しており、音量やパンの設定はできないようである。</p>
+
+<div id="captiondata"></div>
+
+<h3>効果音の演奏</h3>
+
+<p>効果音に関するサウンドドライバファンクションのコマンドは以下の通り。<br>
+BGM同様、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1D00</code></td><td>コマンド（1バイト）</td></tr>
+	<tr><td><code>$00:1D01</code></td><td>引数1（1バイト）</td></tr>
+	<tr><td><code>$00:1D02</code></td><td>引数2（1バイト）</td></tr>
+	<tr><td><code>$00:1D03</code></td><td>引数3（1バイト）</td></tr>
+</tbody>
+</table>
+
+<p>と値をセットして、<code>$00:2140</code>～<code>$00:2143</code>に送信する。<br>
+引数（パラメータ）の有無はコマンドにより変わる。</p>
+
+<h4><span class="formula">$82</span> <span class="formula">xx</span> <span class="formula">yy</span> 効果音フェード用音量倍率 設定/変化</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音量変化時間 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で音量変化時間なし）<br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で無音、<span class="formula">$FF</span>がデフォルト音量）</dd>
+
+	<dt>内容</dt>
+	<dd>効果音の音量を、音量変化時間<span class="formula">yy</span>かけて音量<span class="formula">xx</span>に設定する。<br>
+	※音量変化時間を設定しても効果なし？</dd>
+</dl>
+
+<p>効果音ID<span class="formula">$00</span>～<span class="formula">$FF</span>用音量設定。効果音を鳴らす前に設定する。<br>
+主に音量を通常より下げる場合に使われる。後で紹介するが、幕末編の尾手城地下通路の廊下のスイッチ音などは通常よりかなり音量を下げている。<br>
+また、効果音演奏中に途中で止めたい場合は<span class="formula">xx</span>と<span class="formula">yy</span>を00に設定して送信する。</p>
+
+<h4><span class="formula">$18</span> <span class="formula">xx</span> <span class="formula">yy</span> 効果音ID<span class="formula">$00</span>～<span class="formula">$FF</span> 演奏開始</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：効果音ID <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：	音のパン（音の定位） <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>効果音ID<span class="formula">xx</span>を演奏する。音のパンの設定は<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)、中央に<span class="formula">$7F</span>を設定することもあり。</dd>
+</dl>
+
+<p>効果音ID<span class="formula">$00</span>～<span class="formula">$FF</span>を演奏する時に使用する。<br>
+パン（音の定位）のデフォルト値だが、<a href="sequence.html#no_1_3">シーケンスデータのパン（音の定位）設定</a>と同じく、<br>
+<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)
+と、設定可能である。<br>
+<span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">0～255</span>）のちょうど中間の値は<span class="formula">127.5</span>だから、<span class="formula">$7F</span>または<span class="formula">$80</span>に設定すれば、ちょうど中央あたりの値を設定したことになる。<br>
+おそらく、<span class="formula">$7F</span>と<span class="formula">$80</span>とで大きな差はないと思うが、後述するとおり、<span class="formula">$7F</span>または<span class="formula">$80</span>のどちらかに統一されてはいない。</p>
+
+<h4><span class="formula">$20</span>～<span class="formula">$23</span> カーソル系効果音 演奏開始</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>カーソル系効果音を演奏する。<br><span class="formula">$20</span>：決定音, <span class="formula">$21</span>：キャンセル音, <span class="formula">$22</span>：ブザー音, <span class="formula">$23</span>：カーソル移動音</dd>
+</dl>
+
+<p>1バイトのデータを送るだけで鳴るカーソル系効果音。<br>
+メニュー画面と、戦闘でコマンドウィンドウを開いている時にのみ演奏される。<br>
+文字通りにカーソルをプレイヤーが操作する時の効果音で、決定はAボタン、キャンセルはBボタン、ブザー音はそれ以上カーソルが移動できない時（戦闘では使われない模様）、カーソル移動はカーソル移動時の音。</p>
+
+<h4><span class="formula">$F2</span> 効果音演奏停止</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>効果音の演奏を停止する。</dd>
+</dl>
+
+<p>文字通りに効果音の演奏を停止する時に使う。<br>
+効果音の大半は元々演奏時間が短く、停止指示をしなくても鳴り終わる（効果音のタイミングに合わせてプログラムが作られていることも多い）。<br>
+ただし中にはノイズが鳴り続けるタイプの効果音などもあるため停止指示をすることもある。<br>
+他には、効果音の被りが起こりそうな時に、そのタイミングで鳴っている効果音を停止させ、新たな効果音を鳴らす、というような用途でも使うようだ。</p>
+
+<h3>カーソル系効果音のシーケンスデータ</h3>
+
+<p>カーソル系効果音のサンプリングデータは、効果音<span class="formula">$00</span>～<span class="formula">$FF</span>用と兼用である。<br>
+だが、シーケンスデータは独立している。</p>
+
+<p>効果音<span class="formula">$00</span>～<span class="formula">$FF</span>用シーケンスデータは、ゲーム開始時に<code>$C3:23C8</code>～<code>$C3:3FC7</code>→ARAM<code>$2C00</code>～<code>$47FF</code>へとコピーされるのだが、カーソル系効果音4種のシーケンスデータは、SPC700用プログラム（<code>$C3:0746</code>～<code>$C3:1F0E</code>）の中に格納されている。<br>
+ヘッダを含めると、<code>$C3:1D9B</code>～<code>$C3:1DE7</code>→ARAM<code>$1855</code>～<code>$18A0</code>である。ヘッダ以降のシーケンスコマンド部は<code>$C3:1DBB</code>～<code>$C3:1DE7</code>。</p>
+
+<p>なお、直前のARAMアドレスには以下のように値が入っている。</p>
+
+<ul>
+	<li>ARAM<code>$1826</code>～<code>$1845</code>　サウンド・シーケンスにおけるFIRフィルタ係数一覧表</li>
+	<li>ARAM<code>$1846</code>～<code>$1853</code>　サウンド・シーケンスにおける音符や休符のティック数（演奏長さ）一覧表</li>
+</ul>
+
+<p>どうやら、少なくともARAM<code>$1826</code>～以降は、SPC700用プログラム（ニーモニック）ではなく、プログラムに使う定数などが格納されているようである。<br>
+（おそらくだがARAM<code>$180B</code>までがSPC700用のニーモニックで、以降は何かしらの定数と思われる）</p>
+
+
+<h4>ヘッダ</h4>
+
+<p>ヘッダは<span class="formula">32</span>バイト。<br>
+ARAM<code>$1855</code>～<code>$1874</code>にあたり、最初の8バイトはカーソル系効果音のシーケンスデータの開始アドレスである（各2バイト）。<br>
+なお、カーソル系効果音はチャネル7しか使っていない。つまり単音である。<br>
+他はデータなしということのようで、<span class="formula">$00</span>が並ぶが、チャネル6の演奏がないから<span class="formula">$00</span>が書き込まれているのか、データの区切りか何かなのかは筆者にはわからない。</p>
+
+<div class="code-container"><pre>
+75 18 80 18 8B 18 94 18 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+</pre></div>
+
+<p>とにかく、最初の8バイトを2バイト区切りにして読むと、</p>
+
+<div class="code-container"><pre>
+1875
+1880
+188B
+1894
+</pre></div>
+
+<p>こうなる。これがARAMにおけるカーソル系効果音のシーケンスデータの開始アドレスにあたる。</p>
+
+<h4>シーケンスコマンド</h4>
+
+<p>ARAM<code>$1875</code>～<code>$1918</code>のデータを、上の区切りに従って区切ってみると、以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>内容</th><th>ARAM</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>決定</td><td><code>$1875</code></td><td><code>C4 C8 DC 02 D6 05 C8 04 14 43 EB</code></td></tr>
+	<tr><td>キャンセル</td><td><code>$1880</code></td><td><code>C4 C8 DC 06 D6 07 C8 06 90 0B EB</code></td></tr>
+	<tr><td>ブザー音</td><td><code>$188B</code></td><td><code>C4 C8 DC 00 D6 04 0B 0C EB</code></td></tr>
+	<tr><td>カーソル移動</td><td><code>$1894</code></td><td><code>C4 C8 DC 0A D6 05 C8 0C 0C E0 1B 0A EB</code></td></tr>
+</tbody>
+</table>
+
+<p>どのデータも、<a href="sequence.html#no_1">シーケンスコマンド</a>に従って読むことができる。</p>
+
+<div class="code-container"><pre>
+;決定 $1875～
+C4 C8       トラック音量設定
+DC 02       サンプリングデータ選択
+D6 05       オクターブ設定
+C8 04 14    ピッチスライド
+43          ミ 32分音符
+EB          演奏終了
+
+;キャンセル $1880～
+c31dc6
+C4 C8       トラック音量設定
+DC 06       サンプリングデータ選択
+D6 07       オクターブ設定
+C8 06 90    ピッチスライド
+0B          ド 32分音符
+EB          演奏終了
+
+;ブザー音 $188B～
+C4 C8       トラック音量設定
+DC 00       サンプリングデータ選択
+D6 04       オクターブ設定
+0B          ド 32分音符
+0C          ド
+EB          演奏終了
+
+;カーソル移動 $1894～
+C4 C8       トラック音量設定
+DC 0A       サンプリングデータ選択
+D6 05       オクターブ設定
+C8 0C 0C    ピッチスライド
+E0 1B       サスティンレート(Sustain Rate)
+0A          ド
+EB          演奏終了
+</pre></div>
+
+<p>以下、それぞれの場面における効果音演奏のサブルーチンを説明していく。</p>
+
+<h3>メニュー画面</h3>
+
+<p>まず、カーソル系効果音について説明する。</p>
+
+<h4>メニュー画面（決定）</h4>
+
+<p>Aボタンで何かしらを決定した時の効果音のサブルーチンは以下。</p>
+
+<div class="code-container"><pre>
+$C2/3C35 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3C36 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/3C38 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/3C39 LDA #$20                ;Aに$20をロード　決定効果音の値
+$C2/3C3B JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+$C3/0131 PHB                     ;DBレジスタをスタックにプッシュ
+$C3/0132 PHD                     ;Dレジスタをスタックへプッシュ
+$C3/0133 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C3/0134 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0136 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0138 PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0139 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/013A PHY                     ;Yレジスタをスタックへプッシュ
+$C3/013B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/013D LDA #$00                ;Aに$00をロード
+$C3/013F PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0140 PLB                     ;DBレジスタにスタックからプル
+$C3/0141 LDX #$1D00              ;Xに$1D00をロード
+$C3/0144 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/0145 PLD                     ;Dレジスタにスタックからプル
+$C3/0146 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0148 LDA $00    [$00:1D00]   ;Aに[$00:1D00]($20)をロード
+$C3/014A BEQ $25    [$0171]      ;ゼロフラグが立っているとき[$0171]分岐
+;ゼロフラグOFF
+$C3/014C BMI $19    [$0167]      ;ネガティブフラグが立っているとき[$0167]分岐
+;ネガティブフラグOFF
+$C3/014E CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C3/0150 BCC $1F    [$0171]      ;キャリーフラグが立っていないとき[$0171]分岐
+;キャリーフラグON
+$C3/0152 CMP #$18                ;Aと$18を減算比較（ステータスレジスタ変更のみ）
+$C3/0154 BCS $0D    [$0163]      ;キャリーフラグが立っているとき[$0163]分岐
+;キャリーフラグON
+$C3/0163 CMP #$30                ;Aと$30を減算比較（ステータスレジスタ変更のみ）
+$C3/0165 BCS $03    [$016A]      ;キャリーフラグが立っているとき[$016A]分岐
+;キャリーフラグOFF（[$00:1D00]が$18以上30未満）
+$C3/0167 JMP $05AC  [$C3:05AC]   ;[$C3:05AC]へジャンプ(レジスタをスタックに積まない)
+$C3/05AC SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/05AE LDA $03    [$00:1D03]   ;Aに[$00:1D03]をロード
+$C3/05B0 STA $2143  [$00:2143]   ;Aを[$00:2143]に書き込み
+$C3/05B3 LDA $02    [$00:1D02]   ;Aに[$00:1D02]をロード
+$C3/05B5 STA $2142  [$00:2142]   ;Aを[$00:2142]に書き込み
+$C3/05B8 LDA $01    [$00:1D01]   ;Aに[$00:1D01]をロード
+$C3/05BA STA $2141  [$00:2141]   ;Aを[$00:2141]に書き込み
+$C3/05BD LDA $00    [$00:1D00]   ;Aに[$00:1D00]をロード
+$C3/05BF LDX #$0800              ;Xに$0800をロード
+$C3/05C2 STA $2140  [$00:2140]   ;Aを[$00:2140]に書き込み
+;ループ処理開始
+$C3/05C5 CMP $2140  [$00:2140]   ;Aと[$00:2140]を減算比較（ステータスレジスタ変更のみ）
+$C3/05C8 BEQ $05    [$05CF]      ;ゼロフラグが立っているとき[$05CF]分岐
+$C3/05CA DEX                     ;Xをデクリメント -1
+$C3/05CB BNE $F8    [$05C5]      ;ゼロフラグが立っていないとき[$05C5]分岐
+;ループ処理ここまで
+$C3/05CF CMP #$F0                ;Aと$F0を減算比較（ステータスレジスタ変更のみ）
+$C3/05D1 BCC $21    [$05F4]      ;キャリーフラグが立っていないとき[$05F4]分岐
+$C3/05F4 JMP $0171  [$C3:0171]   ;[$C3:0171]へジャンプ(レジスタをスタックに積まない)
+$C3/0171 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0173 STZ $00    [$00:1D00]   ;[$00:1D00]に$00を書き込み
+$C3/0175 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0177 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0179 PLY                     ;Yレジスタにスタックからプル
+$C3/017A PLX                     ;Xレジスタにスタックからプル
+$C3/017B PLA                     ;Aレジスタにスタックからプル
+$C3/017C PLP                     ;Pレジスタにスタックからプル
+$C3/017D PLD                     ;Dレジスタにスタックからプル
+$C3/017E PLB                     ;DBレジスタにスタックからプル
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C2/3CB3 RTS                     ;サブルーチン戻り
+
+$C2/3C3E PLA                     ;Aレジスタにスタックからプル
+$C2/3C3F PLP                     ;Pレジスタにスタックからプル
+$C2/3C40 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C2/3C39</span></code>で<code>A</code>にロードした<span class="formula">$20</span>を、<code><span class="r">$C2/3CAC</span></code>で<code>[$7E:1D00]</code>に書き込み、<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/017F</span></code>で<code>[$00:2140]</code>を経由してARAMに書き込む、という処理である。<br>
+Aボタンを押すと（基本的に）<code><span class="r">$C2/3C35</span></code>に飛ぶようになっていて、決定時の効果音を鳴らすことになる。<br>
+<code><span class="r">$C2/3CAC</span></code>～<code><span class="r">$C2/3CB3</span></code>が、</p>
+
+<p>「<code>[$7E:1D00]</code>に入っている数値を<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/017F</span></code>で<code>[$00:2140]</code>を経由してARAMに書き込む」</p>
+
+<p><code><span class="r">$C2/3C35</span></code>～<code><span class="r">$C2/3C40</span></code>が、</p>
+
+<p>「<code>[$7E:1D00]</code>に書き込む<span class="formula">$20</span>を<code>A</code>にロードして、<code><span class="r">$C2/3CAC</span></code>～<code><span class="r">$C2/3CB3</span></code>の処理を行う」</p>
+
+<p>というサブルーチンになっていることがわかる。</p>
+
+<p>なお、<code>[$7E:1D01]</code>～<code>[$7E:1D03]</code>の値は特に処理されておらず、ARAMへの転送もない。<br>
+ここから、カーソル系効果音のサウンドドライバファンクションは1バイトで成立している、ということがわかる。</p>
+
+
+<h4>メニュー画面（キャンセル）</h4>
+
+<p>メニュー画面でBボタンでキャンセル（ひとつ前の画面に戻るなど）した時は、<code><span class="r">$C2/3C45</span></code>及び、<code><span class="r">$C2/3CAC</span></code>～<code><span class="r">$C2/3CB3</span></code>で、<code>[$7E:1D00]</code>に<span class="formula">$21</span>が入る。</p>
+
+<div class="code-container"><pre>
+$C2/3C41 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3C42 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/3C44 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/3C45 LDA #$21                ;Aに$21をロード
+$C2/3C47 JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+（略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C2/3CB3 RTS                     ;サブルーチン戻り
+
+$C2/3C4A PLA                     ;Aレジスタにスタックからプル
+$C2/3C4B PLP                     ;Pレジスタにスタックからプル
+$C2/3C4C RTS                     ;サブルーチン戻り
+</pre></div>
+
+<h4>メニュー画面（ブザー音）</h4>
+
+<p>ブザー音が鳴るのは、スクロール中にそれ以上スクロールができない場合。<br>
+持ち物欄の一番上にカーソルがある時に上ボタンを押すとか、装備画面で装備品を選択する時にカーソルが移動できない方向に十字キーを押すなどの場合になる。</p>
+
+<div class="code-container"><pre>
+$C2/3C4D PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3C4E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/3C50 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/3C51 LDA #$22                ;Aに$22をロード
+$C2/3C53 JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C2/3CB3 RTS                     ;サブルーチン戻り
+
+$C2/3C56 PLA                     ;Aレジスタにスタックからプル
+$C2/3C57 PLP                     ;Pレジスタにスタックからプル
+$C2/3C58 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C2/3C51</span></code>及び、<code><span class="r">$C2/3CAC</span></code>～<code><span class="r">$C2/3CB3</span></code>で、<code>[$7E:1D00]</code>に<span class="formula">$22</span>が入る。</p>
+
+
+<h4>メニュー画面（カーソル移動）</h4>
+
+<p>メニュー画面において、カーソル移動のみがやや特殊な処理になる。</p>
+
+<div class="code-container"><pre>
+$C2/06C2 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/06C4 BCC $23    [$06E9]      ;キャリーフラグが立っていないとき[$06E9]分岐
+$C2/06C6 JSR $3C28  [$C2:3C28]   ;[$C2:3C28]へジャンプ
+
+$C2/3C28 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3C29 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/3C2B PHA                     ;Aレジスタをスタックにプッシュ
+$C2/3C2C LDA #$23                ;Aに$23をロード
+$C2/3C2E STA $002140[$00:2140]   ;Aを[$00:2140]に書き込み
+$C2/3C32 PLA                     ;Aレジスタにスタックからプル
+$C2/3C33 PLP                     ;Pレジスタにスタックからプル
+$C2/3C34 RTS                     ;サブルーチン戻り
+
+$C2/06C9 BRA $1E    [$06E9]      ;フラグにかかわりなく常に分岐[$06E9]
+$C2/06E9 LDX #$7000              ;Xに$7000をロード
+$C2/06EC LDA $42    [$00:0542]   ;Aに[$00:0542]をロード
+$C2/06EE JSR $0723  [$C2:0723]   ;[$C2:0723]へジャンプ
+</pre></div>
+
+<p>CPU側では、<code><span class="r">$C2/3C2C</span></code>～<code><span class="r">$C2/3C2E</span></code>の、「<code>[$00:2140]</code>に<span class="formula">$23</span>を書き込む」だけでカーソル移動音が鳴る仕組みである。<br>
+<code>[$7E:1D00]</code>を仲介せず、直に<code>[$00:2140]</code>に値を書き込むのはおそらくこれくらいだろう（他にもあるかもしれないが、筆者が確認した限りではこれだけ）。<br>
+サウンドドライバファンクションの仕様がわかるという意味でも重要な処理である。</p>
+
+<p>メニュー画面では左右押しっぱなしや上下押しっぱなしで、カーソルがループ移動できるが、押しっぱなしにしているとカーソル移動音が連発されることになる。<br>
+この時、チャネル7での演奏が終わる前に次のカーソル移動音の演奏が指示されることがあるのだが、その場合はチャネル6も使ってカーソル移動音を交互に演奏し続けているようである。実際のSPC700側のサブルーチンは未確認。</p>
+
+<p>以上がカーソル系効果音の処理で、他の効果音はまた別の処理を行っている。</p>
+
+
+<h4>装備変更</h4>
+
+<p>装備変更時は、攻撃または防御の値が上がる場合は「シャキーン」という感じの音が、攻撃または防御の値が下がる場合は「ポフッ」という感じの音がなる。<br>
+「シャキーン」の場合の処理は以下のようになっている。</p>
+
+<div class="code-container"><pre>
+$C2/1502 LDA $44    [$00:0544]   ;Aに[$00:0544]をロード
+$C2/1504 CLC                     ;キャリーフラグクリア
+$C2/1505 ADC $36    [$00:0536]   ;A + [$00:0536]
+$C2/1507 TAY                     ;Aの値をYレジスタに転送
+$C2/1508 LDA $8A00,y[$7E:8A00]   ;Aに[$7E:8A01][$7E:8A00](1579)をロード
+$C2/150B AND #$00FF              ;Aと$00FFで論理積
+$C2/150E BNE $14    [$1524]      ;ゼロフラグが立っていないとき[$1524]分岐
+$C2/1524 LDA #$00A9              ;Aに$00A9をロード 効果音ID
+$C2/1527 JSR $3C72  [$C2:3C72]   ;[$C2:3C72]へジャンプ
+
+$C2/3C72 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3C73 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3C75 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/3C76 LDA #$00FF              ;Aに$00FFをロード
+$C2/3C79 STA $1D02  [$7E:1D02]   ;A($00FF)を[$7E:1D03][$7E:1D02]に書き込み
+$C2/3C7C LDA #$0082              ;Aに$0082をロード
+$C2/3C7F JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;A($0082)を[$7E:1D01][$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$7E:1D00~03 : 8200FF00
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C2/3CB3 RTS                     ;サブルーチン戻り
+
+$C2/3C82 LDA #$007F              ;Aに$007Fをロード
+$C2/3C85 STA $1D02  [$7E:1D02]   ;A($007F)を[$7E:1D03][$7E:1D02]に書き込み
+$C2/3C88 PLA                     ;Aレジスタにスタックからプル($00A9)
+$C2/3C89 AND #$00FF              ;Aと$00FFで論理積
+$C2/3C8C XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/3C8D ORA #$0018              ;Aと$0018で論理和
+$C2/3C90 JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ A:A918
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D01][$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$7E:1D00~03 : 18A97F00
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C2/3CB3 RTS                     ;サブルーチン戻り
+
+$C2/3C93 PLP                     ;Pレジスタにスタックからプル
+$C2/3C94 RTS                     ;サブルーチン戻り
+
+$C2/152A LDA #$2E6C              ;Aに$2E6Cをロード
+$C2/152D STA $32    [$00:0532]   ;Aを[$00:0532]に書き込み
+$C2/152F LDA $67    [$00:0567]   ;Aに[$00:0567]をロード
+$C2/1531 JSR $4AAB  [$C2:4AAB]   ;[$C2:4AAB]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/1524</span></code>でロードする$00A9が効果音IDなのだが、<code><span class="r">$C2/3C75</span></code>で、一度スタックに入れている。<br>
+<code><span class="r">$C2/3C76</span></code>～<code><span class="r">$C2/3C82</span></code>で、一回目のARAM送信を行っているが、この時に転送された値は、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:1D00</code></td><td><span class="formula">$82</span></td></tr>
+	<tr><td><code>$7E:1D01</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$7E:1D02</code></td><td><span class="formula">$FF</span></td></tr>
+	<tr><td><code>$7E:1D03</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>である。<br>
+これはサウンドドライバファンクションのコマンド<span class="formula">$82</span>、効果音の音量設定にあたる。<br>
+<code>$7E:1D00</code>に<span class="formula">$82</span>を書き込むと音量設定が可能で、引数として<code>$7E:1D01</code>はにボリュームを書き込む。<br>
+（<code>$7E:1D01</code>も引数で、音量変化時間だが、<span class="formula">$00</span>以外を入れてもこれといって変化がないような気がする？）<br>
+デフォルト値は<span class="formula">$FF</span>で、効果音のボリュームを下げたい場合は<span class="formula">$00</span>～<span class="formula">$FE</span>を設定する。<br>
+ボリューム設定後は、<code><span class="r">$C2/3C82</span></code>以降の処理になるが、ここで効果音IDを送信する。<br>
+次に転送するのは、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:1D00</code></td><td><span class="formula">$18</span></td></tr>
+	<tr><td><code>$7E:1D01</code></td><td><span class="formula">$A9</span></td></tr>
+	<tr><td><code>$7E:1D02</code></td><td><span class="formula">$7F</span></td></tr>
+	<tr><td><code>$7E:1D03</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p><code>$7E:1D00</code>にサウンドドライバファンクションのコマンド<span class="formula">$18</span>を指定すると効果音IDの送信になり、引数として<code>$7E:1D01</code>に効果音IDを書き込む。<br>
+<code>$7E:1D02</code>の<span class="formula">$7F</span>はパン（音の定位）設定。<br>
+先に説明したがシーケンスコマンドでの設定とだいたい同じで、引数に設定する値は、<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)。<br>
+<span class="formula">$7F</span>だと、ほぼ中央ということになる。</p>
+
+<p>効果音の演奏の基本は上の通り。<br>
+メニュー画面においては、他の効果音でも、音量設定は<span class="formula">$FF</span>だし、パン（音の定位）も<span class="formula">$7F</span>である。<br>
+変わるのは効果音IDのみのはず。<br>
+効果音IDを決める処理は<code><span class="r">$C2/1502</span></code>～の処理である。</p>
+
+<div class="code-container"><pre>
+$C2/1502 LDA $44    [$00:0544]   ;Aに[$00:0545][$00:0544]をロード
+$C2/1504 CLC                     ;キャリーフラグクリア
+$C2/1505 ADC $36    [$00:0536]   ;A + [$00:0537][$00:0536]
+$C2/1507 TAY                     ;Aの値をYレジスタに転送
+$C2/1508 LDA $8A00,y[$7E:CD08]   ;Aに[$7E:8A01][$7E:8A00]をロード
+$C2/150B AND #$00FF              ;Aと$00FFで論理積
+$C2/150E BNE $14    [$1524]      ;ゼロフラグが立っていないとき[$1524]分岐
+;ゼロフラグON
+$C2/1510 LDA $67    [$00:0567]   ;Aに[$00:0568][$00:0567]をロード
+$C2/1512 CMP #$0001              ;Aと$0001を減算比較（ステータスレジスタ変更のみ）
+$C2/1515 BNE $05    [$151C]      ;ゼロフラグが立っていないとき[$151C]分岐
+;ゼロフラグON
+$C2/1517 JSR $3C4D  [$C2:3C4D]   ;[$C2:3C4D]へジャンプ
+$C2/151A BRA $46    [$1562]      ;フラグにかかわりなく常に分岐[$1562]
+;$C2/1515ゼロフラグOFF 装備変更 DOWN音
+$C2/151C LDA #$0096              ;Aに$0096をロード　効果音ID
+$C2/151F JSR $3C72  [$C2:3C72]   ;[$C2:3C72]へジャンプ
+;（サウンド処理）
+$C2/1522 BRA $06    [$152A]      ;フラグにかかわりなく常に分岐[$152A]
+;$C2/150EゼロフラグOFF 装備変更 UP音
+$C2/1524 LDA #$00A9              ;Aに$00A9をロード　効果音ID
+$C2/1527 JSR $3C72  [$C2:3C72]   ;[$C2:3C72]へジャンプ
+;（サウンド処理）
+;処理合流
+$C2/152A LDA #$2E6C              ;Aに$2E6Cをロード
+;……
+</pre></div>
+
+<p>つまり、<code><span class="r">$C2/1502</span></code>～<code><span class="r">$C2/152A</span></code>は装備の変更時、どちらの効果音を演奏するかの分岐処理で、最終的には処理が合流するのである。</p>
+
+
+<h4>セーブ音</h4>
+
+<p>セーブ時の効果音は以下処理である。</p>
+
+<div class="code-container"><pre>
+$C2/160D LDA #$0097              ;Aに$0097をロード　効果音ID
+$C2/1610 JSR $3C72  [$C2:3C72]   ;[$C2:3C72]へジャンプ
+
+$C2/3C72 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/3C73 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/3C75 PHA                     ;Aレジスタをスタックにプッシュ
+$C2/3C76 LDA #$00FF              ;Aに$00FFをロード
+$C2/3C79 STA $1D02  [$7E:1D02]   ;Aを[$7E:1D03][$7E:1D02]に書き込み
+$C2/3C7C LDA #$0082              ;Aに$0082をロード
+$C2/3C7F JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D01][$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$7E:1D00~03 : 8200FF00
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C2/3CB3 RTS                     ;サブルーチン戻り
+
+$C2/3C82 LDA #$007F              ;Aに$007Fをロード
+$C2/3C85 STA $1D02  [$7E:1D02]   ;Aを[$7E:1D03][$7E:1D02]に書き込み
+$C2/3C88 PLA                     ;Aレジスタにスタックからプル
+$C2/3C89 AND #$00FF              ;Aと$00FFで論理積
+$C2/3C8C XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C2/3C8D ORA #$0018              ;Aと$0018で論理和
+$C2/3C90 JSR $3CAC  [$C2:3CAC]   ;[$C2:3CAC]へジャンプ
+
+$C2/3CAC STA $1D00  [$7E:1D00]   ;Aを[$7E:1D01][$7E:1D00]に書き込み
+$C2/3CAF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$7E:1D00~03 : 1897007F
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C2/3CB3 RTS                     ;サブルーチン戻り
+
+$C2/3C93 PLP                     ;Pレジスタにスタックからプル
+$C2/3C94 RTS                     ;サブルーチン戻り
+
+$C2/1613 LDX #$7D5E              ;Xに$7D5Eをロード
+$C2/1616 JSR $35AD  [$C2:35AD]   ;[$C2:35AD]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C2/160D</span></code>～<code><span class="r">$C2/1616</span></code>がセーブ時の効果音演奏処理になり、効果音ID<span class="formula">$97</span>が<code><span class="r">$C2/160D</span></code>でロードされている。<br>
+それ以外、音量設定や、パン（音の定位）設定は装備の効果音と変わらない。</p>
+
+<p>以上がメニュー画面における効果音の演奏である。</p>
+
+
+<h3>フィールド</h3>
+
+<p>フィールドでの効果音はシナリオ進行や場所により、演奏する効果音や音量もさまざまなので、一例を紹介していく。</p>
+
+<h4>扉を開ける音</h4>
+
+<p>扉の開閉音は何種類かあるのだが、ここでは、近未来編・壽商会のトイレの扉を開けた時の処理を掲載する。</p>
+
+<div class="code-container"><pre>
+$C0/619B LDA #$00                ;Aに$00をロード
+$C0/619D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/619E LDA $011A  [$00:011A]   ;Aに[$00:011A]をロード $06
+$C0/61A1 ASL A                   ;Aを算術左シフト *2
+$C0/61A2 CLC                     ;キャリーフラグクリア
+$C0/61A3 ADC $011A  [$00:011A]   ;A + [$00:011A] $0C + $06
+$C0/61A6 ASL A                   ;Aを算術左シフト *2
+$C0/61A7 CLC                     ;キャリーフラグクリア
+$C0/61A8 ADC $30    [$00:0030]   ;A($24) + [$00:0030]
+$C0/61AA TAX                     ;Aの値をXレジスタに転送
+$C0/61AB LDA $CD0058,x[$CD:007C] ;Aに[$CD:007C]をロード　効果音ID$F3
+$C0/61AF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/61B1 JSR $1183  [$C0:1183]   ;[$C0:1183]へジャンプ
+
+$C0/1183 LDA #$80                ;Aに$80をロード
+$C0/1185 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1187 STA $000A63[$00:0A63]   ;Aを[$00:0A63]に書き込み
+$C0/118B LDA #$18                ;Aに$18をロード
+$C0/118D BRL $013F  [$12CF]      ;フラグにかかわりなく常に分岐[$12CF]
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 18F38000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+$C3/0131 PHB                     ;DBレジスタをスタックにプッシュ
+$C3/0132 PHD                     ;Dレジスタをスタックへプッシュ
+$C3/0133 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C3/0134 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0136 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0138 PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0139 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/013A PHY                     ;Yレジスタをスタックへプッシュ
+$C3/013B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/013D LDA #$00                ;Aに$00をロード
+$C3/013F PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0140 PLB                     ;DBレジスタにスタックからプル
+$C3/0141 LDX #$1D00              ;Xに$1D00をロード
+$C3/0144 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/0145 PLD                     ;Dレジスタにスタックからプル
+$C3/0146 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0148 LDA $00    [$00:1D00]   ;Aに[$00:1D00]をロード
+$C3/014A BEQ $25    [$0171]      ;ゼロフラグが立っているとき[$0171]分岐
+$C3/014C BMI $19    [$0167]      ;ネガティブフラグが立っているとき[$0167]分岐
+$C3/014E CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C3/0150 BCC $1F    [$0171]      ;キャリーフラグが立っていないとき[$0171]分岐
+$C3/0152 CMP #$18                ;Aと$18を減算比較（ステータスレジスタ変更のみ）
+$C3/0154 BCS $0D    [$0163]      ;キャリーフラグが立っているとき[$0163]分岐
+$C3/0163 CMP #$30                ;Aと$30を減算比較（ステータスレジスタ変更のみ）
+$C3/0165 BCS $03    [$016A]      ;キャリーフラグが立っているとき[$016A]分岐
+$C3/0167 JMP $05AC  [$C3:05AC]   ;[$C3:05AC]へジャンプ(レジスタをスタックに積まない)
+$C3/05AC SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/05AE LDA $03    [$00:1D03]   ;Aに[$00:1D03]をロード
+$C3/05B0 STA $2143  [$00:2143]   ;Aを[$00:2143]に書き込み
+$C3/05B3 LDA $02    [$00:1D02]   ;Aに[$00:1D02]をロード
+$C3/05B5 STA $2142  [$00:2142]   ;Aを[$00:2142]に書き込み
+$C3/05B8 LDA $01    [$00:1D01]   ;Aに[$00:1D01]をロード
+$C3/05BA STA $2141  [$00:2141]   ;Aを[$00:2141]に書き込み
+$C3/05BD LDA $00    [$00:1D00]   ;Aに[$00:1D00]をロード
+$C3/05BF LDX #$0800              ;Xに$0800をロード
+$C3/05C2 STA $2140  [$00:2140]   ;Aを[$00:2140]に書き込み
+;ループ処理
+$C3/05C5 CMP $2140  [$00:2140]   ;Aと[$00:2140]を減算比較（ステータスレジスタ変更のみ）
+$C3/05C8 BEQ $05    [$05CF]      ;ゼロフラグが立っているとき[$05CF]分岐
+$C3/05CA DEX                     ;Xをデクリメント -1
+$C3/05CB BNE $F8    [$05C5]      ;ゼロフラグが立っていないとき[$05C5]分岐
+;ループ処理ここまで
+$C3/05C5 CMP $2140  [$00:2140]   ;Aと[$00:2140]を減算比較（ステータスレジスタ変更のみ）
+$C3/05C8 BEQ $05    [$05CF]      ;ゼロフラグが立っているとき[$05CF]分岐
+$C3/05CF CMP #$F0                ;Aと$F0を減算比較（ステータスレジスタ変更のみ）
+$C3/05D1 BCC $21    [$05F4]      ;キャリーフラグが立っていないとき[$05F4]分岐
+$C3/05F4 JMP $0171  [$C3:0171]   ;[$C3:0171]へジャンプ(レジスタをスタックに積まない)
+$C3/0171 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0173 STZ $00    [$00:1D00]   ;[$00:1D00]に$00を書き込み
+$C3/0175 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0177 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0179 PLY                     ;Yレジスタにスタックからプル
+$C3/017A PLX                     ;Xレジスタにスタックからプル
+$C3/017B PLA                     ;Aレジスタにスタックからプル
+$C3/017C PLP                     ;Pレジスタにスタックからプル
+$C3/017D PLD                     ;Dレジスタにスタックからプル
+$C3/017E PLB                     ;DBレジスタにスタックからプル
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C0/12E6 RTS                     ;サブルーチン戻り
+
+$C0/61B4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ARAMに転送しているのは、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1D00</code></td><td><span class="formula">$18</span></td></tr>
+	<tr><td><code>$00:1D01</code></td><td><span class="formula">$F3</span></td></tr>
+	<tr><td><code>$00:1D02</code></td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>$00:1D03</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>ということになるので、サウンドドライバファンクションのコマンド<span class="formula">$18</span>を使い、音量設定なしで、効果音<span class="formula">$F3</span>をパン（音の定位）<span class="formula">$80</span>で鳴らす処理だということがわかる。<br>
+つまり、効果音<span class="formula">$F3</span>は扉の開閉音である（実際には扉の開閉音も数種類あるようだ）。<br>
+パンの値も<span class="formula">$80</span>だからステレオの中央付近で鳴らしている。<br>
+メニュー画面ではパンの値が<span class="formula">$7F</span>、フィールドでは<span class="formula">$80</span>と統一されていない理由はよくわからない。</p>
+
+<p>では効果音<span class="formula">$F3</span>の<span class="formula">$F3</span>はどう計算しているのかというと、<code><span class="r">$C0/619B</span></code>～<code><span class="r">$C0/61B4</span></code>のサブルーチンで算出している。</p>
+
+<p><span class="formula">$CD0058 + (<code>[$00:011A]</code>*3*2 + <code>[$7E:0A08]</code>)</span></p>
+
+<p>が、<code><span class="r">$C0/61AB</span></code>で呼び出されているアドレスで、扉開閉音の場合<code>[$CD:007C]</code>がロードされている。<br>
+（といっても、<code>[$00:011A]</code>と<code>[$00:0A08]</code>が何なのかわからないとどうにもならないのだが）<br>
+<code>$CD:0058</code>以降に、効果音を呼び出すための定数一覧のようなものがあるのは間違いない。<br>
+実際に見てみると、</p>
+
+<div class="mono">
+$CD:0058～<br>
+F3 F3 F1 D9 D9 00 F3 00 F1 EE E0 E0 F3 F3 F3 EE<br>
+EE EE DB DB DB EE AD AD D3 F3 F1 00 00 00 F0 F0
+</div>
+
+<p><span class="formula">$F3</span>, <span class="formula">$F1</span>, <span class="formula">$EE</span>, <span class="formula">$AD</span>などはいずれも扉の開閉音である（大きさなどがそれなりに異なる）。<br>
+おそらくマップの番号なり座標なりから計算されるのだろう、と思う。</p>
+
+
+<h4>幕末編・地下通路のスイッチ音</h4>
+
+<p>音が小さすぎてろくに聞こえないことに定評がある、尾手城の地下通路のスイッチ音の処理は以下のようになっている。<br>
+ここでは<code>[$00:0203]</code>がフラグとして重要なので、効果音演奏には関係のない部分も合わせて掲載した。</p>
+
+<div class="code-container"><pre>
+$C0/1B7B LDA #$01                ;Aに$01をロード
+$C0/1B7D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/1B80 STZ $0214  [$00:0214]   ;[$00:0214]に$00を書き込み
+$C0/1B83 STZ $021A  [$00:021A]   ;[$00:021A]に$00を書き込み
+$C0/1B86 STZ $0202  [$00:0202]   ;[$00:0202]に$00を書き込み
+$C0/1B89 STZ $0203  [$00:0203]   ;★[$00:0203]に$00を書き込み
+;（中略）
+$C0/2F78 LDA #$01                ;Aに$01をロード
+$C0/2F7A STA $000203[$00:0203]   ;Aを★[$00:0203]に書き込み
+$C0/2F7E STA $000202[$00:0202]   ;Aを[$00:0202]に書き込み
+$C0/2F82 BRA $D8    [$2F5C]      ;フラグにかかわりなく常に分岐[$2F5C]
+;（中略）
+$C0/1D8E LDA $8E00,y[$7F:C201]   ;Aに[$7F:C201]をロード
+$C0/1D91 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1D93 LDA $8E01,y[$7F:C202]   ;Aに[$7F:C202]をロード
+$C0/1D96 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1D98 JSR $1213  [$C0:1213]   ;[$C0:1213]へジャンプ
+
+$C0/1213 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/1215 BNE $02    [$1219]      ;ゼロフラグが立っていないとき[$1219]分岐
+$C0/1219 STA $000A62[$00:0A62]   ;Aを[$00:0A62]に書き込み
+$C0/121D LDA #$82                ;Aに$82をロード
+$C0/121F BRL $00AD  [$12CF]      ;フラグにかかわりなく常に分岐[$12CF]
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 82002000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C0/12E6 RTS                     ;サブルーチン戻り
+
+$C0/1D9B INY                     ;Yをインクリメント +1
+$C0/1D9C INY                     ;Yをインクリメント +1
+$C0/1D9D BRL $FE01  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに★[$00:0203]をロード 切り替えフラグ
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+;通路座標処理
+$C0/1BC3 LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BC7 BEQ $2D    [$1BF6]      ;ゼロフラグが立っているとき[$1BF6]分岐
+$C0/1BC9 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1BCB TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/1BCC CMP $000218[$00:0218]   ;Aと[$00:0218]を減算比較（ステータスレジスタ変更のみ）
+$C0/1BD0 BNE $47    [$1C19]      ;ゼロフラグが立っていないとき[$1C19]分岐
+$C0/1C19 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:C203]   ;Aに[$7F:C203]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1CDC] ;[$C0:1CDC]へジャンプ(レジスタをスタックに積まない)
+$C0/1CDC LDA $8E00,y[$7F:C204]   ;Aに[$7F:C204]をロード　効果音ID$E0
+$C0/1CDF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1CE1 JSR $1183  [$C0:1183]   ;[$C0:1183]へジャンプ
+
+$C0/1183 LDA #$80                ;Aに$80をロード
+$C0/1185 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1187 STA $000A63[$00:0A63]   ;Aを[$00:0A63]に書き込み
+$C0/118B LDA #$18                ;Aに$18をロード
+$C0/118D BRL $013F  [$12CF]      ;フラグにかかわりなく常に分岐[$12CF]
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み　$18
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み　$E0
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み　$80
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 18E08000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C0/12E6 RTS                     ;サブルーチン戻り
+
+$C0/1CE4 INY                     ;Yをインクリメント +1
+;（後略）
+</pre></div>
+
+<p>処理を見ると、最初にサウンドドライバファンクションのコマンド<span class="formula">$82</span>で、音量設定が「<span class="formula">$20</span>」と書き込まれている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1D00</code></td><td><span class="formula">$82</span></td></tr>
+	<tr><td><code>$00:1D01</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>$00:1D02</code></td><td><span class="formula">$20</span></td></tr>
+	<tr><td><code>$00:1D03</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>デフォルトのボリュームが<span class="formula">$FF</span>なので、相当音量を下げていることがわかる。<br>
+しかもBGMの音量は変化しないので、効果音がろくに聞こえないのも無理はない。<br>
+鳴らす効果音IDは<span class="formula">$E0</span>で「カチャッ」という感じの音である。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1D00</code></td><td><span class="formula">$18</span></td></tr>
+	<tr><td><code>$00:1D01</code></td><td><span class="formula">$E0</span></td></tr>
+	<tr><td><code>$00:1D02</code></td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>$00:1D03</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>面白いのは音量設定後に、<code><span class="r">$C0/1D9B</span></code>～<code><span class="r">$C0/1CE1</span></code>で、実際に効果音を鳴らすかの判定分岐があること。<br>
+この地下通路では、<code>$00:0203</code>の値が通路切り替えを記録するフラグになっている。<br>
+ただ、<code>$00:0203</code>の値は、効果音が鳴る座標だけでなく、通路上側の扉の前や、通路下の曲がり角の座標でもロード＆書き換えを行う。<br>
+その時には音を鳴らさないようにするため分岐処理が挟まっているようだ。</p>
+
+<p>また、合言葉切り替えの鐘を鳴らすタイミングと被った時の判定・分岐処理にも<code>$00:0203</code>が使われているようである。</p>
+
+
+<h4>戦闘突入時</h4>
+
+<p>フィールドで戦闘に入る時の、画面が三角形にマスキング処理されるタイミングの効果音処理。</p>
+
+<div class="code-container"><pre>
+$C0/1893 ORA $30    [$00:0030]   ;Aと[$00:0030]で論理和
+$C0/1895 BRA $02    [$1899]      ;フラグにかかわりなく常に分岐[$1899]
+$C0/1899 STA $41    [$00:0041]   ;Aを[$00:0041]に書き込み
+$C0/189B LDA $0161  [$00:0161]   ;Aに[$00:0161]をロード
+$C0/189E BEQ $42    [$18E2]      ;ゼロフラグが立っているとき[$18E2]分岐
+$C0/18A0 LDA $44    [$00:0044]   ;Aに[$00:0044]をロード
+$C0/18A2 BMI $16    [$18BA]      ;ネガティブフラグが立っているとき[$18BA]分岐
+$C0/18A4 CMP $0A60  [$00:0A60]   ;Aと[$00:0A60]を減算比較（ステータスレジスタ変更のみ）
+$C0/18A7 BNE $08    [$18B1]      ;ゼロフラグが立っていないとき[$18B1]分岐
+$C0/18B1 LDA #$20                ;Aに$20をロード
+$C0/18B3 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/18B5 STZ $31    [$00:0031]   ;[$00:0031]に$00を書き込み
+$C0/18B7 JSR $120E  [$C0:120E]   ;[$C0:120E]へジャンプ
+
+$C0/120E LDA #$81                ;Aに$81をロード
+$C0/1210 BRL $00BC  [$12CF]      ;フラグにかかわりなく常に分岐[$12CF]
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 81200000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C0/12E6 RTS                     ;サブルーチン戻り
+
+$C0/18BA LDA #$9B                ;Aに$9Bをロード　効果音ID
+$C0/18BC STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/18BE JSR $1183  [$C0:1183]   ;[$C0:1183]へジャンプ
+
+$C0/1183 LDA #$80                ;Aに$80をロード
+$C0/1185 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1187 STA $000A63[$00:0A63]   ;Aを[$00:0A63]に書き込み
+$C0/118B LDA #$18                ;Aに$18をロード
+$C0/118D BRL $013F  [$12CF]      ;フラグにかかわりなく常に分岐[$12CF]
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 189B8000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C0/12E6 RTS                     ;サブルーチン戻り
+
+$C0/18C1 LDA #$06                ;Aに$06をロード
+$C0/18C3 STA $0160  [$00:0160]   ;Aを[$00:0160]に書き込み
+$C0/18C6 LDX #$00FA              ;Xに$00FAをロード
+$C0/18C9 STX $01F2  [$00:01F2]   ;Xを[$00:01F2]に書き込み
+$C0/18CC LDA #$80                ;Aに$80をロード
+$C0/18CE STA $01F6  [$00:01F6]   ;Aを[$00:01F6]に書き込み
+$C0/18D1 LDA $0A1F  [$00:0A1F]   ;Aに[$00:0A1F]をロード
+$C0/18D4 BNE $04    [$18DA]      ;ゼロフラグが立っていないとき[$18DA]分岐
+$C0/18D6 LDA #$68                ;Aに$68をロード
+$C0/18D8 BRA $02    [$18DC]      ;フラグにかかわりなく常に分岐[$18DC]
+$C0/18DC STA $01F8  [$00:01F8]   ;Aを[$00:01F8]に書き込み
+$C0/18DF JSR $BF15  [$C0:BF15]   ;[$C0:BF15]へジャンプ
+
+$C0/BF15 JSR $0AF7  [$C0:0AF7]   ;[$C0:0AF7]へジャンプ
+
+$C0/0AF7 JSR $D404  [$C0:D404]   ;[$C0:D404]へジャンプ
+</pre></div>
+
+<p>効果音IDは<span class="formula">$9B</span>で鳴らしている。<br>
+その前のサウンドドライバファンクションのコマンド<span class="formula">$81</span>はBGMフェード用音量倍率である。<br>
+直前まで鳴っていたフィールドのBGMを音量変化時間<span class="formula">$20</span>かけて<span class="formula">$00</span>まで落とすことで、実質、演奏を停止させている。<br>
+（ここでフィールドのBGMを止めないと、戦闘BGMの演奏開始までずっとフィールドのBGMが演奏されてしまう）<br>
+といったように、寸前まで鳴っていた音楽をフェードアウト停止＋何かしらの音を鳴らす、という処理を連続で行うのはゲーム内でしょっちゅう行われている。</p>
+
+<h3>戦闘</h3>
+
+<p>戦闘ではコマンドを開いた時に、メニュー画面と同様、カーソル系効果音が鳴るので、まずそちらを紹介する。</p>
+
+<h4>カーソル系効果音</h4>
+
+<p>戦闘では、<code>$00:034C</code>～<code>$00:034D</code>の2バイトにコントローラ1のボタンを押した判定値が入るので（<code>$00:0344</code>～<code>$00:0345</code>のミラー）、そこから音を鳴らすか以下処理で判定しているようだ。</p>
+
+<div class="code-container"><pre>
+$C1/9480 LDA $F0    [$00:03F0]   ;Aに[$00:03F0]をロード
+$C1/9482 BIT #$EF                ;Aと$EFで論理積（ステータスフラグ変更のみ）
+$C1/9484 BEQ $01    [$9487]      ;ゼロフラグが立っているとき[$9487]分岐
+$C1/9487 LDA $62    [$00:0362]   ;Aに[$00:0362]をロード
+$C1/9489 BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/948B BNE $07    [$9494]      ;ゼロフラグが立っていないとき[$9494]分岐
+$C1/9494 LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/9496 BNE $01    [$9499]      ;ゼロフラグが立っていないとき[$9499]分岐
+$C1/9499 LDA $63    [$00:0363]   ;Aに[$00:0363]をロード
+$C1/949B BIT #$F0                ;Aと$F0で論理積（ステータスフラグ変更のみ）
+$C1/949D BEQ $01    [$94A0]      ;ゼロフラグが立っているとき[$94A0]分岐
+$C1/94A0 LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
+$C1/94A2 BEQ $01    [$94A5]      ;ゼロフラグが立っているとき[$94A5]分岐
+$C1/94A5 LDA $62    [$00:0362]   ;Aに[$00:0362]をロード
+$C1/94A7 BEQ $32    [$94DB]      ;ゼロフラグが立っているとき[$94DB]分岐
+$C1/94A9 CMP #$81                ;Aと$81を減算比較（ステータスレジスタ変更のみ）
+$C1/94AB BNE $03    [$94B0]      ;ゼロフラグが立っていないとき[$94B0]分岐
+$C1/94AD BRL $0504  [$99B4]      ;フラグにかかわりなく常に分岐[$99B4]
+$C1/99B4 LDA $4C    [$00:034C]   ;Aに[$00:034C]をロード（Aボタン:$80）
+$C1/99B6 AND #$C0                ;Aと$C0で論理積
+$C1/99B8 ORA $4D    [$00:034D]   ;Aと[$00:034D]で論理和
+$C1/99BA AND #$E0                ;Aと$E0で論理積
+$C1/99BC BEQ $5C    [$9A1A]      ;ゼロフラグが立っているとき[$9A1A]分岐
+;ゼロフラグOFF
+$C1/99BE LDA $4C    [$00:034C]   ;Aに[$00:034C]をロード
+$C1/99C0 BIT #$C0                ;Aと$C0で論理積（ステータスフラグ変更のみ）
+$C1/99C2 BEQ $35    [$99F9]      ;ゼロフラグが立っているとき[$99F9]分岐
+;ゼロフラグOFF
+$C1/99C4 LDA $E6    [$00:03E6]   ;Aに[$00:03E6]をロード
+$C1/99C6 BNE $06    [$99CE]      ;ゼロフラグが立っていないとき[$99CE]分岐
+;ゼロフラグON（決定）
+$C1/99C8 JSR $11E4  [$C1:11E4]   ;[$C1:11E4]へジャンプ
+;$C1/99C2ゼロフラグON（キャンセル）
+$C1/99F9 LDA $C0FFBC[$C0:FFBC]   ;Aに[$C0:FFBC]をロード
+$C1/99FD BNE $0D    [$9A0C]      ;ゼロフラグが立っていないとき[$9A0C]分岐
+$C1/9A0C LDA $4D    [$00:034D]   ;Aに[$00:034D]をロード　Bボタン:$80
+$C1/9A0E BPL $0A    [$9A1A]      ;ネガティブフラグが立っていないとき[$9A1A]分岐
+$C1/9A10 JSR $11E8  [$C1:11E8]   ;[$C1:11E8]へジャンプ
+;$C1/99BCゼロフラグON（カーソル移動）　[$00:034D]右:$01 / 左:$02 / 下:$04 / 上:$08 / Bボタン:$80
+$C1/9A1A LDA $4D    [$00:034D]   ;Aに[$00:034D]をロード
+$C1/9A1C BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C1/9A1E BNE $17    [$9A37]      ;ゼロフラグが立っていないとき[$9A37]分岐
+$C1/9A20 BIT #$04                ;Aと$04で論理積（ステータスフラグ変更のみ）
+$C1/9A22 BNE $02    [$9A26]      ;ゼロフラグが立っていないとき[$9A26]分岐
+$C1/9A26 LDA $E6    [$00:03E6]   ;Aに[$00:03E6]をロード
+$C1/9A28 STA $E7    [$00:03E7]   ;Aを[$00:03E7]に書き込み
+$C1/9A2A INC A                   ;Aをインクリメント +1
+$C1/9A2B STA $E6    [$00:03E6]   ;Aを[$00:03E6]に書き込み
+$C1/9A2D CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/9A2F BNE $15    [$9A46]      ;ゼロフラグが立っていないとき[$9A46]分岐
+$C1/9A46 LDA #$40                ;Aに$40をロード
+$C1/9A48 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/9A4B LDA #$00                ;Aに$00をロード
+$C1/9A4D STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/9A50 LDA $E6    [$00:03E6]   ;Aに[$00:03E6]をロード
+$C1/9A52 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/9A55 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/9A58 LDX $2134  [$00:2134]   ;Xに[$00:2134]をロード
+$C1/9A5B STX $10    [$00:0310]   ;Xを[$00:0310]に書き込み
+$C1/9A5D LDA #$40                ;Aに$40をロード
+$C1/9A5F STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/9A62 LDA #$00                ;Aに$00をロード
+$C1/9A64 STA $211B  [$00:211B]   ;Aを[$00:211B]に書き込み
+$C1/9A67 LDA $E7    [$00:03E7]   ;Aに[$00:03E7]をロード
+$C1/9A69 STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/9A6C STA $211C  [$00:211C]   ;Aを[$00:211C]に書き込み
+$C1/9A6F LDX $2134  [$00:2134]   ;Xに[$00:2134]をロード
+$C1/9A72 STX $12    [$00:0312]   ;Xを[$00:0312]に書き込み
+$C1/9A74 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/9A76 LDA $E4    [$00:03E4]   ;Aに[$00:03E4]をロード
+$C1/9A78 ADC #$0042              ;A + $0042
+$C1/9A7B SEC                     ;キャリーフラグON
+$C1/9A7C SBC #$C000              ;A - $C000
+$C1/9A7F LSR A                   ;Aを論理右シフト　(/2)
+$C1/9A80 ADC #$6800              ;A + $6800
+$C1/9A83 STA $14    [$00:0314]   ;Aを[$00:0314]に書き込み
+$C1/9A85 ADC $10    [$00:0310]   ;A + [$00:0310]
+$C1/9A87 STA $E8    [$00:03E8]   ;Aを[$00:03E8]に書き込み
+$C1/9A89 LDA $14    [$00:0314]   ;Aに[$00:0314]をロード
+$C1/9A8B ADC $12    [$00:0312]   ;A + [$00:0312]
+$C1/9A8D STA $EA    [$00:03EA]   ;Aを[$00:03EA]に書き込み
+$C1/9A8F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/9A91 JSR $11F0  [$C1:11F0]   ;[$C1:11F0]へジャンプ
+</pre></div>
+
+<p>カーソル移動判定がやたら長いのは、戦闘中はウィンドウ隅から外側方向へ向けて上下左右キーを押した時にカーソル音を鳴らすかどうか（ウィンドウ隅でそれ以上カーソルが移動できないかどうか）を判定しなければならないからである。<br>
+何にせよ、まとめると、</p>
+
+<ul>
+	<li>決定音：<code>[$C1:11E4]</code>にジャンプ</li>
+	<li>キャンセル音：<code>[$C1:11E8]</code>へジャンプ</li>
+	<li>カーソル移動音：<code>[$C1:11F0]</code>へジャンプ</li>
+</ul>
+
+<p>と、いうことである。</p>
+
+<div class="code-container"><pre>
+;決定音
+$C1/11E4 LDA #$20                ;Aに$20をロード
+$C1/11E6 BRA $0A    [$11F2]      ;フラグにかかわりなく常に分岐[$11F2]
+$C1/11F2 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/11F5 JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+;キャンセル音
+$C1/11E8 LDA #$21                ;Aに$21をロード
+$C1/11EA BRA $06    [$11F2]      ;フラグにかかわりなく常に分岐[$11F2]
+$C1/11F2 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/11F5 JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+;カーソル移動音
+$C1/11F0 LDA #$23                ;Aに$23をロード
+$C1/11F2 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/11F5 JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+</pre></div>
+
+<p>後はそれぞれの効果音を鳴らすための値を<code>[$00:1D00]</code>に書き込み、すべて<code><span class="r">$C1/11D1</span></code>にジャンプするので処理合流である。<br>
+メニュー画面ではカーソル移動音の場合、直に<span class="formula">$23</span>を<code>[$00:2140]</code>に書き込んでいたが、戦闘では行わない。</p>
+
+<div class="code-container"><pre>
+$C1/11D1 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード
+$C1/11D4 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/11D6 BEQ $0B    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+</pre></div>
+
+<p>戦闘中の効果音処理は必ずこの<code><span class="r">$C1/11D1</span></code>～<code><span class="r">$C1/11DF</span></code>を通る。<br>
+<a href="program45.html">技モーション・エフェクト</a>でも説明したが、<code>[$00:0070]</code>が<span class="formula">$01</span>はタイトルデモでの戦闘、<code>[$00:0040]</code>が<span class="formula">$04</span>になるのは最終編ベストエンドで主人公たちが最強技を見せる場面のため、効果音を一切鳴らさない。<br>
+それ以外の通常のプレイ中であれば、効果音を鳴らすため、<code><span class="r">$C3/0004</span></code>へジャンプして<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/05C5</span></code>の処理にて効果音を演奏することになる。</p>
+
+<div class="code-container"><pre>
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/05C5 CMP $2140  [$00:2140]   ;Aと[$00:2140]を減算比較（ステータスレジスタ変更のみ）
+
+$C3/05D1 BCC $21    [$05F4]      ;キャリーフラグが立っていないとき[$05F4]分岐
+$C3/05F4 JMP $0171  [$C3:0171]   ;[$C3:0171]へジャンプ(レジスタをスタックに積まない)
+$C3/0171 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0173 STZ $00    [$00:1D00]   ;[$00:1D00]に$00を書き込み
+$C3/0175 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0177 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0179 PLY                     ;Yレジスタにスタックからプル
+$C3/017A PLX                     ;Xレジスタにスタックからプル
+$C3/017B PLA                     ;Aレジスタにスタックからプル
+$C3/017C PLP                     ;Pレジスタにスタックからプル
+$C3/017D PLD                     ;Dレジスタにスタックからプル
+$C3/017E PLB                     ;DBレジスタにスタックからプル
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C1/11E3 RTS                     ;サブルーチン戻り
+
+$C1/11F8 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上が戦闘中におけるカーソル系効果音処理である。</p>
+
+<h4>技命中効果音</h4>
+
+<p><a href="program45.html">技モーション・エフェクト</a>で、技の効果音についてざっと説明した。<br>
+技データ20と技データ24が技を出している最中の効果音IDで、<code>[$00:1D01]</code>に書き込まれて効果音として流れる。<br>
+技を出し終えた後、敵に命中する場合は命中した時の音が鳴るが、その処理は以下の通り。</p>
+
+<div class="code-container"><pre>
+$C1/A4EE JSR $12BF  [$C1:12BF]   ;[$C1:12BF]へジャンプ
+
+$C1/12BF LDA #$F2                ;Aに$F2をロード
+$C1/12C1 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/12C4 JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+
+$C1/11D1 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード
+$C1/11D4 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/11D6 BEQ $0B    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : F2008000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C1/11E3 RTS                     ;サブルーチン戻り
+
+$C1/12C7 RTS                     ;サブルーチン戻り
+
+;（中略）
+$C1/A4F1 JSR $10B3  [$C1:10B3]   ;[$C1:10B3]へジャンプ
+
+$C1/C047 LDA #$05                ;Aに$05をロード
+$C1/C049 STA $7B    [$00:037B]   ;Aを[$00:037B]に書き込み
+$C1/C04B LDA #$17                ;Aに$17をロード
+$C1/C04D JSR $12AA  [$C1:12AA]   ;[$C1:12AA]へジャンプ
+
+$C1/12AA CMP #$00                ;Aと$00を減算比較（ステータスレジスタ変更のみ）
+$C1/12AC BEQ $10    [$12BE]      ;ゼロフラグが立っているとき[$12BE]分岐
+$C1/12AE STA $1D01  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C1/12B1 LDA #$18                ;Aに$18をロード
+$C1/12B3 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/12B6 LDA #$80                ;Aに$80をロード
+$C1/12B8 STA $1D02  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C1/12BB JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+
+$C1/11D1 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード
+$C1/11D4 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/11D6 BEQ $0B    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 18178000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C1/11E3 RTS                     ;サブルーチン戻り
+
+$C1/12BE RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>効果音ID<span class="formula">$17</span>のダメージ音を鳴らす処理なのだが、その前にサウンドドライバファンクションのコマンド<span class="formula">$F2</span>を送信している。<br>
+コマンド<span class="formula">$F2</span>は効果音演奏停止だから、それまで鳴っていた効果音があれば停止して、技命中効果音を鳴らすということである。<br>
+技の効果音の演奏が残っていた場合（残っている場合があるかどうかわからないが）、そちらは中断させて、命中音を優先で鳴らすということなのだろう。</p>
+
+
+
+<h4>ダメージ/回復量数値効果音</h4>
+
+<p>技命中効果音の直後、ダメージを与えた場合はダメージ量数値が飛び出し、「ピコリン」という感じの音が鳴る（効果音ID<span class="formula">$9B</span>）。<br>
+回復時も同じ効果音。<br>
+こちらの演奏時、前処理は特に無い。</p>
+
+<div class="code-container"><pre>
+$C1/C050 JSR $C076  [$C1:C076]   ;[$C1:C076]へジャンプ
+
+$C1/C076 LDX #$F880              ;Xに$F880をロード
+$C1/C079 BRA $03    [$C07E]      ;フラグにかかわりなく常に分岐[$C07E]
+$C1/C07E JSR $C0B6  [$C1:C0B6]   ;[$C1:C0B6]へジャンプ
+
+$C1/BEA1 LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
+$C1/BEA3 ORA #$40                ;Aと$40で論理和
+$C1/BEA5 STA $77    [$00:0377]   ;Aを[$00:0377]に書き込み
+$C1/BEA7 LDA #$0D                ;Aに$0Dをロード
+$C1/BEA9 JSR $12AA  [$C1:12AA]   ;[$C1:12AA]へジャンプ
+
+$C1/12AA CMP #$00                ;Aと$00を減算比較（ステータスレジスタ変更のみ）
+$C1/12AC BEQ $10    [$12BE]      ;ゼロフラグが立っているとき[$12BE]分岐
+$C1/12AE STA $1D01  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C1/12B1 LDA #$18                ;Aに$18をロード
+$C1/12B3 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/12B6 LDA #$80                ;Aに$80をロード
+$C1/12B8 STA $1D02  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C1/12BB JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+
+$C1/11D1 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード
+$C1/11D4 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/11D6 BEQ $0B    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 189B8000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+</pre></div>
+
+
+<h4>ボス戦勝利</h4>
+
+<p>ボス敵を撃破すると、ザコ敵とは異なる処理が入る（敵のグラフィックがランダムでドット毎に消滅する中、効果音が鳴り続ける）。<br>
+やたらと長い効果音は効果音ID<span class="formula">$90</span>で、停止指示を出さない限り鳴り終わらない。<br>
+また、最初の<code><span class="r">$C1/C1D6</span></code>～<code><span class="r">$C1/C1FB</span></code>で敵IDの分岐処理があり、ボス戦かつ倒した相手がブリキ大王とピュアオディオだとサウンド処理が別になることがわかる。<br>
+とはいえ、実際に効果音がまったく異なるのは最終編でピュアオディオを倒した時のみ。（効果音ID<span class="formula">$53</span>）<br>
+最終編オルステッド主人公時にブリキ大王を倒した時は途中処理が分岐するだけで、結局通常のボス戦と同じ効果音ID<span class="formula">$90</span>が流れる。</p>
+
+<div class="code-container"><pre>
+$C1/C1D6 LDA $0000,x[$00:1B00]   ;Aに[$00:1B00]をロード　敵種類1の敵ID
+$C1/C1D9 CMP #$69                ;Aと$69を減算比較（ステータスレジスタ変更のみ）敵ID$69:ブリキ大王
+$C1/C1DB BNE $12    [$C1EF]      ;ゼロフラグが立っていないとき[$C1EF]分岐
+;ブリキ大王専用処理
+$C1/C1DD LDA #$FF                ;Aに$FFをロード
+$C1/C1DF STA $000D,x[$00:1B1D]   ;Aを[$00:1B1D]に書き込み
+$C1/C1E2 JSR $E7BD  [$C1:E7BD]   ;[$C1:E7BD]へジャンプ
+$C1/C1E5 JSR $6121  [$C1:6121]   ;[$C1:6121]へジャンプ
+$C1/C1E8 JSR $8B6B  [$C1:8B6B]   ;[$C1:8B6B]へジャンプ
+$C1/C1EB LDX $60    [$00:0360]   ;Xに[$00:0360]をロード
+$C1/C1ED BRA $0C    [$C1FB]      ;フラグにかかわりなく常に分岐[$C1FB]
+;処理合流
+$C1/C1EF CMP #$D1                ;Aと$D1を減算比較（ステータスレジスタ変更のみ）敵ID$D1:ピュアオディオ
+$C1/C1F1 BNE $08    [$C1FB]      ;ゼロフラグが立っていないとき[$C1FB]分岐
+;ピュアオディオ専用処理
+$C1/C1F3 JSR $C56B  [$C1:C56B]   ;[$C1:C56B]へジャンプ
+;ピュアオディオ以外
+$C1/C1FB JSR $04BD  [$C1:04BD]   ;[$C1:04BD]へジャンプ
+$C1/04BD LDA #$90                ;Aに$90をロード
+$C1/04BF JSR $12AA  [$C1:12AA]   ;[$C1:12AA]へジャンプ
+
+;効果音ID$90演奏開始処理
+$C1/12AA CMP #$00                ;Aと$00を減算比較（ステータスレジスタ変更のみ）
+$C1/12AC BEQ $10    [$12BE]      ;ゼロフラグが立っているとき[$12BE]分岐
+$C1/12AE STA $1D01  [$00:1D01]   ;Aを[$00:1D01]に書き込み
+$C1/12B1 LDA #$18                ;Aに$18をロード
+$C1/12B3 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/12B6 LDA #$80                ;Aに$80をロード
+$C1/12B8 STA $1D02  [$00:1D02]   ;Aを[$00:1D02]に書き込み
+$C1/12BB JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+
+$C1/11D1 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード
+$C1/11D4 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/11D6 BEQ $0B    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : 18908000
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C1/11E3 RTS                     ;サブルーチン戻り
+
+$C1/12BE RTS                     ;サブルーチン戻り
+
+$C1/04C2 LDA $85    [$00:0385]   ;Aに[$00:0385]をロード
+$C1/04C4 BEQ $03    [$04C9]      ;ゼロフラグが立っているとき[$04C9]分岐
+$C1/04C9 LDX $60    [$00:0360]   ;Xに[$00:0360]をロード
+$C1/04CB JSR $29BE  [$C1:29BE]   ;[$C1:29BE]へジャンプ
+
+$C1/29BE LDY $0002,x[$00:1B02]   ;Yに[$00:1B02]をロード
+$C1/29C1 LDA $0008,y[$00:1A08]   ;Aに[$00:1A08]をロード
+$C1/29C4 PHA                     ;Aレジスタをスタックにプッシュ
+$C1/29C5 AND #$E3                ;Aと$E3で論理積
+$C1/29C7 ORA #$0C                ;Aと$0Cで論理和
+$C1/29C9 STA $0008,y[$00:1A08]   ;Aを[$00:1A08]に書き込み
+$C1/29CC PHX                     ;Xレジスタをスタックにプッシュ
+$C1/29CD PHY                     ;Yレジスタをスタックへプッシュ
+$C1/29CE JSR $E7BD  [$C1:E7BD]   ;[$C1:E7BD]へジャンプ
+;
+;（中略　効果音演奏）
+;
+;効果音演奏終了処理
+$C1/0566 LDA #$17                ;Aに$17をロード
+$C1/0568 STA $212D  [$00:212D]   ;Aを[$00:212D]に書き込み
+$C1/056B LDA #$00                ;Aに$00をロード
+$C1/056D STA $2130  [$00:2130]   ;Aを[$00:2130]に書き込み
+$C1/0570 STA $2131  [$00:2131]   ;Aを[$00:2131]に書き込み
+$C1/0573 LDA $85    [$00:0385]   ;Aに[$00:0385]をロード
+$C1/0575 BEQ $03    [$057A]      ;ゼロフラグが立っているとき[$057A]分岐
+$C1/057A JSR $12BF  [$C1:12BF]   ;[$C1:12BF]へジャンプ
+
+$C1/12BF LDA #$F2                ;Aに$F2をロード
+$C1/12C1 STA $1D00  [$00:1D00]   ;Aを[$00:1D00]に書き込み
+$C1/12C4 JSR $11D1  [$C1:11D1]   ;[$C1:11D1]へジャンプ
+
+$C1/11D1 LDA $0070  [$00:0070]   ;Aに[$00:0070]をロード
+$C1/11D4 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C1/11D6 BEQ $0B    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11D8 LDA $0040  [$00:0040]   ;Aに[$00:0040]をロード
+$C1/11DB CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C1/11DD BEQ $04    [$11E3]      ;ゼロフラグが立っているとき[$11E3]分岐
+$C1/11DF JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;$00:1D00~03 : F2908000（有効なコマンドはF2のみ）
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+;（中略）
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C1/11E3 RTS                     ;サブルーチン戻り
+
+$C1/12C7 RTS                     ;サブルーチン戻り
+
+$C1/057D RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上、効果音演奏処理の紹介とする。</p>
+
+
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="sound2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="sound3.html"><span class="button">&#9654;次 シーケンスデータ調査</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<!-- <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program3.html">アイテム改造などの確率</a></li>
+		<li><a href="program4.html">ダメージ計算式解説</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program8.html">ドロップアイテム判定</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program35.html">セーブ</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

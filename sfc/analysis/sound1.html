@@ -7,20 +7,20 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="msapplication-TileImage" content="../img/social.png">
 <meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
-<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; BGMの演奏">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; サウンドの演奏 (1) BGM演奏">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livealive.client.jp/sfc/">
 <meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
 <meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="Summary">
-<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; BGMの演奏">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; サウンドの演奏 (1) BGM演奏">
 <meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
 <meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
 <meta name="twitter:url" content="https://livealive.client.jp/sfc/">
 <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
 <link rel="icon alternate" href="../img/social.png" type="image/png">
-<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; BGMの演奏</title>
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; サウンドについて &gt; サウンドの演奏 (1) BGM演奏</title>
 <link href="../../css/main.min.css?20260714" rel="stylesheet">
 <link href="../../css/sfc.css?20260301" rel="stylesheet">
 <link href="../../css/cssmenu.css?20240801" rel="stylesheet">
@@ -200,6 +200,7 @@ table {
 		<li><a href="sound.html">サウンドについて</a></li>
 		<li><a href="sound1.html">BGMの演奏</a></li>
 		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
 		<li><a href="sound3.html">シーケンスデータ調査</a></li>
 	</ul>
 </li>
@@ -208,35 +209,45 @@ table {
 </div>
 
 <div class="maincontents">
-<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="sound.html">サウンドについて</a> &gt; BGMの演奏</h1>
-<h2>サウンドについて &gt; BGMの演奏</h2>
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="sound.html">サウンドについて</a> &gt; サウンドの演奏 (1) BGM演奏</h1>
+<h2>サウンドについて &gt; サウンドの演奏 (1) BGM演奏</h2>
 
 <div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
 まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
 
-<p>このページでは、BGMの演奏について、サブルーチンで説明していく。<br>
+<p>このページでは、サウンドの演奏について説明していく。<br>
 先に<a href="sound.html">サウンドについて</a>をお読みいただきたい。</p>
 
-<p>本作でBGMを演奏開始する場面は、ゲームデータのロード時、戦闘開始時、戦闘終了時、特定のマップでの切り替え時、イベント中のBGM切り替え時など。<br>
-本作のBGMはID<span class="formula">$00</span>～<span class="formula">$4D</span>に割り振られており、ID<span class="formula">$00</span>は無音、つまりBGMなしの扱いのため、実質77曲分。<br>
-ただ、ID<span class="formula">$3E</span>と<span class="formula">$49</span>どちらにも「CAPTAIN SQUARE」が登録されているので、76曲ということになる。<br>
-一覧は<a href="sounddata.html#BGMlist">サウンド（BGM・効果音）</a>にあるが、幕末編で本丸1階天井裏にいる時にずっと鳴っているカラクリ音など、効果音のようなものでも、BGMとして扱っているものがある。<br>
-元の曲に対し演奏開始前に演奏速度やキー、演奏チャネルなどを別途指定しているBGMが幾つかあるが（「いいお天気でしょっ!」の夜バージョン、近未来編のバーで流れる「PSYCHOで夜露死苦!!」のスローバージョン、「CRY・A・LIVE」のハープ音のみ流すバージョンなど）、BGMIDは元の曲と共通になるため、BGM一覧の中にはない。</p>
+<p>サウンドの演奏手順は、BGMと効果音とで異なるが、大まかな仕組みは、</p>
 
-<p>演奏するBGMのIDだが、イベントやフィールドのBGMは<code>[$00:0A60]</code>に入る。<br>
-また、シナリオによる通常戦闘曲のIDは<code>[$00:10E5]</code>に入っており、そのシナリオのプレイ中は変動しない。<br>
-その他、マップ移動やイベントによるBGM切り替え、メニュー画面でのLISTENING ROOMなど、BGMを演奏開始する場面は多々あるが、長くなるので諸々は<a href="sound2.html">BGMIDの呼び出し</a>で紹介する。</p>
+<p style="font-weight:bold;">「ARAMに送信されたサンプリングデータとシーケンスデータに対し、CPU側から演奏命令を出してSPC700が演奏する」</p>
 
-<p>最終的には<code>$00:1D01</code>にBGMIDが書き込まれて、サンプリングデータとシーケンスデータが呼び出されることになるのだが、実際のサブルーチンでは、サウンド処理中、<code>$00:1D01</code>には途中計算の値も入る。<br>
-曲の再生中は<code>$00:1D01</code>にBGMIDが入るが、戦闘中などでは効果音が流れた時に効果音IDが入ることもあるので、常に「演奏中のBGMID＝<code>$00:1D01</code>」ではない。<br>
-そのあたりの細かい話は省く。</p>
+<p>と、なる。<br>
+CPU側から出す演奏などの命令を「サウンドドライバファンクション」という。<br>
+シーケンスデータのコマンドや、サウンドドライバファンクションは、ゲーム毎にサウンドプログラマーが決めているが、「ライブ・ア・ライブ」と同時期に発売されたスクウェアのRPGには共通の仕様が見られる。<br>
+「ライブ・ア・ライブ」のサウンド・プログラムを手掛けた赤尾実氏（<a href="https://ja.wikipedia.org/wiki/%E8%B5%A4%E5%B0%BE%E5%AE%9F" target="_blank">赤尾実 - Wikipedia</a>）は、当時のスクウェアのゲームの大半のサウンド・プログラムを担当していており、先達による研究により判明している、「ファイナルファンタジー」4～6（ファイナルファンタジーは以降「FF」と省略する）、「クロノ・トリガー」、「ロマンシング・サガ」1～3（ロマンシング・サガは以降「ロマサガ」と省略する）のサウンド関連のデータを参考にさせていただいた。</p>
+
+<ul>
+	<li><a href="https://gnilda.cloudfree.jp/spc/" target="_blank">スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+	<li><a href="https://gnilda.cloudfree.jp/spc/2l/sound_commands.html" target="_blank">シーケンスコマンド一覧 - Romancing Sa・Ga 2 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+	<li><a href="https://gnilda.cloudfree.jp/spc/al3j/sound_functions.html" target="_blank">サウンドドライバファンクション一覧 - Romancing Sa・Ga 3 - スーパーファミコンのサウンドドライバ - Gnilda のページ</a></li>
+</ul>
+
+<p>シーケンスデータについては、<span class="tri"><a href="sound3.html">シーケンスデータ調査</a></span>のページで詳細に説明しているので参照していただきたい。<br>
+「ライブ・ア・ライブ」のシーケンスコマンドは、「ロマサガ2」とほぼ共通の仕様と思われる。</p>
+
+<p>一方、サウンドドライバファンクションについては、似通った部分と、本作独自の部分とがあるようなので、実際の例と共に紹介していく。<br>
+一覧は<span class="tri"><a href="soundfunc.html">サウンドドライバファンクション</a></span>にあるので参照のこと。</p>
+
+<p>このページでは、BGMの演奏について説明する。<br>
+効果音は別ページで紹介している。<a href="sound5.html">効果音の演奏</a>を参照。</p>
 
 <div id="captiondata"></div>
 
-<h3>BGMの演奏手順</h3>
+<h3>サウンドの演奏</h3>
 
-<p>大雑把な手順は以下のようになっている、と思う。<br>
-基本として、CPUからAPU（SPC700）へデータを送信する場合、</p>
+<p>大雑把な手順は以下のようになっている。<br>
+基本として、CPUからAPU（SPC700）へデータを送信する場合、互いのI/Oレジスタアドレスは、</p>
 
 <p><code>$00:2140</code>～<code>$00:2143</code>→ARAM<code>$00F4</code>～<code>$00F7</code></p>
 
@@ -246,14 +257,192 @@ table {
 <p><code>$00:1D00</code>～<code>$00:1D03</code>→<code>$00:2140</code>～<code>$00:2143</code></p>
 
 <p>という処理をしている。<br>
-<a href="sounddata.html#BGMlist_3">サウンド（BGM・効果音） &gt; 特殊なBGM演奏</a>も参照のこと。</p>
+サウンドドライバファンクションでSPC700に命令を送る際、だいたいの場合において、</p>
 
-<h4>BGMの初期設定</h4>
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1D00</code></td><td>コマンド（1バイト）</td></tr>
+	<tr><td><code>$00:1D01</code></td><td>引数1（1バイト）</td></tr>
+	<tr><td><code>$00:1D02</code></td><td>引数2（1バイト）</td></tr>
+	<tr><td><code>$00:1D03</code></td><td>引数3（1バイト）</td></tr>
+</tbody>
+</table>
 
-<p>BGMの演奏を行う場合、初期設定が行われる。<br>
-演奏時の状況により設定項目は変わる。<br>
-どれがどの設定かまで筆者は確認しきれていないが、例えば近未来編でザコ戦に突入する時、戦闘突入時の効果音の後、戦闘BGMであるBGMID<span class="formula">$0B</span>「PSYCHOで夜露死苦!!」を演奏する準備は以下のようになる。<br>
-<code>$00:1D00</code>～<code>$00:1D03</code>に以下の数値を書き込んでは転送、という処理を5回行っている（サブルーチン<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/017F</span></code>）。</p>
+<p>と値をセットして、<code>$00:2140</code>～<code>$00:2143</code>に送信する。<br>
+引数（パラメータ）の有無はコマンドにより変わる。<br>
+送信時に使うサブルーチンが<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/017F</span></code>である（状況により例外あり）。</p>
+
+<p><code>$00:1D00</code>～<code>$00:1D03</code>→<code>$00:2140</code>～<code>$00:2143</code></p>
+
+<p>と書き込んでから、<code>$00:2140</code>が<code>$00:1D00</code>と同値を返してくるまでループ処理で待機し、同値を返してきたら<code>$00:2140</code>に<span class="formula">$00</span>を書き込んでCPUからの命令終了、という手順になる。<br>
+APU側はサウンド演奏も行っており、CPUから値の送信があるかどうかは1フレーム毎に確認している。<br>
+CPUからの送信を確認したら、「CPU側の値を受け取った」と、<code>$00F4</code>→<code>$00:2140</code>と値を返しているのである。</p>
+
+<h3>BGMの演奏</h3>
+
+<p>BGMを演奏する場合、サウンドドライバファンクションのコマンドは3種類ある。<br>
+更に、演奏前に、「フェードインしながら演奏開始する」「ボリュームを通常より下げて演奏する」「演奏速度やピッチを変更する」「一部チャネルの演奏はミュートにする」……といった設定もサウンドドライバファンクションのコマンドで可能になっている。</p>
+
+<p>何にしても、まずは演奏するBGMのBGMIDが必要である。<br>
+戦闘に突入したら戦闘BGMの演奏を開始するが、シナリオ毎の通常戦闘BGMのIDはどう呼び出しているのか？　ボス戦などはどう処理しているのか？<br>
+マップによりBGMを切り替える時、シナリオ進行によりBGMを変更する時などなど、BGMIDをどう計算しているのかだけでも話が長くなるため、それらは別ページで説明することにした。<br>
+<span class="tri"><a href="sound2.html">BGMIDの呼び出し</a></span>で紹介しているので参照のこと。</p>
+
+<p>以降、「コマンド<span class="formula">$nn</span> 引数1<span class="formula">xx</span> 引数2<span class="formula">yy</span>」という形式で表記する。</p>
+
+<h4>BGM演奏開始コマンド</h4>
+
+<p>BGM演奏開始コマンドは3種類ある。</p>
+
+<table>
+<thead>
+	<tr><th>コマンド</th><th>引数1<span class="formula">xx</span></th><th>引数2<span class="formula">yy</span></th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$10</span> <span class="formula">xx</span> <span class="formula">yy</span></td><td>BGMID <span class="formula">$00</span>～<span class="formula">$4D</span></td><td>音量 <span class="formula">$00</span>～<span class="formula">$FF</span></td><td>BGM演奏開始（演奏中断設定込）</td></tr>
+	<tr><td><span class="formula">$11</span> <span class="formula">xx</span> <span class="formula">yy</span></td><td>BGMID <span class="formula">$00</span>～<span class="formula">$4D</span></td><td>音量 <span class="formula">$00</span>～<span class="formula">$FF</span></td><td>BGM演奏開始（バージョン違い）</td></tr>
+	<tr><td><span class="formula">$14</span> <span class="formula">xx</span> <span class="formula">yy</span></td><td>BGMID <span class="formula">$00</span>～<span class="formula">$4D</span></td><td>音量 <span class="formula">$00</span>～<span class="formula">$FF</span></td><td>BGM演奏開始（演奏中断割り込み用）</td></tr>
+</tbody>
+</table>
+
+<p>このコマンドを送信した後に、該当のBGMIDのサンプリングデータとシーケンスデータをARAMに送信（後の<a href="#sampd">サンプリングデータの処理</a>及び、<a href="#seqd">シーケンスデータの処理</a>を参照）。<br>
+送信し終わると演奏が開始になる（<code>$00:2140</code>に転送はされないが、送信終了のタイミングで<code>$00:1D00</code>に<span class="formula">$00</span>が入る）。</p>
+
+<p>コマンド<span class="formula">$11</span>は特殊で、以下のBGMIDを指定すると、バージョン違いの曲を演奏できる。<br>
+他のBGMIDもバージョン違いがあるかもしれないが、筆者が確認できたのは以下3曲である。<br>
+なお、バージョン違いの曲がない場合、コマンド<span class="formula">$11</span>はコマンド<span class="formula">$10</span>と同じ役割になるようだ。</p>
+
+<table>
+<thead>
+	<tr><th>BGMID</th><th>曲名</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$04</span></td><td>WANDERER</td><td>前奏なしバージョン</td></tr>
+	<tr><td><span class="formula">$08</span></td><td>UNSEEN SYNDROME</td><td>チャネル2と3のみのバージョン（ＳＦ編オープニング）</td></tr>
+	<tr><td><span class="formula">$19</span></td><td>届かぬ翼</td><td>回想などで流れるスローバージョン（リメイクにおける「届かぬ翼 (回想)」）</td></tr>
+</tbody>
+</table>
+
+<p>コマンド<span class="formula">$10</span>と<span class="formula">$14</span>は、いわゆるレジューム演奏に使う。<br>
+例えばフィールドで雑魚戦に突入した時、フィールド曲から戦闘曲に切り替えになり、戦闘が終わると再びフィールド曲が演奏されるが、戦闘終了後、戦闘前に流れていたフィールド曲の中断箇所から演奏が開始される。毎回、フィールド曲の頭から演奏開始にはならない。<br>
+演奏を中断しても、次の演奏時に続きから演奏したい曲はコマンド<span class="formula">$10</span>で演奏開始し、割り込んで演奏する曲はコマンド<span class="formula">$14</span>で演奏するようである。<br>
+他にも、フィールドでアイテムを獲得する時や、味方キャラが加わった時に流れる、効果音のようなBGM（高原や功夫編キャラのボイスなど）でもレジューム機能でBGMを演奏している。</p>
+
+<h4>BGM演奏各種指示</h4>
+
+<p>BGM演奏時は、ただ演奏するだけではなく、各種指示ができる。<br>
+代表的なものを紹介する。</p>
+
+<h5><span class="formula">$81</span> <span class="formula">xx</span> <span class="formula">yy</span> BGMフェード用音量倍率 設定/変化</h5>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：音量変化時間 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で音量変化時間なし）<br>
+	<span class="formula">yy</span>：音量 <span class="formula">$00</span>～<span class="formula">$FF</span>（<span class="formula">$00</span>で無音、<span class="formula">$FF</span>がデフォルト音量）</dd>
+
+	<dt>内容</dt>
+	<dd>BGMの音量を、音量変化時間<span class="formula">yy</span>かけて音量<span class="formula">xx</span>に設定する。</dd>
+</dl>
+
+<p>BGM演奏のフェードイン・フェードアウトに使う。<br>
+ゲーム内のほとんどの演奏は、演奏前にコマンド<span class="formula">$81</span>によるフェードインを設定、演奏終了時にフェードアウトを使っている。<br>
+演奏停止用のコマンドも別途あるが（コマンド<span class="formula">$F0</span>や<span class="formula">$F1</span>）、フェードアウトで音量<span class="formula">$00</span>まで落とすことで演奏停止としていることも多い。</p>
+
+
+<h5><span class="formula">$86</span> <span class="formula">xx</span> <span class="formula">yy</span> BGM演奏速度倍率 設定/変化</h5>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：処理時間 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：演奏速度（倍率） <span class="formula">$00</span>～<span class="formula">$FF</span>（符号付き8ビット整数, 通常<span class="formula">$00</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>処理時間<span class="formula">xx</span>かけて演奏速度を<span class="formula">yy</span>に変更する。演奏速度が負なら速度低下、正なら速度上昇。</dd>
+</dl>
+
+<p>本作のBGMの中に、元の楽曲の演奏速度を下げることで別BGMとしている曲がある。<br>
+BGMID<span class="formula">$0B</span>「PSYCHOで夜露死苦!!」（バー）や、BGMID<span class="formula">$15</span>「いいお天気でしょっ!」（夜）などが該当し、これらの曲の場合演奏開始時から演奏速度を下げるので、処理時間は0、演奏速度に負の値をセットしている。<br>
+本作において演奏中に演奏速度を下げていく（処理時間が0以上）という曲はおそらくない。</p>
+
+<h5><span class="formula">$89</span> <span class="formula">xx</span> <span class="formula">yy</span> BGMピッチ倍率 設定/変化</h5>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：処理時間 <span class="formula">$00</span>～<span class="formula">$FF</span><br>
+	<span class="formula">yy</span>：ピッチ（倍率） <span class="formula">$00</span>～<span class="formula">$FF</span>（符号付き8ビット整数, 通常<span class="formula">$00</span>）</dd>
+
+	<dt>内容</dt>
+	<dd>処理時間<span class="formula">xx</span>かけてピッチを<span class="formula">yy</span>に変更する。ピッチが負ならピッチ低下、正ならピッチ上昇。</dd>
+</dl>
+
+<p>BGM演奏速度倍率同様に、演奏前に元の楽曲のピッチを下げて別BGMとしている曲がある。<br>
+BGMID<span class="formula">$15</span>「いいお天気でしょっ!」（夜）や、BGMID<span class="formula">$0C</span>「猛者達…」（敗北時）が該当。<br>
+こちらについても、演奏中にピッチを下げていく（処理時間が0以上）という曲はおそらくない。</p>
+
+<h4><span class="formula">$F5</span> <span class="formula">xx</span> BGMミュート設定 (チャネル選択)</h4>
+
+<dl>
+	<dt>引数</dt>
+	<dd><span class="formula">xx</span>：ミュートするチャネル <span class="formula">$00</span>～<span class="formula">$FF</span></dd>
+
+	<dt>内容</dt>
+	<dd>Bit0～7がチャネル0～7に対応しており、1が立っているチャネルはミュート（無音）処理される。</dd>
+</dl>
+
+<p>こちらも、演奏前に元の楽曲の一部チャネルをミュートすることにより別BGMにするパターン。<br>
+音量を0にするだけなので演奏自体は全チャネル行っている。<br>
+BGMID<span class="formula">$35</span>「CRY・A・LIVE」（ハープのみ）の場合、<span class="formula">xx</span>が<span class="formula">$F7 = $1111 0111</span>なので、0が立っているBit3、つまりチャネル3以外はミュート処理になる。<br>
+チャネル3がハープを担当しているので、ハープのみの演奏になる。</p>
+
+<h4><span class="formula">$FB</span> ループ停止してコーダ部へ</h4>
+
+<dl>
+	<dt>内容</dt>
+	<dd>指定後、ループ処理せずコーダ部へ移行して演奏終了する。</dd>
+</dl>
+
+<p>コマンド<span class="formula">$FB</span>は特殊なパターンで、おそらくだが、BGMID<span class="formula">$18</span>「GO!GO!ブリキ大王!!」専用と思われる。<br>
+「GO!GO!ブリキ大王!!」は、ブリキ大王操作時や、LISTENING ROOMで聞く時は、</p>
+
+<p>イントロ→メイン部分→イントロ→メイン部分→……</p>
+
+<p>という感じでループ演奏される。<br>
+だが、近未来編のオープニングだと、</p>
+
+<p>イントロ→メイン部分→イントロ＋コーダ部</p>
+
+<p>のような感じでループしない。<br>
+この、ループさせないための命令がコマンド<span class="formula">$FB</span>である。<br>
+演奏開始は通常通りだが、メイン部分の演奏中にコマンド<span class="formula">$FB</span>を送信すると、次のイントロ演奏でコーダ部に入り演奏終了する。<br>
+演奏開始時に同時にコマンド<span class="formula">$FB</span>を指示すると、最初のイントロでコーダ部に入って演奏が終わってしまうので、メイン部分の演奏中に送る必要がある。<br>
+実際のゲームプレイでは、「あつい心が呼びさます」の字幕が出る港のシーンから、全体マップに切り替わるタイミングでコマンド<span class="formula">$FB</span>が送信されている。</p>
+
+<h4>BGM演奏例</h4>
+
+<p>近未来編でザコ戦に突入する時、戦闘突入時の効果音の後、戦闘BGMであるBGMID<span class="formula">$0B</span>「PSYCHOで夜露死苦!!」を演奏する場合、コマンド送信は以下のようになる（実際には一回送信する度に<code>$00:2140</code>に<span class="formula">00</span>を送信しているが省略）。<br>
+筆者にはわからないコマンドも含まれているが、とりあえずわかる部分を説明していく。</p>
+
+<table>
+<thead>
+	<tr><th>内容</th><th colspan="4"><code>$00:1DXX</code></th></tr>
+	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
+</thead>
+<tbody>
+	<tr><td>BGM演奏速度倍率 設定/変化</td><td><span class="formula">$86</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>BGMピッチ倍率 設定/変化</td><td><span class="formula">$89</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>BGMミュート設定</td><td><span class="formula">$F5</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>？（ループ設定？）</td><td><span class="formula">$FA</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>BGM演奏開始（演奏中断割り込み用）</td><td><span class="formula">$14</span></td><td><span class="formula">$0B</span></td><td><span class="formula">$FF</span></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>戦闘で演奏する「PSYCHOで夜露死苦!!」は、演奏速度、ピッチ、ミュート設定など、すべて<span class="formula">$00</span>である。<br>
+つまりシーケンスデータのまま演奏する。</p>
+
+<p>近未来編のバーに全体マップから入った時、BGMID<span class="formula">$0B</span>「PSYCHOで夜露死苦!!」（バー）に演奏が切り替わる処理は以下のようになる。</p>
 
 <table>
 <thead>
@@ -261,52 +450,19 @@ table {
 	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
 </thead>
 <tbody>
-	<tr><td>1回目</td><td><span class="formula">$82</span></td><td><span class="formula">$00</span></td><td><span class="formula">$FF</span></td><td><span class="formula">$00</span></td></tr>
-	<tr><td>2回目</td><td><span class="formula">$86</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
-	<tr><td>3回目</td><td><span class="formula">$89</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
-	<tr><td>4回目</td><td><span class="formula">$F5</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
-	<tr><td>5回目</td><td><span class="formula">$FA</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>BGMフェード用音量倍率 設定/変化</td><td><span class="formula">$81</span></td><td><span class="formula">$10</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>BGMミュート設定</td><td><span class="formula">$F5</span></td><td><span class="formula">$85</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>BGM演奏速度倍率 設定/変化</td><td><span class="formula">$86</span></td><td><span class="formula">$00</span></td><td><span class="formula">$8C</span></td><td><span class="formula">$00</span></td></tr>
+	<tr><td>BGM演奏開始（演奏中断設定込）</td><td><span class="formula">$10</span></td><td><span class="formula">$0B</span></td><td><span class="formula">$FF</span></td><td><span class="formula">$00</span></td></tr>
 </tbody>
 </table>
 
-<p>近未来編のバーはBGMID<span class="formula">$0B</span>「PSYCHOで夜露死苦!!」を演奏パート削減＆スローテンポで流しているのだが、バーに入った時は以下のように処理が入る。</p>
+<p>バーに入ると、まずコマンド<span class="formula">$81</span>で、フィールド曲をフェードアウトで停止する。<br>
+その後に、コマンド<span class="formula">$F5</span>のBGMミュート設定を<span class="formula">$85</span>に設定することでチャネル0, 2, 7をミュート処理、コマンド<span class="formula">$86</span>でBGM演奏速度倍率を<span class="formula">$8C</span>に下げてから、「PSYCHOで夜露死苦!!」をコマンド<span class="formula">$10</span>で演奏する。<br>
+これにより、戦闘での演奏時とは異なり、スローテンポでキーも下がった「PSYCHOで夜露死苦!!」が演奏されることになる。<br>
+ミュート設定もあるので、メインメロディがない状態で演奏されることになる。</p>
 
-<table>
-<thead>
-	<tr><th>回数</th><th colspan="4"><code>$00:1DXX</code></th></tr>
-	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
-</thead>
-<tbody>
-	<tr><td>1回目</td><td><span class="formula">$81</span></td><td><span class="formula">$10</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
-	<tr><td>2回目</td><td><span class="formula">$F5</span></td><td><span class="formula">$85</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
-	<tr><td>3回目</td><td><span class="formula">$86</span></td><td><span class="formula">$00</span></td><td><span class="formula">$8C</span></td><td><span class="formula">$00</span></td></tr>
-</tbody>
-</table>
-
-<p>1回目の<span class="formula">$81</span>はBGM一時停止処理である。詳細は後述する。</p>
-
-<p>この後に呼び出すBGMIDは<span class="formula">$0B</span>で共通なので、上でテンポやキー、演奏パートを設定を変えている。<br>
-どれで何が変更できるか、筆者もすべて把握はできていないが、重要なあたりは以下である。</p>
-
-<table>
-<thead>
-	<tr><th rowspan="2">設定</th><th colspan="4"><code>$00:1DXX</code></th><th rowspan="2">内容</th></tr>
-	<tr><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
-</thead>
-<tbody>
-	<tr><td>演奏速度（テンポ）変更</td><td><span class="formula">$86</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span>: <span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
-	<tr><td>ピッチ（キー）変更</td><td><span class="formula">$89</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span></td><td><span class="formula">$00</span></td><td><span class="formula">$zz</span>: <span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
-	<tr><td>演奏パートミュート設定</td><td><span class="formula">$F5</span></td><td><span class="formula">$zz</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td><td>Bit0～7がチャネル0～7に対応しており、<br><span class="formula">1</span>が立っているチャネルはミュート（無音）処理される</td></tr>
-</tbody>
-</table>
-
-<p>近未来編のバーなら、演奏パートミュート設定<span class="formula">$F5</span>に<span class="formula">$85(%1000 0101)</span>が設定されており、Bit0, 2, 7に<span class="formula">1</span>が立っているから、チャネル0, 2, 7は演奏はするがボリュームは<span class="formula">0</span>、無音処理される。つまりチャネル1, 3, 4, 5, 6の音しか出ていない。<br>
-更に、演奏速度（テンポ）変更<span class="formula">$86</span>に<span class="formula">$8C</span>が入っているので通常より演奏速度が下がる（スローテンポでの演奏）。</p>
-
-<p>演奏速度やキーは、各曲のシーケンスデータ内の<a href="sequence.html#no_1">シーケンスコマンド</a>で決まっているのだが、演奏前に上のデータを送ることで変更されるということになる。<br>
-シーケンスコマンドとは異なる方法（コマンド？）で変更しているようなので、どれで何を指定しているのかがわかりにくい。（SPC700側の処理を確認すれば良いのだろうが……）</p>
-
-<p>なお、フィールドにおける現在のBGMの初期設定などは、<code>$00:0A60</code>～<code>$00:0A6C</code>に同時に書き込まれ、セーブデータにも記録される。<br>
+<p>なお、フィールドにおけるBGMの演奏時、演奏設定は<code>$00:0A60</code>～<code>$00:0A6C</code>に同時に書き込まれ、セーブデータにも記録される。<br>
 セーブデータをロードした時は以下の値からBGMの演奏を開始することになる。<br>
 ただし<code>$00:0A62</code>～<code>$00:0A63</code>は効果音設定であり、セーブデータをロードした時はどちらも<span class="formula">$00</span>が入っているようである。</p>
 
@@ -315,177 +471,21 @@ table {
 	<tr><th>アドレス</th><th>内容</th></tr>
 </thead>
 <tbody>
-	<tr><td><code>$00:0A60</code></td><td>BGMID</td></tr>
-	<tr><td><code>$00:0A61</code></td><td>BGMの音量（デフォルト値は<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:0A62</code></td><td>効果音の音量（デフォルト値は<span class="formula">$FF</span>）</td></tr>
-	<tr><td><code>$00:0A63</code></td><td>効果音のPAN（音の定位）の値　<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)</td></tr>
-	<tr><td><code>$00:0A64</code></td><td>BGMの演奏速度（テンポ）の値　<span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
-	<tr><td><code>$00:0A65</code></td><td>BGMピッチ（キー）変更　<span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
-	<tr><td><code>$00:0A66</code></td><td>BGM演奏パートミュート設定　Bit0～7がチャネル0～7に対応しており、<span class="formula">1</span>が立っているチャネルはミュート（無音）処理される</td></tr>
-	<tr><td><code>$00:0A67</code></td><td>BGM演奏時、コマンド<span class="formula">$F8</span>のON・OFF（内容不明）</td></tr>
-	<tr><td><code>$00:0A68</code></td><td>BGMID</td></tr>
-	<tr><td><code>$00:0A6B</code></td><td>BGM演奏時、コマンド<span class="formula">$8C</span>のON・OFF（内容不明）</td></tr>
-	<tr><td><code>$00:0A6C</code></td><td>BGM演奏時、コマンド<span class="formula">$8F</span>のON・OFF（内容不明）</td></tr>
+	<tr><td><code>$00:0A60</code></td><td>演奏中のBGMID</td></tr>
+	<tr><td><code>$00:0A61</code></td><td>コマンド<span class="formula">$81</span>で設定されるBGMの音量（デフォルト値は<span class="formula">$FF</span>）</td></tr>
+	<tr><td><code>$00:0A62</code></td><td>コマンド<span class="formula">$82</span>で設定される効果音の音量（デフォルト値は<span class="formula">$FF</span>）</td></tr>
+	<tr><td><code>$00:0A63</code></td><td>コマンド<span class="formula">$18</span>で設定される効果音のPAN（音の定位）の値　<span class="formula">$00</span> (左)～<span class="formula">$80</span> (中央・モノラル)～<span class="formula">$FF</span> (右)</td></tr>
+	<tr><td><code>$00:0A64</code></td><td>コマンド<span class="formula">$86</span>で設定されるBGMの演奏速度の値　<span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
+	<tr><td><code>$00:0A65</code></td><td>コマンド<span class="formula">$89</span>で設定されるBGMピッチの値　<span class="formula">$00</span>～<span class="formula">$FF</span>（通常<span class="formula">$00</span>）</td></tr>
+	<tr><td><code>$00:0A66</code></td><td>コマンド<span class="formula">$F5</span>で設定されるBGMミュート設定　Bit0～7がチャネル0～7に対応しており、<span class="formula">1</span>が立っているチャネルはミュート（無音）処理</td></tr>
+	<tr><td><code>$00:0A67</code></td><td>コマンド<span class="formula">$F8</span>で設定される値（内容不明）</td></tr>
+	<tr><td><code>$00:0A68</code></td><td>演奏中のBGMID</td></tr>
+	<tr><td><code>$00:0A6B</code></td><td>コマンド<span class="formula">$8C</span>で設定される値（内容不明）</td></tr>
+	<tr><td><code>$00:0A6C</code></td><td>コマンド<span class="formula">$8F</span>で設定される値（内容不明）</td></tr>
 </tbody>
 </table>
 
-<h4>BGMのデータ転送</h4>
-
-<p>以上の設定後に、演奏するBGMIDの計算・呼び出しを行う。<br>
-また、ここで全体ボリュームの設定も行うことが可能。<br>
-詳細は<a href="sound2.html">サウンドについて &gt; BGMIDの呼び出し</a>を参照。</p>
-
-<p>演奏するBGMIDが<span class="formula">$NN</span>だとする。<br>
-まず、サブルーチン<code><span class="r">$C3/0004</span></code>～<code><span class="r">$C3/018E</span></code>で、以下を送信する。</p>
-
-<table>
-<thead>
-	<tr><th colspan="5"><code>$00:1DXX</code></th></tr>
-	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
-</thead>
-<tbody>
-	<tr><td>値</td><td><span class="formula">$10</span>, <span class="formula">$11</span>, <span class="formula">$14</span></td><td><span class="formula">$NN</span></td><td><span class="formula">$00</span></td><td><span class="formula">$00</span></td></tr>
-</tbody>
-</table>
-
-<p><code>$00:1D00</code>に<span class="formula">$10</span>か<span class="formula">$14</span>がセットされていると全データ送信後に演奏を行う。<br>
-<span class="formula">$10</span>で通常のBGMを流し、途中で割り込みで別のBGMを流す時は<span class="formula">$14</span>、というような感じで分けているようである。<br>
-戦闘BGMに<span class="formula">$14</span>を使うのも同じ理由と思われる。<br>
-また、<span class="formula">$10</span>を使うと<span class="formula">$14</span>で割り込んだ後にレジューム（続きから）再生ができるようである。</p>
-
-<p><span class="formula">$11</span>については、曲によりプリセットで設定を用意してあるらしく、少なくとも下の2曲は<span class="formula">$11</span>を設定すると原曲とは異なる設定で流れる。</p>
-
-<table>
-<thead>
-	<tr><th>BGMID</th><th>曲名</th><th>内容</th></tr>
-</thead>
-<tbody>
-	<tr><td><span class="formula">$19</span></td><td>届かぬ翼</td><td>回想などで流れるスローバージョンが流れる（リメイクにおける「届かぬ翼 (回想)」）</td></tr>
-	<tr><td><span class="formula">$08</span></td><td>UNSEEN SYNDROME</td><td>チャネル2と3のみのバージョン（ＳＦ編オープニング）が流れる</td></tr>
-</tbody>
-</table>
-
-
-<p>この後に全体ボリュームを設定可能。<br>
-通常のボリュームを<span class="formula">$FF</span>として、ボリューム<span class="formula">$00</span>～<span class="formula">$FF</span>の値を、下の<span class="formula">$VV</span>にセットする。<br>
-つまりボリュームを通常より下げたい場合は<span class="formula">$00</span>～<span class="formula">$FE</span>を書き込む。<br>
-（例えば、原始編におけるポゴの集落の夜のBGMは、<span class="formula">$VV</span>に<span class="formula">$60</span>をセットすることで、ボリュームを下げている）<br>
-<code><span class="r">$C3/06CD</span></code>～で、</p>
-
-<table>
-<thead>
-	<tr><th colspan="5"><code>$00:1DXX</code></th></tr>
-	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
-</thead>
-<tbody>
-	<tr><td>値</td><td><span class="formula">$10</span>, <span class="formula">$11</span>, <span class="formula">$14</span></td><td><span class="formula">$NN</span></td><td><span class="formula">$VV</span></td><td><span class="formula">$00</span></td></tr>
-</tbody>
-</table>
-
-
-<p>とセットしてから、</p>
-
-<ul>
-	<li>サンプリングデータのアドレス計算・容量計算→ARAM転送</li>
-	<li>シーケンスデータのアドレス計算→ARAM転送</li>
-</ul>
-
-<p>を行い、全データを送信し終わったら、<code>$00:1D00</code>に<span class="formula">$00</span>を書き込み、<code>$00:2140</code>経由でARAMに送信して、送信終了＆演奏開始を指示することになる。<br>
-サンプリングデータ・シーケンスデータの計算・転送にそれなりの時間を要することになる。<br>
-サンプリングデータの被りの有無によってはデータの並び替えも行っている（はず）。</p>
-
-<h5>「GO!GO!ブリキ大王!!」のループ処理について</h5>
-
-<p>BGMID<span class="formula">$18</span>の「GO!GO!ブリキ大王!!」は、近未来編オープニングで流れる時だけ、ループせず、最後にコーダ部分を流して演奏終了する。<br>
-それ以外、ブリキ大王操作中や、LISTENING ROOMで演奏する時は無限ループする。<br>
-この処理はどのように行っているのか。</p>
-
-<p>近未来編オープニングで流れる際、最初の処理は通常のBGM演奏と同じである。</p>
-
-<table>
-<thead>
-	<tr><th colspan="5"><code>$00:1DXX</code></th></tr>
-	<tr><th><span class="formula">XX</span></th><th><span class="formula">00</span></th><th><span class="formula">01</span></th><th><span class="formula">02</span></th><th><span class="formula">03</span></th></tr>
-</thead>
-<tbody>
-	<tr><td>値</td><td><span class="formula">$10</span></td><td><span class="formula">$18</span></td><td><span class="formula">$FF</span></td><td><span class="formula">$00</span></td></tr>
-</tbody>
-</table>
-
-<p>だが、「あつい心が呼びさます」の字幕が出て、背景が港になった後、ワールドマップに画面が切り替わるタイミングで、<span class="formula">$FB</span>を<code>$00:1D00</code>→<code>$00:2140</code>と送信しており、これによりループせずコーダ部へ移行して演奏が終了する仕組みになっている。<br>
-送信しているのは<span class="formula">$FB</span>の1バイトのみで、追加で他データは送っていない。<br>
-演奏中に<span class="formula">$FB</span>を送信することでループ処理を抜けるか何かの処理が行われるようだ。<br>
-ループあり・なしで別々のシーケンスデータが存在している、ということではない。</p>
-
-
-<h4>BGMの演奏停止</h4>
-
-<p>演奏中のBGMを停止するのは<span class="formula">$F0</span>を<code>[$00:1D00]</code>→<code>[$00:2140]</code>とARAMに転送することで行われるが、これ以外の方法が使われることも多い。</p>
-
-<h5>レジューム機能での一時停止</h5>
-
-<p>レジューム（一時停止後、他のBGMなどを流した後、一時停止した時点から演奏開始する機能）はゲームプレイ中によく見られる演奏停止・再開方法である。<br>
-（おそらくだが）演奏開始時、コマンド<span class="formula">$10</span>で演奏した曲はレジュームで演奏停止・再開ができる。</p>
-
-<p><span class="formula">$81</span>を<code>[$00:1D00]</code>→<code>[$00:2140]</code>とARAMに転送することで行われる。<br>
-コマンドの<span class="formula">$81</span>は引数を2個取り、</p>
-
-<table>
-<thead>
-	<tr><th>アドレス</th><th>値</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00:1D00</code></td><td><span class="formula">$81</span></td></tr>
-	<tr><td><code>$00:1D01</code></td><td>音量変化時間（<span class="formula">$00</span>～<span class="formula">$FF</span>）　<span class="formula">$00</span>で音量変化時間なし、すぐ変更</td></tr>
-	<tr><td><code>$00:1D02</code></td><td>音量（<span class="formula">$00</span>～<span class="formula">$FF</span>）　<span class="formula">$00</span>で無音、<span class="formula">$FF</span>がデフォルト音量</td></tr>
-</tbody>
-</table>
-
-<p>と設定して、<code>[$00:2140]</code>～<code>[$00:2142]</code>へ送信する。<br>
-これにより、現在演奏されているBGMが、<code>$00:1D01</code>で設定した音量変化時間かけて<code>$00:1D02</code>で設定した音量に変化する。<br>
-（音量変化時間の単位はわからないが、<span class="formula">$FF</span>に設定すると2秒くらい？　という程度と思われる）<br>
-以上の仕様のため、レジュームは別として、単純に演奏中の曲のボリュームの変更にも使われている。</p>
-
-<p>フェードアウトでの演奏停止なら<code>$00:1D02</code>に<span class="formula">$00</span>を設定する。<br>
-<code>$00:1D01</code>の音量変化時間の値を<span class="formula">$00</span>以上に設定すると、フェードアウトやフェードインが表現できることになる（エコーもかかっているかもしれない）。<br>
-上で紹介した、近未来編のバーに入った時に、</p>
-
-<table>
-<thead>
-	<tr><th>アドレス</th><th>値</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>[$00:1D00]</code></td><td><span class="formula">$81</span></td></tr>
-	<tr><td><code>[$00:1D01]</code></td><td><span class="formula">$10</span></td></tr>
-	<tr><td><code>[$00:1D02]</code></td><td><span class="formula">$00</span></td></tr>
-</tbody>
-</table>
-
-<p>という処理が最初に入るのも、フィールド曲をフェードアウトしつつ一時停止させるためである。</p>
-
-<p>一方、ゲーム内のイベントなどによっては<code>[$00:1D01]</code>に<span class="formula">$00</span>を設定して急にBGMを停止させたりもしている。<br>
-中世編冒頭でルクレチア城を出て、ストレイボウが城門前で声をかけるシーンの処理などが該当する。</p>
-
-<p>BGMのレジューム演奏を行うのは、フィールドでザコ戦を行った時、戦闘突入前のフィールドBGMが戦闘終了後に続きから演奏されるケースなどである。<br>
-重要アイテム獲得時に、アイテム獲得のBGM（ボイス系BGM）が流れた後、フィールドBGMがレジューム演奏される時も該当する。</p>
-
-<p>例えば、心山拳師範主人公で最終編を開始すると、冒頭イベント後に勇者の山山頂から開始となり、BGMID<span class="formula">$37</span>「絶望の都」が流れる（厳密には異次元空間にいる時から流れているが）。<br>
-山頂の石碑を調べると「ブライオン」を入手するが、入手時に「絶望の都」を一時停止してボイスが流れ（ユン・サモならBGMID<span class="formula">$23</span>、レイならBGMID<span class="formula">$24</span>）、入手時のセリフウィンドウを消すと「絶望の都」がレジュームで演奏開始する。この時はわずかだがフェードイン（ボリュームが次第に大きくなる）処理が入る。<br>
-この時、ARAMへの指示はどうなっているのかというと、ボイスがBGMID<span class="formula">$23</span>の場合は以下のようになる。<br>
-<code>[$00:1D00]</code>～<code>[$00:1D03]</code>の値は、4バイトの値という形で省略表記。</p>
-
-<ol>
-	<li>プレイヤーが石碑を調べる</li>
-	<li><span class="formula">$14</span> <span class="formula">$23</span> <span class="formula">$FF</span> <span class="formula">$00</span>をARAM転送（BGMID<span class="formula">$23</span>　効果音ボイス演奏指示）</li>
-	<li>（ARAMにBGMID<span class="formula">$23</span>のシーケンスデータ＆サンプリングデータ転送）</li>
-	<li>BGMID<span class="formula">$23</span>効果音が流れる</li>
-	<li>セリフウィンドウをプレイヤーが閉じる</li>
-	<li><span class="formula">$10</span> <span class="formula">$37</span> <span class="formula">$20</span> <span class="formula">$00</span>をARAM転送（BGMID<span class="formula">$37</span>「絶望の都」をボリューム<span class="formula">$20</span>で演奏指示）</li>
-	<li>（ARAMにBGMID<span class="formula">$37</span>のシーケンスデータ＆サンプリングデータ転送）</li>
-	<li><span class="formula">$81</span> <span class="formula">$10</span> <span class="formula">$FF</span> <span class="formula">$00</span>をARAM転送（BGMID<span class="formula">$37</span>「絶望の都」を<span class="formula">$10</span>（時間単位不明）かけてボリュームを<span class="formula">$FF</span>まで上げレジューム演奏指示）</li>
-</ol>
-
-<h3>サンプリングデータの処理</h3>
+<h3><span id="sampd">サンプリングデータの処理</span></h3>
 
 <p>効果音用のサンプリングデータはゲーム開始の時点で読み込まれている。<br>
 効果音専用ではなくBGMにも使われていることがあり、例えば「CAPTAIN SQUARE」は効果音用の正弦波などが使われているため、「CAPTAIN SQUARE」の曲がゲーム内で流れる時、シーケンスデータの転送しかしていない。<br>
@@ -897,8 +897,7 @@ ID<span class="formula">$25</span>を使っているのは曲<span class="formul
 曲を決定してから実際に再生されるまで、曲にもよるが長いと1～2秒はあるような感じがするかもしれないが、おそらくサンプリングデータがARAMにない時に大量にデータを送る必要があるからである。<br>
 逆に、一度聞いた曲をキャンセルしてすぐにもう一度聞く時は、再生までの時間が短くなる。これはARAMにサンプリングデータが残っているため。</p>
 
-
-<h3>シーケンスデータの処理</h3>
+<h3><span id="seqd">シーケンスデータの処理</span></h3>
 
 <p>シーケンスデータの開始位置は、以下処理で計算されている。</p>
 
