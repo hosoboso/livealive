@@ -228,8 +228,9 @@ table {
 STEPS数は戦闘乱数から計算されているが、他の技のように、技を出す前にダメージ量を計算するのではなく、技のモーションの最中に戦闘乱数を生成し、次のSTEPに移るかどうかを決めている。<br>
 STEPS数は<span class="formula">2</span>～<span class="formula">99</span>で、99STEPSの時のみサモが四股を踏むモーションが入る。</p>
 
-<p>STEPSの計算方法も少々特殊である。<br>
-大まかにまとめると、以下のようになる。</p>
+<p>なお、幕末編の家老、商人および、最終編のポリディクティスが使う技「わいろ」も、似た仕様であるため、最後に追記した。</p>
+
+<p>大まかにまとめると、以下のようになる。</p>
 
 <h5>STEPSの計算方法</h5>
 
@@ -265,6 +266,9 @@ STEPS数は<span class="formula">2</span>～<span class="formula">99</span>で�
 （ダメージ量表示の時にSTEPS数が表示されるが、グラフィックデータには「STEPS」というスプライトはあっても、「STEP」はないので、単数形になる1STEPが出ない仕様にしているのではないだろうか。筆者の想像でしかないが）<br>
 また、99STEPSに到達した時に、増加判定フラグが<span class="formula">0</span>か<span class="formula">1</span>かで、サモが四股を踏むモーション前のサモ回転モーションの長さが変わるというちょっとしたネタがある。<br>
 （増加判定フラグが<span class="formula">0</span>だと回転モーションが長くなる）</p>
+
+<p>なお、「わいろ」は、STEPS増加判定フラグがないバージョンである。<br>
+ただし、ダメージ量は<span class="formula">1～100</span>までと思われる（実際には「ほいこーろー」と同じく<span class="formula">99</span>までしか値の増加はないのだが、「わいろ」は回避属性が適用されることがあるため、<span class="formula">「単発ダメージ量×ヒット数」（=0）/2+1</span>により、<span class="formula">99+1</span>が最大値になるはず）。</p>
 
 <h5>確率</h5>
 
@@ -342,7 +346,7 @@ STEPS平均値は<span class="formula">31.8</span>くらいになる。</p>
 
 <p><span class="formula">A<sub>n</sub> = ((乱数$0000～$007F) - $0040) + A<sub>n-1</sub></span><br>
 ※減算・加算時はキャリーフラグを考慮（符号付き16ビット整数）<br>
-※乱数<span class="formula">$0000</span>～<span class="formula">$007F</span>は、戦闘乱数<span class="formula">$0000～$FFFF * $0080)/$100</span>で計算</p>
+※乱数<span class="formula">$0000</span>～<span class="formula">$007F</span>は、<span class="formula">(戦闘乱数$0000～$FFFF * $0080)/$100</span>で計算</p>
 
 <p>で計算できる。<br>
 乱数判定に使うのは実質<code>[$7E:A018]</code>のみ。</p>
@@ -1223,7 +1227,7 @@ $C1/CDEF CMP #$08                ;Aと$08を減算比較（ステータスレジ
 $C1/CDF1 BNE $17    [$CE0A]      ;ゼロフラグが立っていないとき[$CE0A]分岐
 $C1/CDF3 LDA $6E    [$00:036E]   ;Aに[$00:036E](STEPS数)をロード
 $C1/CDF5 BEQ $13    [$CE0A]      ;ゼロフラグが立っているとき[$CE0A]分岐
-;ゼロフラグOFF ほいこーろー用処理
+;ゼロフラグOFF 「ほいこーろー」及び「わいろ」用処理
 $C1/CDF7 AND #$F0                ;Aと$F0で論理積
 $C1/CDF9 LSR A                   ;Aを論理右シフト　(/2)
 $C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
@@ -1240,7 +1244,7 @@ $C1/CE0A RTS                     ;サブルーチン戻り
 </pre></div>
 
 <p><code><span class="r">$C1/CDF3</span></code>で<code>[$00:036E]</code>(STEPS数)のゼロフラグ分岐がある。<br>
-「ほいこーろー」だと<span class="formula">$02</span>以上の値が入っているはずなので、ここで<code><span class="r">$C1/CDF7</span></code>～<code><span class="r">$C1/CE08</span></code>のほいこーろー用処理が入る。<br>
+「ほいこーろー」だと<span class="formula">$02</span>以上の値が入っているはずなので（後で紹介するが「わいろ」もここで<span class="formula">$01</span>以上の値が入っている）、ここで<code><span class="r">$C1/CDF7</span></code>～<code><span class="r">$C1/CE08</span></code>の「ほいこーろー」用処理が入る。<br>
 ここが、「2桁の16進数の値を10進数に解釈し直すサブルーチン」である。</p>
 
 <p>例えば、STEPS数として<code>[$00:036E]</code>に<span class="formula">$67</span>が入っていた場合、「ほいこーろー」のモーション終了時には10進数として「67STEPS」と表示される。<br>
@@ -1310,6 +1314,69 @@ $C1/CD5C JSR $CE0B  [$C1:CE0B]   ;[$C1:CE0B]へジャンプ
 <p>となってしまい、STEPS数<span class="formula">+1</span>のダメージを与えることになる。<br>
 これが、オディオモールに「ほいこーろー」を当てると、STEPSで表示される値とダメージ量とに<span class="formula">1</span>の差がある原因である。<br>
 （リメイク版ではこの現象が起こらないようになっている）</p>
+
+<h3>「わいろ」について</h3>
+
+<p>幕末編の家老、商人および、最終編のポリディクティスが使う技「わいろ」は回転数だけダメージを与える技だが、簡単に言えば「ほいこーろー」のSTEPS増加判定フラグがないバージョンである。<br>
+つまり、確率関数は底が<span class="formula">0～1</span>の右下がりな指数関数になり、小さい回転数ほど出やすい。<br>
+メモリアドレスや、「ほいこーろー」用乱数も、「ほいこーろー」と同じように使われる。</p>
+
+<p>ただ、<span class="formula"><code>[$7E:A018]</code> &#x26; $0F</span>での判定後、増加判定フラグでの判定がないため、<span class="formula">1</span>から<span class="formula">2</span>に増加する時にも乱数判定で増加が止まるケースがあり、ダメージ量<span class="formula">1</span>があり得る。<br>
+回転数の最大値は「ほいこーろー」と同じく<span class="formula">99</span>である。</p>
+
+<p>「ほいこーろー」は無属性だが、「わいろ」は精神属性のため、<a href="program38.html">回避属性</a>が適用されることがある。<br>
+「わいろ」も「ほいこーろー」と同じく、「単発ダメージ量×ヒット数」自体は<span class="formula">0</span>なのだが、回避属性が適用される時は、<span class="formula">0/2+1</span>が「単発ダメージ量×ヒット数 回避属性反映」である。<br>
+このため、最大ダメージ量は<span class="formula">99 + 0/2+1</span>で<span class="formula">100</span>となる。</p>
+
+<p>なお、味方の防御力はダメージ量に反映されない。<br>
+つまり、防御の値でダメージ量が減ることはない。</p>
+
+<p>もし、回避属性が適用されるのなら、トータルのダメージ量は以下のようになる。<br>
+（敵から味方への攻撃なのでサブルーチンは<code><span class="r">$C1/CD9F</span></code>～が適用される）</p>
+
+<div class="code-container"><pre>
+$C1/CD9F REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CDA1 LDA $2134  [$00:2134]   ;Aに[$00:2135][$00:2134](この時点での総ダメージ量)をロード
+$C1/CDA4 SEC                     ;キャリーフラグON
+$C1/CDA5 SBC $20    [$00:0320]   ;A - [$00:0321][$00:0320](防御合計値 0000)
+$C1/CDA7 BCS $03    [$CDAC]      ;キャリーフラグが立っているとき[$CDAC]分岐
+$C1/CDAC STA $20    [$00:0320]   ;Aを[$00:0321][$00:0320]に書き込み　0000
+$C1/CDAE LDA $7ECE35,x[$7E:EAB5] ;Aに[$7ECE35,x+1][$7ECE35,x]をロード　味方の回避属性適用
+$C1/CDB2 AND #$00FF              ;Aと$00FFで論理積
+$C1/CDB5 BEQ $04    [$CDBB]      ;ゼロフラグが立っているとき[$CDBB]分岐
+;ゼロフラグON　味方キャラの回避属性が精神属性
+$C1/CDB7 LSR $20    [$00:0320]   ;[$00:0321][$00:0320](0000)を論理右シフト　(/2)
+$C1/CDB9 INC $20    [$00:0320]   ;[$00:0321][$00:0320]をインクリメント +1
+$C1/CDBB LDA $20    [$00:0320]   ;Aに[$00:0321][$00:0320]をロード 0001
+;処理合流
+$C1/CDBD CLC                     ;キャリーフラグクリア
+$C1/CDBE ADC $22    [$00:0322]   ;A + [$00:0323][$00:0322](「わいろ」回転数）
+$C1/CDC0 CMP #$03E7              ;Aと$03E7を減算比較（ステータスレジスタ変更のみ）
+$C1/CDC3 BCC $03    [$CDC8]      ;キャリーフラグが立っていないとき[$CDC8]分岐
+$C1/CDC8 STA $7ECE2E,x[$7E:EAAE] ;Aを[7ECE2E,x+1][7ECE2E,x]に書き込み
+$C1/CDCC STA $4204  [$00:4204]   ;Aを[$00:4205][$00:4204]に書き込み
+$C1/CDCF SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CDD1 JSR $CE0B  [$C1:CE0B]   ;[$C1:CE0B]へジャンプ
+</pre></div>
+
+<p>「わいろ」のダメージ量<span class="formula">n</span>の確率は、回避属性なしなら、</p>
+
+<p><span class="formula">n</span>が<span class="formula">1</span>以上<span class="formula">98</span>未満：<br>
+<span class="formula">(15/16)^(n-1)*(1/16)</span></p>
+
+<p><span class="formula">n</span>が<span class="formula">99</span>：<br>
+<span class="formula">1 -（1以上98未満が出る確率の総和）</span></p>
+
+<p>と、いうことになる。<br>
+ダメージ平均値は<span class="formula">15.97</span>となる。</p>
+
+<p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR6xWnksSbfhuLheVIfbfx8gnQ11_l83OnwFDZJmPru5rb-ALFDEROF31XIVpQnZFIAgO_nVvfcF7WG/pubhtml#gid=217747342" target="_blank">lal_wairo - Google ドキュメント</a></p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/wairograph.png" class="modal-link">
+		<img src="img/wairograph.png" alt="わいろ確率関数" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
 
 <script>//リストタイトル静的生成
 document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
