@@ -24,6 +24,7 @@
 <link href="../css/main.min.css?20260714" rel="stylesheet">
 <link href="../css/sfc.css?20260301" rel="stylesheet">
 <link href="../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../css/calculation.css" rel="stylesheet">
 <link href="../css/cssmenu.css?20240801" rel="stylesheet">
 <style>
 table {
@@ -92,45 +93,134 @@ table {
 
 <p>サモの技「ほいこーろー」は、敵味方のステータスに関係なくランダム固定ダメージを与えるという、通常のダメージ量の計算式には従わない技である。<br>
 ここでは、実際に「ほいこーろー」のダメージ量や期待値についてプレイして調べた結果を掲載する。<br>
-また、敵側にも「ほいこーろー」と似た仕様の「わいろ」という技があるので、合わせて掲載している。</p>
+<!-- また、敵側にも「ほいこーろー」と似た仕様の「わいろ」という技があるので、合わせて掲載している。 --></p>
 
 <p>プログラムから見た場合の「ほいこーろー」の仕様については、<span class="tri"><a href="analysis/program6_2.html">ダメージ計算式の簡易解説・4（「ほいこーろー」の仕様）</a></span>を参照。</p>
 
-<ul>
+<!-- <ul>
 	<li><a href="#01">「ほいこーろー」について</a></li>
 	<li><a href="#02">「わいろ」について</a></li>
-</ul>
+</ul> -->
 
 <h3 id="01">「ほいこーろー」について</h3>
 
-<p>「ほいこーろー」は、1～99のランダム固定ダメージを与えるという仕様がある（ようである）。<br>
+<p>「ほいこーろー」は、2～99のランダム固定ダメージを与えるという仕様がある。<br>
 演出では、サモが妙な踊りを踊り、そのSTEP数が最後に表示され、そのSTEP数のダメージを与える。<br>
 99STEPSだとサモが最後に四股を踏むモーションが入る。</p>
 
-<p>実のところ、「ほいこーろー」の仕様の詳細はよくわからない。<br>
-インターネットで検索してみても「敵味方のステータスに関係なく1～99のランダム固定ダメージ」程度の情報しか見当たらない（あるのかもしれないが、筆者には見つけられなかった。ご存知の方がいらっしゃったら情報いただけると非常にありがたいです）。<br>
-99STEPSの時だけサモが最後に四股を踏む限定モーションが入るため、上限が99であることは確実と思われる。<br>
-<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様によれば、SFC版での「ほいこーろー」は、</p>
+<p>少し突っ込んだ話になるが、「ほいこーろー」のSTEPS数は以下のようにして決まっている。<br>
+「ほいこーろー」のSTEPS数は、「技を出す前に計算して、計算結果から決まったSTEPS数の通りにサモが踊る」という決め方ではない。<br>
+技のモーションを出しながら、次のモーションに移るか、つまりSTEPS数を増やすか、乱数で決めている。</p>
 
-<blockquote>ほいこーろーは、踊る前にSTEP数を設定するわけではなく、<br>
-踊りながらここで終わるか続けるかを決めている気がする。<br>
-具体的な確率はわからない。<br>
-STEP数は分布で言うと一様分布ではなく幾何分布になりそう。</blockquote>
+<h5>STEPSの計算方法</h5>
 
-<p>つまり、サイコロの目が出る確率（1～6の目が均等に1/6の確率で出現する）のような一様分布ではなく、特定の値が出やすい幾何分布ではないか、という話である。<br>
-そこで、実際にプレイして1000回分の「ほいこーろー」のデータを記録してみた。<br>
+<p>STEPSは<span class="formula">1</span>から増加開始。<br>
+また、STEPS増加判定フラグがあり、このフラグがONかOFFかでSTEPSの増加条件が変わる。</p>
+
+<p>増加判定フラグは初期値<span class="formula">0</span>（フラグはオフ）。</p>
+
+<ol>
+	<li>0～15の乱数を生成する。<br>
+	増加判定フラグの値により、2.または3.へ進む。</li>
+
+	<li>増加判定フラグが<span class="formula">0</span>の時、</li>
+	<ol type="a">
+		<li>乱数が1～15の時（確率15/16）：STEPSを<span class="formula">+1</span>する。4.に進む</li>
+		<li>乱数が<span class="formula">0</span>の時（確率1/16）：STEPSを<span class="formula">+1</span>する。増加判定フラグが<span class="formula">1</span>になる。4.に進む</li>
+	</ol>
+	
+	<li>増加判定フラグが<span class="formula">1</span>の時、</li>
+	<ol type="a">
+		<li>乱数が1～15の時（確率15/16）：STEPSを<span class="formula">+1</span>する。4.に進む</li>
+		<li>乱数が<span class="formula">0</span>の時（確率1/16）：STEPSの増加を停止（STEPS確定）</li>
+	</ol>
+	
+	<li>1と2でSTEPSが増加した時、</li>
+	<ol type="a">
+		<li>STEPSが99未満：1.の乱数生成に戻る。</li>
+		<li>STEPSが99：STEPSの増加を停止（STEPS確定）</li>
+	</ol>
+</ol>
+
+<p>増加判定フラグの仕様により、1STEP→2STEPSの増加は乱数に関係なく必ず起こるので、「ほいこーろー」のSTEPSは2以上ということになる。1STEPが出ることはない。<br>
+（ダメージ量表示の時にSTEPS数が表示されるが、グラフィックデータには「STEPS」というスプライトはあっても、「STEP」はないので、単数形になる1STEPが出ない仕様にしているのではないだろうか。筆者の想像でしかないが）<br>
+また、99STEPSに到達した時に、増加判定フラグが<span class="formula">0</span>か<span class="formula">1</span>かで、サモが四股を踏むモーション前のサモ回転モーションの長さが変わるというちょっとしたネタがある。<br>
+（増加判定フラグが<span class="formula">0</span>だと回転モーションが長くなる）</p>
+
+<h5>確率</h5>
+
+<p>以上より、STEPSが2以上98未満の時、STEPS<span class="formula"> = n</span>が出る確率は、</p>
+
+<p><span class="formula">(n-1) × (15/16)<sup>n-2</sup> × (1/16)<sup>2</sup></span><br>
+<span class="formula">= ((n-1)/256) × (15/16)<sup>n-2</sup></span></p>
+
+<p>で計算される。</p>
+
+<p>99が出る確率は、</p>
+
+<p><span class="formula">1 -（2～98STEPSが出る確率の総和）</span></p>
+
+<p>約<span class="formula">0.0135（1.35％）</span>くらい。</p>
+
+<p>16～17が出る確率がそれぞれ<span class="formula">0.0237（2.37％）</span>くらいで最大。<br>
+STEPS平均値は<span class="formula">31.8</span>くらいになる。</p>
+
+<p><span class="formula">y = ((x-1)/256) × (15/16)<sup>x-2</sup> (2 ≦ x ≦ 98)</span><br>
+<span class="formula">y = 1 -（2～98STEPSが出る確率の総和） (x = 99)</span></p>
+
+<p>という確率関数のグラフを表計算ソフトに書いてもらうと下のようになる。<br>
+<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6IduhNp2Owf7cxDM1xDSOyqkQz26JJ_sijVA3D01XmFT0A8ozWbL1-_crQIWmjN3a_Sc1Y7hOndu9/pubhtml#gid=2000233335" target="_blank">lal_Huiguorou - Google ドキュメント</a></p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="analysis/img/hoistepgraph.png" class="modal-link">
+		<img src="analysis/img/hoistepgraph.png" alt="ほいこーろー確率関数" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p><span class="formula">x = 16～17</span>まで増加し、以降はなだらかに減少していく。<br>
+また、99STEPSが出る「<span class="formula">1-（2～98が出る確率の総和）</span>」が割と高いので、そこそこの確率で99STEPSが見られることになる。<br>
+98STEPSの出る確率が<span class="formula">0.00077（0.077％）</span>に対し、99STEPSが出る確率は約<span class="formula">0.0135（1.35％）</span>である。</p>
+
+<p>98STEPS時は、増加判定フラグが<span class="formula">0</span>だと回転モーションが長くなるが、それぞれの確率は以下のようになっている。</p>
+
+<ul>
+	<li>増加判定フラグ<span class="formula">0</span>の状態で99STEPSになる確率：<br>
+	<span class="formula">(15/16)<sup>98</sup> ≒ 0.001791（約0.179％）</span></li>
+
+	<li>増加判定フラグ<span class="formula">1</span>の状態で99STEPSになる確率：<br>
+	<span class="formula">(98/16) × (15/16)<sup>97</sup> ≒ 0.01170（約1.17％）</span></li>
+</ul>
+
+<p>なので、モーションが長くなる確率の方がかなり低め。</p>
+
+<p>筆者は確率や統計には詳しくないが、STEPSが2以上98未満については、おそらく、</p>
+
+<ul>
+	<li><a href="https://ja.wikipedia.org/wiki/%E8%B2%A0%E3%81%AE%E4%BA%8C%E9%A0%85%E5%88%86%E5%B8%83" target="_blank">負の二項分布 - Wikipedia</a></li>
+	<li><a href="https://mathlandscape.com/neg-binomial-distrib/" target="_blank">負の二項分布の定義と例と性質まとめ | 数学の景色</a></li>
+</ul>
+
+<p>いわゆる負の二項分布で表すことができる確率分布になるのだと思う。<br>
+負の二項分布では、「成功回数を表す定数<span class="formula">r</span>と、おのおのの試行で成功する確率<span class="formula">p</span>」の2つのパラメータで成り立っているが、「ほいこーろー」のSTEPS数は、成功回数<span class="formula">2</span>、確率<span class="formula">15/16</span>の負の二項分布になる、と思う。</p>
+
+<h4>実際のゲームプレイの例</h4>
+
+<p>実際にプレイして1000回分の「ほいこーろー」のデータを記録した結果は以下のようになっている。<br>
 敵味方のステータスは一切関係ないという前提で行っているので、最終編で出くわした敵に片っ端から「ほいこーろー」をぶつけている。<br>
 データは<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6IduhNp2Owf7cxDM1xDSOyqkQz26JJ_sijVA3D01XmFT0A8ozWbL1-_crQIWmjN3a_Sc1Y7hOndu9/pubhtml?gid=0&single=true" target="_blank">lal_Huiguorou - Googleスプレッドシート</a>にまとめて掲載した。</p>
 
-<p>このデータからわかったことを以下に記す。</p>
+<p>グラフを見るとわかるが、上の計算値からのグラフと比較すると「なんとなく形は似ている」程度である。<br>
+試行回数が1000回ではそうそう結果は合わないということがわかるのだが、それでも、</p>
 
-<h4>平均値について</h4>
+<ul>
+	<li>STEP数の平均値は32.4</li>
+	<li>STEPS数99が出る回数がそこそこ高い</li>
+	<li>16～17が出る確率もそこそこ高い</li>
+</ul>
 
-<p>1000回「ほいこーろー」を試した結果、STEP数の平均値は32.4となった。<br>
-上の通り、サイコロの目が出る確率のような一様分布だったら、平均値は1～99の中央の値である「50」がSTEP数の平均となったはず。<br>
-だが、そうならなかったということは、少なくとも一様分布ではなく偏りがあるということになる。<br>
-ただしどういう分布なのかまではわからない。<br>
-下は1000回中の各STEPの出現回数である。</p>
+<p>と、先の計算とそれなりに合った結果も出ている。</p>
+
+<p>下は1000回中の各STEPの出現回数である。</p>
 
 <table>
 <thead><tr><th>STEP数</th><th>出現回数</th><th>STEP数</th><th>出現回数</th><th>STEP数</th><th>出現回数</th><th>STEP数</th><th>出現回数</th></tr></thead>
@@ -170,51 +260,7 @@ STEP数は分布で言うと一様分布ではなく幾何分布になりそう�
 		<img src="img/sfc_hoi.png" alt="グラフ" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="icon/mark_zoom_in.svg" width="24px"></span></a>
 	</div>
 </div>
-
-<p>今回の結果を見ると、極端に低い値（5以下）と、41以上あたりは出る確率が低めになっているようである。<br>
-幾何分布（<a href="https://ja.wikipedia.org/wiki/%E5%B9%BE%E4%BD%95%E5%88%86%E5%B8%83" target="_blank">幾何分布 - Wikipedia</a>）なら、STEP数が少ないほど確率が高くなる、という分布になるはずであるから、単純な幾何分布に従っているということではなさそうである。</p>
-
-<p>もうひとつ気になるのは、最大であるSTEP数99が割と高い確率で出現していることである。<br>
-この点についても幾何分布には従っていない。</p>
-
-<p>「踊る前にSTEP数を設定するわけではなく、踊りながらここで終わるか続けるかを決めている」という説が正しいと仮定してみる。<br>
-例えば、</p>
-
-<ol>
-	<li>STEP数5あたりまでは「踊りを停止する」確率が低めに設定されている</li>
-	<li>それ以降はもう少し高めの「踊りを停止する」確率が設定されている</li>
-	<li>99に到達しても続けることが選ばれた場合はそこで踊りを終了</li>
-</ol>
-
-<p>ということであれば、今回の結果が再現できそうな気もする。<br>
-筆者は確率や統計には詳しくないので、これ以上のことはよくわからない。</p>
-
-<h4>下限値は「1」ではなく「2」？</h4>
-
-<p>上にも記したが、インターネットで調べると、「ほいこーろー」のSTEP数の下限値は「1」であると記してあるウェブサイト様が多いようである。<br>
-だが、今回、1000回データを取ってみたものの、「1」は出なかった。<br>
-75以上のSTEP数でも、出なかった数値がいくつかあるのだが、最大値と思われる99は何度か出ているので、単純に確率が低くて出なかっただけ、という可能性が考えられる。<br>
-一方で、1桁のSTEP数は1以外全てそこそこの回数で出現している。<br>
-試行回数1000回では、全ての値を出すには足りないというだけなのかもしれないので、「1は出ない」と断言はできない。<br>
-ただ、確率とは別の、「画面上の表示」の問題で気にかかることがあるので、以下に記しておく。<br>
-ゲーム機の仕様や仕組み、プログラミング等に関係する話になり、筆者は特別詳しいという訳ではないため、間違いがあるかもしれない。</p>
-
-<p>スーパーファミコンでは、背景であるバックグラウンド（BG）、キャラなど動きのある絵を描画するためのスプライトという小さめの画像の2種類で、画面に絵を表示している。</p>
-
-<ul>
-	<li><a href="https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%97%E3%83%A9%E3%82%A4%E3%83%88_(%E6%98%A0%E5%83%8F%E6%8A%80%E8%A1%93)" target="_blank">スプライト (映像技術) - Wikipedia</a></li>
-	<li><a href="https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%83%95%E3%82%A1%E3%83%9F%E3%82%B3%E3%83%B3" target="_blank">スーパーファミコン - Wikipedia</a></li>
-</ul>
-
-<p>ほいこーろーの結果は、「99STEPS」のように「数字」＋「STEPS」と画面上に表示している。<br>
-STEP数の表示用の「数字」及び、「STEPS」という文字の画像も、専用のスプライトを別途作成して使っている、と思われる。<br>
-複数形の「S」が最後についているため、STEP数が1の時だけ「STEP」という別のスプライトを用意し（あるいは、「STEP」と「S」を分けて作るか）、プログラムも別に記す必要があるのではないだろうか。<br>
-スプライトの仕様及び、ゲームソフトの容量や読み込み時のメモリを節約するため、STEP数に1を含まないようにしていた、という可能性は一応考えられる。</p>
-
-<p>（ちなみにほいこーろーを舞っている最中には&#x266a;などのスプライトも使われているが、これはおそらく、べるの「るーるー」演出時のスプライトと兼用ではないだろうか）</p>
-
-<p>なお、リメイク版ではSTEP数「1」も存在し、この時は「1STEP」と単数形表示されることを確認している。<br>
-ゲーム機の進化により、容量的にも技術的にも、「1STEP」と「2STEPS」以上の表記分けにさして問題はないのであろう。</p>
+<!-- 
 
 <h3 id="02">「わいろ」について</h3>
 
@@ -281,7 +327,7 @@ STEP数の表示用の「数字」及び、「STEPS」という文字の画像�
 <p>「わいろ」の方が「ほいこーろー」よりダメージ量が低めに出るよう設定されているのは、敵が使用する技だからだろう。<br>
 幕末編では、進め方次第でおぼろ丸が初期レベルの時から「わいろ」を使用する敵と戦うことができる。<br>
 最終編ではポリディクティスが出現するのは味方レベル合計値が4～7であり、普通にプレイしていると初期レベルが2の高原など、相当限られた条件下でしかエンカウントすることがない。<br>
-このような状況下で、「ほいこーろー」と同じ仕様のままの「わいろ」を使われると難易度の問題が生じるという判断だろう。</p>
+このような状況下で、「ほいこーろー」と同じ仕様のままの「わいろ」を使われると難易度の問題が生じるという判断だろう。</p> -->
 
 <div class="foot"><a href="battle04.html"><span class="button">戻る</span></a></div>
 
@@ -479,6 +525,23 @@ STEP数の表示用の「数字」及び、「STEPS」という文字の画像�
 	<li><a href="data/enemy_bakumatsu.html">敵</a></li>
 	<li><a href="data/list01.html">一覧</a></li>
 </ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="analysis/index.html">解説トップページ</a></li>
+		<li><a href="analysis/datamap.html">データマップ</a></li>
+		<li><a href="analysis/flag.html">フラグ</a></li>
+		<li><a href="analysis/d5.html">各種データアドレス</a></li>
+		<li><a href="analysis/fontdata.html">文字データ</a></li>
+		<li><a href="analysis/program1.html">ボタン判定</a></li>
+		<li><a href="analysis/graphic.html">グラフィックについて</a></li>
+		<li><a href="analysis/sound.html">サウンドについて</a></li>
+	</ul>
 </div>
 </div>
 

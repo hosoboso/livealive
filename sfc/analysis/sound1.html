@@ -202,6 +202,7 @@ table {
 		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
 		<li><a href="sound5.html">効果音の演奏</a></li>
 		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
 	</ul>
 </li>
 </ul>
@@ -331,6 +332,111 @@ CPUからの送信を確認したら、「CPU側の値を受け取った」と�
 演奏を中断しても、次の演奏時に続きから演奏したい曲はコマンド<span class="formula">$10</span>で演奏開始し、割り込んで演奏する曲はコマンド<span class="formula">$14</span>で演奏するようである。<br>
 他にも、フィールドでアイテムを獲得する時や、味方キャラが加わった時に流れる、効果音のようなBGM（高原や功夫編キャラのボイスなど）でもレジューム機能でBGMを演奏している。<br>
 一方、近未来編のバーや、最終編の各地のダンジョンなどは、コマンド<span class="formula">$10</span>でBGMを流すため、フィールドに戻った時にフィールド曲がレジュームで再開されず、最初から演奏開始になる。</p>
+
+<p><code><span class="r">$C3/0004</span></code>からのサブルーチンで演奏を指示する場合、途中で、</p>
+
+<ul>
+	<li>今回演奏するBGMIDが、<code>[$00:1D05]</code>（ひとつ前に演奏していたBGMID）と一致しない</li>
+	<li>BGMIDが<code>[$C3:3FC8]</code>(<span class="formula">$4E</span>)以上ではない（BGMIDは<span class="formula">$00</span>～<span class="formula">$4D</span>にしか曲が登録されていない）</li>
+</ul>
+
+<p>という判定をしている。他にも各種分岐があるが説明は省略する。<br>
+大まかには以下の手順で処理される。</p>
+
+<div class="code-container"><pre>
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+$C3/0131 PHB                     ;DBレジスタをスタックにプッシュ
+$C3/0132 PHD                     ;Dレジスタをスタックへプッシュ
+$C3/0133 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C3/0134 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0136 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0138 PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0139 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/013A PHY                     ;Yレジスタをスタックへプッシュ
+$C3/013B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/013D LDA #$00                ;Aに$00をロード
+$C3/013F PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0140 PLB                     ;DBレジスタにスタックからプル
+$C3/0141 LDX #$1D00              ;Xに$1D00をロード
+$C3/0144 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/0145 PLD                     ;Dレジスタにスタックからプル
+$C3/0146 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0148 LDA $00    [$00:1D00]   ;Aに[$00:1D00]をロード(10~14)
+$C3/014A BEQ $25    [$0171]      ;ゼロフラグが立っているとき[$0171]分岐
+$C3/014C BMI $19    [$0167]      ;ネガティブフラグが立っているとき[$0167]分岐
+$C3/014E CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C3/0150 BCC $1F    [$0171]      ;キャリーフラグが立っていないとき[$0171]分岐
+$C3/0152 CMP #$18                ;Aと$18を減算比較（ステータスレジスタ変更のみ）
+$C3/0154 BCS $0D    [$0163]      ;キャリーフラグが立っているとき[$0163]分岐　効果音演奏
+$C3/0156 AND #$0F                ;Aと$0Fで論理積
+$C3/0158 ASL A                   ;Aを算術左シフト *2
+$C3/0159 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C3/015A LDA #$00                ;Aに$00をロード
+$C3/015C PHA                     ;Aレジスタをスタックにプッシュ
+$C3/015D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C3/015E PHA                     ;Aレジスタをスタックにプッシュ
+$C3/015F PLX                     ;Xレジスタにスタックからプル
+$C3/0160 JMP ($0734,x)[$C3:0180] ;[$C3:0180]へジャンプ(レジスタをスタックに積まない)
+$C3/0180 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0182 LDA $01    [$00:1D01]   ;Aに[$00:1D01]をロード BGMID
+$C3/0184 CMP $05    [$00:1D05]   ;Aと[$00:1D05]を減算比較（ステータスレジスタ変更のみ）
+$C3/0186 BEQ $E9    [$0171]      ;ゼロフラグが立っているとき[$0171]分岐（処理抜ける）
+;ゼロフラグOFF　ひとつ前に演奏していたBGMIDと今回演奏するBGMIDは一致しない
+$C3/0188 CMP $C33FC8[$C3:3FC8]   ;Aと[$C3:3FC8]($4E)を減算比較（ステータスレジスタ変更のみ）
+$C3/018C BCS $E3    [$0171]      ;キャリーフラグが立っているとき[$0171]分岐（処理抜ける）
+;キャリーフラグON　BGMIDが$4E以上（存在しない）
+$C3/018E JSR $062F  [$C3:062F]   ;[$C3:062F]へジャンプ
+
+$C3/062F PHP                     ;ステータスレジスタをスタックへプッシュ
+$C3/0630 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0632 LDA $00    [$00:1D00]   ;Aに[$00:1D00]をロード
+$C3/0634 CMP #$14                ;Aと$14を減算比較（ステータスレジスタ変更のみ）
+$C3/0636 BCS $10    [$0648]      ;キャリーフラグが立っているとき[$0648]分岐
+;キャリーフラグOFF　[$00:1D00]は10か11
+$C3/0638 LDX #$0000              ;Xに$0000をロード
+$C3/063B LDA $C30733,x[$C3:0733] ;Aに[$C3:0733,x]をロード
+$C3/063F BMI $0D    [$064E]      ;ネガティブフラグが立っているとき[$064E]分岐
+;キャリーフラグON　[$00:1D00]は14
+$C3/0641 CMP $01    [$00:1D01]   ;Aと[$00:1D01](BGMID)を減算比較（ステータスレジスタ変更のみ）
+$C3/0643 BEQ $03    [$0648]      ;ゼロフラグが立っているとき[$0648]分岐
+$C3/0645 INX                     ;Xをインクリメント +1
+$C3/0646 BRA $F3    [$063B]      ;フラグにかかわりなく常に分岐[$063B]
+$C3/0648 LDA #$04                ;Aに$04をロード
+$C3/064A ORA $00    [$00:1D00]   ;Aと[$00:1D00]で論理和
+$C3/064C STA $00    [$00:1D00]   ;Aを[$00:1D00]に書き込み
+;処理合流
+$C3/064E PLP                     ;Pレジスタにスタックからプル
+$C3/064F RTS                     ;サブルーチン戻り
+
+$C3/0191 LDA $F3    [$00:1DF3]   ;Aに[$00:1DF4][$00:1DF3]をロード
+$C3/0193 BEQ $03    [$0198]      ;ゼロフラグが立っているとき[$0198]分岐
+$C3/0198 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/019A LDA $01    [$00:1D01]   ;Aに[$00:1D02][$00:1D01]をロード
+$C3/019C AND #$00FF              ;Aと$00FFで論理積
+$C3/019F TAX                     ;Aの値をXレジスタに転送
+;（中略）
+$C3/01BF JSR $060E  [$C3:060E]   ;[$C3:060E]へジャンプ
+;
+;（中略 サンプリングデータとシーケンスデータをARAM送信）
+;
+$C3/0171 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0173 STZ $00    [$00:1D00]   ;[$00:1D00]に$00を書き込み ARAM送信終了、演奏開始
+$C3/0175 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0177 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0179 PLY                     ;Yレジスタにスタックからプル
+$C3/017A PLX                     ;Xレジスタにスタックからプル
+$C3/017B PLA                     ;Aレジスタにスタックからプル
+$C3/017C PLP                     ;Pレジスタにスタックからプル
+$C3/017D PLD                     ;Dレジスタにスタックからプル
+$C3/017E PLB                     ;DBレジスタにスタックからプル
+$C3/017F RTL                     ;サブルーチン戻り
+</pre></div>
+
+
+
+
+
+
 
 <h4>BGM演奏各種指示</h4>
 
@@ -1365,49 +1471,12 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 	<ul>
 		<li><a href="index.html">解説トップページ</a></li>
 		<li><a href="datamap.html">データマップ</a></li>
-		<li><a href="program2.html">テレポートの仕様</a></li>
-		<li><a href="program3.html">アイテム改造などの確率</a></li>
-		<li><a href="program4.html">ダメージ計算式解説</a></li>
-		<li><a href="program5.html">戦闘用乱数計算</a></li>
-		<li><a href="program6.html">オディオモールのダメージ量</a></li>
-		<li><a href="program6_3.html">命中判定について</a></li>
-		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
-		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
-		<li><a href="program7.html">マップ乱数について</a></li>
-		<li><a href="program8.html">ドロップアイテム判定</a></li>
-		<li><a href="program10.html">経験値計算</a></li>
-		<li><a href="program10_2.html">ステータス上昇値</a></li>
-		<li><a href="program9_1.html">マップタイマー</a></li>
-		<li><a href="program11.html">セレクトバグ</a></li>
-		<li><a href="program12.html">サモに与えるアイテム</a></li>
-		<li><a href="program14.html">キューブのバッテリー</a></li>
-		<li><a href="program25.html">かわひもバグ</a></li>
-		<li><a href="program13.html">現代編ワタナベイベント</a></li>
-		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
-		<li><a href="program16.html">最終編敵パーティ</a></li>
-		<li><a href="program17.html">行動異常</a></li>
-		<li><a href="program18.html">状態異常</a></li>
-		<li><a href="program19.html">副能力変動値</a></li>
-		<li><a href="program20.html">幕末編のザコ敵</a></li>
-		<li><a href="program21.html">文字入力と判定</a></li>
-		<li><a href="program22.html">ラーニング</a></li>
-		<li><a href="program23.html">功夫編・修行</a></li>
-		<li><a href="program24.html">味方との戦闘</a></li>
-		<li><a href="program26.html">ダメージフィールド</a></li>
-		<li><a href="program27.html">反撃</a></li>
-		<li><a href="program28.html">ざき3戦目</a></li>
-		<li><a href="program32.html">位置変化・向き変え</a></li>
-		<li><a href="program33.html">オディオ戦</a></li>
-		<li><a href="program34.html">ステータス変動</a></li>
-		<li><a href="program35.html">セーブ</a></li>
-		<li><a href="program36.html">回復技</a></li>
-		<li><a href="program37.html">特殊タイプの技処理</a></li>
-		<li><a href="program38.html">回避属性</a></li>
-		<li><a href="program39.html">向き補正</a></li>
-		<li><a href="program40.html">行動ポイント</a></li>
-		<li><a href="program40_2.html">順序ポイント</a></li>
-		<li><a href="program41.html">敵の行動選択</a></li>
-		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
 	</ul>
 </div>
 </div>

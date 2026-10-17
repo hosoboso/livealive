@@ -26,6 +26,7 @@
 <link href="../../css/cssmenu.css?20240801" rel="stylesheet">
 <link href="../../css/GEsubset.css?20231001" rel="stylesheet">
 <link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
 <style>
 .code-container {
   border: 1px solid #ccc;
@@ -59,6 +60,11 @@ code {
   font-style: italic;
 }
 
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
 
 @media (max-width: 768px) {
 table {
@@ -66,39 +72,7 @@ table {
 	}
 }
 
-/* ネタバレ用ドロップダウン */
-.tog {
-	display: none;
-}
-.opt {
-	position: relative;
-	margin-bottom: 0.5rem;
-}
-.titl {
-	color: #FFF; 
-	background: #19447d;
-	margin:	0 0.5rem 0 0;
-	padding: 0.5rem;
-	display: block;
-	font-weight: bold;
-	cursor : pointer;
-}
-.con {
-	max-height: 0;
-	overflow: hidden;
-	margin:	0 0.5rem 0 0;
-	padding: 0.5rem;
-	border-color:#19447d;
-	border-width: 1px;
-	border-style: none;
-	transition: max-height .5s ease;
-	transition: border-style .5s ease;
-}
-.tog:checked + .titl + .con {
-	max-height: 9999px;
-	transition: max-height 2.2s ease;
-	border-style: solid;
-}
+
 </style>
 </head>
 <body>
@@ -228,6 +202,7 @@ table {
 		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
 		<li><a href="sound5.html">効果音の演奏</a></li>
 		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
 	</ul>
 </li>
 </ul>
@@ -243,398 +218,1102 @@ table {
 
 <p>前ページの<a href="program6.html">オディオモールのダメージ量処理</a>の続き。</p>
 
-<p>オディオモールのダメージ量処理から、「ほいこーろー」の仕様はどうなっているのかが気になってくるところである。<br>
+<p>オディオモールのダメージ量処理から、サモの技「ほいこーろー」の仕様はどうなっているのかが気になってくるところである。<br>
 「ほいこーろー」そのものの計算方法もさることながら、単発ダメージ量を強制的に1にするオディオモールに「ほいこーろー」を当てた時、オディオモールに対して、STEP数＋1のダメージを与えられる理由は何だろうか。</p>
 
 <!-- <p>なお、オディオモールだけではなく、ザコ敵のマスタードラゴンやピスタチオも、デバフでステータスを下げない限り同じ現象が起こることがある。</p> -->
 
-<p>筆者も以前から「ほいこーろー」の仕様については気になってはいたが、筆者のプログラミングに関する知識程度ではどうにもならない部分が多々ある。<br>
-とはいえ、多少はわかったこともあるので、以下で紹介しておく。</p>
+<p>調べた結果、「ほいこーろー」のダメージ量計算は、かなり特殊な仕様となっている。<br>
+敵味方のステータスは関係なく、範囲内の敵に、サモが踊ったSTEPS数だけダメージを与える。<br>
+STEPS数は戦闘乱数から計算されているが、他の技のように、技を出す前にダメージ量を計算するのではなく、技のモーションの最中に戦闘乱数を生成し、次のSTEPに移るかどうかを決めている。<br>
+STEPS数は<span class="formula">2</span>～<span class="formula">99</span>で、99STEPSの時のみサモが四股を踏むモーションが入る。</p>
 
-<p>筆者は以前、<a href="../battle04_hui.html"> 技 &gt; 「ほいこーろー」について</a>で、実際に1000回「ほいこーろー」を使い、STEP数をカウントしてみたことがあるので、そちらも参照していただきたい。<br>
-検証において、STEP数の平均値は<span class="formula">32.4</span>で、出現する値は<span class="formula">2～99</span>だった。<br>
-中央の値である50付近が平均ではない。</p>
+<p>STEPSの計算方法も少々特殊である。<br>
+大まかにまとめると、以下のようになる。</p>
 
-<p>また、上の「ほいこーろー」の検証内でも紹介しているが、<a href="https://rodgersia.ninpou.jp/livealive/" target="_blank">世界の合言葉は森部</a>様によれば、SFC版での「ほいこーろー」は、</p>
+<h5>STEPSの計算方法</h5>
 
-<blockquote>ほいこーろーは、踊る前にSTEP数を設定するわけではなく、<br>
-踊りながらここで終わるか続けるかを決めている気がする。<br>
-具体的な確率はわからない。<br>
-STEP数は分布で言うと一様分布ではなく幾何分布になりそう。</blockquote>
+<p>STEPSは<span class="formula">1</span>から増加開始。<br>
+また、STEPS増加判定フラグがあり、このフラグがONかOFFかでSTEPSの増加条件が変わる。</p>
 
-<p>とのことである。</p>
+<p>増加判定フラグは初期値<span class="formula">0</span>（フラグはオフ）。</p>
 
-<p>では、実際のプログラムではどうなっているのだろうか。<br>
-上にある通り、「ほいこーろー」のモーションの踊りが開始する前の乱数でSTEP数が決まっているのではなさそうで、</p>
+<ol>
+	<li>0～15の乱数を生成する。<br>
+	増加判定フラグの値により、2.または3.へ進む。</li>
 
-<p>乱数計算→特定のアドレスに値を追加→乱数計算→特定のアドレスに値を追加→……</p>
+	<li>増加判定フラグが<span class="formula">0</span>の時、</li>
+	<ol type="a">
+		<li>乱数が1～15の時（確率15/16）：STEPSを<span class="formula">+1</span>する。4.に進む</li>
+		<li>乱数が<span class="formula">0</span>の時（確率1/16）：STEPSを<span class="formula">+1</span>する。増加判定フラグが<span class="formula">1</span>になる。4.に進む</li>
+	</ol>
+	
+	<li>増加判定フラグが<span class="formula">1</span>の時、</li>
+	<ol type="a">
+		<li>乱数が1～15の時（確率15/16）：STEPSを<span class="formula">+1</span>する。4.に進む</li>
+		<li>乱数が<span class="formula">0</span>の時（確率1/16）：STEPSの増加を停止（STEPS確定）</li>
+	</ol>
+	
+	<li>1と2でSTEPSが増加した時、</li>
+	<ol type="a">
+		<li>STEPSが99未満：1.の乱数生成に戻る。</li>
+		<li>STEPSが99：STEPSの増加を停止（STEPS確定）</li>
+	</ol>
+</ol>
 
-<p>を繰り返し、メモリに蓄積された値がSTEP数となる、という仕様は間違いないようである。<br>
-これまでも述べた通り、戦闘中の乱数は、必要な時にだけ計算される。<br>
-マップ上での乱数のように常に計算され続けているのではない。<br>
-このため、「ほいこーろー」開始直前に、バーチャルコンソールの「まるごと保存」で保存してから「まるごと復元」した場合、その後に「ほいこーろー」を選択すると、すぐにAボタンで「ほいこーろー」を開始しようが、しばらく待ってからAボタンで「ほいこーろー」を開始しようが、「ほいこーろー」のSTEPSは変わらない。<br>
-戦闘中の乱数は、前4つの乱数が常に記録されている状態であるが、ただ待機するだけではそれら乱数が変化することはないからである。<br>
-逆に言えば、「ほいこーろー」のダメージ量を確認してから「まるごと復元」してわざと敵に行動させるなどして乱数を動かし、それから「ほいこーろー」を開始するとSTEP数が変わる可能性がある、ということでもある。バーチャルコンソール限定ではあるが、「ほいこーろー」で高ダメージ量だけを狙い続けたい場合に使えるテクニックである。</p>
+<p>増加判定フラグの仕様により、1STEP→2STEPSの増加は乱数に関係なく必ず起こるので、「ほいこーろー」のSTEPSは2以上ということになる。1STEPが出ることはない。<br>
+（ダメージ量表示の時にSTEPS数が表示されるが、グラフィックデータには「STEPS」というスプライトはあっても、「STEP」はないので、単数形になる1STEPが出ない仕様にしているのではないだろうか。筆者の想像でしかないが）<br>
+また、99STEPSに到達した時に、増加判定フラグが<span class="formula">0</span>か<span class="formula">1</span>かで、サモが四股を踏むモーション前のサモ回転モーションの長さが変わるというちょっとしたネタがある。<br>
+（増加判定フラグが<span class="formula">0</span>だと回転モーションが長くなる）</p>
 
-<p>ただ、具体的にどういう条件だと踊りを続けるのか、また止めるのかはよくわからない。<br>
-乱数計算は何度も繰り返されている上、間にサモのモーション関係のサブルーチンも動くようであり、筆者のような素人には非常に難解なプログラムになっている。<br>
-とりあえず最低限わかったことを、以下に記す。</p>
+<h5>確率</h5>
 
-<p>「ほいこーろー」が始まると、サモが踊るたびにアドレス<code>[$7E:A01A]</code>に値が蓄積されていく。<br>
-最初に初期値<span class="formula">$00</span>が以下のサブルーチンで入り、加算されていく。</p>
+<p>以上より、STEPSが2以上98未満の時、STEPS<span class="formula"> = n</span>が出る確率は、</p>
+
+<p><span class="formula">(n-1) * (15/16)^(n-2) * (1/16)^2</span><br>
+<span class="formula">= ((n-1)/256) * (15/16)^(n-2)</span></p>
+
+<p>で計算される。</p>
+
+<p>99が出る確率は、</p>
+
+<p><span class="formula">1 -（2～98STEPSが出る確率の総和）</span></p>
+
+<p>約<span class="formula">0.0135（1.35％）</span>くらい。</p>
+
+<p>16～17が出る確率がそれぞれ<span class="formula">0.0237（2.37％）</span>くらいで最大。<br>
+STEPS平均値は<span class="formula">31.8</span>くらいになる。</p>
+
+<p><span class="formula">y = ((x-1)/256) * (15/16)^(x-2) (2 ≦ x ≦ 98)</span><br>
+<span class="formula">y = 1 -（2～98STEPSが出る確率の総和） (x = 99)</span></p>
+
+<p>という確率関数のグラフを表計算ソフトに書いてもらうと下のようになる。<br>
+<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6IduhNp2Owf7cxDM1xDSOyqkQz26JJ_sijVA3D01XmFT0A8ozWbL1-_crQIWmjN3a_Sc1Y7hOndu9/pubhtml#gid=2000233335" target="_blank">lal_Huiguorou - Google ドキュメント</a></p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/hoistepgraph.png" class="modal-link">
+		<img src="img/hoistepgraph.png" alt="ほいこーろー確率関数" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p><span class="formula">x = 16～17</span>まで増加し、以降はなだらかに減少していく。<br>
+また、99STEPSが出る「<span class="formula">1-（2～98が出る確率の総和）</span>」が割と高いので、そこそこの確率で99STEPSが見られることになる。<br>
+98STEPSの出る確率が<span class="formula">0.00077（0.077％）</span>に対し、99STEPSが出る確率は約<span class="formula">0.0135（1.35％）</span>である。</p>
+
+<p>98STEPS時は、増加判定フラグが<span class="formula">0</span>だと回転モーションが長くなるが、それぞれの確率は以下のようになっている。</p>
+
+<ul>
+	<li>増加判定フラグ<span class="formula">0</span>の状態で99STEPSになる確率：<br>
+	<span class="formula">(15/16)^98 ≒ 0.001791（約0.179％）</span></li>
+
+	<li>増加判定フラグ<span class="formula">1</span>の状態で99STEPSになる確率：<br>
+	<span class="formula">(98/16) * (15/16)^97 ≒ 0.01170（約1.17％）</span></li>
+</ul>
+
+<p>なので、モーションが長くなる確率の方がかなり低め。</p>
+
+<p>筆者は確率や統計には詳しくないが、STEPSが2以上98未満については、おそらく、</p>
+
+<ul>
+	<li><a href="https://ja.wikipedia.org/wiki/%E8%B2%A0%E3%81%AE%E4%BA%8C%E9%A0%85%E5%88%86%E5%B8%83" target="_blank">負の二項分布 - Wikipedia</a></li>
+	<li><a href="https://mathlandscape.com/neg-binomial-distrib/" target="_blank">負の二項分布の定義と例と性質まとめ | 数学の景色</a></li>
+</ul>
+
+<p>いわゆる負の二項分布で表すことができる確率分布になるのだと思う。<br>
+負の二項分布では、「成功回数を表す定数<span class="formula">r</span>と、おのおのの試行で成功する確率<span class="formula">p</span>」の2つのパラメータで成り立っているが、「ほいこーろー」のSTEPS数は、成功回数<span class="formula">2</span>、確率<span class="formula">15/16</span>の負の二項分布になる、と思う。</p>
+
+<p>ここからは、実際のプログラムの内容を紹介していく。</p>
+
+<div id="captiondata"></div>
+
+<h3>メモリアドレス</h3>
+
+<p>技のモーションの最中、「キャラの動き（向き、座標など）」「エフェクト」「効果音」などを計算・記録する領域は<code>$7E:A000</code>～<code>$7E:A47F</code>に割り振られている。<br>
+技モーション開始時に初期化（すべて<span class="formula">$00</span>が書き込まれる）され、技モーション終了時にも初期化される。<br>
+実際には<code>$7E:A000</code>～<code>$7E:A01F</code>には技固有の変数のようなものが記録され、<code>$7E:A020</code>～がモーションのサブルーチンに関わっているようである。</p>
+
+<p>「ほいこーろー」のSTEPS数に関わる重要なメモリアドレスは以下。</p>
+
+<h4><code>[$7E:A019]</code><code>[$7E:A018]</code></h4>
+
+<p>初期値は<span class="formula">$0000</span>。2バイト値。<br>
+戦闘乱数から計算される「ほいこーろー」用乱数が記録されるアドレス。<br>
+「ほいこーろー」用乱数は後で説明する通り、漸化式であり、</p>
+
+<p><span class="formula">A<sub>n</sub> = ((乱数$0000～$007F) - $0040) + A<sub>n-1</sub></span><br>
+※減算・加算時はキャリーフラグを考慮（符号付き16ビット整数）<br>
+※乱数<span class="formula">$0000</span>～<span class="formula">$007F</span>は、戦闘乱数<span class="formula">$0000～$FFFF * $0080)/$100</span>で計算</p>
+
+<p>で計算できる。<br>
+乱数判定に使うのは実質<code>[$7E:A018]</code>のみ。</p>
+
+<h4><code>[$7E:A02C]</code></h4>
+
+<p>初期値は<span class="formula">$00</span>。1バイト値。<br>
+上で記した「増加判定フラグ」にあたる。<br>
+乱数判定に失敗しても、この値が<span class="formula">$00</span>だったら成功になりSTEPS回数が増える。<br>
+その代わり<code>[$7E:A02C]</code>に<span class="formula">$01</span>が入り、<code>[$7E:A02C]</code>が<span class="formula">$01</span>の時に乱数判定失敗するとSTEPS増加終了。</p>
+
+<p>99STEPSの時は、<span class="formula">$00</span>と<span class="formula">$01</span>どちらが入っているかによって、サモのモーションが少し変化するというちょっとした分岐要素がある。</p>
+
+<h4><code>[$7E:A01B]</code><code>[$7E:A01A]</code></h4>
+
+<p>「ほいこーろー」のSTEP数を記録するアドレス。2バイト値。<br>
+初期値として<code>[$7E:A01B]</code><code>[$7E:A01A]</code>に<span class="formula">$2000</span>が入る。<br>
+2バイト値だが、<code>[$7E:A01A]</code>にSTEPS回数が入り、<code>[$7E:A01B]</code>は<span class="formula">$20</span>のまま。<br>
+<span class="formula">$00</span>が初期値だが、「ほいこーろー」を開始すると、乱数を使わず<span class="formula">$01</span>に増える。以降の増加は乱数による。<br>
+また、<span class="formula">$01</span>→<span class="formula">$02</span>は<code>[$7E:A02C]</code>の仕様上、必ず増えるはず。</p>
+
+<p>記録される値は16進数だが、10進数に対応している。<br>
+というのは、<span class="formula">$09</span>まで増えたら、次は<span class="formula">+$01</span>されて<span class="formula">$0A</span>になるはずなのに、サブルーチンでは<span class="formula">+$07</span>され、<span class="formula">$10</span>になるからである。<br>
+<span class="formula">$10</span>だと10進数では<span class="formula">16</span>だが、<code>[$7E:A01A]</code>に<span class="formula">$10</span>が入っている時に「ほいこーろー」のSTEPが止まると、「10STEPS」と表示されてダメージ量も<span class="formula">10</span>となる。</p>
+
+<h3>サブルーチン</h3>
+
+<p>技のモーションは、<a href="d5.html#waza">技データ</a>の00～05に入っている値から、技モーションを指定するサブルーチンのアドレスを計算し、サブルーチンを実行することで行われる。<br>
+その計算はややこしいし、すべて紹介するとキリがないので、「ほいこーろー」のSTEP数計算に重要な部分だけ紹介していく。</p>
+
+<h4>初期値設定</h4>
+
+<p><code>[$7E:A02C]</code>は、技モーション開始時、サブルーチン<code><span class="r">$C1/A3E4</span></code>～<code><span class="r">$C1/A3F3</span></code>の、<code>$7E:A000</code>～<code>$7E:A47F</code>を<span class="formula">$00</span>で初期化する処理で<span class="formula">$00</span>が入った状態から開始になる。<br>
+<code>[$7E:A018]</code>と<code>[$7E:A01A]</code>もここで<span class="formula">$00</span>が入るのだが、更に、「ほいこーろー」のモーションのサブルーチンが開始した直後で初期値が入る。</p>
+
+<p><code>[$7E:A018]</code>の処理は以下で、<span class="formula">$0000</span>が入る。</p>
 
 <div class="code-container"><pre>
+$C1/A810 LDA $10    [$00:0310]   ;Aに[$00:0311][$00:0310]をロード
+$C1/A812 AND #$0F                ;Aと$0Fで論理積
+$C1/A814 ASL A                   ;Aを算術左シフト *2
+$C1/A815 STX $1C    [$00:031C]   ;Xを[$00:031D][$00:031C]に書き込み
+$C1/A817 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A819 AND #$00FF              ;Aと$00FFで論理積
+$C1/A81C ADC $1E    [$00:031E]   ;A + [$00:031F][$00:031E]
+$C1/A81E TAX                     ;Aの値をXレジスタに転送　X:A018
 $C1/A81F LDA #$0000              ;Aに$0000をロード
-$C1/A822 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A]に書き込み
+$C1/A822 STA $7E0000,x[$7E:A018] ;Aを[$7E:A018][$7E:A018]に書き込み
+$C1/A826 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A828 LDX $1C    [$00:031C]   ;Xに[$00:031D][$00:031C]をロード
+$C1/A82A BRL $FE8E  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
 </pre></div>
 
-<p>また、<code>[$7E:A01A]</code>への数値の蓄積は、下のサブルーチンが関わっている。</p>
+<p><code>[$7E:A01B]</code><code>[$7E:A01A]</code>の初期値は以下で書き込まれる。</p>
 
 <div class="code-container"><pre>
-$C1/A73F LDA $7E0000,x[$7E:A01A] ;[$7E:A01A]をロード
-$C1/A743 CLC                     ;キャリーフラグをクリア
-$C1/A744 ADC $11    [$00:0311]   ;[$7E:A01A]+[$00:0311]
-$C1/A746 STA $7E0000,x[$7E:A01A] ;[$7E:A01A]に書き込み
+$C1/A6E7 LDA $D50000,x[$D5:AB8D] ;Aに[$D5:AB8D](00)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:AB8E] ;Aに[$D5:AB8E](20)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A754 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A756 AND #$0F                ;Aと$0Fで論理積
+$C1/A758 ASL A                   ;Aを算術左シフト *2
+$C1/A759 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A75B AND #$00FF              ;Aと$00FFで論理積
+$C1/A75E ADC $1E    [$00:031E]   ;A + [$00:031E]
+$C1/A760 TAX                     ;Aの値をXレジスタに転送
+$C1/A761 LDA $11    [$00:0311]   ;Aに[$00:0312][$00:0311]をロード
+$C1/A763 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A]に書き込み
+;(中略)
+$C1/A6DA JMP ($031A)[$C1:AF58]   ;[$C1:AF58]へジャンプ(レジスタをスタックに積まない)
+$C1/AF58 JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
 </pre></div>
 
-<p>踊るたびに乱数計算をし、このサブルーチンに到達して、<code>[$7E:A01A]</code>が増加するのだが、<code><span class="r">$C1/A73F</span></code>は、<br>
-<code><span style="color: #0000FF;">LDA</span> $7E0000,x</code><br>
-と指定されており、この前までの計算で<span class="formula">X:A01A</span>となっていなければ<code>[$7E:A01A]</code>は増加しない。<br>
-乱数によって他のメモリが選ばれることがあり、それが分岐となって<code>[$7E:A01A]</code>が増えなくなり、実際のSTEP数が決まるはずだが、そのあたりもよくわからない。<br>
-このサブルーチンはサモが踊っている間に回るので、踊りつつ戦闘乱数を計算し踊り続けるかどうかを決めているのは間違いない。</p>
+<p>以上から、<code>[$7E:A01B]</code><code>[$7E:A01A]</code>の初期値は<code>[$D5:AB8E]</code><code>[$D5:AB8D]</code>(<span class="formula">$2000</span>)である。<br>
+ほいこーろーのSTEPS回数として使うのは実質<code>[$7E:A01A]</code>の1バイトで、初期値<span class="formula">$00</span>である。</p>
 
-<p><code><span class="r">$C1/A744</span></code>では<code>[$00:0311]</code>が足されているが、<code>[$00:0311]</code>の値は常に一定ではなく、踊った回数に従い<span class="formula">1</span>ずつ増加していくのではない。<br>
-16進数であるにも関わらず、</p>
+<h4>STEPS1回目処理</h4>
 
-<p class="formula">00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 0A, 10, 11, 12, 13……, 18, 19, 1A, 20, 21……</p>
-
-<p>と、一番下の桁の<span class="formula">B～F</span>が飛ばされている。<br>
-どうやら<code>[$00:0311]</code>は、<code>[$7E:A01A]</code>に収納されている数値により変化し、通常は「<span class="formula">$01</span>」で、一番下の桁が<span class="formula">A</span>の時だけ「<span class="formula">$06</span>」になるようだ。<br>
-しかも一番下の桁が<span class="formula">A</span>だと、その直後にすぐ「<span class="formula">$01</span>」を加える処理が入るため、実質的には「<span class="formula">$09</span>」の後はすぐに「<span class="formula">$10</span>」に変わる。<br>
-何故このような処理にしているのかは、後でわかる。</p>
-
-<p>最終的に何かしらの条件で踊りが止まる。つまり、<code>[$7E:A01A]</code>の増加が止まる。<br>
-そうすると、諸々の計算を挟んだ後に、以下のアドレスに飛ぶ。</p>
+<p>STEPSに<span class="formula">1</span>が書き込まれる処理が以下だが、この処理は乱数計算などはせず、モーション開始時に<code>[$7E:A01A]</code>に必ず書き込まれる。</p>
 
 <div class="code-container"><pre>
-$C1/A4F7 LDA $7EA01A[$7E:A01A]
-$C1/A4FB STA $6E    [$00:036E]
-</pre></div>
-
-<p>ここで<code>[$7E:A01A]</code>の値は、<code>[$00:036E]</code>に収納され、STEP数として「●●STEPS」と画面上に表示される。<br>
-面白いことに、この時の数値は16進数2桁なのに、10進数に変換せず、そのままで表示される。<br>
-たとえば<code>[$00:036E]</code>に<span class="formula">$50</span>が入った場合、16進数の「<span class="formula">50</span>」は10進数に変換すると「<span class="formula">80</span>」なのに、<span class="formula">80</span>ではなく<span style="font-weight:bold;">「50 STEPS」</span>と表示されるのである。<br>
-このために、<code>[$7E:A01A]</code>の増加量は「<span class="formula">$01</span>」か「<span class="formula">$06</span>」のどちらかであったのだ。</p>
-
-<p>また、STEPS最大値が99である以上、何かしらの処理で最大値を「<span class="formula">$99</span>」までと制限しているはずである。</p>
-
-<p>更に、STEPSの表示の後に、実際のダメージ量計算が別に挟まっている。<br>
-このままでは、画面上では「50 STEPS」と表示されていても、10進数では「<span class="formula">80</span>」だから、例えば攻撃した敵の現在HPからダメージ量を引く場合などに矛盾が生じてしまう。<br>
-よって、STEPSから実際のダメージ量に変換する必要がある。<br>
-その変換は「ゲーム画面に実際のダメージ量を表示する前」に行われ、</p>
-
-<p>「計算した総ダメージ量から、実際に画面上に表示する数値を計算する」</p>
-
-<p>サブルーチンとなる。<br>
-そのサブルーチンは以下のようになっており、STEPS数が画面に表示されてから、実際のダメージ量（敵が回復技や吸収技を使った時は回復量）が敵の上に表示されるまでの間に処理される。<br>
-実は通常の攻撃技と共通のサブルーチンを使っているので、他の味方の技などでもこのサブルーチンは通過する。<br>
-ただ、「ほいこーろー」のダメージ量のみ<code>[$00:036E]</code>に格納され、それ以外の技だと<code>[$00:036E]</code>に「<span class="formula">00</span>」が収納されており、そこでのみ分岐が起きる仕組みである。<br>
-（このサブルーチンは、「ほいこーろー」とほぼ同じ仕組みである幕末編の商人などが使用してくる「わいろ」にも使用されているかもしれないが、未確認）</p>
-
-<p>なお以下は、オディオモールに「ほいこーろー」を当てた前提でメモリの位置を記している。</p>
-
-<div class="code-container"><pre>
-;通常技と共通処理
-$C1/CDE7 STZ $22    [$00:0322]   ;[$00:0322]に0を書き込み
-$C1/CDE9 STZ $23    [$00:0323]   ;[$00:0323]に0を書き込み
-$C1/CDEB LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
-$C1/CDED AND #$0F                ;Aと$0Fで論理積
-$C1/CDEF CMP #$08                ;Aと$08を減算比較
-$C1/CDF1 BNE $17    [$CE0A]      ;ゼロフラグが立っていないとき[$C1/CE0A]分岐
-$C1/CDF3 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード（= 「ほいこーろー」STEP数）
-$C1/CDF5 BEQ $13    [$CE0A]      ;ゼロフラグが立っているとき[$C1/CE0A]分岐（※おそらく「ほいこーろー」以外の技は00）
+;（中略）
+$C1/A6BB LDA $D50000,x[$D5:ACA3] ;Aに[$D5:ACA3]($0D)をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+;（後略）
 ;
-;ここから「ほいこーろー」用処理
-$C1/CDF7 AND #$F0                ;Aと$F0で論理積
-$C1/CDF9 LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-$C1/CDFC LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFD LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFE ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CE00 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-$C1/CE02 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード
-$C1/CE04 AND #$0F                ;Aと$0Fで論理積
-$C1/CE06 ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CE08 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-;ここまで「ほいこーろー」用処理
+$C1/A6E7 LDA $D50000,x[$D5:ACA4] ;Aに[$D5:ACA4]($01)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ACA5] ;Aに[$D5:ACA5]($00)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A732 LDA $10    [$00:0310]   ;Aに[$00:0310]($0D)をロード
+$C1/A734 AND #$0F                ;Aと$0Fで論理積
+$C1/A736 ASL A                   ;Aを算術左シフト *2
+$C1/A737 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A739 AND #$00FF              ;Aと$00FFで論理積
+$C1/A73C ADC $1E    [$00:031E]   ;A + [$00:031E]
+$C1/A73E TAX                     ;Aの値をXレジスタに転送
+$C1/A73F LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A](STEPS回数)をロード
+$C1/A743 CLC                     ;キャリーフラグクリア
+$C1/A744 ADC $11    [$00:0311]   ;A + [$00:0312][$00:0311]($0001)
+$C1/A746 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A]に書き込み
+$C1/A74A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A74C LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A74E BRL $FF6A  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+</pre></div>
+
+<p>ここでは、<code>[$D5:ACA3]</code>～<code>[$D5:ACA5]</code>が「ほいこーろー」用の定数として機能していることがわかる。<br>
+<code>[$D5:ACA3]</code>はアドレス呼び出しの値、<code>[$D5:ACA5]</code><code>[$D5:ACA4]</code>はSTEPS回数の加算用数値である。<br>
+<code><span class="r">$C1/A73F</span></code>～<code><span class="r">$C1/A746</span></code>で、</p>
+
+<p><span class="formula"><code>[$7E:A01B]</code><code>[$7E:A01A]</code>(STEPS回数) = <code>[$7E:A01B]</code><code>[$7E:A01A]</code> + $0001</span></p>
+
+<p>となり、元のSTEPS回数に<span class="formula">+1</span>した値が新たなSTEPS回数となって、<span class="formula"><code>[$7E:A01B]</code><code>[$7E:A01A]</code> = $2001</span>となる。<br>
+<code>[$7E:A01A]</code>に入っている<span class="formula">$01</span>がSTEPS回数扱い。</p>
+
+
+<h4>「ほいこーろー」用乱数</h4>
+
+
+<p>STEPSが<span class="formula">1</span>に増える時、上の通り乱数は使わず、必ず増加するのであるが、それとは別に戦闘乱数が計算されはじめている。<br>
+技のモーションは基本的に決まった動きを行うだけなので乱数計算の必要はないのだが、「ほいこーろー」については、STEPS数以外にも乱数でモーションを選んでいる（？）らしく、モーション中に戦闘乱数を何度も計算して作っている。<br>
+更に、戦闘乱数をそのまま使うのではなく、戦闘乱数から計算した「ほいこーろー」用乱数を別途用意しているので、サブルーチンはなかなか複雑である。<br>
+（なぜここまで複雑な仕様にしたのかは、筆者にはよくわからない。後でわかる通り、「ほいこーろー」のSTEPS数を増加するかどうかの判定は1バイトの乱数で判定しているので、戦闘乱数でも判定可能である）</p>
+
+<p>「ほいこーろー」用乱数が記録されるアドレスが<code>[$7E:A019]</code><code>[$7E:A018]</code>の2バイト値。<br>
+戦闘乱数計算のサブルーチン<code><span class="r">$C1/6150</span></code>～<code><span class="r">$C1/61A4</span></code>は中略としている。</p>
+
+<div class="code-container"><pre>
+;（中略）
+$C1/A6BB LDA $D50000,x[$D5:ABA1] ;Aに[$D5:ABA1](8C)をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+;（後略）
+
+$C1/A6E7 LDA $D50000,x[$D5:ABA2] ;Aに[$D5:ABA2](80)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ABA3] ;Aに[$D5:ABA3](00)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A83C JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+
+$C1/6150 PHX                     ;Xをスタックにプッシュ
+;（中略 戦闘乱数生成サブルーチン 乱数1）
+$C1/61A4 RTS                     ;サブルーチン戻り
+
+$C1/A83F JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+
+$C1/6150 PHX                     ;Xをスタックにプッシュ
+;（中略 戦闘乱数生成サブルーチン 乱数2）
+$C1/61A4 RTS                     ;サブルーチン戻り
 ;
-$C1/CE0A RTS                     ;サブルーチンここまで
+;乱数1は[$00:033A]、乱数2は[$00:033B]とAレジスタに入っている
 ;
-;通常技と共通処理
-$C1/CD32 REP #$20                ;Mフラグをクリア　Aレジスタは16bit幅
-$C1/CD34 LDA $2134  [$00:2134]   ;Aに[$00:2134]をロード（= この時点での総ダメージ量）
-$C1/CD37 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
-$C1/CD39 LDA $7E920A,x[$7E:AD2A] ;Aに[$7E:AD2A]をロード
-$C1/CD3D AND #$00FF              ;Aと$00FFで論理積
-$C1/CD40 BEQ $04    [$CD46]      ;ゼロフラグが立っているとき[$C1/CD46]分岐
-$C1/CD46 LDA $20    [$00:0320]   ;Aに[$00:0320]をロード
-$C1/CD48 CLC                     ;キャリーフラグをクリア
-$C1/CD49 ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CD4B CMP #$03E7              ;Aと$03E7（=10進数999）を減算比較
-$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$C1/CD53]分岐
-$C1/CD53 STA $7E9200,x[$7E:AD20] ;Aを[$7E:AD20]に書き込み
+;ここから16bit×16bitサブルーチン
+;[$00:033A][$00:033B] * $0080
+$C1/A842 LDA $11    [$00:0311]   ;Aに[$00:0311]をロード＝[$D5:ABA2]80
+$C1/A844 STA $4202  [$00:4202]   ;Aを[$00:4202]に書き込み
+$C1/A847 LDA $3A    [$00:033A]   ;Aに[$00:033A]をロード 乱数1
+$C1/A849 STA $4203  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C1/A84C NOP                     ;計算待ち
+$C1/A84D NOP                     ;計算待ち
+$C1/A84E NOP                     ;計算待ち
+$C1/A84F NOP                     ;計算待ち
+$C1/A850 LDA $4217  [$00:4217]   ;Aに[$00:4217]をロード 乗算の上2桁
+$C1/A853 STA $16    [$00:0316]   ;Aを[$00:0316]に書き込み
+$C1/A855 LDA $3B    [$00:033B]   ;Aに[$00:033B]をロード 乱数2
+$C1/A857 STA $4203  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C1/A85A NOP                     ;計算待ち
+$C1/A85B NOP                     ;計算待ち
+$C1/A85C CLC                     ;キャリーフラグクリア
+$C1/A85D LDA $16    [$00:0316]   ;Aに[$00:0316]をロード
+$C1/A85F ADC $4216  [$00:4216]   ;A + [$00:4216]
+$C1/A862 STA $16    [$00:0316]   ;Aを[$00:0316]に書き込み
+$C1/A864 LDA #$00                ;Aに$00をロード
+$C1/A866 ADC $4217  [$00:4217]   ;A + [$00:4217]
+$C1/A869 STA $17    [$00:0317]   ;Aを[$00:0317]に書き込み
+$C1/A86B LDA $12    [$00:0312]   ;Aに[$00:0312](00)をロード
+$C1/A86D STA $4202  [$00:4202]   ;Aを[$00:4202]に書き込み
+$C1/A870 LDA $3A    [$00:033A]   ;Aに[$00:033A]をロード　乱数1
+$C1/A872 STA $4203  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C1/A875 NOP                     ;計算待ち
+$C1/A876 NOP                     ;計算待ち
+$C1/A877 LDA $16    [$00:0316]   ;Aに[$00:0316]をロード
+$C1/A879 CLC                     ;キャリーフラグクリア
+$C1/A87A ADC $4216  [$00:4216]   ;A + [$00:4216]
+$C1/A87D STA $16    [$00:0316]   ;Aを[$00:0316]に書き込み
+$C1/A87F LDA $17    [$00:0317]   ;Aに[$00:0317]をロード
+$C1/A881 ADC $4217  [$00:4217]   ;A + [$00:4217]
+$C1/A884 STA $17    [$00:0317]   ;Aを[$00:0317]に書き込み
+$C1/A886 LDA #$00                ;Aに$00をロード
+$C1/A888 ADC #$00                ;A + $00
+$C1/A88A STA $18    [$00:0318]   ;Aを[$00:0318]に書き込み
+$C1/A88C LDA $3B    [$00:033B]   ;Aに[$00:033B]をロード
+$C1/A88E STA $4203  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C1/A891 NOP                     ;計算待ち
+$C1/A892 NOP                     ;計算待ち
+$C1/A893 CLC                     ;キャリーフラグクリア
+$C1/A894 LDA $17    [$00:0317]   ;Aに[$00:0317]をロード
+$C1/A896 ADC $4216  [$00:4216]   ;A + [$00:4216]
+$C1/A899 STA $17    [$00:0317]   ;Aを[$00:0317]に書き込み
+$C1/A89B LDA $18    [$00:0318]   ;Aに[$00:0318]をロード
+$C1/A89D ADC $4217  [$00:4217]   ;A + [$00:4217]
+$C1/A8A0 STA $18    [$00:0318]   ;Aを[$00:0318]に書き込み
+;[$00:0318][$00:0317][$00:0316]が乗算結果の上3バイト
+$C1/A8A2 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード=[$D5:ABA1] 8C
+$C1/A8A4 AND #$0F                ;Aと$0Fで論理積
+$C1/A8A6 ASL A                   ;Aを算術左シフト *2
+$C1/A8A7 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A8A9 AND #$00FF              ;Aと$00FFで論理積
+$C1/A8AC ADC $1E    [$00:031E]   ;A + [$00:031F][$00:031E](A000)
+$C1/A8AE TAX                     ;Aの値をXレジスタに転送
+$C1/A8AF LDA $11    [$00:0311]   ;Aに[$00:0312][$00:0311]をロード　$0080
+$C1/A8B1 LSR A                   ;Aを論理右シフト　(/2)
+$C1/A8B2 STA $19    [$00:0319]   ;A($0040)を[$00:031A][$00:0319]に書き込み
+$C1/A8B4 LDA $17    [$00:0317]   ;Aに[$00:0318][$00:0317]をロード 乗算結果上2バイト（$0000～$007F）
+$C1/A8B6 SEC                     ;キャリーフラグON
+$C1/A8B7 SBC $19    [$00:0319]   ;A - [$00:031A][$00:0319]($0040)
+$C1/A8B9 CLC                     ;キャリーフラグクリア
+$C1/A8BA ADC $7E0000,x[$7E:A018] ;A + [$7E:A019][$7E:A018](初期値$0000)
+$C1/A8BE STA $7E0000,x[$7E:A018] ;Aを[$7E:A019][$7E:A018]に書き込み
+;（中略）
+$C1/A6DA JMP ($031A)[$C1:AFA8]   ;[$C1:AFA8]へジャンプ(レジスタをスタックに積まない)
+$C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
 </pre></div>
 
-<p>順に説明する。</p>
+<p>まとめると、戦闘乱数を2回発生させ、繋げて2バイト値とし（<code><span class="r">$C1/A842</span></code>の時点で<code>[$00:033A]</code><code>[$00:033B]</code>）、更に、<code><span class="r">$C1/A842</span></code>以降の処理で、<code>[$D5:ABA3]</code><code>[$D5:ABA2]</code>(<span class="formula">$0080</span>)の2バイト値と掛け算している。<br>
+つまり、</p>
 
-<div class="code-container"><pre>
-;通常技と共通処理
-$C1/CDE7 STZ $22    [$00:0322]   ;[$00:0322]に0を書き込み
-$C1/CDE9 STZ $23    [$00:0323]   ;[$00:0323]に0を書き込み
-$C1/CDEB LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
-$C1/CDED AND #$0F                ;Aと$0Fで論理積
-$C1/CDEF CMP #$08                ;Aと$08を減算比較
-$C1/CDF1 BNE $17    [$CE0A]      ;ゼロフラグが立っていないとき[$C1/CE0A]分岐
-$C1/CDF3 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード（= 「ほいこーろー」STEP数）
-$C1/CDF5 BEQ $13    [$CE0A]      ;ゼロフラグが立っているとき[$C1/CE0A]分岐（※おそらく「ほいこーろー」以外の技は00）
-</pre></div>
-
-<p>「ほいこーろー」専用処理前の部分。<br>
-敵にダメージを与えたり、敵が回復するなど、敵側のHPの値に変動が起きる場合、敵のHPの増減分が画面に表示される直前に、必ずここの処理を通るようである。</p>
-
-<p>最初の2行、<code><span style="color: #0000FF;">STZ</span> $22</code>と<code><span style="color: #0000FF;">STZ</span> $23</code>は、該当アドレスに<span class="formula">0</span>を書き込むという命令なのだが、この後の計算の都合などで一度<span class="formula">0</span>を書き込んでいるのだと思われる。<br>
-その後に<code><span class="r">$C1/CDEB</span> <span style="color: #0000FF;">LDA</span> $77</code>で、アドレス<code>[$00:0377]</code>の値をロードし、次に<span class="formula">$0F</span>で論理積を取っていることから、必要なのは<code>[$00:0377]</code>の値の下1桁だけなのだろうという推測ができる。</p>
-
-<p>次の<br>
-<code><span class="r">$C1/CDEF</span> <span style="color: #0000FF;">CMP</span> #$08</code><br>
-は、「<code>[$00:0377]</code>の値の下1桁」と<span class="formula">$08</span>を引き算して比較しており、その次でゼロフラグが立っていないのなら<code>[<span class="r">$C1/CE0A</span>]</code>へジャンプする。<br>
-ここの「<code>[$00:0377]</code>の値の下1桁」は、敵のHPをマイナスするか（攻撃技か）、それともプラスするか（回復または吸収技か）、という判定のようである。<br>
-「ほいこーろー」はじめ、敵にダメージを与える場合は、ここで「<code>[$00:0377]</code>の値の下1桁」が<span class="formula">$08</span>となり、ゼロフラグが必ず立つようである。<br>
-（このあたりの詳しい処理は確認していない）<br>
-回復や吸収だと、戦闘画面に出る数値が緑色になることや、後の計算処理の関係から、ここで条件分岐して何かしら指定しているのだと思われる。</p>
-
-<p>問題は次の<br>
-<code><span class="r">$C1/CDF3</span> <span style="color: #0000FF;">LDA</span> $6E    [$00:036E]</code><br>
-である。<br>
-先に述べた通りに、<code>[$00:036E]</code>には「ほいこーろー」のSTEPS数が収納されており、「ほいこーろー」を使った時以外は<span class="formula">0</span>が入っているようである。<br>
-このため、「ほいこーろー」使用時だとここでゼロフラグが立たず、<code>[<span class="r">$C1/CE0A</span>]</code>へは飛ばないで、「ほいこーろー」用処理へ続く。</p>
-
-<div class="code-container"><pre>
-;ここから「ほいこーろー」用処理
-$C1/CDF7 AND #$F0                ;Aと$F0で論理積
-$C1/CDF9 LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-$C1/CDFC LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFD LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFE ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CE00 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-$C1/CE02 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード
-$C1/CE04 AND #$0F                ;Aと$0Fで論理積
-$C1/CE06 ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CE08 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-;ここまで「ほいこーろー」用処理
-</pre></div>
-
-<p>ここからが「ほいこーろー」用の処理になる。<br>
-<code>A</code>には、STEP数である<code>[$00:036E]</code>がロードされている状態である。<br>
-STEP数は16進数なのに、そのまま「10進数のSTEP数」という扱いで画面に表示されてしまったので、ここで<code>[$00:036E]</code>を10進数から16進数に変換する処理が行われているのだろう、ということは想像に難くない。<br>
-調べてみたところ、やはりその通りであったが、アセンブラ言語の教科書にも載っているような基本の「2桁の16進数の値を10進数に解釈し直すプログラム」であるらしいので、わかる方は以下の説明は飛ばしてしまっても構わない。<br>
-結論だけ述べると、最後の<br>
-<code><span class="r">$C1/CE08</span> <span style="color: #0000FF;">STA</span> $22    [$00:0322]</code><br>
-で、STEP数が16進数として<code>A</code>と<code>[$00:0322]</code>に書き込まれた状態になり、通常技と共通処理の<code><span class="r">$C1/CDF7</span></code>～に続く。</p>
-
-<div class="opt">
-<input type="checkbox" id="tog1" class="tog">
-<label class="titl" for="tog1">「2桁の16進数の値を10進数に解釈し直すプログラム」についての説明<br>ここをクリックまたはタップで表示&#x25bc;</label>
-<div class="con">
-<p>前提として、STEP数の最大値は<span class="formula">99</span>であるから、10進数1～2桁の数値を、16進数1～2桁に変換することになる。<br>
-また、これまでも何度か記しているが、2進数と16進数について理解しておく必要がある。<br>
-16進数2桁の数は、上1桁を2進数4桁＋下1桁を2進数4桁という形で表記できる。<br>
-たとえば、16進数<span class="formula">67</span>は、2進数だと「<span class="formula">01100111</span>」だが、2進数の上4桁「<span class="formula">0110</span>」は16進数だと「<span class="formula">6</span>」で、2進数の下4桁「<span class="formula">0111</span>」は16進数だと「<span class="formula">7</span>」である。</p>
-
-<p>では、「2桁の16進数の値を10進数に解釈し直す」には、どうしたら良いか。<br>
-10進数では、上1桁が10の位であるから、「<span class="formula">上1桁×10 + 下4桁</span>」で、10進数に見なした値に変換できる、という理屈である。<br>
-ここからの目的は「<span class="formula">上1桁×10 + 下4桁</span>」の実行である。</p>
-
-<p>例えばSTEP数が「<span class="formula">67</span>」の時、実際には16進数の<span class="formula">67</span>であるが、上1桁の「<span class="formula">6</span>」と下1桁の「<span class="formula">7</span>」に分離し、上1桁の「<span class="formula">6</span>」を10倍した後、下1桁の「<span class="formula">7</span>」を足せば、10進数の扱いにできる。<br>
-各桁を分離する方法だが、上の通りに16進数<span class="formula">67</span>は、2進数の上4桁「<span class="formula">0110</span>」が「<span class="formula">6</span>」にあたり、2進数の下4桁「<span class="formula">0111</span>」が「<span class="formula">7</span>」に当たる。<br>
-2進数に一度変換することで、上1桁と下1桁の分離が簡単にできる（……といっても、人間には2進数や16進数の時点で簡単には見えないが、2進数が基本のコンピュータにとっては都合が良い）。</p>
-
-<p>上1桁と下1桁の分離については、論理積を使えば良い。<br>
-ここまででも何度か紹介しているが、論理積は2つのものを見比べて、「AかつBなら真とする」「それ以外は偽」という演算のこと。<br>
-2進数での計算においては、2つの値を見比べて「どちらも1の桁は1とし、それ以外の桁は0とする」演算である。<br>
-16進数<span class="formula">67</span>は、2進数だと「<span class="formula">01100111</span>」であるが、上4桁だけ取り出したいのなら、上4桁が<span class="formula">1</span>で下4桁が<span class="formula">0</span>の値とで論理積を取る。<br>
-つまり「<span class="formula">01100111</span>」と「<span class="formula">11110000</span>」との論理積で、上4桁「<span class="formula">01100000</span>」になる。<br>
-これを16進数で書き直すと、「<span class="formula">$67</span>と<span class="formula">$F0</span>との論理積で、<span class="formula">$60</span>になる」ということになる。<br>
-「ほいこーろー」用処理の最初の行である、</p>
-
-<div class="code-container"><pre>
-$C1/CDF7 AND #$F0                ;Aと$F0で論理積
-</pre></div>
-
-<p>これはまさに「16進数の上1桁だけ取り出す」という計算である。<br>
-ただしこの時点では「<span class="formula">01100000</span>」と、下に<span class="formula">0</span>が4個ついた状態である（<span class="formula">$60</span>である）ということに注意。<br>
-「<span class="formula">$6</span>」だけだと、「<span class="formula">0110</span>」である。</p>
-
-<p>16進数の上1桁が取り出せたので、まずは「<span class="formula">上1桁×10 + 下4桁</span>」の最初の「<span class="formula">上1桁×10</span>」を行うのだが、上の処理を見ると、<code><span class="r">$C1/CDF7</span></code>以降に「<span class="formula">上1桁×10</span>」の計算はしておらず、なぜか割り算と足し算を繰り返している。<br>
-割り算と足し算でいったい何を計算しているのだろうか。</p>
-
-<p>ここまででも紹介してきた通り、スーパーファミコンのプログラム言語の65C816用アセンブリで乗算や除算をするのは処理に時間がかかるし、容量もかさむ。<br>
-ただし<span class="formula">×2</span>と<span class="formula">÷2</span>は、ビットシフトという方法で簡単にできるようになっている。<br>
-命令だと「<code><span style="color: #0000FF;">ASL</span></code>」が<span class="formula">×2</span>で（算術左シフト）、「<code><span style="color: #0000FF;">LSR</span></code>」が<span class="formula">÷2</span>である（論理右シフト）。</p>
-
-<p>2進数は<span class="formula">÷2</span>すると、数字列がそのまま右へ移動していく（ビットシフト。右に移動する場合、論理右シフト）。<br>
-16進数<span class="formula">67</span>を1回論理右シフトすると（<span class="formula">÷2</span>）、「<span class="formula">01100111</span>」→「<span class="formula">00110011</span>」である。</p>
-
-<p>では、「<code><span class="r">$C1/CDF7</span> <span style="color: #0000FF;">AND</span> #$F0</code>」で算出した、16進数の上4桁部分であり2進数の「<span class="formula">01100000</span>」に1回論理右シフトするとどうなるか。<br>
-右に1回移動するから、「<span class="formula">00110000</span>」である。<br>
-この値は、「<span class="formula">$6</span>」である「<span class="formula">0110</span>」を、左に3回移動（<span class="formula">×2</span>を3回）と同じである。<br>
-「<span class="formula">0110</span>」を左に3回移動することは、下に<span class="formula">0</span>を3個つけるのと同じことだから、「<span class="formula">0110000</span>」、8桁表示にすれば「<span class="formula">00110000</span>」である。</p>
-
-<p>つまり、「<span class="formula">$60</span>」を1回論理右シフト（<span class="formula">÷2</span>）と、「<span class="formula">$6</span>」を左に3回算術左シフト（<span class="formula">×2</span>を3回）は、同じ結果となる。</p>
-
-<p>現在の目的は、「<span class="formula">上1桁×10</span>」である。上1桁に<span class="formula">0</span>がひとつついている「<span class="formula">$60</span>」ではなく、「<span class="formula">$6</span>」を<span class="formula">×10</span>したい。<br>
-ここまでで、「<span class="formula">$6</span>」を左に3回算術左シフト（<span class="formula">×2</span>を3回）したことになる。つまり「<span class="formula">$6</span>」を<span class="formula">×8</span>することはできた。</p>
-
-<div class="code-container"><pre>
-$C1/CDF9 LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-</pre></div>
-
-<p>これは結局、「16進数の上1桁の数を<span class="formula">×8</span>」して、<code>[$00:0322]</code>に書き込んだ、という手順であった。<br>
-だが実際にやりたいのは「16進数の上1桁の数を<span class="formula">×10</span>」である。<br>
-この後の処理の続きを見てみよう。</p>
-
-<div class="code-container"><pre>
-$C1/CDFC LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFD LSR A                   ;Aを論理右シフト（A/2）
-$C1/CDFE ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CE00 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-</pre></div>
-
-<p>「<span class="formula">$60</span>」を1回論理右シフト（<span class="formula">÷2</span>）した後の数値を、更に2回続けて論理右シフト（<span class="formula">÷2</span>）している。<br>
-現在、「<span class="formula">01100000</span>」を1回右シフトして「<span class="formula">00110000</span>」になっており、ここから更に2回右シフトすると、「<span class="formula">00001100</span>」である。<br>
-この値は、「<span class="formula">$6</span>」である「<span class="formula">0110</span>」を、左に1回移動（<span class="formula">×2</span>を1回）と同じである。<br>
-よって、ここで行ったことは、<code><span class="r">$C1/CDFC</span></code>と<code><span class="r">$C1/CDFD</span></code>で「16進数の上1桁の数を<span class="formula">×2</span>」してから、<code><span class="r">$C1/CDFE</span></code>で、既に<code>[$00:0322]</code>に入っていた「16進数の上1桁の数を<span class="formula">×8</span>」と足し算をする、という計算である。<br>
-<code><span class="r">$C1/CE00</span></code>では足し算した結果を<code>[$00:0322]</code>に書き込んでいるので、<code>[$00:0322]</code>の中は、</p>
-
-<p class="formula">「16進数の上1桁の数を×8」+「16進数の上1桁の数を×2」</p>
-
-<p>に変化した。<br>
-これは、</p>
-
-<p class="formula">「16進数の上1桁の数」×(8 + 2)</p>
-
-<p>と、まとめることができ、結局、</p>
-
-<p class="formula">「16進数の上1桁の数」×10</p>
+<p><span class="formula"><code>[$00:033A]</code><code>[$00:033B]</code> * <code>[$D5:ABA3]</code><code>[$D5:ABA2]</code></span><br>
+<span class="formula">= <code>[$00:033A]</code><code>[$00:033B]</code> * $0080</span></p>
 
 <p>である。<br>
-論理右シフトという割り算と、足し算を組み合わせて、「16進数の上1桁の数」<span class="formula">×10</span>ができたのである。</p>
+65C816のアセンブリ言語では乗算の命令がないので乗算を行うには一工夫必要になるのだが、2バイト×2バイト（16bit×16bit）の掛け算をする方法として、<code><span class="r">$C1/A842</span></code>～では、符号付8bit×8bitの方法（<a href="https://donkeyhacks.zouri.jp/databank/65C816/function/65c816timedivide.html" target="_blank">65C816命令表　ロード･ストア命令</a>参照）を4回に分けて行っている。<br>
+つまり、</p>
 
-<p>さて、ここまで計算したら、後は、<br>
-「<span class="formula">上1桁×10 + 下4桁</span>」<br>
-の、最後の「<span class="formula"> + 下4桁</span>」をするだけである。</p>
+<p><span class="formula">$1234 * $0080</span><br>
+<span class="formula">= ($1200 + $34) * ($0000 + $80)</span><br>
+<span class="formula">= $12*$00*$10000 + ($12*$80 + $34*$00)*$100 + $34*$80</span></p>
+
+<p><span class="formula">$10000</span>や<span class="formula">$100</span>を掛け算する場合は小数点を左にずらすだけである。<br>
+答えは4バイト（32bit）になる。</p>
+
+<p>上の計算を<code><span class="r">$C1/A842</span></code>～<code><span class="r">$C1/A8A0</span></code>で実行した結果、乗算結果の上3バイトは<code>[$00:0318]</code><code>[$00:0317]</code><code>[$00:0316]</code>に入ることになる。<br>
+<span class="formula">$1234 * $0080 = $00091A00</span><br>
+だが、「<span class="formula">$00091A</span>」の部分が順に<code>[$00:0318]</code><code>[$00:0317]</code><code>[$00:0316]</code>に入る、ということである。</p>
+
+<p>また、乱数<span class="formula">$0000～$FFFF * $0080</span>を計算した場合、答えは<span class="formula">$00000000</span>～<span class="formula">$007FFF80</span>になる。<br>
+上2バイトの<code>[$00:0318]</code><code>[$00:0317]</code>は<span class="formula">$0000</span>～<span class="formula">$007F</span>しかとらない。<br>
+この計算により、実質、<span class="formula">$0000</span>～<span class="formula">$007F</span>の乱数に計算し直したことになる。</p>
+
+<p>さて、<code><span class="r">$C1/A8AF</span></code>以降でこの乱数を更に計算していく。<br>
+<code><span class="r">$C1/A8B7</span></code>で、キャリーフラグを立て、16ビットで、</p>
+
+<p><span class="formula"><code>[$00:0318]</code><code>[$00:0317]</code> - <code>[$D5:ABA3]</code><code>[$D5:ABA2]</code>/2</span></p>
+
+<p>という引き算を計算している。</p>
+
+<p><span class="formula"><code>[$D5:ABA3]</code><code>[$D5:ABA2]</code>（$0080）/2 = $0040</span></p>
+
+<p>であり、<code>[$00:0318]</code><code>[$00:0317]</code>は<span class="formula">$0000</span>～<span class="formula">$007F</span>の乱数だから、</p>
+
+<p><span class="formula">（$0000～$007Fの乱数） - $0040</span></p>
+
+<p>キャリーフラグを立てて考えるので、</p>
+
+<p><span class="formula">（$10000～$1007Fの乱数） - $0040</span></p>
+
+<p>の、下2バイトが答えになると考えても良い。<br>
+つまり、乱数により、</p>
+
+<p><span class="formula">$FFC0</span>～<span class="formula">$FFFF</span>、または <span class="formula">$0000</span>～<span class="formula">$003F</span></p>
+
+<p>が、引き算の答えである。<br>
+符号付き16ビット整数で考えたら、10進数の<span class="formula">-64</span>～<span class="formula">0</span>～<span class="formula">+63</span>ということになる。</p>
+
+<p>最後に、キャリーフラグをクリアして、<code><span class="r">$C1/A8BA</span></code>～で、以下の足し算を計算する。</p>
+
+<p><span class="formula"><code>[$7E:A019]</code><code>[$7E:A018]</code> = <code>A</code> + <code>[$7E:A019]</code><code>[$7E:A018]</code></span>(初期値<span class="formula">$0000</span>)</p>
+
+<p><code>A</code>レジスタは先の引き算の答えであり、<code>[$7E:A019]</code><code>[$7E:A018]</code>は「ほいこーろー」用乱数を記録するアドレス2バイトで、先に述べた通り初期値は<span class="formula">$0000</span>である。<br>
+よって、</p>
+
+<p><span class="formula"><code>[$7E:A019]</code><code>[$7E:A018]</code> = （$FFC0～$FFFF、または $0000～$003F） + $0000</span></p>
+
+<p>先の引き算の答えがそのまま、<code>[$7E:A019]</code><code>[$7E:A018]</code>に入る。<br>
+以降はこのサブルーチンで<code>[$7E:A019]</code><code>[$7E:A018]</code>が計算され続けるので、漸化式で考えると、</p>
+
+<div class="place"><span class="formula">A<sub>n</sub> = ((乱数$0000～$007F) - $0040) + A<sub>n-1</sub></span><br>
+※減算・加算時はキャリーフラグを考慮（符号付き16ビット整数）<br>
+※乱数<span class="formula">$0000</span>～<span class="formula">$007F</span>は、(戦闘乱数<span class="formula">$0000～$FFFF * $0080)/$100</span>で計算</div>
+
+<p>このようになる。<br>
+仕様上、乱数として有効なのは下1バイトの<code>[$7E:A018]</code>だけであろう。<br>
+上の計算でわかるとおり、最初の計算で<code>[$7E:A019]</code>に入るのは<span class="formula">$FF</span>か<span class="formula">$00</span>のどちらかであり、この時点で2パターンしか乱数が算出できないからである。<br>
+実際、「ほいこーろー」のSTEPSの判定でも、下1バイトの<code>[$7E:A018]</code>しか使わない。</p>
+
+
+<h4>STEPS2回目以降の処理</h4>
+
+
+<p>では、STEPS2回目以降、つまりSTEPSが増加するか、そこで止まるかの判定部分を見てみよう。<br>
+上の乱数生成のサブルーチンは<code><span class="r">$C1/AFA8</span></code>で終わって、<code><span class="r">$C1/A710</span></code>にジャンプする。<br>
+そこから先について見ていく。</p>
 
 <div class="code-container"><pre>
-$C1/CE02 LDA $6E    [$00:036E]   ;Aに[$00:036E]をロード
-$C1/CE04 AND #$0F                ;Aと$0Fで論理積
-$C1/CE06 ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CE08 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
-;ここまで「ほいこーろー」用処理
+$C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
+
+$C1/A710 LDA $D50000,x[$D5:ABC6] ;Aに[$D5:ABC6]をロード
+$C1/A714 STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み　0F
+$C1/A716 INX                     ;Xをインクリメント +1
+$C1/A717 LDA $D50000,x[$D5:ABC7] ;Aに[$D5:ABC7]をロード　00
+$C1/A71B STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A71D INX                     ;Xをインクリメント +1
+$C1/A71E LDA $D50000,x[$D5:ABC8] ;Aに[$D5:ABC8]をロード　99
+$C1/A722 STA $13    [$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/A724 INX                     ;Xをインクリメント +1
+$C1/A725 LDA $D50000,x[$D5:ABC9] ;Aに[$D5:ABC9]をロード　AB
+$C1/A729 STA $14    [$00:0314]   ;Aを[$00:0314]に書き込み
+$C1/A72B INX                     ;Xをインクリメント +1
+$C1/A72C STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A72E RTS                     ;サブルーチン戻り
+
+$C1/AFAB LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/AFAD AND #$0F                ;Aと$0Fで論理積
+$C1/AFAF ASL A                   ;Aを算術左シフト *2
+$C1/AFB0 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/AFB2 AND #$00FF              ;Aと$00FFで論理積
+$C1/AFB5 ADC $1E    [$00:031E]   ;A + [$00:031F][$00:031E]
+$C1/AFB7 TAX                     ;Aの値をXレジスタに転送
+$C1/AFB8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/AFBA LDA $7E0000,x[$7E:A018] ;Aに[$7E:A018]をロード
+$C1/AFBE AND $11    [$00:0311]   ;Aと[$00:0311]で論理積　0F
+$C1/AFC0 BNE $0D    [$AFCF]      ;ゼロフラグが立っていないとき[$AFCF]分岐
+;（後略）
 </pre></div>
 
-<p>上1桁と下1桁の分離の話で述べた通り、下1桁だけ取り出したいのなら、STEP数と<span class="formula">$0F</span>の論理積を取れば良い。<br>
-16進数<span class="formula">67</span>の下1桁だったら、<span class="formula">$67</span>と<span class="formula">$0F</span>の論理積を取って「<span class="formula">$07</span>」である。<br>
-<code><span class="r">$C1/CE02</span></code>でSTEP数を<code>A</code>にロードし、<code><span class="r">$C1/CE04</span></code>でSTEP数と<span class="formula">$0F</span>の論理積を取っている。<br>
-この値と、<code>[$00:0322]</code>に収納されている「<span class="formula">上1桁×10</span>」を足したのが<code><span class="r">$C1/CE06</span></code>である。<br>
-最後に、足した結果を<code>[$00:0322]</code>に書き込みして、「2桁の16進数の値を10進数に解釈し直す」作業が終了した。</p>
+<p>乱数判定前の<code><span class="r">$C1/A710</span></code>～<code><span class="r">$C1/A72E</span></code>では、<code>[$D5:ABC6]</code>～<code>[$D5:ABC9]</code>の4バイト分が<code>[$00:0311]</code>～<code>[$00:0314]</code>に入る。<br>
+値は<span class="formula">$0F</span>, <span class="formula">$00</span>, <span class="formula">$99</span>, <span class="formula">$AB</span>。<br>
+<code><span class="r">$C1/AFAB</span></code>からが判定のサブルーチンである。<br>
+<code><span class="r">$C1/AFBA</span></code>で、「ほいこーろー」用乱数の下1バイトの<code>[$7E:A018]</code>が<code>A</code>にロードされる。<br>
+<code><span class="r">$C1/AFBE</span></code>で、<code>A</code>と<code>[$00:0311]</code>と論理積を取り、ゼロフラグ判定をしている。<code>[$00:0311]</code>は先程呼び出された<code>[$D5:ABC6]</code>（<span class="formula">$0F</span>）が入っているから、</p>
 
-<p>実際の計算だけ取り出すと以下の通り。<br>
-「<span class="formula">67</span>」を10進数と見なし、16進数に変換する場合、</p>
+<p><span class="formula"><code>[$7E:A018]</code> &amp; $0F</span></p>
 
-<p class="formula">$60/2 + $60/8 + $7 = $43</p>
+<p>であり、ゼロフラグ判定をすることになるから、実質、「<code>[$7E:A018]</code>の下1桁が<span class="formula">0</span>かどうか」の判定である。<br>
+<code>[$7E:A018]</code>が<span class="formula">$?0</span>のように下1桁が<span class="formula">0</span>であればゼロフラグが立ち、それ以外の値ならゼロフラグが立たない。<br>
+<code><span class="r">$C1/AFC0</span></code>では、ゼロフラグが立たない場合、<code><span class="r">$C1/AFCF</span></code>に分岐することになるが、この<code><span class="r">$C1/AFCF</span></code>～以降が後々でわかる通り、「STEPS数が加算される」処理である。<br>
+ということで、</p>
 
-<p>である。</p>
-</div></div>
+<p style="font-weight:bold;"><code>[$7E:A018]</code>の下1桁が<span class="formula">1</span>～<span class="formula">F</span>の時はSTEPS数が加算される（確率15/16）</p>
+
+<p>まず、これが成立する。<br>
+ちなみにこの「<code>[$7E:A018]</code>と<span class="formula">$0F</span>の論理積を取って判定」は、2STEPS目の判定だろうが、98STEPS目の判定だろうが、同一の処理である。論理積を取る値は一切変わらない。</p>
+
+<p>では、<code>[$7E:A018]</code>の下1桁が<span class="formula">0</span>だと続きはどうなるか。</p>
 
 <div class="code-container"><pre>
-;通常技と共通処理
-$C1/CD32 REP #$20                ;Mフラグをクリア　Aレジスタは16bit幅
-$C1/CD34 LDA $2134  [$00:2134]   ;Aに[$00:2134]をロード（総ダメージ量）
-$C1/CD37 STA $20    [$00:0320]   ;Aを[$00:0320]に書き込み
-$C1/CD39 LDA $7E920A,x[$7E:AD2A] ;Aに[$7E:AD2A]をロード
-$C1/CD3D AND #$00FF              ;Aと$00FFで論理積
-$C1/CD40 BEQ $04    [$CD46]      ;ゼロフラグが立っているとき[$C1/CD46]分岐
-$C1/CD46 LDA $20    [$00:0320]   ;Aに[$00:0320]をロード
-$C1/CD48 CLC                     ;キャリーフラグをクリア
-$C1/CD49 ADC $22    [$00:0322]   ;A＋[$00:0322]
-$C1/CD4B CMP #$03E7              ;Aと$03E7（=999）を減算比較（0033-03E7）
-$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$C1/CD53]分岐
-$C1/CD53 STA $7E9200,x[$7E:AD20] ;Aを[$7E:AD20]に書き込み
+$C1/AFC0 BNE $0D    [$AFCF]      ;ゼロフラグが立っていないとき[$AFCF]分岐
+;ゼロフラグON　[$7E:A018]の下1桁が0
+$C1/AFC2 LDA $7E0001,x[$7E:A019] ;Aに[$7E:A019]をロード
+$C1/AFC6 AND $12    [$00:0312]   ;Aと[$00:0312](00)で論理積
+$C1/AFC8 BNE $05    [$AFCF]      ;ゼロフラグが立っていないとき[$AFCF]分岐
+$C1/AFCA LDX $1C    [$00:031C]   ;Xに[$00:031D][$00:031C]をロード
+$C1/AFCC BRL $F6EC  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+;(中略)
+$C1/B016 JMP ($031A)[$C1:B419]   ;[$C1:B419]へジャンプ(レジスタをスタックに積まない)
+$C1/B419 JSR $A6F8  [$C1:A6F8]   ;[$C1:A6F8]へジャンプ
+
+$C1/A6F8 LDA $D50000,x[$D5:ABCB] ;Aに[$D5:ABCB](99)をロード
+$C1/A6FC STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6FE INX                     ;Xをインクリメント +1
+$C1/A6FF LDA $D50000,x[$D5:ABCC] ;Aに[$D5:ABCC](AB)をロード
+$C1/A703 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A705 INX                     ;Xをインクリメント +1
+$C1/A706 LDA $D50000,x[$D5:ABCD] ;Aに[$D5:ABCD](01)をロード
+$C1/A70A STA $13    [$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/A70C INX                     ;Xをインクリメント +1
+$C1/A70D STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A70F RTS                     ;サブルーチン戻り
+
+$C1/B41C BRL $02D3  [$B6F2]      ;フラグにかかわりなく常に分岐[$B6F2]
+$C1/B6F2 LDX $1E    [$00:031E]   ;Xに[$00:031E]をロード
+$C1/B6F4 LDA $7E002C,x[$7E:A02C] ;Aに[$7E:A02C]をロード
+$C1/B6F8 BEQ $13    [$B70D]      ;ゼロフラグが立っているとき[$B70D]分岐
+;ゼロフラグON [$7E:A02C]は初期値$00
+$C1/B70D LDA $13    [$00:0313]   ;Aに[$00:0313](01)をロード
+$C1/B70F STA $7E002C,x[$7E:A02C] ;Aを[$7E:A02C]に書き込み
 </pre></div>
 
-<p>STEP数が16進数として<code>A</code>と<code>[$00:0322]</code>に書き込まれた状態で、残りの処理が進む。<br>
-経緯は省略するが、この時点で<code>[$00:2134]</code>には総ダメージ量（= 単発ダメージ量×ヒット数）が入っている。<br>
-とはいえ、「ほいこーろー」の場合、この値は敵味方のステータスに関係なく<span class="formula">0</span>で、例外はオディオモールのみ。<br>
-単発ダメージ量が強制的に<span class="formula">1</span>に変更される都合で、オディオモールに対しての「ほいこーろー」の総ダメージ量は必ず「<span class="formula">1</span>」である。<br>
-総ダメージ量は一度、<code>[$00:0320]</code>に書き込まれる。</p>
+<p><code>[$7E:A018]</code>の下1桁が<span class="formula">0</span>だと<code><span class="r">$C1/AFC2</span></code>に進むが、次の処理は<code>[$7E:A019]</code>と<code>[$00:0312]</code>(<span class="formula">$00</span>)で論理積を取ってゼロフラグ判定だから、<code>[$7E:A019]</code>の値は関係なくゼロフラグが立って、<code><span class="r">$C1/AFCA</span></code>に進む。<br>
+（他の値の処理だと別の分岐処理が入るのだろうが、STEPS判定のこのケースでは確定で処理が進むことになる）<br>
+しばらくそのまま処理が続き、次の分岐は<code><span class="r">$C1/B6F4</span></code>である。<br>
+<code>[$7E:A02C]</code>、増加判定フラグによる分岐になる。<br>
+<code>[$7E:A02C]</code>のゼロフラグ判定で分岐であり、ここでゼロフラグが立っている場合、つまり初期値<span class="formula">$00</span>のままだったら、<code><span class="r">$C1/B70D</span></code>に進む。<br>
+これで、STEPS数増加処理確定の分岐になる。<br>
+ただし、このサブルーチンでは、<code><span class="r">$C1/B70F</span></code>で<code>[$7E:A02C]</code>に<code>[$D5:ABCD]</code>(<span class="formula">$01</span>)の値を書き込む。<br>
+つまり、増加判定フラグが<span class="formula">$00</span>から<span class="formula">$01</span>になる。</p>
 
-<p>次の<code><span class="r">$C1/CD39</span> <span style="color: #0000FF;">LDA</span> $7E920A,x</code>は、攻撃相手の回避属性関係・場の属性関係の値を取得しており、<code><span class="r">$C1/CD3D</span></code>で$00FFで論理積を取った結果、ゼロフラグが立つのであれば回避属性によるダメージ量半減計算が挟まる。<br>
-オディオモールには回避属性が設定されていないので、回避属性での半減は起こらないが、ここで回避属性のダメージ量半減が起こる場合は、</p>
+<p>では、増加判定フラグ<code>[$7E:A02C]</code>が<span class="formula">$01</span>だったらどうなるか。<br>
+<code><span class="r">$C1/B6F8</span></code>でゼロフラグが立たないから、<code><span class="r">$C1/B6FA</span></code>へ進む。</p>
 
 <div class="code-container"><pre>
-$C1/CD42 LSR $20    [$00:0320] ;論理右シフト(÷2)
-$C1/CD44 INC $20    [$00:0320] ;[$00:0320]の値をインクリメント(+1)
+$C1/B6F8 BEQ $13    [$B70D]      ;ゼロフラグが立っているとき[$B70D]分岐
+;ゼロフラグOFF [$7E:A02C]$01
+$C1/B6FA DEC A                   ;Aをデクリメント -1
+$C1/B6FB STA $7E002C,x[$7E:A02C] ;Aを[$7E:A02C]に書き込み
+$C1/B6FF BEQ $07    [$B708]      ;ゼロフラグが立っているとき[$B708]分岐
+$C1/B708 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/B70A BRL $EFAE  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+;（後略）
 </pre></div>
 
-<p>このような処理が挟まって、<span class="formula">[$00:0320]</span>に書き込まれた総ダメージ量は<span class="formula">÷2</span>された後<span class="formula">+1</span>される。<br>
-ＳＦ編キャプテンスクウェアで、ラ・ラに攻撃を当てた時、実際の総ダメージ量が<span class="formula">0</span>でも回避属性で「<span class="formula">0÷2+1</span>」と計算されてダメージ量が<span class="formula">1</span>になる、という有名なネタがあるが、その計算はここで生まれているのである。</p>
+<p>ここで一度<code>[$7E:A02C]</code>が<span class="formula">$00</span>に戻るのだが、結局この先はモーション終了処理へ進むことになり、STEPS数増加は止まる（STEPS数確定）。</p>
 
-<p>とはいえ、「ほいこーろー」では上の処理は入らないので、次の<code><span class="r">$C1/CD46</span></code>以降の話を続ける。</p>
+<p>以上が分岐の仕組みである。<br>
+つまり、</p>
 
-<p>この後は<code><span class="r">$C1/CD48</span></code>でキャリーフラグをクリアし（キャリーフラグが立っていると、この後の「<code><span style="color: #0000FF;">ADC</span> $22</code>」の計算で余計な繰り上がりが生じるので）、<code><span class="r">$C1/CD49</span> <span style="color: #0000FF;">ADC</span> $22</code>では、</p>
+<ul style="font-weight:bold;">
+	<li><code>[$7E:A018]</code>の下1桁が<span class="formula">1</span>～<span class="formula">F</span>の時はSTEPS数が加算される</li>
+	<li><code>[$7E:A018]</code>の下1桁が<span class="formula">0</span>かつ、増加判定フラグ<code>[$7E:A02C]</code>が<span class="formula">$00</span>の時も、STEPS数が加算される（ただし増加判定フラグ<code>[$7E:A02C]</code>が<span class="formula">$01</span>になる）</li>
+	<li><code>[$7E:A018]</code>の下1桁が<span class="formula">0</span>かつ、増加判定フラグ<code>[$7E:A02C]</code>が<span class="formula">$01</span>の時は、STEPS数は加算されず処理終了（STEPS数確定）</li>
+</ul>
 
-<p><code>[$00:0320]</code>（＝総ダメージ量） + <code>[$00:0322]</code>（＝「ほいこーろー」でのダメージ量）</p>
+<p>この3パターンに分かれていることがわかった。<br>
+また、この仕様のため、STEPS数は必ず<span class="formula">2</span>以上になる。<br>
+もし1STEPから2STEPSに増える最初の乱数判定で<code>[$7E:A018]</code>の下1桁が<span class="formula">0</span>だったとしても、この時点では増加判定フラグ<code>[$7E:A02C]</code>は必ず<span class="formula">$00</span>だから、STEPS数が加算されるからである。<br>
+「ほいこーろー」で1STEPが出ない理由がここでわかった。</p>
+
+<p>実際にSTEPS数が増加する処理は以下になる。<br>
+分岐処理からそこそこ先である。<br>
+<code><span class="r">$C1/AFC0</span></code>で分岐して<code><span class="r">$C1/AFCF</span></code>に進んだ場合は以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C1/AFC0 BNE $0D    [$AFCF]      ;ゼロフラグが立っていないとき[$AFCF]分岐
+;ゼロフラグOFF
+$C1/AFCF LDX $13    [$00:0313]   ;Xに[$00:0314][$00:0313]をロード　X:AB99
+;(中略)
+$C1/B413 JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+
+$C1/A6E7 LDA $D50000,x[$D5:AB9A] ;Aに[$D5:AB9A]をロード　A3
+;(中略)
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/B416 BRL $0307  [$B720]      ;フラグにかかわりなく常に分岐[$B720]
+;(中略)
+$C1/A72F JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+
+$C1/A6E7 LDA $D50000,x[$D5:ACA4] ;Aに[$D5:ACA4](01)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ACA5] ;Aに[$D5:ACA5](00)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A732 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A734 AND #$0F                ;Aと$0Fで論理積
+$C1/A736 ASL A                   ;Aを算術左シフト *2
+$C1/A737 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A739 AND #$00FF              ;Aと$00FFで論理積
+$C1/A73C ADC $1E    [$00:031E]   ;A + [$00:031F][$00:031E]
+$C1/A73E TAX                     ;Aの値をXレジスタに転送
+$C1/A73F LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A]をロード STEPS回数
+$C1/A743 CLC                     ;キャリーフラグクリア
+$C1/A744 ADC $11    [$00:0311]   ;A + [$00:0312][$00:0311]($0001)
+$C1/A746 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A]に書き込み
+$C1/A74A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A74C LDX $1C    [$00:031C]   ;Xに[$00:031D][$00:031C]をロード
+$C1/A74E BRL $FF6A  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+;（後略）
+</pre></div>
+
+<p><code><span class="r">$C1/A73F</span></code>でSTEPS回数のアドレス<code>[$7E:A01B]</code><code>[$7E:A01A]</code>をロードし、<code>[$D5:ACA5]</code><code>[$D5:ACA4]</code>(<span class="formula">$0001</span>)を加算して、<code><span class="r">$C1/A746</span></code>にて<code>[$7E:A01B]</code><code>[$7E:A01A]</code>に書き戻している。<br>
+ここでSTEPSが<span class="formula">+1</span>されたことになる。</p>
+
+<p>ただ、この処理だと、たとえば<code>[$7E:A01B]</code><code>[$7E:A01A]</code>に<span class="formula">$2009</span>が入っていた時、<span class="formula">+1</span>して<span class="formula">$200A</span>になる。<br>
+下1桁が16進数の<span class="formula">A</span>になった場合は、少し後で分岐処理がある。<br>
+<span class="formula">$200A</span>になった後の処理が以下。</p>
+
+<div class="code-container"><pre>
+$C1/A6E7 LDA $D50000,x[$D5:ACB3] ;Aに[$D5:ACB3](F0)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ACB4] ;Aに[$D5:ACB4](FF)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A7D1 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A7D3 AND #$0F                ;Aと$0Fで論理積
+$C1/A7D5 ASL A                   ;Aを算術左シフト *2
+$C1/A7D6 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A7D8 AND #$00FF              ;Aと$00FFで論理積
+$C1/A7DB ADC $1E    [$00:031E]   ;A + [$00:031E]
+$C1/A7DD TAX                     ;Aの値をXレジスタに転送
+$C1/A7DE LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A]をロード
+$C1/A7E2 AND $11    [$00:0311]   ;Aと[$00:0312][$00:0311](FFF0)で論理積
+$C1/A7E4 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A]に書き込み
+$C1/A7E8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A7EA LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A7EC BRL $FECC  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+$C1/A6BB LDA $D50000,x[$D5:ACB5] ;Aに[$D5:ACB5](0D)をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A6C1 INX                     ;Xをインクリメント +1
+$C1/A6C2 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6C4 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/A6C6 AND #$00F0              ;Aと$00F0で論理積
+$C1/A6C9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CA LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CB LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CC ADC #$A5E6              ;A + $A5E6
+$C1/A6CF TAX                     ;Aの値をXレジスタに転送
+$C1/A6D0 LDA $C10000,x[$C1:A5E6] ;Aに[$C1:A5E6]をロード
+$C1/A6D4 STA $1A    [$00:031A]   ;Aを[$00:031A]に書き込み
+$C1/A6D6 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A6D8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A6DA JMP ($031A)[$C1:A72F]   ;[$C1:A72F]へジャンプ(レジスタをスタックに積まない)
+$C1/A72F JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+
+$C1/A6E7 LDA $D50000,x[$D5:ACB6] ;Aに[$D5:ACB6]をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311](10)に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ACB7] ;Aに[$D5:ACB7](00)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A732 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A734 AND #$0F                ;Aと$0Fで論理積
+$C1/A736 ASL A                   ;Aを算術左シフト *2
+$C1/A737 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A739 AND #$00FF              ;Aと$00FFで論理積
+$C1/A73C ADC $1E    [$00:031E]   ;A + [$00:031F][$00:031E]
+$C1/A73E TAX                     ;Aの値をXレジスタに転送
+$C1/A73F LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A]をロード
+$C1/A743 CLC                     ;キャリーフラグクリア
+$C1/A744 ADC $11    [$00:0311]   ;A + [$00:0312][$00:0311](0010)
+$C1/A746 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A]に書き込み
+$C1/A74A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A74C LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A74E BRL $FF6A  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+$C1/A6BB LDA $D50000,x[$D5:ACB8] ;Aに[$D5:ACB8]をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A6C1 INX                     ;Xをインクリメント +1
+$C1/A6C2 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6C4 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/A6C6 AND #$00F0              ;Aと$00F0で論理積
+$C1/A6C9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CA LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CB LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CC ADC #$A5E6              ;A + $A5E6
+$C1/A6CF TAX                     ;Aの値をXレジスタに転送
+$C1/A6D0 LDA $C10000,x[$C1:A600] ;Aに[$C1:A600]をロード
+$C1/A6D4 STA $1A    [$00:031A]   ;Aを[$00:031A]に書き込み
+$C1/A6D6 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A6D8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A6DA JMP ($031A)[$C1:AFA8]   ;[$C1:AFA8]へジャンプ(レジスタをスタックに積まない)
+$C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
+</pre></div>
+
+<p>まず、<br>
+<span class="formula"><code>[$7E:A01B]</code><code>[$7E:A01A]</code> &amp; <code>[$D5:ACB4]</code><code>[$D5:ACB3]</code></span>(<span class="formula">$FFF0</span>)<br>
+で、下1桁の<span class="formula">A</span>を<span class="formula">0</span>に変えてしまう。<br>
+<span class="formula">$200A</span>が<span class="formula">$2000</span>になり<code>[$7E:A01B]</code><code>[$7E:A01A]</code>に書き戻されることになる。<br>
+続けて、<br>
+<span class="formula"><code>[$7E:A01B]</code><code>[$7E:A01A]</code> + <code>[$D5:ACB7]</code><code>[$D5:ACB6]</code></span>(<span class="formula">$0010</span>)<br>
+で、<code>[$7E:A01B]</code><code>[$7E:A01A]</code>が<span class="formula">$2010</span>となる。</p>
+
+<p>よって、<code>[$7E:A01B]</code><code>[$7E:A01A]</code>は、</p>
+
+<p><span class="formula">$2009</span>→<span class="formula">$200A</span>→<span class="formula">$2010</span></p>
+
+<p>このように変わる。<br>
+16進数だと<span class="formula">+7</span>だが、10進数とみなすと、<span class="formula">9</span>から<span class="formula">10</span>に<span class="formula">+1</span>された、ということになる。</p>
+
+<p><code><span class="r">$C1/A7D1</span></code>～の処理へ進むのは、下1桁が16進数の<span class="formula">A</span>になった時のみのようである。</p>
+
+<h4>STEPS99回目の処理</h4>
+
+<p>以上の処理により、乱数次第で、STEPS数が増加していく。<br>
+だが、「ほいこーろー」の仕様ではSTEPSは99が最大で、ここで必ず停止する。<br>
+98回から99回に増える場合は通常通りに処理される（99回目のモーション処理などを行うため）。<br>
+99回から更にSTEPSが増加するか、増加せず乱数で増加が停止するか、いずれにしても処理は合流するが、99回でも乱数判定により増加が決まった場合は以下のようになる。<br>
+上で紹介したように、下1桁が9だから、別処理が入っている。</p>
+
+<div class="code-container"><pre>
+$C1/A732 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A734 AND #$0F                ;Aと$0Fで論理積
+$C1/A736 ASL A                   ;Aを算術左シフト *2
+$C1/A737 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A739 AND #$00FF              ;Aと$00FFで論理積
+$C1/A73C ADC $1E    [$00:031E]   ;A + [$00:031E]
+$C1/A73E TAX                     ;Aの値をXレジスタに転送
+$C1/A73F LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A](0099)をロード
+$C1/A743 CLC                     ;キャリーフラグクリア
+$C1/A744 ADC $11    [$00:0311]   ;A + [$00:0312][$00:0311](0001)
+$C1/A746 STA $7E0000,x[$7E:A01A] ;A(009A)を[$7E:A01B][$7E:A01A]に書き込み
+$C1/A74A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A74C LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A74E BRL $FF6A  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+$C1/A6BB LDA $D50000,x[$D5:ACA6] ;Aに[$D5:ACA6]をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A6C1 INX                     ;Xをインクリメント +1
+$C1/A6C2 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6C4 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/A6C6 AND #$00F0              ;Aと$00F0で論理積
+$C1/A6C9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CA LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CB LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CC ADC #$A5E6              ;A + $A5E6
+$C1/A6CF TAX                     ;Aの値をXレジスタに転送
+$C1/A6D0 LDA $C10000,x[$C1:A600] ;Aに[$C1:A600]をロード
+$C1/A6D4 STA $1A    [$00:031A]   ;Aを[$00:031A]に書き込み
+$C1/A6D6 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A6D8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A6DA JMP ($031A)[$C1:AFA8]   ;[$C1:AFA8]へジャンプ(レジスタをスタックに積まない)
+$C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
+
+$C1/A710 LDA $D50000,x[$D5:ACA7] ;Aに[$D5:ACA7]をロード
+;(中略)
+$C1/A72E RTS                     ;サブルーチン戻り
+
+$C1/AFAB LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+;(中略)
+$C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
+
+$C1/A710 LDA $D50000,x[$D5:ACAD] ;Aに[$D5:ACAD]をロード
+;(中略)
+$C1/A72E RTS                     ;サブルーチン戻り
+
+$C1/AFAB LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+;(中略)
+$C1/A7CE JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+
+$C1/A6E7 LDA $D50000,x[$D5:ACB3] ;Aに[$D5:ACB3](F0)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ACB4] ;Aに[$D5:ACB4](FF)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A7D1 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A7D3 AND #$0F                ;Aと$0Fで論理積
+$C1/A7D5 ASL A                   ;Aを算術左シフト *2
+$C1/A7D6 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A7D8 AND #$00FF              ;Aと$00FFで論理積
+$C1/A7DB ADC $1E    [$00:031E]   ;A + [$00:031E]
+$C1/A7DD TAX                     ;Aの値をXレジスタに転送
+$C1/A7DE LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A](009A)をロード
+$C1/A7E2 AND $11    [$00:0311]   ;Aと[$00:0312][$00:0311](FFF0)で論理積
+$C1/A7E4 STA $7E0000,x[$7E:A01A] ;A(0090)を[$7E:A01B][$7E:A01A]に書き込み
+$C1/A7E8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A7EA LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A7EC BRL $FECC  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+$C1/A6BB LDA $D50000,x[$D5:ACB5] ;Aに[$D5:ACB5]をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A6C1 INX                     ;Xをインクリメント +1
+$C1/A6C2 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6C4 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/A6C6 AND #$00F0              ;Aと$00F0で論理積
+$C1/A6C9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CA LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CB LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CC ADC #$A5E6              ;A + $A5E6
+$C1/A6CF TAX                     ;Aの値をXレジスタに転送
+$C1/A6D0 LDA $C10000,x[$C1:A5E6] ;Aに[$C1:A5E6]をロード
+$C1/A6D4 STA $1A    [$00:031A]   ;Aを[$00:031A]に書き込み
+$C1/A6D6 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A6D8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A6DA JMP ($031A)[$C1:A72F]   ;[$C1:A72F]へジャンプ(レジスタをスタックに積まない)
+$C1/A72F JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+
+$C1/A6E7 LDA $D50000,x[$D5:ACB6] ;Aに[$D5:ACB6](10)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ACB7] ;Aに[$D5:ACB7](00)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A732 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A734 AND #$0F                ;Aと$0Fで論理積
+$C1/A736 ASL A                   ;Aを算術左シフト *2
+$C1/A737 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A739 AND #$00FF              ;Aと$00FFで論理積
+$C1/A73C ADC $1E    [$00:031E]   ;A + [$00:031E]
+$C1/A73E TAX                     ;Aの値をXレジスタに転送
+$C1/A73F LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A](0090)をロード
+$C1/A743 CLC                     ;キャリーフラグクリア
+$C1/A744 ADC $11    [$00:0311]   ;A + [$00:0312][$00:0311](0010)
+$C1/A746 STA $7E0000,x[$7E:A01A] ;A(00A0)を[$7E:A01B][$7E:A01A]に書き込み
+$C1/A74A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A74C LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A74E BRL $FF6A  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+$C1/A6BB LDA $D50000,x[$D5:ACB8] ;Aに[$D5:ACB8]をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A6C1 INX                     ;Xをインクリメント +1
+$C1/A6C2 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6C4 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/A6C6 AND #$00F0              ;Aと$00F0で論理積
+$C1/A6C9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CA LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CB LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CC ADC #$A5E6              ;A + $A5E6
+$C1/A6CF TAX                     ;Aの値をXレジスタに転送
+$C1/A6D0 LDA $C10000,x[$C1:A600] ;Aに[$C1:A600]をロード
+$C1/A6D4 STA $1A    [$00:031A]   ;Aを[$00:031A]に書き込み
+$C1/A6D6 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A6D8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A6DA JMP ($031A)[$C1:AFA8]   ;[$C1:AFA8]へジャンプ(レジスタをスタックに積まない)
+$C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
+</pre></div>
+
+<p>ここまでは、これまでの「<code>[$7E:A01A]</code>の下1桁が<span class="formula">9</span>の時の処理」と同じである。<br>
+<span class="formula">$0099</span>に<span class="formula">+1</span>するので<span class="formula">$009A</span>になるが、一度<span class="formula">$FFF0</span>と論理積を取って<span class="formula">$0090</span>とし、上の<code><span class="r">$C1/A73F</span></code>～で、</p>
+
+<p><span class="formula">$0090 + $0010</span></p>
+
+<p>と、計算する。<br>
+これまでなら、例えば<span class="formula">$0089</span>→<span class="formula">$008A</span>→<span class="formula">$0080 + $0010</span>→<span class="formula">$0090</span>と処理したのであるが、<span class="formula">$0090 + $0010</span>では<span class="formula">$00A0</span>である。<br>
+見た目10進数にならない。<br>
+この場合は以下のように処理が続く。</p>
+
+<div class="code-container"><pre>
+$C1/A710 LDA $D50000,x[$D5:ACB9] ;Aに[$D5:ACB9](80)をロード
+;(中略)
+$C1/A72E RTS                     ;サブルーチン戻り
+
+$C1/AFAB LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+;(中略)
+$C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
+
+$C1/A710 LDA $D50000,x[$D5:ACBF] ;Aに[$D5:ACBF]をロード
+;(中略)
+$C1/A72E RTS                     ;サブルーチン戻り
+
+$C1/AFAB LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+;(中略)
+$C1/A72F JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+
+$C1/A6E7 LDA $D50000,x[$D5:ACC5] ;Aに[$D5:ACC5](F9)をロード
+$C1/A6EB STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6ED INX                     ;Xをインクリメント +1
+$C1/A6EE LDA $D50000,x[$D5:ACC6] ;Aに[$D5:ACC6](FF)をロード
+$C1/A6F2 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A6F4 INX                     ;Xをインクリメント +1
+$C1/A6F5 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6F7 RTS                     ;サブルーチン戻り
+
+$C1/A732 LDA $10    [$00:0310]   ;Aに[$00:0310]をロード
+$C1/A734 AND #$0F                ;Aと$0Fで論理積
+$C1/A736 ASL A                   ;Aを算術左シフト *2
+$C1/A737 REP #$21                ;Aを16bit幅に変更、キャリーフラグクリア
+$C1/A739 AND #$00FF              ;Aと$00FFで論理積
+$C1/A73C ADC $1E    [$00:031E]   ;A + [$00:031E]
+$C1/A73E TAX                     ;Aの値をXレジスタに転送
+$C1/A73F LDA $7E0000,x[$7E:A01A] ;Aに[$7E:A01B][$7E:A01A](00A0)をロード
+$C1/A743 CLC                     ;キャリーフラグクリア
+$C1/A744 ADC $11    [$00:0311]   ;A + [$00:0312][$00:0311](FFF9)
+$C1/A746 STA $7E0000,x[$7E:A01A] ;Aを[$7E:A01B][$7E:A01A](0099)に書き込み
+$C1/A74A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A74C LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A74E BRL $FF6A  [$A6BB]      ;フラグにかかわりなく常に分岐[$A6BB]
+$C1/A6BB LDA $D50000,x[$D5:ACC7] ;Aに[$D5:ACC7]をロード
+$C1/A6BF STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/A6C1 INX                     ;Xをインクリメント +1
+$C1/A6C2 STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A6C4 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/A6C6 AND #$00F0              ;Aと$00F0で論理積
+$C1/A6C9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CA LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CB LSR A                   ;Aを論理右シフト　(/2)
+$C1/A6CC ADC #$A5E6              ;A + $A5E6
+$C1/A6CF TAX                     ;Aの値をXレジスタに転送
+$C1/A6D0 LDA $C10000,x[$C1:A5E6] ;Aに[$C1:A5E6]をロード
+$C1/A6D4 STA $1A    [$00:031A]   ;Aを[$00:031A]に書き込み
+$C1/A6D6 LDX $1C    [$00:031C]   ;Xに[$00:031C]をロード
+$C1/A6D8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/A6DA JMP ($031A)[$C1:A72F]   ;[$C1:A72F]へジャンプ(レジスタをスタックに積まない)
+$C1/A72F JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C1/A73F</span></code>～の処理は、キャリーフラグクリア後、</p>
+
+<p><span class="formula"><code>[$7E:A01B]</code><code>[$7E:A01A]</code>($00A0) + <code>[$D5:ACC6]</code><code>[$D5:ACC5]</code>($FFF9)</span></p>
 
 <p>を計算している。<br>
-「ほいこーろー」以外では、<code>[$00:0322]</code>の値は<span class="formula">0</span>であるから、<code>[$00:0320]</code>（＝総ダメージ量）に変化はない。<br>
-一方、「ほいこーろー」の場合、ここで「ほいこーろー」のSTEP数が足されることになる。<br>
-「ほいこーろー」の単発ダメージ量は、敵味方のステータスに関係なく、計算値は「<span class="formula">0</span>」にされる。<br>
-よって、通常、「ほいこーろー」のダメージ量は、</p>
+答えは<span class="formula">$10099</span>、つまり<span class="formula">$0099</span>（キャリーフラグON）である。<br>
+ここで、<code>[$7E:A01B]</code><code>[$7E:A01A]</code>が<span class="formula">$0099</span>の状態で乱数処理によりSTEPS数が<span class="formula">+1</span>されても<span class="formula">$0099</span>に戻る、という処理が行われたことになり、ここでSTEPS増加は終了となる。<br>
+また、99STEPSの時は、これよりも後で別途、増加判定フラグである<code>[$7E:A02C]</code>の処理も入る。<br>
+99STEPS確定の時点では、<code>[$7E:A02C]</code>には<span class="formula">$00</span>か<span class="formula">$01</span>が入っているはずだが、99STEPS確定時から後は増加判定フラグとしては機能せず、サモの締めのモーションの変化に関わってくる。以下サブルーチンで分岐処理を行っている。</p>
 
-<p class="formula">0 + 「ほいこーろー」のSTEP数</p>
+<div class="code-container"><pre>
+$C1/A6F8 LDA $D50000,x[$D5:ABDF] ;Aに[$D5:ABDF](DB)をロード
+$C1/A6FC STA $11    [$00:0311]   ;Aを[$00:0311]に書き込み
+$C1/A6FE INX                     ;Xをインクリメント +1
+$C1/A6FF LDA $D50000,x[$D5:ABE0] ;Aに[$D5:ABE0](AB)をロード
+$C1/A703 STA $12    [$00:0312]   ;Aを[$00:0312]に書き込み
+$C1/A705 INX                     ;Xをインクリメント +1
+$C1/A706 LDA $D50000,x[$D5:ABE1] ;Aに[$D5:ABE1](07)をロード
+$C1/A70A STA $13    [$00:0313]   ;Aを[$00:0313]に書き込み
+$C1/A70C INX                     ;Xをインクリメント +1
+$C1/A70D STX $1C    [$00:031C]   ;Xを[$00:031C]に書き込み
+$C1/A70F RTS                     ;サブルーチン戻り
+
+$C1/B41C BRL $02D3  [$B6F2]      ;フラグにかかわりなく常に分岐[$B6F2]
+$C1/B6F2 LDX $1E    [$00:031E]   ;Xに[$00:031E]をロード
+$C1/B6F4 LDA $7E002C,x[$7E:A02C] ;Aに[$7E:A02C]をロード
+$C1/B6F8 BEQ $13    [$B70D]      ;ゼロフラグが立っているとき[$B70D]分岐
+;ゼロフラグOFF（[$7E:A02C]が$01）
+$C1/B6FA DEC A                   ;Aをデクリメント -1
+$C1/B6FB STA $7E002C,x[$7E:A02C] ;A(00)を[$7E:A02C]に書き込み
+$C1/B6FF BEQ $07    [$B708]      ;ゼロフラグが立っているとき[$B708]分岐
+;（以降省略）
+;ゼロフラグON
+$C1/B70D LDA $13    [$00:0313]   ;Aに[$00:0313](07)をロード
+$C1/B70F STA $7E002C,x[$7E:A02C] ;Aを[$7E:A02C]に書き込み
+;(中略)
+$C1/B413 JSR $A6E7  [$C1:A6E7]   ;[$C1:A6E7]へジャンプ
+</pre></div>
+
+<p>ここで増加判定フラグ<code>[$7E:A02C]</code>に入っていた値が<span class="formula">$00</span>か<span class="formula">$01</span>かで分岐処理する。<br>
+<span class="formula">$00</span>だった場合、<code>[$7E:A02C]</code>には<code>[$D5:ABE1]</code>(<span class="formula">$07</span>)が入る。<br>
+これにより、サモがくるくる回る処理が追加され、その後に四股を踏んで99STEPSの文字が出る。<br>
+サモの回転は1回転で<code>[$7E:A02C]</code>が<span class="formula">-1</span>されるので7回転（7回のモーション）が行われ、<code>[$7E:A02C]</code>が<span class="formula">$00</span>になると回転モーションが終わる。</p>
+
+<p>一方、<code>[$7E:A02C]</code>が<span class="formula">$01</span>の場合、上の処理の<code><span class="r">$C1/B6FB</span></code>で<code>[$7E:A02C]</code>に<span class="formula">$00</span>が書き込まれ、回転モーション1回で四股を踏むモーションへと移行する。</p>
+
+<p>つまり99STEPSの時は、2パターンのモーションが見られるということになる。<br>
+回転数が変わるだけなので、わかりにくいといえばわかりにくいが……<br>
+モーションが異なるだけでダメージ量自体は<span class="formula">99</span>で共通である。</p>
+
+<h4>STEPS数からダメージ量へ</h4>
+
+<p><code>[$7E:A01B]</code><code>[$7E:A01A]</code>に入ったSTEPS数は、他の技と同じく、敵へのダメージ量として処理される。<br>
+そのサブルーチンが以下。<br>
+まず、以下処理で<code>[$7E:A01A]</code>の値が<code>[$00:036E]</code>にコピーされる。</p>
+
+<div class="code-container"><pre>
+$C1/A4F7 LDA $7EA01A[$7E:A01A]   ;Aに[$7E:A01A]をロード
+$C1/A4FB STA $6E    [$00:036E]   ;Aを[$00:036E]に書き込み
+$C1/A4FD JSR $A3E4  [$C1:A3E4]   ;[$C1:A3E4]へジャンプ
+</pre></div>
+
+<p>もちろんこの時点での<code>[$7E:A01A]</code>は、「16進数だが10進数で読み取れるSTEPS数」のままである。<br>
+25STEPSなら<code>[$7E:A01A]</code>には<span class="formula">$25</span>が入っているが、16進数での<span class="formula">$25</span>は10進数変換すると<span class="formula">37</span>である。</p>
+
+<p>上のサブルーチンは、敵味方どちらも技を使用した時に、モーションが終了した時点で処理されるのだが、<code>[$7E:A01A]</code>に00以外の値が入るのが「ほいこーろー」しかないようで（未確認）、他の技はだいたい<code>[$00:036E]</code>に<span class="formula">$00</span>が入ったまま処理が進むことになる。</p>
+
+<p>ここから少し飛んで、他の技との共通処理（ダメージ量処理）のサブルーチン<code><span class="r">$C1/CDE7</span></code>～から分岐が発生する。</p>
+
+<div class="code-container"><pre>
+$C1/CDE7 STZ $22    [$00:0322]   ;[$00:0322]に$00を書き込み
+$C1/CDE9 STZ $23    [$00:0323]   ;[$00:0323]に$00を書き込み
+$C1/CDEB LDA $77    [$00:0377]   ;Aに[$00:0377]をロード
+$C1/CDED AND #$0F                ;Aと$0Fで論理積
+$C1/CDEF CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C1/CDF1 BNE $17    [$CE0A]      ;ゼロフラグが立っていないとき[$CE0A]分岐
+$C1/CDF3 LDA $6E    [$00:036E]   ;Aに[$00:036E](STEPS数)をロード
+$C1/CDF5 BEQ $13    [$CE0A]      ;ゼロフラグが立っているとき[$CE0A]分岐
+;ゼロフラグOFF ほいこーろー用処理
+$C1/CDF7 AND #$F0                ;Aと$F0で論理積
+$C1/CDF9 LSR A                   ;Aを論理右シフト　(/2)
+$C1/CDFA STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+$C1/CDFC LSR A                   ;Aを論理右シフト　(/2)
+$C1/CDFD LSR A                   ;Aを論理右シフト　(/2)
+$C1/CDFE ADC $22    [$00:0322]   ;A + [$00:0322]
+$C1/CE00 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+$C1/CE02 LDA $6E    [$00:036E]   ;Aに[$00:036E](STEPS数)をロード
+$C1/CE04 AND #$0F                ;Aと$0Fで論理積
+$C1/CE06 ADC $22    [$00:0322]   ;A + [$00:0322]
+$C1/CE08 STA $22    [$00:0322]   ;Aを[$00:0322]に書き込み
+;処理合流
+$C1/CE0A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/CDF3</span></code>で<code>[$00:036E]</code>(STEPS数)のゼロフラグ分岐がある。<br>
+「ほいこーろー」だと<span class="formula">$02</span>以上の値が入っているはずなので、ここで<code><span class="r">$C1/CDF7</span></code>～<code><span class="r">$C1/CE08</span></code>のほいこーろー用処理が入る。<br>
+ここが、「2桁の16進数の値を10進数に解釈し直すサブルーチン」である。</p>
+
+<p>例えば、STEPS数として<code>[$00:036E]</code>に<span class="formula">$67</span>が入っていた場合、「ほいこーろー」のモーション終了時には10進数として「67STEPS」と表示される。<br>
+だが、16進数<span class="formula">$67</span> (<span class="formula">%0110 0111</span>)は、10進数に直すと<span class="formula">103</span>である。これでは後々で「<span class="formula">103</span>ダメージ」と算出されてしまう。<br>
+10進数で<span class="formula">67</span>は、16進数だと幾つか？　という計算をして、その値を「ほいこーろー」のダメージ量とする。</p>
+
+<p>そこで上では、まず<code><span class="r">$C1/CDF7</span></code>で<code>[$00:036E]</code>と<span class="formula">$F0</span>の論理積を取る。<br>
+これで<span class="formula">$67</span>の上の桁、10進数で見なした時の10の位が取り出せて、<span class="formula">$60</span>になる。(<span class="formula">%0110 0000</span>)<br>
+<code><span class="r">$C1/CDFA</span></code>で、$60/2を<code>[$00:0322]</code>に書き込む。(<span class="formula">%0011 0000</span>)<br>
+この値は実質、<span class="formula">$6</span>(<span class="formula">%0000 0110</span>)を<span class="formula">×8</span>した値(<span class="formula">%0011 0000</span>)と等しい。つまり16進数<span class="formula">$67</span>の10の位の値<span class="formula">×8</span>である。<br>
+更に<code><span class="r">$C1/CDFC</span></code>～で、論理右シフト3回分（<span class="formula">/8</span>）だから、<span class="formula">$6</span>(<span class="formula">%0000 0110</span>)を<span class="formula">×2</span>した値と等しい。<br>
+<code><span class="r">$C1/CE00</span></code>で求められたのは、</p>
+
+<p><span class="formula">STEPS数の上の位×8 + STEPS数の上の位×2</span><br>
+<span class="formula">= STEPS数の上の位×10</span></p>
 
 <p>である。<br>
-しかし、<a href="program6.html">オディオモールのダメージ量処理</a>で記したとおり、オディオモールは自身への「単発ダメージ量を無条件で<span class="formula">1</span>に変更する」という仕様がある。<br>
-このため、オディオモールに対してだけは、「ほいこーろー」のダメージ量は、</p>
+ここに、<code><span class="r">$C1/CE02</span></code>～からの<code>[$00:036E]</code>と<span class="formula">$0F</span>で論理積を取った値（つまり1の位）を足せば、「10進数で<span class="formula">67</span>は、16進数だと幾つか？」が計算できたことになる。</p>
 
-<p class="formula">1 + 「ほいこーろー」のSTEP数</p>
-
-<p>になる。<br>
-これが、オディオモールに対して「ほいこーろー」を使った場合、画面に表示されるSTEPSの数と、実際にオディオモールへ与えるダメージ量が「<span class="formula">1</span>」だけ異なる理由である。</p>
-
-
-<p>最後に、以下の処理が入っている。</p>
+<p>ということで、<code><span class="r">$C1/CE08</span></code>で<code>[$00:0322]</code>に書き込んだ値が、「2桁の16進数の値を10進数に解釈」した値である。</p>
 
 <div class="code-container"><pre>
-$C1/CD4B CMP #$03E7              ;Aと$03E7（=10進数999）を減算比較
-$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$C1/CD53]分岐
-$C1/CD53 STA $7E9200,x[$7E:AD20] ;Aを[$7E:AD20]に書き込み
+$C1/CD32 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C1/CD34 LDA $2134  [$00:2134]   ;Aに[$00:2135][$00:2134](この時点での総ダメージ量)をロード
+$C1/CD37 STA $20    [$00:0320]   ;Aを[$00:0321][$00:0320]に書き込み
+$C1/CD39 LDA $7E920A,x           ;Aに[$7E:ADxB][$7E:ADxA]をロード
+$C1/CD3D AND #$00FF              ;Aと$00FFで論理積
+$C1/CD40 BEQ $04    [$CD46]      ;ゼロフラグが立っているとき[$CD46]分岐
+;ゼロフラグON
+$C1/CD46 LDA $20    [$00:0320]   ;Aに[$00:0321][$00:0320]をロード
+$C1/CD48 CLC                     ;キャリーフラグクリア
+$C1/CD49 ADC $22    [$00:0322]   ;A + [$00:0323][$00:0322]（STEPS数ダメージ量）
+$C1/CD4B CMP #$03E7              ;Aと$03E7を減算比較（ステータスレジスタ変更のみ）
+$C1/CD4E BCC $03    [$CD53]      ;キャリーフラグが立っていないとき[$CD53]分岐
+;キャリーフラグOFF　ダメージ量は999未満
+$C1/CD53 STA $7E9200,x           ;Aを[$7E:ADx1][$7E:ADx0]に書き込み
+$C1/CD57 STA $4204  [$00:4204]   ;Aを[$00:4205][$00:4204]に書き込み
+$C1/CD5A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C1/CD5C JSR $CE0B  [$C1:CE0B]   ;[$C1:CE0B]へジャンプ
 </pre></div>
 
-<p>総ダメージ量と、<span class="formula">$03E7（=10進数999）</span>を比較している。<br>
-この計算でキャリーフラグが立つのは、2進数で計算した時、引き算で繰り下がりが起きない時であり、つまりは引き算の結果が<span class="formula">0</span>以上の時である。<br>
-要するに、総ダメージ量が<span class="formula">999</span>以上の時は<code>[<span class="r">$C1/CD53</span>]</code>に飛ばずにそのまま計算が続くのだが、<code><span class="r">$C1/CD4E</span></code>と<code><span class="r">$C1/CD53</span></code>の間は、</p>
+<p><code>[$00:2135]</code><code>[$00:2134]</code>に入っているのは「単発ダメージ量×ヒット数」になる（処理省略）。<br>
+「ほいこーろー」は単発ダメージ量が計算上<span class="formula">0</span>、ヒット数<span class="formula">1</span>なのだが、例外になるのは最終編のオディオモールで、「単発ダメージ量の計算を通常通り行った後、単発ダメージ量を<span class="formula">1</span>に変更する」という処理が入る。<a href="program6.html">オディオモールのダメージ量処理</a>を見ていただきたい。<br>
+このため、<code><span class="r">$C1/CD37</span></code>で<code>[$00:0321]</code><code>[$00:0320]</code>に入る値は、オディオモール以外は<span class="formula">$0000</span>、オディオモールのみ<span class="formula">$0001</span>ということになる。</p>
 
-<div class="code-container"><pre>
-$C1/CD50 LDA #$03E7 ;Aに$03E7（=10進数999）を書き込む
-</pre></div>
+<p><code><span class="r">$C1/CD39</span></code>～の判定は<a href="program38.html">回避属性</a>判定値からダメージ量を半減するかどうかの分岐である。詳細は<a href="program38.html">回避属性</a>のサブルーチン（敵が回避属性で半減）を見ていただきたい。<br>
+<code><span class="r">$C1/CD39</span></code>でロードする<code>[$7E:ADxA]</code>が<span class="formula">$00</span>の時は回避属性判定なしでダメージ量は半減されない。<br>
+「ほいこーろー」は無属性技だから半減なし。</p>
 
-<p>これが挟まっている。<br>
-つまり、総ダメージ量が<span class="formula">999</span>以上の時は、ダメージ量を<span class="formula">999</span>に変更する、という処理である。<br>
-ダメージ量（または回復量）のカウンターストップはここで処理されていた、ということがわかる。<br>
-ただし「ほいこーろー」のダメージ量は最大で<span class="formula">99</span>なので、この処理を通ることはない。</p>
+<p><code><span class="r">$C1/CD49</span></code>～で、</p>
+
+<p><span class="formula"><code>[$00:0321]</code><code>[$00:0320]</code>（単発ダメージ量×ヒット数 回避属性反映） + <code>[$00:0323]</code><code>[$00:0322]</code>（STEPS数ダメージ量）</span></p>
+
+<p>を計算し、<code><span class="r">$C1/CD4B</span></code>～で<span class="formula">$03E7</span>（10進数<span class="formula">999</span>）と比較して、<span class="formula">999</span>以下であればダメージ量は変化せず、そのまま最終的なダメージ量となる。<br>
+「ほいこーろー」の最大ダメージ量は<span class="formula">99</span>（<span class="formula">$63</span>）だから、<code><span class="r">$C1/CD4E</span></code>でキャリーフラグが立つことはなく、そのままダメージ量が書き込まれる。</p>
+
+<p>「ほいこーろー」以外だと<code>[$00:0323]</code><code>[$00:0322]</code>は<span class="formula">$0000</span>なので、<code>[$00:0321]</code><code>[$00:0320]</code>（単発ダメージ量×ヒット数 回避属性反映）がそのままダメージ量扱いとなる。<br>
+「ほいこーろー」の場合は、オディオモール以外なら、</p>
+
+<p><span class="formula">$0000 + <code>[$00:0323]</code><code>[$00:0322]</code></span>（STEPS数ダメージ量）</p>
+
+<p>だから、STEPSの値がそのままダメージ量である。<br>
+だが、オディオモールだと、</p>
+
+<p><span class="formula">$0001 + <code>[$00:0323]</code><code>[$00:0322]</code></span>（STEPS数ダメージ量）</p>
+
+<p>となってしまい、STEPS数<span class="formula">+1</span>のダメージを与えることになる。<br>
+これが、オディオモールに「ほいこーろー」を当てると、STEPSで表示される値とダメージ量とに<span class="formula">1</span>の差がある原因である。<br>
+（リメイク版ではこの現象が起こらないようになっている）</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
 
 <script>//ソースコード色分け処理
 window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
@@ -653,6 +1332,9 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 <div class="innertube">
 
 <!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
 
 <div class="accordion">
 
@@ -849,49 +1531,12 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 	<ul>
 		<li><a href="index.html">解説トップページ</a></li>
 		<li><a href="datamap.html">データマップ</a></li>
-		<li><a href="program2.html">テレポートの仕様</a></li>
-		<li><a href="program3.html">アイテム改造などの確率</a></li>
-		<li><a href="program4.html">ダメージ計算式解説</a></li>
-		<li><a href="program5.html">戦闘用乱数計算</a></li>
-		<li><a href="program6.html">オディオモールのダメージ量</a></li>
-		<li><a href="program6_3.html">命中判定について</a></li>
-		<li><a href="program6_4.html">攻撃技のヒット数</a></li>
-		<li><a href="program6_5.html">敵ターゲット決定方法</a></li>
-		<li><a href="program7.html">マップ乱数について</a></li>
-		<li><a href="program8.html">ドロップアイテム判定</a></li>
-		<li><a href="program10.html">経験値計算</a></li>
-		<li><a href="program10_2.html">ステータス上昇値</a></li>
-		<li><a href="program9_1.html">マップタイマー</a></li>
-		<li><a href="program11.html">セレクトバグ</a></li>
-		<li><a href="program12.html">サモに与えるアイテム</a></li>
-		<li><a href="program14.html">キューブのバッテリー</a></li>
-		<li><a href="program25.html">かわひもバグ</a></li>
-		<li><a href="program13.html">現代編ワタナベイベント</a></li>
-		<li><a href="program15.html">「逃げる」コマンドのフラグ</a></li>
-		<li><a href="program16.html">最終編敵パーティ</a></li>
-		<li><a href="program17.html">行動異常</a></li>
-		<li><a href="program18.html">状態異常</a></li>
-		<li><a href="program19.html">副能力変動値</a></li>
-		<li><a href="program20.html">幕末編のザコ敵</a></li>
-		<li><a href="program21.html">文字入力と判定</a></li>
-		<li><a href="program22.html">ラーニング</a></li>
-		<li><a href="program23.html">功夫編・修行</a></li>
-		<li><a href="program24.html">味方との戦闘</a></li>
-		<li><a href="program26.html">ダメージフィールド</a></li>
-		<li><a href="program27.html">反撃</a></li>
-		<li><a href="program28.html">ざき3戦目</a></li>
-		<li><a href="program32.html">位置変化・向き変え</a></li>
-		<li><a href="program33.html">オディオ戦</a></li>
-		<li><a href="program34.html">ステータス変動</a></li>
-		<li><a href="program35.html">セーブ</a></li>
-		<li><a href="program36.html">回復技</a></li>
-		<li><a href="program37.html">特殊タイプの技処理</a></li>
-		<li><a href="program38.html">回避属性</a></li>
-		<li><a href="program39.html">向き補正</a></li>
-		<li><a href="program40.html">行動ポイント</a></li>
-		<li><a href="program40_2.html">順序ポイント</a></li>
-		<li><a href="program41.html">敵の行動選択</a></li>
-		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
 	</ul>
 </div>
 </div>
