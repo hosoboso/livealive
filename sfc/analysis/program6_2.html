@@ -342,14 +342,15 @@ STEPS平均値は<span class="formula">31.8</span>くらいになる。</p>
 
 <p>初期値は<span class="formula">$0000</span>。2バイト値。<br>
 戦闘乱数から計算される「ほいこーろー」用乱数が記録されるアドレス。<br>
-「ほいこーろー」用乱数は後で説明する通り、漸化式であり、</p>
+「ほいこーろー」用乱数は後で説明する通り、漸化式であり、漸化式A<sub>n</sub>とすると以下のようになる。</p>
 
 <p><span class="formula">A<sub>n</sub> = ((乱数$0000～$007F) - $0040) + A<sub>n-1</sub></span><br>
-※減算・加算時はキャリーフラグを考慮（符号付き16ビット整数）<br>
+<span class="formula">A<sub>0</sub> = $0000</span></p>
+
+<p>※減算・加算時はキャリーフラグを考慮（符号付き16ビット整数）<br>
 ※乱数<span class="formula">$0000</span>～<span class="formula">$007F</span>は、<span class="formula">(戦闘乱数$0000～$FFFF * $0080)/$100</span>で計算</p>
 
-<p>で計算できる。<br>
-乱数判定に使うのは実質<code>[$7E:A018]</code>のみ。</p>
+<p>乱数判定に使うのは実質<code>[$7E:A018]</code>のみ。</p>
 
 <h4><code>[$7E:A02C]</code></h4>
 
@@ -648,9 +649,11 @@ $C1/AFA8 JSR $A710  [$C1:A710]   ;[$C1:A710]へジャンプ
 <p>先の引き算の答えがそのまま、<code>[$7E:A019]</code><code>[$7E:A018]</code>に入る。<br>
 以降はこのサブルーチンで<code>[$7E:A019]</code><code>[$7E:A018]</code>が計算され続けるので、漸化式で考えると、</p>
 
-<div class="place"><span class="formula">A<sub>n</sub> = ((乱数$0000～$007F) - $0040) + A<sub>n-1</sub></span><br>
-※減算・加算時はキャリーフラグを考慮（符号付き16ビット整数）<br>
-※乱数<span class="formula">$0000</span>～<span class="formula">$007F</span>は、(戦闘乱数<span class="formula">$0000～$FFFF * $0080)/$100</span>で計算</div>
+<div class="place"><p><span class="formula">A<sub>n</sub> = ((乱数$0000～$007F) - $0040) + A<sub>n-1</sub></span><br>
+<span class="formula">A<sub>0</sub> = $0000</span></p>
+
+<p>※減算・加算時はキャリーフラグを考慮（符号付き16ビット整数）<br>
+※乱数<span class="formula">$0000</span>～<span class="formula">$007F</span>は、<span class="formula">(戦闘乱数$0000～$FFFF * $0080)/$100</span>で計算</p></div>
 
 <p>このようになる。<br>
 仕様上、乱数として有効なのは下1バイトの<code>[$7E:A018]</code>だけであろう。<br>
