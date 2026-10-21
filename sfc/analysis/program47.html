@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 味方キャラの移動">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 味方キャラの移動">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 味方キャラの移動</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.apu_code-container,
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.apu_code-container pre,
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; 味方キャラの移動</h1>
+<h2>味方キャラの移動</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここでは、戦闘における味方キャラの移動について紹介する。<br>
+味方キャラの場合、味方にターンが回った時、プレイヤーがコマンドを開いていない状態で、十字キーを押した方向へ1マス移動、という一見単純な処理ではあるが、味方キャラの場合、状態異常の「酔い」状態だと十字キーを押した方向ではない方向へ移動する場合がある。<br>
+酔い状態による移動処理はどうなるのか、移動がミスする確率はどう計算されるのか、などはこれといって資料もない。<br>
+ということで、酔い状態の調査も含めた味方キャラの移動について以下でまとめる。</p>
+
+<p>ちなみに、<span class="tri"><a href="program41_4.html">敵の移動・向き変え</a></span>にも記した通り、敵の酔い状態は敵の移動には影響しないようである。</p>
+
+<div id="captiondata"></div>
+
+<h3>メモリアドレス</h3>
+
+<p>ここでは味方キャラ1のアドレスとする。2人目以降のキャラはアドレスを<span class="formula">+$40*n</span>する。</p>
+
+<h4>状態異常の状態</h4>
+
+<p>味方キャラの状態異常の状態は<code>$00:1C39</code>(<span class="formula">+$40*n</span>)に入る。<br>
+1バイトで8種の状態異常の状態を表す。<br>
+Bit7からBit0の順に（上の桁から順に）、</p>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>状態異常</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">7</span></td><td>石化</td></tr>
+	<tr><td><span class="formula">6</span></td><td>酔い</td></tr>
+	<tr><td><span class="formula">5</span></td><td>眠り</td></tr>
+	<tr><td><span class="formula">4</span></td><td>マヒ</td></tr>
+	<tr><td><span class="formula">3</span></td><td>毒</td></tr>
+	<tr><td><span class="formula">2</span></td><td>腕かため</td></tr>
+	<tr><td><span class="formula">1</span></td><td>足かため</td></tr>
+	<tr><td><span class="formula">0</span></td><td>首かため</td></tr>
+</tbody>
+</table>
+
+<p>に<span class="formula">1</span>ビットずつ対応して、該当の状態異常だと<span class="formula">1</span>が立つ。</p>
+
+<p>酔い状態はBit6に対応だから、<span class="formula">%0100 0000 = $40</span>である。</p>
+
+<h4>コントローラ1ボタン判定値</h4>
+
+<p><code>[$00:0345]</code><code>[$00:0344]</code>の2バイトが、コントローラ1のボタンを押した判定値。<br>
+どの方向キーを押したかの判断に使用する。<br>
+何かしらのボタンが押された時、I/Oポートアドレス<code>[$00:4219]</code><code>[$00:4218]</code>（コントローラ1のボタンの状態を出力）の2バイトが、<code>[$00:0345]</code><code>[$00:0344]</code>にコピーされる。<br>
+<code>[$00:0344]</code>はR・L・X・Aボタンの判定、<code>[$00:0345]</code>はR・L・X・Aボタン以外。<br>
+今回は移動なので、<code>[$00:0345]</code>の値が重要になる。<br>
+Bit7からBit0の順に（上の桁から順に）、</p>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>ボタン</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">7</span></td><td>B</td></tr>
+	<tr><td><span class="formula">6</span></td><td>Y</td></tr>
+	<tr><td><span class="formula">5</span></td><td>セレクト</td></tr>
+	<tr><td><span class="formula">4</span></td><td>スタート</td></tr>
+	<tr><td><span class="formula">3</span></td><td>上</td></tr>
+	<tr><td><span class="formula">2</span></td><td>下</td></tr>
+	<tr><td><span class="formula">1</span></td><td>左</td></tr>
+	<tr><td><span class="formula">0</span></td><td>右</td></tr>
+</tbody>
+</table>
+
+<p>十字キーは斜め押しすることで2種を同時押し可能だが、その場合の判定方法はサブルーチンで紹介する。</p>
+
+<h4>味方キャラのマス目の座標</h4>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1C18</code></td><td>キャラ位置のマス目のX座標（左から<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
+	<tr><td><code>$00:1C19</code></td><td>キャラ位置のマス目のY座標（上から<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
+	<tr><td><code>$00:1C1A</code></td><td>途中計算用のマス目のX座標（左から<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
+	<tr><td><code>$00:1C1B</code></td><td>途中計算用のマス目のY座標（上から<span class="formula">$00</span>～<span class="formula">$06</span>）</td></tr>
+</tbody>
+</table>
+
+<p>マス目の座標は、左上を原点<span class="formula">(0,0)</span>として<span class="formula">(6,6)</span>まで。<br>
+移動時、移動前のX・Y座標は<code>$00:1C18</code>と<code>$00:1C19</code>に入っているが、移動時には、移動したいマスに移動可能かどうかの判定のため、計算用に<code>$00:1C1A</code>と<code>$00:1C1B</code>に値を入れて計算、最後に<code>$00:1C18</code>と<code>$00:1C19</code>に決定値を書き戻す。</p>
+
+<h4>モーション値</h4>
+
+<p><code>$00:1C1E</code>, <code>$00:1C1F</code>の2バイトで、現在キャラが何のモーションかを表す数値、と思われる（が、よくわからない）。<br>
+モーション値というかモーション値のようなものであり（仮）なのでご了承いただきたい。<br>
+戦闘開始時に全キャラ<span class="formula">$80</span>, <span class="formula">$84</span>が入り、技を出す時や移動時に別の値が入る。</p>
+
+<h4>戦闘フィールドの状態</h4>
+
+<p><code>$00:04C8</code>～<code>$00:04FE</code>に、敵味方及びダメージフィールドの状態が入っている。<br>
+移動したい方向に他キャラ（敵味方）がいないかどうか、フィールド隅ではないか、の判定に使う。<br>
+以下、<code>$00:04??</code>の<code>??</code>の値部分のみ記している。</p>
+
+<table>
+<tbody>
+	<tr class="formula"><td>C8</td><td>C9</td><td>CA</td><td>CB</td><td>CC</td><td>CD</td><td>CE</td></tr>
+	<tr class="formula"><td>D0</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td></tr>
+	<tr class="formula"><td>D8</td><td>D9</td><td>DA</td><td>DB</td><td>DC</td><td>DD</td><td>DE</td></tr>
+	<tr class="formula"><td>E0</td><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td></tr>
+	<tr class="formula"><td>E8</td><td>E9</td><td>EA</td><td>EB</td><td>EC</td><td>ED</td><td>EE</td></tr>
+	<tr class="formula"><td>F0</td><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td></tr>
+	<tr class="formula"><td>F8</td><td>F9</td><td>FA</td><td>FB</td><td>FC</td><td>FD</td><td>FE</td></tr>
+</tbody>
+</table>
+<br>
+<table>
+<thead>
+	<tr><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$01</span></td><td>味方キャラ1</td></tr>
+	<tr><td><span class="formula">$02</span></td><td>味方キャラ2</td></tr>
+	<tr><td><span class="formula">$03</span></td><td>味方キャラ3</td></tr>
+	<tr><td><span class="formula">$04</span></td><td>味方キャラ4</td></tr>
+	<tr><td><span class="formula">$11</span></td><td>敵キャラ0</td></tr>
+	<tr><td><span class="formula">$12</span></td><td>敵キャラ1</td></tr>
+	<tr><td><span class="formula">$13</span></td><td>敵キャラ2</td></tr>
+	<tr><td><span class="formula">$14</span></td><td>敵キャラ3</td></tr>
+	<tr><td><span class="formula">$15</span></td><td>敵キャラ4</td></tr>
+	<tr><td><span class="formula">$16</span></td><td>敵キャラ5</td></tr>
+	<tr><td><span class="formula">$17</span></td><td>敵キャラ6</td></tr>
+	<tr><td><span class="formula">$18</span></td><td>敵キャラ7</td></tr>
+	<tr><td><span class="formula">$19</span></td><td>敵キャラ8</td></tr>
+	<tr><td><span class="formula">$1A</span></td><td>敵キャラ9</td></tr>
+	<tr><td><span class="formula">$1B</span></td><td>敵キャラA</td></tr>
+	<tr><td><span class="formula">$1C</span></td><td>敵キャラB</td></tr>
+	<tr><td><span class="formula">$1D</span></td><td>敵キャラC</td></tr>
+	<tr><td><span class="formula">$1E</span></td><td>敵キャラD</td></tr>
+	<tr><td><span class="formula">$1F</span></td><td>敵キャラE</td></tr>
+	<tr><td><span class="formula">$80</span></td><td>水フィールド</td></tr>
+	<tr><td><span class="formula">$A0</span></td><td>毒フィールド</td></tr>
+	<tr><td><span class="formula">$C0</span></td><td>火炎フィールド</td></tr>
+	<tr><td><span class="formula">$E0</span></td><td>電撃フィールド</td></tr>
+</tbody>
+</table>
+
+
+<h4>味方キャラの向き</h4>
+
+<p><code>$00:1C1D</code>にキャラの現在の向きの値が入る。</p>
+
+<table>
+<thead>
+	<tr><th>向き</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>右下</td><td><span class="formula">$00</span></td></tr>
+	<tr><td>左下</td><td><span class="formula">$01</span></td></tr>
+	<tr><td>右上</td><td><span class="formula">$02</span></td></tr>
+	<tr><td>左上</td><td><span class="formula">$03</span></td></tr>
+</tbody>
+</table>
+
+<p>味方キャラが移動する場合、同時に向きが変わることがあるため、向き判定・変更も行うことになる。</p>
+
+<h3>サブルーチン</h3>
+
+<p>順に説明していく。<br>
+味方キャラは基本的に味方キャラ1ということでメモリアドレスを記す。<br>
+（戦闘中、<code>[$00:1C00]</code>～<code>[$00:1C3F]</code>に各種の値が入る）</p>
+
+<h4>コントローラのボタンを押したかどうか判定</h4>
+
+<p>まず、コントローラのボタンが押されたかどうかの判定を行う。</p>
+
+<div class="code-container"><pre>
+;ループ処理開始
+$C1/8AD8 LDA $4212  [$00:4212]   ;Aに[$00:4212]をロード Bit0自動ジョイパッド読み取りフラグ
+$C1/8ADB AND #$01                ;Aと$01で論理積
+$C1/8ADD BNE $F9    [$8AD8]      ;ゼロフラグが立っていないとき[$8AD8]分岐
+;ループ処理ここまで
+$C1/8ADD BNE $F9    [$8AD8]      ;ゼロフラグが立っていないとき[$8AD8]分岐
+$C1/8ADF LDX #$0000              ;Xに$0000をロード
+$C1/8AE2 LDA $4218  [$00:4218]   ;Aに[$00:4218]をロード　コントローラ1ボタン判定
+$C1/8AE5 BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/8AE7 BNE $03    [$8AEC]      ;ゼロフラグが立っていないとき[$8AEC]分岐
+$C1/8AE9 LDX $4218  [$00:4218]   ;Xに[$00:4219][$00:4218]をロード　コントローラ1ボタン判定
+$C1/8AEC STX $44    [$00:0344]   ;Xを[$00:0345][$00:0344]に書き込み
+$C1/8AEE LDX #$0000              ;Xに$0000をロード
+$C1/8AF1 LDA $421A  [$00:421A]   ;Aに[$00:421A]をロード　コントローラ2ボタン判定
+$C1/8AF4 BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/8AF6 BNE $03    [$8AFB]      ;ゼロフラグが立っていないとき[$8AFB]分岐
+$C1/8AF8 LDX $421A  [$00:421A]   ;Xに[$00:421B][$00:421A]をロード　コントローラ2ボタン判定
+$C1/8AFB STX $46    [$00:0346]   ;Xを[$00:0347][$00:0346]に書き込み
+$C1/8AFD RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>I/Oポートアドレス<code>[$00:4212]</code>のBit0が自動ジョイパッド読み取りフラグで、Bit0に<span class="formula">1</span>を書き込んで有効にすると、コントローラ1のボタンの状態を<code>[$00:4219]</code><code>[$00:4218]</code>に書き出しBit0の値を<span class="formula">0</span>に戻す。<br>
+上の通り、何かしらのボタンが押された時は、<code>[$00:4219]</code><code>[$00:4218]</code>の2バイトが、<code>[$00:0345]</code><code>[$00:0344]</code>にコピーされる。<br>
+押したかどうかだけの判断なので、ボタンを離したかどうかは判定していない。<br>
+実際にプレイすればわかるとおり、戦闘ではAボタンを一瞬押しただけでも、Aボタン押しっぱなしでも、コマンドウィンドウが表示される。Aボタンを押す→離すを行わないとコマンドが出ない、ということはない。<br>
+他ボタンでも同じで、少しでも何かしらのボタンを押せば、そのボタンに対応した操作が実行されることになる。</p>
+
+
+<h4>向き判定</h4>
+
+
+<p>何かしらのボタンが押された場合、どのボタンを押したかの判定を行う。<br>
+詳細は省略して、ここでは「コマンドウィンドウが開いていない状態で十字キーが押された」の分岐先から紹介する。<br>
+つまり、移動処理の最初の処理になるのだが、実は最初に行うのは移動に伴う向き処理である。</p>
+
+<div class="code-container"><pre>
+$C1/9589 LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/958B LDY #$0208              ;Yに$0208をロード 0010 0000 1000
+$C1/958E JSR $95A4  [$C1:95A4]   ;[$C1:95A4]へジャンプ
+
+$C1/95A4 STY $10    [$00:0310]   ;Yを[$00:0311][$00:0310]に書き込み
+$C1/95A6 LDA $45    [$00:0345]   ;Aに[$00:0345]をロード 押したボタン
+$C1/95A8 BIT $10    [$00:0310]   ;Aと[$00:0310]で論理積（ステータスフラグ変更のみ）
+$C1/95AA BEQ $34    [$95E0]      ;ゼロフラグが立っているとき[$95E0]分岐
+;ゼロフラグON（上キーのみ、または上キーを含めたボタンを押している）
+$C1/95AC LDA $001D,x[$00:1C1D]   ;Aに[$00:1C1D]をロード 向き
+$C1/95AF BIT $11    [$00:0311]   ;Aと[$00:0311]($02 = %0010)で論理積（ステータスフラグ変更のみ）
+$C1/95B1 BNE $2D    [$95E0]      ;ゼロフラグが立っていないとき[$95E0]分岐
+;ゼロフラグON　右上向きではない
+$C1/95B3 ORA $11    [$00:0311]   ;Aと[$00:0311]($02 = %0010)で論理和
+$C1/95B5 STA $001D,x[$00:1C1D]   ;Aを[$00:1C1D]に書き込み 向き
+$C1/95B8 BRA $16    [$95D0]      ;フラグにかかわりなく常に分岐[$95D0]
+;ゼロフラグOFF（上キーは押していない）
+$C1/95E0 RTS                     ;サブルーチン戻り
+
+$C1/9591 LDY #$0204              ;Yに$0204をロード 0010 0000 0100
+$C1/9594 JSR $95BA  [$C1:95BA]   ;[$C1:95BA]へジャンプ
+
+$C1/95BA STY $10    [$00:0310]   ;Yを[$00:0311][$00:0310]に書き込み
+$C1/95BC LDA $45    [$00:0345]   ;Aに[$00:0345]をロード 押したボタン
+$C1/95BE BIT $10    [$00:0310]   ;Aと[$00:0310]で論理積（ステータスフラグ変更のみ）
+$C1/95C0 BEQ $1E    [$95E0]      ;ゼロフラグが立っているとき[$95E0]分岐
+;ゼロフラグON（下キーのみ、または下キーを含めたボタンを押している）
+$C1/95C2 LDA $001D,x[$00:1C1D]   ;Aに[$00:1C1D]をロード 向き
+$C1/95C5 BIT $11    [$00:0311]   ;Aと[$00:0311]($02 = %0010)で論理積（ステータスフラグ変更のみ）
+$C1/95C7 BEQ $17    [$95E0]      ;ゼロフラグが立っているとき[$95E0]分岐
+;ゼロフラグOFF　右上向き
+$C1/95C9 EOR $11    [$00:0311]   ;Aと[$00:0311]($02 = %0010)で排他的論理和XOR
+$C1/95CB STA $001D,x[$00:1C1D]   ;Aを[$00:1C1D]に書き込み 向き
+$C1/95CE BRA $00    [$95D0]      ;フラグにかかわりなく常に分岐[$95D0]
+;ゼロフラグOFF（下キーは押していない）
+$C1/95E0 RTS                     ;サブルーチン戻り
+
+$C1/9597 LDY #$0102              ;Yに$0102をロード 0001 0000 0010
+$C1/959A JSR $95A4  [$C1:95A4]   ;[$C1:95A4]へジャンプ
+
+$C1/95A4 STY $10    [$00:0310]   ;Yを[$00:0311][$00:0310]に書き込み
+$C1/95A6 LDA $45    [$00:0345]   ;Aに[$00:0345]をロード 押したボタン
+$C1/95A8 BIT $10    [$00:0310]   ;Aと[$00:0310]で論理積（ステータスフラグ変更のみ）
+$C1/95AA BEQ $34    [$95E0]      ;ゼロフラグが立っているとき[$95E0]分岐
+;ゼロフラグON（左キーのみ、または左キーを含めたボタンを押している）
+$C1/95AC LDA $001D,x[$00:1C1D]   ;Aに[$00:1C1D]をロード 向き
+$C1/95AF BIT $11    [$00:0311]   ;Aと[$00:0311]($01 = %0001)で論理積（ステータスフラグ変更のみ）
+$C1/95B1 BNE $2D    [$95E0]      ;ゼロフラグが立っていないとき[$95E0]分岐
+;ゼロフラグON　左下向きではない
+$C1/95B3 ORA $11    [$00:0311]   ;Aと[$00:0311]で論理和
+$C1/95B5 STA $001D,x[$00:1C1D]   ;Aを[$00:1C1D]に書き込み 向き
+$C1/95B8 BRA $16    [$95D0]      ;フラグにかかわりなく常に分岐[$95D0]
+;ゼロフラグOFF（左キーは押していない）
+$C1/95E0 RTS                     ;サブルーチン戻り
+
+$C1/959D LDY #$0101              ;Yに$0101をロード 0001 0000 0001
+$C1/95A0 JSR $95BA  [$C1:95BA]   ;[$C1:95BA]へジャンプ
+$C1/95BA STY $10    [$00:0310]   ;Yを[$00:0311][$00:0310]に書き込み
+$C1/95BC LDA $45    [$00:0345]   ;Aに[$00:0345]をロード　押したボタン
+$C1/95BE BIT $10    [$00:0310]   ;Aと[$00:0310]で論理積（ステータスフラグ変更のみ）
+$C1/95C0 BEQ $1E    [$95E0]      ;ゼロフラグが立っているとき[$95E0]分岐
+;ゼロフラグON（右キーのみ、または右キーを含めたボタンを押している）
+$C1/95C2 LDA $001D,x[$00:1C1D]   ;Aに[$00:1C1D]をロード 向き
+$C1/95C5 BIT $11    [$00:0311]   ;Aと[$00:0311]($01 = %0001)で論理積（ステータスフラグ変更のみ）
+$C1/95C7 BEQ $17    [$95E0]      ;ゼロフラグが立っているとき[$95E0]分岐
+;ゼロフラグOFF　左下向き
+$C1/95C9 EOR $11    [$00:0311]   ;Aと[$00:0311]($01 = %0001)で排他的論理和XOR
+$C1/95CB STA $001D,x[$00:1C1D]   ;Aを[$00:1C1D]に書き込み 向き
+$C1/95CE BRA $00    [$95D0]      ;フラグにかかわりなく常に分岐[$95D0]
+</pre></div>
+
+<p>最終的に分岐先がすべて<code><span class="r">$C1/95D0</span></code>で合流するが、それは後で説明するとして、上の分岐処理について説明する。<br>
+少しややこしいので、まず上キーを押した場合の処理だけ見てみよう。</p>
+
+<div class="code-container"><pre>
+$C1/9589 LDX $5A    [$00:035A]   ;Xに[$00:035A]をロード
+$C1/958B LDY #$0208              ;Yに$0208をロード 0010 0000 1000
+$C1/958E JSR $95A4  [$C1:95A4]   ;[$C1:95A4]へジャンプ
+
+$C1/95A4 STY $10    [$00:0310]   ;Y($0208)を[$00:0311][$00:0310]に書き込み
+$C1/95A6 LDA $45    [$00:0345]   ;Aに[$00:0345]をロード 押したボタン
+$C1/95A8 BIT $10    [$00:0310]   ;Aと[$00:0310]($08)で論理積（ステータスフラグ変更のみ）
+$C1/95AA BEQ $34    [$95E0]      ;ゼロフラグが立っているとき[$95E0]分岐
+;ゼロフラグON（上キーのみ、または上キーを含めたボタンを押している）
+$C1/95AC LDA $001D,x[$00:1C1D]   ;Aに[$00:1C1D]をロード 向き
+$C1/95AF BIT $11    [$00:0311]   ;Aと[$00:0311]($02 = %0010)で論理積（ステータスフラグ変更のみ）
+$C1/95B1 BNE $2D    [$95E0]      ;ゼロフラグが立っていないとき[$95E0]分岐
+;ゼロフラグON　右上向きではない
+$C1/95B3 ORA $11    [$00:0311]   ;Aと[$00:0311]($02 = %0010)で論理和
+$C1/95B5 STA $001D,x[$00:1C1D]   ;Aを[$00:1C1D]に書き込み 向き
+$C1/95B8 BRA $16    [$95D0]      ;フラグにかかわりなく常に分岐[$95D0]
+;ゼロフラグOFF（上キーは押していない）
+$C1/95E0 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/95A6</span></code>～<code><span class="r">$C1/95AA</span></code>は、<code>[$00:0345]</code> &amp; <span class="formula">$08</span>(0000 1000)のゼロフラグ判定で、<code>[$00:0345]</code>のBit3に<span class="formula">1</span>が立つのは上キーを押した場合。<br>
+よって、<code><span class="r">$C1/95AC</span></code>からは上キーを押した場合の処理である。<br>
+ただしここでは「上キーのみ、または、上キーを含めた複数のボタンを押している」の意味になることに注意。<br>
+本作は十字キー斜め押しができるから、右上を押しても、左上を押しても、ここでは共通処理になる。<br>
+逆に言えば右上または左上を押した場合、上方向処理が優先になる、ということでもある。</p>
+
+<p><code><span class="r">$C1/95AC</span></code>でキャラの向きをロードしている。<br>
+向きは、右下<span class="formula">$00</span>, 左下<span class="formula">$01</span>, 右上<span class="formula">$02</span>, 左上<span class="formula">$03</span>が入っている。<br>
+<code><span class="r">$C1/95B1</span></code>での分岐は、</p>
+
+<p><span class="formula">向き &amp; $02</span></p>
+
+<p>のゼロフラグ判定分岐なので、右上向きならゼロフラグOFFだから、向きについてここでは変更しない。<br>
+右上向き以外の処理が<code><span class="r">$C1/95B3</span></code>～<code><span class="r">$C1/95B8</span></code>である。<br>
+その場合、</p>
+
+<p><span class="formula">向き &#x7c; $02</span></p>
+
+<p>を、新たな向きとしてキャラの向きのアドレスに書き込んでいる。<br>
+向きと<span class="formula">$02</span>の論理和を取るとどうなるのか。</p>
+
+<ul>
+	<li>右下向き(<span class="formula">$00</span>)→<span class="formula">$00 &#x7c; $02 = $02</span>（右上向き）</li>
+	<li>左下向き(<span class="formula">$01</span>)→<span class="formula">$01 &#x7c; $02 = $03</span>（左上向き）</li>
+	<li>左上向き(<span class="formula">$03</span>)→<span class="formula">$03 &#x7c; $02 = $03</span>（左上向き）</li>
+</ul>
+
+<p>簡単に言えば、下向きの場合は左右はそのままで上向きになる、という処理である。<br>
+向き変えが行われた場合は<code><span class="r">$C1/95D0</span></code>にジャンプだが、元々右上向きで向き変えをしなかった時のみ、<code><span class="r">$C1/95E0</span></code>にジャンプしてサブルーチンを抜け、次の方向キー判定（下判定）へ移っている。<br>
+右上斜め押しの場合の場合の右キー判定なども行う都合と思われる。</p>
+
+<p>他の向き処理は以下の通り。</p>
+
+<p>下キーを押した時、</p>
+
+<ul>
+	<li>右下向き(<span class="formula">$00</span>)　次処理へ</li>
+	<li>左下向き(<span class="formula">$01</span>)　次処理へ</li>
+	<li>右上向き(<span class="formula">$02</span>)→<span class="formula">$02 XOR $02 = $00</span>（右下向き）</li>
+	<li>左上向き(<span class="formula">$03</span>)　次処理へ</li>
+</ul>
+
+<p>左キーを押した時、</p>
+
+<ul>
+	<li>右下向き(<span class="formula">$00</span>)→<span class="formula">$00 &#x7c; $01 = $01</span>（左下向き）</li>
+	<li>左下向き(<span class="formula">$01</span>)　次処理へ</li>
+	<li>右上向き(<span class="formula">$02</span>)→<span class="formula">$02 &#x7c; $01 = $03</span>（左上向き）</li>
+	<li>左上向き(<span class="formula">$03</span>)　次処理へ</li>
+</ul>
+
+<p>右キーを押した時、</p>
+
+<ul>
+	<li>右下向き(<span class="formula">$00</span>)　変更なし</li>
+	<li>左下向き(<span class="formula">$01</span>)→<span class="formula">$01 XOR $01 = $00</span>（右下向き）</li>
+	<li>右上向き(<span class="formula">$02</span>)　変更なし</li>
+	<li>左上向き(<span class="formula">$03</span>)→<span class="formula">$03 XOR $01 = $02</span>（右上向き）</li>
+</ul>
+
+<p>結局のところ、移動方向に対して、向きが左右方向が逆なら左右を逆に、上下方向が逆なら上下を逆にする、という、当たり前といえば当たり前な処理をしている。</p>
+
+<p>以上、移動の前に向きの処理が行われることがわかった。<br>
+この後に、実際に移動可能かどうかの判定が入るが、フィールド隅で移動できない、移動先のマスに既に他キャラが居る、という時は移動はできない。<br>
+だが、移動したい方向へ向き変えだけは可能ということがわかる。</p>
+
+<h4>モーション値更新</h4>
+
+<p>向き処理を終えると<code><span class="r">$C1/95D0</span></code>に処理がジャンプすることになる。</p>
+
+<div class="code-container"><pre>
+;処理合流
+$C1/95D0 LDA $001E,x[$00:1C1E]   ;Aに[$00:1C1E]をロード
+$C1/95D3 AND #$0F                ;Aと$0Fで論理積
+$C1/95D5 STA $001E,x[$00:1C1E]   ;Aを[$00:1C1E]に書き込み
+$C1/95D8 LDA $001F,x[$00:1C1F]   ;Aに[$00:1C1F]をロード
+$C1/95DB AND #$0F                ;Aと$0Fで論理積
+$C1/95DD STA $001F,x[$00:1C1F]   ;Aを[$00:1C1F]に書き込み
+$C1/95E0 RTS                     ;サブルーチン戻り
+
+$C1/95A3 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここで、モーション値（のようなもの）である、<code>$00:1C1E</code>と<code>$00:1C1F</code>の処理がある。<br>
+この2バイトは戦闘開始時にどの味方キャラでも必ず、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1C1E</code></td><td><span class="formula">$80</span></td></tr>
+	<tr><td><code>$00:1C1F</code></td><td><span class="formula">$84</span></td></tr>
+</tbody>
+</table>
+
+<p>と、値が入る。<br>
+ボタン判定でキャラが何かしらの行動を取ることが決まると、上の処理が入るから、</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:1C1E]</code>($80) &amp; $0F = $00</span></li>
+	<li><span class="formula"><code>[$00:1C1F]</code>($84) &amp; $0F = $04</span></li>
+</ul>
+
+と、値が変更される。
+
+<h4>移動可能かの判定</h4>
+
+<p>上処理の直後、<code><span class="r">$C1/95A3</span></code>の次の処理から、移動できるかどうかと移動方向判定を行う。</p>
+
+<div class="code-container"><pre>
+$C1/9536 LDA $0039,x             ;Aに[$00:1C39]をロード　味方キャラ状態異常
+$C1/9539 BIT #$B2                ;Aと$B2(1011 0010)で論理積（ステータスフラグ変更のみ） 石化/眠り/マヒ/足かため
+$C1/953B BNE $3E    [$957B]      ;ゼロフラグが立っていないとき[$957B]分岐
+;ゼロフラグON 石化/眠り/マヒ/足かためではない
+$C1/953D BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ） 酔い
+$C1/953F BEQ $11    [$9552]      ;ゼロフラグが立っているとき[$9552]分岐
+;ゼロフラグON 酔い状態である
+$C1/9541 LDA $45    [$00:0345]   ;Aに[$00:0345]をロード　押したボタン
+$C1/9543 BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ） 方向キー
+$C1/9545 BEQ $34    [$957B]      ;ゼロフラグが立っているとき[$957B]分岐
+;ゼロフラグOFF 上下左右いずれかのボタンを押した
+$C1/9547 JSR $6150  [$C1:6150]   ;[$C1:6150]へジャンプ
+
+;戦闘乱数生成
+$C1/6150 PHX                     ;Xレジスタをスタックにプッシュ
+;（中略）
+$C1/61A4 RTS                     ;サブルーチン戻り
+
+$C1/954A BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）　乱数 &amp; $80
+$C1/954C BNE $04    [$9552]      ;ゼロフラグが立っていないとき[$9552]分岐 0~$79ならゼロフラグON（1/2）
+;ゼロフラグON
+$C1/954E AND #$0F                ;Aと$0Fで論理積
+$C1/9550 STA $45    [$00:0345]   ;Aを[$00:0345]に書き込み
+;ゼロフラグOFF（酔い状態ではない場合とも処理合流）
+$C1/9552 LDA $45    [$00:0345]   ;Aに[$00:0345]をロード
+$C1/9554 BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C1/9556 BEQ $03    [$955B]      ;ゼロフラグが立っているとき[$955B]分岐
+</pre></div>
+
+<p>ここが移動する味方キャラの状態異常判定及び、酔い状態の時の処理になる。<br>
+<code><span class="r">$C1/9536</span></code>でロードする<code>$0039,x</code>が、味方キャラの現在の状態異常の値。<br>
+まず、<span class="formula">$B2</span>(<span class="formula">%1011 0010</span>)と論理積を取りゼロフラグ判定だが、状態異常の<span class="formula">$B2</span>(<span class="formula">%1011 0010</span>)は、石化、眠り、マヒ、足かためのいずれかが<span class="formula">1</span>が立っているとゼロフラグが立たない。<br>
+石化、眠り、マヒ、足かためのいずれかだと<code><span class="r">$C1/957B</span></code>にジャンプだが、これは移動処理スキップという意味である。<br>
+石化、眠り、マヒの時はそもそも該当キャラにターンが回ってこないはずだから、実質、足かため用の分岐処理ということになるのだろう。</p>
+
+<p><code><span class="r">$C1/953D</span></code>の<span class="formula">$40</span>(<span class="formula">%0100 0000</span>)との論理積が、酔い状態の判定になる。<br>
+ここでゼロフラグが立つ場合は酔い状態で、<code><span class="r">$C1/9541</span></code>に進む。<br>
+酔い状態でない場合は<code><span class="r">$C1/9552</span></code>までジャンプする。</p>
+
+<p><code><span class="r">$C1/9541</span></code>では、<code>[$00:0345]</code>と<span class="formula">$0F</span>(<span class="formula">%0000 1111</span>)の論理積を取ってゼロフラグ判定である。<br>
+<code>[$00:0345]</code>は押したボタンの値が入り、Bit0～3（下4桁）は、上下左右キーに対応している。<br>
+つまり移動するため上下左右（十字キー）を押したかどうかの判定である。<br>
+十字キーを押したのではないのなら移動判定はスキップで<code><span class="r">$C1/957B</span></code>にジャンプ。<br>
+十字キーを押した場合、「酔い状態かつ移動のため十字キーを押した」ということになる。<br>
+（ちなみに右と上同時押しなど、つまり十字キー斜め押しの場合も該当する）<br>
+<code><span class="r">$C1/9547</span></code>に進み、<code><span class="r">$C1/6150</span></code>にジャンプなので、戦闘乱数生成のサブルーチンに飛ぶことになる。</p>
+
+<p>戦闘乱数生成サブルーチンの説明は省略。<br>
+<code><span class="r">$C1/61A4</span></code>の時点で、乱数が<code>A</code>レジスタと<code>$00:033B</code>に入る。</p>
+
+<p><code><span class="r">$C1/954A</span></code>からが移動時の乱数判定。<br>
+生成した戦闘乱数（<span class="formula">$00</span>～<span class="formula">$FF</span>）と<span class="formula">$80</span>で論理積を取り、ゼロフラグ判定をしている。<br>
+<span class="formula">$00</span>～<span class="formula">$FF</span>と<span class="formula">$80</span>で論理積を取った場合、乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>ならゼロになりゼロフラグが立つ。<br>
+その場合は分岐処理で<code><span class="r">$C1/954E</span></code>に進み、<code>A</code>と<span class="formula">$0F</span>の論理積、つまり、</p>
+
+<p><span class="formula">戦闘乱数 &amp; $0F</span></p>
+
+<p>が<code>[$00:0345]</code>に入る。つまり、新たな「押したボタンの値」になる。<br>
+ここで、押したボタンが変更されてしまうということだから、</p>
+
+<p><span style="font-weight:bold;">戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>の時（確率<span class="formula">1/2</span>）、<span class="formula">戦闘乱数 &amp; $0F</span>が新たな「押した十字キーの値」になる。</span></p>
+
+<p>これが酔い状態における、十字キーで押した方向と異なる方向へ移動してしまう、という処理である。</p>
+
+<p>とはいえ、この方法だと、十字キーの値が変更されたとしても、元々押していた十字キーの値と同じになる可能性もある。<br>
+例えば、酔い状態で左キーを押して左へ1マス移動しようとした時、<code>[$00:0345]</code>には<br>
+<span class="formula">%0000 0010 = $02</span><br>
+が入る。<br>
+この時に戦闘乱数が<span class="formula">$62</span>だったら、戦闘乱数は<span class="formula">$00</span>～<span class="formula">$7F</span>に含まれるので、<br>
+<span class="formula">戦闘乱数 &amp; $0F</span><br>
+が新たな「押した十字キーの値」になる。<br>
+<span class="formula">$62 &amp; $0F = $02</span><br>
+だから、結局<code>[$00:0345]</code>に入る値は<span class="formula">$02</span>で、左に移動する。<br>
+乱数が<span class="formula">$22</span>でも<span class="formula">$32</span>でも、下1桁が2なら同じ結果になるから、戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>の時でも、確率<span class="formula">1/16</span>で「プレイヤーが押した十字キーと同一になる」。</p>
+
+<p>更に、乱数が<span class="formula">$6F</span>の場合、<span class="formula">戦闘乱数 &amp; $0F = $0F</span>だから、「押した十字キーの値」は上下左右すべてということになる。<br>
+スーパーファミコンの通常のコントローラでは不可能である（バーチャルコンソールでも不可能）。<br>
+周辺機器で対応していたものがあったかもしれないが、何にしても任天堂純正コントローラではできないから、サブルーチンできちんと処理をしているはずである。</p>
+
+<p>更なる問題として乱数が<span class="formula">$60</span>だったら、<span class="formula">戦闘乱数 &amp; $0F = $00</span>で、「何の十字キーも押していない」ことになり、移動すらしないことになってしまう。</p>
+
+<p>ということを考慮すると、酔い状態で押したキーの方向へ移動しない確率は、単純に<span class="formula">1/2</span>ではない。<br>
+十字キー同時押し判定について、きちんと見てみる必要がある。</p>
+
+<p>その処理が、酔い状態ではなくても移動する場合の処理<code><span class="r">$C1/9552</span></code>～である。</p>
+
+<div class="code-container"><pre>
+;ゼロフラグOFF（酔い状態ではない場合とも処理合流）
+$C1/9552 LDA $45    [$00:0345]   ;Aに[$00:0345]をロード
+$C1/9554 BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C1/9556 BEQ $03    [$955B]      ;ゼロフラグが立っているとき[$955B]分岐
+;ゼロフラグOFF　上キー（Bit3）に1が立っている
+$C1/9558 BRL $00AD  [$9608]      ;フラグにかかわりなく常に分岐[$9608]
+;ゼロフラグON
+$C1/955B BIT #$04                ;Aと$04で論理積（ステータスフラグ変更のみ）
+$C1/955D BEQ $03    [$9562]      ;ゼロフラグが立っているとき[$9562]分岐→左右
+;ゼロフラグOFF　下キー（Bit2）に1が立っている
+$C1/955F BRL $00D0  [$9632]      ;フラグにかかわりなく常に分岐[$9632]
+;ゼロフラグON　左右いずれか
+$C1/9562 BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C1/9564 BEQ $03    [$9569]      ;ゼロフラグが立っているとき[$9569]分岐
+;ゼロフラグOFF　左キー（Bit1）に1が立っている
+$C1/9566 BRL $010F  [$9678]      ;フラグにかかわりなく常に分岐[$9678]
+;ゼロフラグON
+$C1/9569 BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C1/956B BEQ $0E    [$957B]      ;ゼロフラグが立っているとき[$957B]分岐→移動なし
+;ゼロフラグOFF　右キー（Bit0）に1が立っている
+$C1/956D BRL $0132  [$96A2]      ;フラグにかかわりなく常に分岐[$96A2]
+</pre></div>
+
+<p><code><span class="r">$C1/9552</span></code>～<code><span class="r">$C1/956D</span></code>が<code>[$00:0345]</code>の値、つまり十字キーによる分岐で、十字キー同時押しの場合の分岐処理もここでわかる。<br>
+<code>[$00:0345]</code>のBit3, Bit2, Bit1, Bit0の順に1が立っているかどうかで分岐処理をしているので、同時押しなら、</p>
+
+<p>上＞下＞左＞右</p>
+
+<p>という順で、優先されることがわかる。<br>
+斜め押しは上か下と左か右を同時に押すから、斜め押しでは上下の方が左右より優先される、ということである。<br>
+先のように酔い状態で方向キー判定が変わって、十字キー全部同時押しという状態になった場合は、上が最優先である。<br>
+なお、この方向キー判定順序は、コマンド選択やフィールド移動などでも共通している。</p>
+
+<p>それぞれのジャンプ先では、キャラの座標から、上下左右方向1マスに移動できるか（移動したいマスに他キャラがいたり、フィールド隅ではみ出す場合はそもそも移動ができない）を判定して、座標を変更する処理が行われるが、それは後回しにして、酔い状態の移動についてもう一度考えてみよう。</p>
+
+<p>戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>かつ、戦闘乱数の下1桁について考える。<br>
+戦闘乱数の下1桁は<span class="formula">$0(%0000)</span>～<span class="formula">$F(%1111)</span>のいずれかになるが、それぞれどの方向へ移動することになるのか。</p>
+
+<table>
+<thead>
+	<tr><th>下1桁</th><th>十字キー</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$0(%0000)</span></td><td>キーなし（移動なし）</td></tr>
+	<tr><td><span class="formula">$1(%0001)</span></td><td>右</td></tr>
+	<tr><td><span class="formula">$2(%0010)</span></td><td>左</td></tr>
+	<tr><td><span class="formula">$3(%0011)</span></td><td>左</td></tr>
+	<tr><td><span class="formula">$4(%0100)</span></td><td>下</td></tr>
+	<tr><td><span class="formula">$5(%0101)</span></td><td>下</td></tr>
+	<tr><td><span class="formula">$6(%0110)</span></td><td>下</td></tr>
+	<tr><td><span class="formula">$7(%0111)</span></td><td>下</td></tr>
+	<tr><td><span class="formula">$8(%1000)</span></td><td>上</td></tr>
+	<tr><td><span class="formula">$9(%1001)</span></td><td>上</td></tr>
+	<tr><td><span class="formula">$A(%1010)</span></td><td>上</td></tr>
+	<tr><td><span class="formula">$B(%1011)</span></td><td>上</td></tr>
+	<tr><td><span class="formula">$C(%1100)</span></td><td>上</td></tr>
+	<tr><td><span class="formula">$D(%1101)</span></td><td>上</td></tr>
+	<tr><td><span class="formula">$E(%1110)</span></td><td>上</td></tr>
+	<tr><td><span class="formula">$F(%1111)</span></td><td>上</td></tr>
+</tbody>
+</table>
+
+<p>このようになるはずだ。<br>
+つまり、確率としては、まず乱数<span class="formula">$00</span>～<span class="formula">$7F</span>が出た場合（確率<span class="formula">1/2</span>）でキーの入力方向が変更になり、</p>
+
+<table>
+<thead>
+	<tr><th>確率</th><th>移動方向</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">1/16</span></td><td>移動しない</td></tr>
+	<tr><td><span class="formula">1/16</span></td><td>右移動</td></tr>
+	<tr><td><span class="formula">2/16</span></td><td>左移動</td></tr>
+	<tr><td><span class="formula">4/16</span></td><td>下移動</td></tr>
+	<tr><td><span class="formula">8/16</span></td><td>上移動</td></tr>
+</tbody>
+</table>
+
+<p>に変更される。<br>
+上下左右で確率がまったく異なるのである。</p>
+
+<p>まとめると、酔い状態で移動する時、</p>
+
+<table>
+<thead>
+	<tr><th>確率</th><th>移動方向</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">16/32</span></td><td>方向キーの通り移動</td></tr>
+	<tr><td><span class="formula">1/32</span></td><td>移動しない</td></tr>
+	<tr><td><span class="formula">1/32</span></td><td>強制的に右移動</td></tr>
+	<tr><td><span class="formula">2/32</span></td><td>強制的に左移動</td></tr>
+	<tr><td><span class="formula">4/32</span></td><td>強制的に下移動</td></tr>
+	<tr><td><span class="formula">8/32</span></td><td>強制的に上移動</td></tr>
+</tbody>
+</table>
+
+<p>と、いうことになる。</p>
+
+<p>ただ、元々の移動方向と被る場合もあり得るため、結果として移動方向が変わらないように見えることがある。</p>
+
+<p>上に移動しようとした場合、</p>
+
+<ul>
+	<li>戦闘乱数が<span class="formula">$80</span>～<span class="formula">$FF</span><br>……上へ移動（確率<span class="formula">1/2</span>）</li>
+	<li>戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>　かつ　下1桁が<span class="formula">$8</span>～<span class="formula">$F</span><br>……上へ移動（確率<span class="formula">1/2*8/16</span>）</li>
+	<li>戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>　かつ　下1桁が<span class="formula">$4</span>～<span class="formula">$7</span><br>……下へ移動（確率<span class="formula">1/2*4/16</span>）</li>
+	<li>戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>　かつ　下1桁が<span class="formula">$2</span>～<span class="formula">$3</span><br>……左へ移動（確率<span class="formula">1/2*2/16</span>）</li>
+	<li>戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>　かつ　下1桁が<span class="formula">$1</span><br>……右へ移動（確率<span class="formula">1/2*1/16</span>）</li>
+	<li>戦闘乱数が<span class="formula">$00</span>～<span class="formula">$7F</span>　かつ　下1桁が<span class="formula">$0</span><br>……移動しない（確率<span class="formula">1/2*1/16</span>）</li>
+</ul>
+
+<p>ということで、酔い状態で上に移動しようとした時、</p>
+
+<ul>
+	<li>上へ移動：<span class="formula">1/2 + 1/2*8/16 = 12/32</span></li>
+	<li>下へ移動：<span class="formula">1/2*4/16 = 4/32</span></li>
+	<li>左へ移動：<span class="formula">1/2*2/16 = 2/32</span></li>
+	<li>右へ移動：<span class="formula">1/2*1/16 = 1/32</span></li>
+	<li>移動しない：<span class="formula">1/2*1/16 = 1/32</span></li>
+</ul>
+
+<p>キーを押した通りに移動できる確率は<span class="formula">3/4</span>（<span class="formula">75％</span>）とそこそこ高い。<br>
+ところが、酔い状態で右に移動しようとした時、同じ理屈で考えると、</p>
+
+<ul>
+	<li>上へ移動：<span class="formula">1/2*8/16 = 8/32</span></li>
+	<li>下へ移動：<span class="formula">1/2*4/16 = 4/32</span></li>
+	<li>左へ移動：<span class="formula">1/2*2/16 = 2/32</span></li>
+	<li>右へ移動：<span class="formula">1/2 + 1/2*1/16 = 17/32</span></li>
+	<li>移動しない：<span class="formula">1/2*1/16 = 1/32</span></li>
+</ul>
+
+<p>右だとキーを押した通りに移動できる確率は<span class="formula">17/32</span>（<span class="formula">53％</span>くらい）と、上方向移動時とはまったく異なる結果になることがわかった。<br>
+左や下もまた、確率が異なるということになるが省略。</p>
+
+
+<h4>座標・向きの書き換え</h4>
+
+<p>以上で、酔い状態であってもなくても、上下左右いずれかへの移動が決まる。<br>
+先の分岐処理から、それぞれの移動方向へのサブルーチンジャンプ先がわかる。</p>
+
+<h5>上へ移動</h5>
+<br>
+<div class="code-container"><pre>
+$C1/9608 LDX $5A    [$00:035A]   ;Xに[$00:035B][$00:035A]をロード
+$C1/960A LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]をロード　キャラの状態
+$C1/960D CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/960F BNE $0A    [$961B]      ;ゼロフラグが立っていないとき[$961B]分岐
+;ゼロフラグOFF 敵操作状態ではない
+$C1/961B LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]をロード　Y座標
+$C1/961E BEQ $3E    [$965E]      ;ゼロフラグが立っているとき[$965E]分岐
+;ゼロフラグOFF 移動したいマスがフィールド外ではない
+;Y座標が0なら上移動不可
+$C1/9620 DEC A                   ;Aをデクリメント -1
+$C1/9621 STA $001B,x[$00:1C1B]   ;Aを[$00:1C1B]に書き込み　途中計算用Y座標
+$C1/9624 LDA $0018,x[$00:1C18]   ;Aに[$00:1C18]をロード　X座標
+$C1/9627 STA $001A,x[$00:1C1A]   ;Aを[$00:1C1A]に書き込み　途中計算用X座標
+$C1/962A JSR $42D4  [$C1:42D4]   ;[$C1:42D4]へジャンプ
+</pre></div>
+
+<h5>下へ移動</h5>
+<br>
+<div class="code-container"><pre>
+$C1/9632 LDX $5A    [$00:035A]   ;Xに[$00:035B][$00:035A]をロード
+$C1/9634 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]をロード　キャラの状態
+$C1/9637 CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/9639 BNE $0A    [$9645]      ;ゼロフラグが立っていないとき[$9645]分岐
+;ゼロフラグOFF 敵操作状態ではない
+$C1/9645 LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]をロード　Y座標
+$C1/9648 CMP #$06                ;Aと$06を減算比較（ステータスレジスタ変更のみ）
+$C1/964A BEQ $12    [$965E]      ;ゼロフラグが立っているとき[$965E]分岐
+;ゼロフラグOFF 移動したいマスがフィールド外ではない
+$C1/964C INC A                   ;Aをインクリメント +1
+$C1/964D STA $001B,x[$00:1C1B]   ;Aを[$00:1C1B]に書き込み　途中計算用Y座標
+$C1/9650 LDA $0018,x[$00:1C18]   ;Aに[$00:1C18]をロード　X座標
+$C1/9653 STA $001A,x[$00:1C1A]   ;Aを[$00:1C1A]に書き込み　途中計算用X座標
+$C1/9656 JSR $42D4  [$C1:42D4]   ;[$C1:42D4]へジャンプ
+</pre></div>
+
+<h5>左へ移動</h5>
+<br>
+<div class="code-container"><pre>
+$C1/9678 LDX $5A    [$00:035A]   ;Xに[$00:035B][$00:035A]をロード
+$C1/967A LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]をロード　キャラの状態
+$C1/967D CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/967F BNE $0A    [$968B]      ;ゼロフラグが立っていないとき[$968B]分岐
+;ゼロフラグOFF 敵操作状態ではない
+$C1/968B LDA $0018,x[$00:1C18]   ;Aに[$00:1C18]をロード　X座標
+$C1/968E BEQ $D7    [$9667]      ;ゼロフラグが立っているとき[$9667]分岐
+;ゼロフラグOFF 移動したいマスがフィールド外ではない
+;X座標が0なら左移動不可
+$C1/9690 DEC A                   ;Aをデクリメント -1
+$C1/9691 STA $001A,x[$00:1C1A]   ;Aを[$00:1C1A]に書き込み　途中計算用X座標
+$C1/9694 LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]をロード　Y座標
+$C1/9697 STA $001B,x[$00:1C1B]   ;Aを[$00:1C1B]に書き込み　途中計算用Y座標
+$C1/969A JSR $42D4  [$C1:42D4]   ;[$C1:42D4]へジャンプ
+</pre></div>
+
+<h5>右へ移動</h5>
+<br>
+<div class="code-container"><pre>
+$C1/96A2 LDX $5A    [$00:035A]   ;Xに[$00:035B][$00:035A]をロード
+$C1/96A4 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]をロード　キャラの状態
+$C1/96A7 CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/96A9 BNE $0A    [$96B5]      ;ゼロフラグが立っていないとき[$96B5]分岐
+;ゼロフラグOFF 敵操作状態ではない
+$C1/96B5 LDA $0018,x[$00:1C18]   ;Aに[$00:1C18]をロード　X座標
+$C1/96B8 CMP #$06                ;Aと$06を減算比較（ステータスレジスタ変更のみ）
+$C1/96BA BEQ $AB    [$9667]      ;ゼロフラグが立っているとき[$9667]分岐
+;ゼロフラグOFF 移動したいマスがフィールド外ではない
+$C1/96BC INC A                   ;Aをインクリメント +1
+$C1/96BD STA $001A,x[$00:1C1A]   ;Aを[$00:1C1A]に書き込み　途中計算用X座標
+$C1/96C0 LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]をロード　Y座標
+$C1/96C3 STA $001B,x[$00:1C1B]   ;Aを[$00:1C1B]に書き込み　途中計算用Y座標
+$C1/96C6 JSR $42D4  [$C1:42D4]   ;[$C1:42D4]へジャンプ
+</pre></div>
+
+<p>それぞれ4パターンの処理を見てみると、共通して、</p>
+
+<ol>
+	<li>キャラが敵操作状態でないことを確認</li>
+	<li>移動先のマスがフィールド外でなければ、移動先のX座標またはY座標を計算して、途中計算用X座標または途中計算用Y座標に書き込む</li>
+	<li>また、変化しない方のY座標またはX座標も、途中計算用Y座標または途中計算用X座標に書き込む</li>
+</ol>
+
+<p>という順序で処理していることがわかる。<br>
+更に、フィールド外移動ではない場合、上処理の後のジャンプ先はすべて<code><span class="r">$C1/42D4</span></code>である。<br>
+ここから、<code><span class="r">$C1/42D4</span></code>以降は、移動先予定のマスに既に他キャラがいるかどうかの判定であろうことが予想できる。</p>
+
+<p>その前に、移動したいマスがフィールド外だった場合の分岐処理を確認しておこう。<br>
+上または下へ移動しようとしたがフィールド外、という場合は<code><span class="r">$C1/965E</span></code>に、右または左の場合は<code><span class="r">$C1/9667</span></code>にジャンプしている。<br>
+このふたつの処理だが、実際には途中で処理が合流する。</p>
+
+<div class="code-container"><pre>
+;上または下へ移動しようとしたがフィールド外 $C1/965E~
+$C1/965E LDA $45    [$00:0345]   ;Aに[$00:0345]をロード　押したキー
+$C1/9660 BIT #$03                ;Aと$03で論理積（ステータスフラグ変更のみ）
+$C1/9662 BEQ $03    [$9667]      ;ゼロフラグが立っているとき[$9667]分岐
+;ゼロフラグOFF 右または左を同時押し
+$C1/9664 BRL $FEFB  [$9562]      ;フラグにかかわりなく常に分岐[$9562]
+;右または左へ移動しようとしたがフィールド外 $C1/9667~
+;$C1/9662でゼロフラグON
+$C1/9667 LDA $001E,x[$00:1C1E]   ;Aに[$00:1C1E]をロード
+$C1/966A AND #$0F                ;Aと$0Fで論理積
+$C1/966C STA $001E,x[$00:1C1E]   ;Aを[$00:1C1E]に書き込み
+$C1/966F LDA $001F,x[$00:1C1F]   ;Aに[$00:1C1F]をロード
+$C1/9672 AND #$0F                ;Aと$0Fで論理積
+$C1/9674 STA $001F,x[$00:1C1F]   ;Aを[$00:1C1F]に書き込み
+$C1/9677 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/965E</span></code>からが上または下へ移動しようとしたがフィールド外のパターンで、<code>[$00:0345]</code>と<span class="formula">$03(%0011)</span>の論理積を取りゼロフラグ判定である。<br>
+つまり、右か左も同時に押しているかどうかの判定で、斜め押ししている場合はゼロフラグが立たないから<code><span class="r">$C1/9664</span></code>に進み、<code><span class="r">$C1/9562</span></code>にジャンプする。<br>
+この<code><span class="r">$C1/9562</span></code>は、先に説明した、左右いずれかへの移動処理である。<br>
+上下はフィールド外になるため移動できないが、左右なら移動できるかどうか、という判定を行うということである。</p>
+
+<p>もし左右同時押しではないのであればゼロフラグが立ち、<code><span class="r">$C1/9667</span></code>に進むが、これは「右または左へ移動しようとしたがフィールド外」の処理との合流である。<br>
+実質、上下にも左右にも移動できない、フィールドの4隅であり、移動不可ということになる。<br>
+この時はモーション値が更新される。<br>
+先の処理で、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:1C1E]</code></td><td><span class="formula">$00</span></td></tr>
+	<tr><td><code>[$00:1C1F]</code></td><td><span class="formula">$04</span></td></tr>
+</tbody>
+</table>
+
+<p>と、値が入っていたが、上処理でも<span class="formula">$0F</span>との論理積を取るため、結局値は変わらない。<br>
+なお、直後に、移動停止のため、以下処理にて<code>[$00:1C1E]</code>と<code>[$00:1C1F]</code>には<span class="formula">$80</span>と<span class="formula">$84</span>が入る。</p>
+
+<div class="code-container"><pre>
+$C1/5F89 STZ $FE    [$00:03FE]   ;[$00:03FE]に$00を書き込み
+$C1/5F8B LDY #$D000              ;Yに$D000をロード
+$C1/5F8E STY $1C    [$00:031C]   ;Yを[$00:031C]に書き込み
+$C1/5F90 LDY #$0000              ;Yに$0000をロード
+$C1/5F93 STY $16    [$00:0316]   ;Yを[$00:0316]に書き込み
+$C1/5F95 LDX #$1C00              ;Xに$1C00をロード
+$C1/5F98 STX $1E    [$00:031E]   ;Xを[$00:031E]に書き込み
+$C1/5F9A LDA $0000,x[$00:1C00]   ;Aに[$00:1C00]をロード
+$C1/5F9D BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/5F9F BNE $2D    [$5FCE]      ;ゼロフラグが立っていないとき[$5FCE]分岐
+$C1/5FA1 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]をロード
+$C1/5FA4 BIT #$20                ;Aと$20で論理積（ステータスフラグ変更のみ）
+$C1/5FA6 BEQ $26    [$5FCE]      ;ゼロフラグが立っているとき[$5FCE]分岐
+$C1/5FA8 LDA $001E,x[$00:1C1E]   ;Aに[$00:1C1E]をロード
+$C1/5FAB BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/5FAD BNE $0D    [$5FBC]      ;ゼロフラグが立っていないとき[$5FBC]分岐
+$C1/5FAF ORA #$80                ;Aと$80で論理和
+$C1/5FB1 STA $001E,x[$00:1C1E]   ;Aを[$00:1C1E]に書き込み
+$C1/5FB4 LDY $000C,x[$00:1C0C]   ;Yに[$00:1C0C]をロード
+$C1/5FB7 JSR $5FE0  [$C1:5FE0]   ;[$C1:5FE0]へジャンプ
+;
+;（中略、キャラのグラフィックデータ転送処理）
+;
+$C1/5FBA LDX $1E    [$00:031E]   ;Xに[$00:031E]をロード
+$C1/5FBC LDA $001F,x[$00:1C1F]   ;Aに[$00:1C1F]をロード
+$C1/5FBF BIT #$80                ;Aと$80で論理積（ステータスフラグ変更のみ）
+$C1/5FC1 BNE $0B    [$5FCE]      ;ゼロフラグが立っていないとき[$5FCE]分岐
+$C1/5FC3 ORA #$80                ;Aと$80で論理和
+$C1/5FC5 STA $001F,x[$00:1C1F]   ;Aを[$00:1C1F]に書き込み
+$C1/5FC8 LDY $000E,x[$00:1C0E]   ;Yに[$00:1C0E]をロード
+$C1/5FCB JSR $5FE0  [$C1:5FE0]   ;[$C1:5FE0]へジャンプ
+</pre></div>
+
+<h4>フィールドマス判定</h4>
+
+<p>ここまでが、「移動時の向き変え及び、1マス移動、かつ、移動先はフィールド外ではない」という処理にあたる。<br>
+次に、移動先のマスに他キャラがいるかどうかの判定を行う。<br>
+つまり、<code><span class="r">$C1/42D4</span></code>～の処理である。</p>
+
+<div class="code-container"><pre>
+$C1/42D4 LDA $001B,x[$00:1C1B]   ;Aに[$00:1C1B]をロード　計算用Y座標
+$C1/42D7 ASL A                   ;Aを算術左シフト *2
+$C1/42D8 ASL A                   ;Aを算術左シフト *2
+$C1/42D9 ASL A                   ;Aを算術左シフト *2
+$C1/42DA ADC $001A,x[$00:1C1A]   ;A + [$00:1C1A]　計算用X座標
+$C1/42DD STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/42DF STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/42E1 LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/42E3 LDA $04C8,y[$00:04E5]   ;Aに[$04C8,y]をロード
+$C1/42E6 BIT #$0F                ;Aと$0Fで論理積（ステータスフラグ変更のみ）
+$C1/42E8 BEQ $01    [$42EB]      ;ゼロフラグが立っているとき[$42EB]分岐
+;ゼロフラグOFF　移動先のマスに他キャラがいる
+$C1/42EA RTS                     ;サブルーチン戻り
+;ゼロフラグON　移動先のマスに他キャラはいない
+$C1/42EB TXA                     ;Xレジスタの値をAレジスタに転送
+$C1/42EC CLC                     ;キャリーフラグクリア
+$C1/42ED ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/42EE ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/42EF ROL A                   ;Aをキャリーフラグを含めた9bitで左ローテート
+$C1/42F0 INC A                   ;Aをインクリメント +1
+$C1/42F1 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/42F3 LDA $04C8,y[$00:04E5]   ;Aに[$04C8,y]をロード
+$C1/42F6 AND #$E0                ;Aと$E0で論理積　フィールドの状態
+$C1/42F8 ORA $10    [$00:0310]   ;Aと[$00:0310]で論理和
+$C1/42FA STA $04C8,y[$00:04E5]   ;Aを[$04C8,y]に書き込み
+$C1/42FD LDA $0019,x[$00:1C19]   ;Aに[$00:1C19]をロード　Y座標
+$C1/4300 ASL A                   ;Aを算術左シフト *2
+$C1/4301 ASL A                   ;Aを算術左シフト *2
+$C1/4302 ASL A                   ;Aを算術左シフト *2
+$C1/4303 ADC $0018,x[$00:1C18]   ;A + [$00:1C18]　X座標
+$C1/4306 STA $10    [$00:0310]   ;Aを[$00:0310]に書き込み
+$C1/4308 STZ $11    [$00:0311]   ;[$00:0311]に$00を書き込み
+$C1/430A LDY $10    [$00:0310]   ;Yに[$00:0310]をロード
+$C1/430C LDA $04C8,y[$00:04E4]   ;Aに[$04C8,y]をロード　元いた場所の座標
+$C1/430F AND #$E0                ;Aと$E0で論理積　フィールドの状態
+$C1/4311 STA $04C8,y[$00:04E4]   ;Aを[$04C8,y]に書き込み
+$C1/4314 AND #$00                ;Aと$00で論理積
+$C1/4316 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C1/42D4</span></code>～<code><span class="r">$C1/42E8</span></code>で、先に移動先として書き込んだ計算用Y座標と計算用X座標から、</p>
+
+<p><span class="formula">計算用Y座標 * 8 + 計算用X座標</span></p>
+
+<p>を計算する。<br>
+X座標もY座標も<span class="formula">$0</span>～<span class="formula">$6</span>（<span class="formula">%000</span>～<span class="formula">%110</span>）なので、Y座標を<span class="formula">×8</span>（<span class="formula">3</span>ビット左にずらす）してX座標を足すと、Bit0～2がX座標、Bit3～5がY座標という1バイト値になり、<code>$00:04C8</code>～<code>$00:04FE</code>のフィールドマス状態の位置（アドレス）が、</p>
+
+<p><span class="formula"><code>$00:04C8</code> + (計算用Y座標 * 8 + 計算用X座標)</span></p>
+
+<p>で計算できる。<br>
+その加算処理で算出したアドレスが、<code><span class="r">$C1/42E3</span> LDA $04C8,y</code>である。</p>
+
+<p>後は、<code>$04C8,y</code>に敵キャラや味方キャラがいなければ移動可能ということになる。<br>
+味方キャラや敵キャラだと、1バイト値の下1桁に<span class="formula">0</span>以外が入る。<br>
+なので、<code><span class="r">$C1/42E6</span></code>で<span class="formula">$0F</span>と論理積を取りゼロフラグ判定をしているのである。<br>
+ここでゼロフラグが立たないのなら、移動先のマスに他キャラがいるということなので、<code><span class="r">$C1/42EA</span></code>でサブルーチンを抜ける。<br>
+つまり、移動処理は行わない。</p>
+
+<p>ゼロフラグが立つ場合は<code><span class="r">$C1/42EB</span></code>～で移動処理に移る。<br>
+<code><span class="r">$C1/42EB</span></code>～<code><span class="r">$C1/42FA</span></code>は、移動先のマスに移動するキャラの値を書き込む処理。<br>
+<code><span class="r">$C1/42FD</span></code>～<code><span class="r">$C1/4316</span></code>は、元いた場所のマスの座標<code>[$00:1C18]</code><code>[$00:1C19]</code>の値から、フィールドマスの該当マスのキャラの値を削除する処理である。<br>
+どちらでも<span class="formula">$E0</span>との論理積を取っているのは、ダメージフィールドの状態を保存しているからである。</p>
+
+<p>これで、フィールドの状態は1マス移動後の状態に更新された。<br>
+ただし、キャラのグラフィックはまだ移動していない。<br>
+<code>[$00:1C18]</code><code>[$00:1C19]</code>の値が更新されるのは、1マス移動が終了してから。<br>
+上下1マスでも、左右1マスでも、1マス移動に<span class="formula">12</span>フレーム使っている。<br>
+ただ、本作の1マスは、縦24ピクセル×横32ピクセルなので、左右へ1マス移動する時は<span class="formula">1</span>フレームあたり<span class="formula">3</span>ピクセル、上下に1マス移動する時は<span class="formula">1</span>フレームあたり<span class="formula">2</span>ピクセル移動、ということになる。<br>
+1フレームの移動毎にグラフィックデータの更新や、時間経過によるタメ時間・状態異常継続時間などの計算も行われることになるが、ここでは省略する。</p>
+
+<div class="code-container"><pre>
+$C1/4450 LDA $0001,x[$00:1C01]   ;Aに[$00:1C01]をロード
+$C1/4453 CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C1/4455 BNE $14    [$446B]      ;ゼロフラグが立っていないとき[$446B]分岐
+$C1/446B INC $0006,x[$00:1C06]   ;[$00:1C06]をインクリメント +1 タメ時間ありの技発動までの時間
+$C1/446E LDA $0006,x[$00:1C06]   ;Aに[$00:1C06]をロード
+$C1/4471 CMP $0007,x[$00:1C07]   ;Aと[$00:1C07]を減算比較（ステータスレジスタ変更のみ）実行しようとしている技のタメ時間
+$C1/4474 BNE $24    [$449A]      ;ゼロフラグが立っていないとき[$449A]分岐
+$C1/4476 LDA $001A,x[$00:1C1A]   ;Aに[$00:1C1A]をロード 計算用X座標
+$C1/4479 STA $0018,x[$00:1C18]   ;Aを[$00:1C18]に書き込み X座標
+$C1/447C LDA $001B,x[$00:1C1B]   ;Aに[$00:1C1B]をロード 計算用Y座標
+$C1/447F STA $0019,x[$00:1C19]   ;Aを[$00:1C19]に書き込み Y座標
+$C1/4482 JSR $45D5  [$C1:45D5]   ;[$C1:45D5]へジャンプ
+</pre></div>
+
+<p>以上が味方キャラの戦闘における移動処理である。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.querySelectorAll(".maincontents h3, .maincontents h4, .maincontents h5");if(0===t.length||!e)return;let l=document.createElement("ul"),n=[{ul:l,level:3}],a=[0,0,0];t.forEach(e=>{let t=parseInt(e.tagName.substring(1),10),l=t-3;a[l]++;for(let i=l+1;i<a.length;i++)a[i]=0;let h=a.slice(0,l+1),d=`c${h.join("-")}`;e.id=d;let o=n[n.length-1];if(t>o.level){let p=document.createElement("ul"),r=o.ul.lastElementChild;r?r.appendChild(p):o.ul.appendChild(p),n.push({ul:p,level:t}),o=n[n.length-1]}else if(t<o.level){for(;n.length>1&&n[n.length-1].level>t;)n.pop();o=n[n.length-1]}let c=document.createElement("li"),u=document.createElement("a");u.href=`#${d}`,u.textContent=e.textContent,c.appendChild(u),o.ul.appendChild(c)}),e.appendChild(l)});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program41_5.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program42.html"><span class="button">&#9654;次 戦闘コマンド</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
