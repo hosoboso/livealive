@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ベストエンドのカラーパレット変更">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ベストエンドのカラーパレット変更">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; ベストエンドのカラーパレット変更</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; ベストエンドのカラーパレット変更</h1>
+<h2>ベストエンドのカラーパレット変更</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>最終編ベストエンドでは、エンディングだけあり、グラフィック関係で他にはない特殊な処理が幾つか見られる。<br>
+ここでは、その中のひとつ、最終編のマップの色が徐々に中世編の色味へ戻っていく処理を紹介する。<br>
+ちょうど「Live over Again」が流れ始めるタイミングで、魔王山、ファミリオの村、勇者の山、ルクレチア城と順に色が戻っていく。</p>
+
+<p>理屈としては、背景のタイルデータはそのままでカラーパレットのみ3フレーム毎に変更していく、という処理である。<br>
+カラーマスや固定色処理ではない。</p>
+
+<p>タイルデータはそのままカラーパレットだけ変更する、つまり色だけ変える処理は、回想シーンのセピア色変更処理などでも使っているし、カラーマスや固定色で段階的に色（明るさ）を変える処理もあちこちで見られるのだが、カラーパレットで画面全体の色を徐々に変化させていく処理はほとんどない。おそらくエンディングのみである。</p>
+
+<p>実際の処理を見ると、CGRAMアドレスの全メモリアドレス、つまり<span class="formula">$200</span>バイト分の領域を3フレーム毎に更新しているが、実際に変更されるのは<code>$0040</code>～<code>$00FF</code>、つまりカラーパレット番号<span class="formula">$3</span>～<span class="formula">$8</span>にあたる。</p>
+
+<div id="captiondata"></div>
+
+<h3>色データ（BGR555フォーマット）</h3>
+
+<p><span class="tri"><a href="sprite.html">スプライトについて</a></span>にも記したが、色データの表記方法について、ここにもう一度記しておく。<br>
+スーパーファミコンにおける色データは、BGR555フォーマットという形式を使用している。<br>
+2バイト値で、青(B)・緑(G)・赤(R)にそれぞれ5ビットずつ(<span class="formula">%00000</span>～<span class="formula">%11111</span>)、各色の色の輝度を割り振る。<br>
+<span class="formula">%0 <span style="color: #0000FF">00000</span> <span style="color: #00FF00">00000</span> <span style="color: #FF0000">00000</span></span><br>
+と16ビット＝2バイトに色データが収まる（一番上のビットは使わず<span class="formula">0</span>とする）。<br>
+Bit0～4に赤、Bit5～9に緑、Bit10～14に青、と値が入るということである。</p>
+
+<p><span class="formula">%11111 = $1F</span>(<span class="formula">31</span>)だから、各色が<span class="formula">$00</span>～<span class="formula">$1F</span>の<span class="formula">32</span>段階色調で表現できることになる。<br>
+3色を混ぜる度合いで、<span class="formula">32,768</span>色の表現が可能となっている。<br>
+ベストエンド時のように、滑らかに色味を変えていく場合、2バイトの値を単純に最終編→中世編の値へ少しずつ変えていけば良い、ということではない。<br>
+元となる赤、緑、青の3色に分けて（5ビットずつの値に分けて）、各色の成分を少しずつ変化させていくことになる。</p>
+
+<p>今回のカラーパレット変化の話とはあまり関係ないが、BGR555の値のまま、現代のコンピュータなどで汎用的に使われている24ビットカラー（各色8ビット）に変換すると、やや暗めの色になる。<br>
+各色5ビットで表した「白」は<span class="formula">%0 11111 11111 11111 = $7FFF</span>である。<br>
+24ビットカラーは各色8ビットなので、3ビット分のデータを追加しなければならない。<br>
+その追加分をとりあえず<span class="formula">%000</span>とすると、</p>
+
+<p>B: <span class="formula">%11111 000 = $F8</span><br>
+G: <span class="formula">%11111 000 = $F8</span><br>
+R: <span class="formula">%11111 000 = $F8</span></p>
+
+<p><span class="formula">$F8F8F8</span>（やや灰色）になってしまう。<br>
+単純に<span class="formula">%000</span>を下にくっつけただけでは5ビットカラーから8ビットカラーにはできない。<br>
+そこで補正（正規化）として</p>
+
+<p><span class="formula">R補正 = R + R / 32</span><br>
+<span class="formula">G補正 = G + G / 32</span><br>
+<span class="formula">B補正 = B + B / 32</span></p>
+
+<p>としている。</p>
+
+
+<h3>サブルーチン</h3>
+
+<p>ここでは例として、ファミリオ村での演出部分を取り上げる。他の場面も基本的には同じ処理である。</p>
+
+<h4>最初のカラーパレット処理（最終編の色）</h4>
+
+<p>まず、ファミリオ村の場面に切り替わる際の処理。<br>
+ここでは通常通りに、最終編の色の設定で、カラーパレットのデータがCGRAMに転送される。<br>
+パレット番号の<span class="formula">$0</span>～<span class="formula">$1</span>は共通部分、<span class="formula">$2</span>～<span class="formula">$8</span>が背景用、<span class="formula">$9</span>～<span class="formula">$F</span>がスプライト用。</p>
+
+<h5>パレット番号の<span class="formula">$0</span>～<span class="formula">$1</span>処理</h5>
+
+<div class="code-container"><pre>
+$C0/9ACA LDA #$00                ;Aに$00をロード
+$C0/9ACC STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/9ACF LDA #$22                ;Aに$22をロード
+$C0/9AD1 STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/9AD4 LDX #$F920              ;Xに$F920をロード
+$C0/9AD7 STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/9ADA LDA #$CF                ;Aに$CFをロード
+$C0/9ADC STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/9ADF LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/9AE1 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/9AE3 BEQ $11    [$9AF6]      ;ゼロフラグが立っているとき[$9AF6]分岐
+$C0/9AE5 JSR $B925  [$C0:B925]   ;[$C0:B925]へジャンプ
+;（中略）
+$C0/9AE8 STZ $2121  [$00:2121]   ;[$00:2121]に$00を書き込み
+$C0/9AEB LDX #$0040              ;Xに$0040をロード
+$C0/9AEE STX $4305  [$00:4305]   ;Xを[$00:4306][$00:4305]に書き込み
+$C0/9AF1 LDA #$01                ;Aに$01をロード
+$C0/9AF3 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2121]	CGRAMのパレットアドレス開始位置 ※word単位	$00
+;[$00:4300]	GDMA / HDMA設定レジスタ	$00
+;[$00:4301]	転送先指定	$22=CGRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$F920
+;[$00:4304]	データ元バンク	$CF
+;[$00:4306][$00:4305]	転送するデータ量	$0040
+;$CF:F920 -&gt; CGRAM $00word($0000byte) +$0040byte
+;
+$C0/9AF6 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上の処理は、</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th>CGRAMアドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$CF:F920</code>～<code>$CF:F95F</code></td><td><code>$0000</code>～<code>$003F</code></td></tr>
+</tbody>
+</table>
+
+<h5>パレット番号の<span class="formula">$9</span>～<span class="formula">$F</span>処理</h5>
+
+<div class="code-container"><pre>
+$C0/9A09 LDY #$3900              ;Yに$3900をロード
+$C0/9A0C LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード
+$C0/9A0F CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/9A11 BNE $03    [$9A16]      ;ゼロフラグが立っていないとき[$9A16]分岐
+$C0/9A13 LDA $0A10  [$00:0A10]   ;Aに[$00:0A10]をロード
+$C0/9A16 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A18 AND #$00FF              ;Aと$00FFで論理積
+$C0/9A1B ASL A                   ;Aを算術左シフト *2
+$C0/9A1C ASL A                   ;Aを算術左シフト *2
+$C0/9A1D ASL A                   ;Aを算術左シフト *2
+$C0/9A1E ASL A                   ;Aを算術左シフト *2
+$C0/9A1F ASL A                   ;Aを算術左シフト *2
+$C0/9A20 CLC                     ;キャリーフラグクリア
+$C0/9A21 ADC #$F960              ;A + $F960
+$C0/9A24 TAX                     ;Aの値をXレジスタに転送
+$C0/9A25 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A26 LDA #$001F              ;Aに$001Fをロード
+$C0/9A29 MVN CF 7E               ;データ転送
+;A:転送データサイズ-1 $001F
+;X:転送元アドレス $F9C0
+;Y:転送先アドレス $3900
+;オペランド:転送元と転送先バンク CF -&gt; 7E
+;$CF:F9C0 -&gt; $7E:3900 +$001Fバイト
+$C0/9A2C PLB                     ;DBレジスタにスタックからプル
+$C0/9A2D SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A2F LDA $0A0B  [$00:0A0B]   ;Aに[$00:0A0B]をロード
+$C0/9A32 BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C0/9A34 BNE $05    [$9A3B]      ;ゼロフラグが立っていないとき[$9A3B]分岐
+$C0/9A36 LDX #$FA60              ;Xに$FA60をロード
+$C0/9A39 BRA $03    [$9A3E]      ;フラグにかかわりなく常に分岐[$9A3E]
+$C0/9A3E REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A40 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A41 LDA #$007F              ;Aに$007Fをロード
+$C0/9A44 MVN CF 7E               ;データ転送
+;A:転送データサイズ-1 $007F
+;X:転送元アドレス $FA60
+;Y:転送先アドレス $3920
+;オペランド:転送元と転送先バンク CF -&gt; 7E
+;$CF:FA60 -&gt; $7E:3920 +$007Fバイト
+$C0/9A47 PLB                     ;DBレジスタにスタックからプル
+$C0/9A48 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A4A LDA $0A0B  [$00:0A0B]   ;Aに[$00:0A0B]をロード
+$C0/9A4D BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C0/9A4F BNE $19    [$9A6A]      ;ゼロフラグが立っていないとき[$9A6A]分岐
+$C0/9A51 LDA $0ACF  [$00:0ACF]   ;Aに[$00:0ACF]をロード
+$C0/9A54 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/9A55 LDA #$00                ;Aに$00をロード
+$C0/9A57 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A59 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9A5A LSR A                   ;Aを論理右シフト　(/2)
+$C0/9A5B STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/9A5D LSR A                   ;Aを論理右シフト　(/2)
+$C0/9A5E CLC                     ;キャリーフラグクリア
+$C0/9A5F ADC $32    [$00:0032]   ;A + [$00:0032]
+$C0/9A61 CLC                     ;キャリーフラグクリア
+$C0/9A62 ADC #$FAE0              ;A + $FAE0
+$C0/9A65 TAX                     ;Aの値をXレジスタに転送
+$C0/9A66 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A68 BRA $18    [$9A82]      ;フラグにかかわりなく常に分岐[$9A82]
+$C0/9A82 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A84 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A85 LDA #$005F              ;Aに$005Fをロード
+$C0/9A88 MVN CF 7E               ;データ転送
+;A:転送データサイズ-1 $005F
+;X:転送元アドレス $FDE0
+;Y:転送先アドレス $3920
+;オペランド:転送元と転送先バンク CF -&gt; 7E
+;$CF:FDE0 -&gt; $7E:39A0 +$005Fバイト
+$C0/9A8B PLB                     ;DBレジスタにスタックからプル
+$C0/9A8C SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9A8E LDY #$3920              ;Yに$3920をロード
+$C0/9A91 LDA #$07                ;Aに$07をロード
+$C0/9A93 JSR $C449  [$C0:C449]   ;[$C0:C449]へジャンプ
+
+$C0/C449 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/C44B LDA $10E2  [$00:10E2]   ;Aに[$00:10E2]をロード
+$C0/C44E BEQ $4D    [$C49D]      ;ゼロフラグが立っているとき[$C49D]分岐
+$C0/C49D RTS                     ;サブルーチン戻り
+
+$C0/9A96 LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/9A98 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/9A9A BEQ $12    [$9AAE]      ;ゼロフラグが立っているとき[$9AAE]分岐
+$C0/9A9C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9A9E PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9A9F LDX #$F920              ;Xに$F920をロード
+$C0/9AA2 LDY #$3800              ;Yに$3800をロード
+$C0/9AA5 LDA #$003F              ;Aに$003Fをロード
+$C0/9AA8 MVN CF 7E               ;データ転送
+;A:転送データサイズ-1 $003F
+;X:転送元アドレス $F920
+;Y:転送先アドレス $3800
+;オペランド:転送元と転送先バンク CF -&gt; 7E
+;$CF:F920 -&gt; $7E:3800 +$003Fバイト
+$C0/9AAB PLB                     ;DBレジスタにスタックからプル
+$C0/9AAC SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9AAE LDA #$80                ;Aに$80をロード
+$C0/9AB0 STA $2121  [$00:2121]   ;Aを[$00:2121]に書き込み
+$C0/9AB3 LDX #$3900              ;Xに$3900をロード
+$C0/9AB6 STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/9AB9 LDA #$7E                ;Aに$7Eをロード
+$C0/9ABB STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/9ABE LDX #$0100              ;Xに$0100をロード
+$C0/9AC1 STX $4305  [$00:4305]   ;Xを[$00:4306][$00:4305]に書き込み
+$C0/9AC4 LDA #$01                ;Aに$01をロード
+$C0/9AC6 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2121]	CGRAMのパレットアドレス開始位置 ※word単位	$80
+;[$00:4300]	GDMA / HDMA設定レジスタ	$00
+;[$00:4301]	転送先指定	$22=CGRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$3900
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$0100
+;$7E:3900 -&gt; CGRAM $80word($0100byte) +$0100byte
+;
+$C0/9AC9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>以上の処理は、</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th>CGRAMアドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:3900</code>～<code>$7E:39FF</code></td><td><code>$0100</code>～<code>$01FF</code></td></tr>
+</tbody>
+</table>
+
+<p><code>$7E:3900</code>～<code>$7E:39FF</code>の元のデータは、</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th>バンク<span class="formula">$7E</span>コピー</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$CF:F9C0</code>～<code>$CF:F9DF</code></td><td><code>$7E:3900</code>～<code>$7E:391F</code></td></tr>
+	<tr><td><code>$CF:FA60</code>～<code>$CF:FADF</code></td><td><code>$7E:3920</code>～<code>$7E:399F</code></td></tr>
+	<tr><td><code>$CF:FDE0</code>～<code>$CF:FE3F</code></td><td><code>$7E:39A0</code>～<code>$7E:39FF</code></td></tr>
+	<tr><td><code>$CF:F920</code>～<code>$CF:F95F</code></td><td><code>$7E:3800</code>～<code>$7E:383F</code></td></tr>
+</tbody>
+</table>
+
+
+<h5>パレット番号の<span class="formula">$2</span>～<span class="formula">$8</span>処理</h5>
+
+<div class="code-container"><pre>
+$C0/4D17 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード
+$C0/4D1A CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/4D1C BEQ $05    [$4D23]      ;ゼロフラグが立っているとき[$4D23]分岐
+$C0/4D23 LDA $0123  [$00:0123]   ;Aに[$00:0123]をロード
+$C0/4D26 INC A                   ;Aをインクリメント +1
+$C0/4D27 INC A                   ;Aをインクリメント +1
+$C0/4D28 CLC                     ;キャリーフラグクリア
+$C0/4D29 ADC $0A0A  [$00:0A0A]   ;A + [$00:0A0A]
+$C0/4D2C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/4D2E AND #$00FF              ;Aと$00FFで論理積
+$C0/4D31 ASL A                   ;Aを算術左シフト *2
+$C0/4D32 ASL A                   ;Aを算術左シフト *2
+$C0/4D33 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/4D35 ASL A                   ;Aを算術左シフト *2
+$C0/4D36 ASL A                   ;Aを算術左シフト *2
+$C0/4D37 STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/4D39 ASL A                   ;Aを算術左シフト *2
+$C0/4D3A STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/4D3C ASL A                   ;Aを算術左シフト *2
+$C0/4D3D ASL A                   ;Aを算術左シフト *2
+$C0/4D3E CLC                     ;キャリーフラグクリア
+$C0/4D3F ADC $30    [$00:0030]   ;A + [$00:0030]
+$C0/4D41 CLC                     ;キャリーフラグクリア
+$C0/4D42 ADC $32    [$00:0032]   ;A + [$00:0032]
+$C0/4D44 CLC                     ;キャリーフラグクリア
+$C0/4D45 ADC $34    [$00:0034]   ;A + [$00:0034]
+$C0/4D47 CLC                     ;キャリーフラグクリア
+$C0/4D48 ADC #$E000              ;A + $E000
+$C0/4D4B TAX                     ;Aの値をXレジスタに転送
+$C0/4D4C SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/4D4E PHB                     ;DBレジスタをスタックにプッシュ
+$C0/4D4F LDA #$7E                ;Aに$7Eをロード
+$C0/4D51 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/4D52 PLB                     ;DBレジスタにスタックからプル
+$C0/4D53 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/4D55 LDY #$3840              ;Yに$3840をロード
+$C0/4D58 LDA #$0006              ;Aに$0006をロード
+$C0/4D5B STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;ループ処理
+$C0/4D5D LDA #$0000              ;Aに$0000をロード
+$C0/4D60 STA $0000,y[$7E:3840]   ;Aを[$7E:3841+20n][$7E:3840+20n]に書き込み
+$C0/4D63 INY                     ;Yをインクリメント +1
+$C0/4D64 INY                     ;Yをインクリメント +1
+$C0/4D65 LDA #$001D              ;Aに$001Dをロード
+$C0/4D68 MVN DE 7E               ;データ転送
+;A:転送データサイズ-1 $001D
+;X:転送元アドレス $E9D8, E9F6, EA14, EA32, EA50, EA6E
+;Y:転送先アドレス $3842, 3862, 3882, 38A2, 38C2, 38E2
+;オペランド:転送元と転送先バンク DE -&gt; 7E
+;$DE:E9D8 -&gt; $7E:3842 +$001Dバイト
+$C0/4D6B DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/4D6D BNE $EE    [$4D5D]      ;ゼロフラグが立っていないとき[$4D5D]分岐
+;ループ処理ここまで
+$C0/4D6F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/4D71 PLB                     ;DBレジスタにスタックからプル
+$C0/4D72 LDA $0240  [$00:0240]   ;Aに[$00:0240]をロード
+$C0/4D75 BEQ $20    [$4D97]      ;ゼロフラグが立っているとき[$4D97]分岐
+$C0/4D97 LDY #$3840              ;Yに$3840をロード
+$C0/4D9A LDA #$06                ;Aに$06をロード
+$C0/4D9C JSR $C449  [$C0:C449]   ;[$C0:C449]へジャンプ
+
+$C0/C449 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/C44B LDA $10E2  [$00:10E2]   ;Aに[$00:10E2]をロード
+$C0/C44E BEQ $4D    [$C49D]      ;ゼロフラグが立っているとき[$C49D]分岐
+$C0/C49D RTS                     ;サブルーチン戻り
+
+$C0/4D9F LDA #$00                ;Aに$00をロード
+$C0/4DA1 STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/4DA4 LDA #$22                ;Aに$22をロード
+$C0/4DA6 STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/4DA9 LDX #$3840              ;Xに$3840をロード
+$C0/4DAC STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/4DAF LDA #$7E                ;Aに$7Eをロード
+$C0/4DB1 STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/4DB4 LDX #$00C0              ;Xに$00C0をロード
+$C0/4DB7 STX $4305  [$00:4305]   ;Xを[$00:4306][$00:4305]に書き込み
+$C0/4DBA LDA #$20                ;Aに$20をロード
+$C0/4DBC STA $2121  [$00:2121]   ;Aを[$00:2121]に書き込み
+$C0/4DBF LDA #$01                ;Aに$01をロード
+$C0/4DC1 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2121]	CGRAMのパレットアドレス開始位置 ※word単位	$20
+;[$00:4300]	GDMA / HDMA設定レジスタ	$00
+;[$00:4301]	転送先指定	$22=CGRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$3840
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$00C0
+;$7E:3840 -&gt; CGRAM $20word($0040byte) +$00C0byte
+;
+$C0/4DC4 LDA #$01                ;Aに$01をロード
+$C0/4DC6 STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/4DC9 LDA #$18                ;Aに$18をロード
+$C0/4DCB STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/4DCE LDX #$0000              ;Xに$0000をロード
+$C0/4DD1 STX $2116  [$00:2116]   ;Xを[$00:2116]に書き込み
+$C0/4DD4 LDX #$2000              ;Xに$2000をロード
+$C0/4DD7 STX $26    [$00:0026]   ;Xを[$00:0026]に書き込み
+$C0/4DD9 LDA $0120  [$00:0120]   ;Aに[$00:0120]をロード
+$C0/4DDC STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/4DDE STZ $22    [$00:0022]   ;[$00:0022]に$00を書き込み
+$C0/4DE0 JSR $4E8A  [$C0:4E8A]   ;[$C0:4E8A]へジャンプ
+</pre></div>
+
+<p>以上の処理は、</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th>CGRAMアドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:3840</code>～<code>$7E:38FF</code></td><td><code>$0040</code>～<code>$00FF</code></td></tr>
+</tbody>
+</table>
+
+<p><code>$7E:3840</code>～<code>$7E:38FF</code>の元のデータは、</p>
+
+<table>
+<thead>
+	<tr><th>元アドレス</th><th>バンク<span class="formula">$7E</span>コピー</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$DE:E9D8</code>～<code>$DE:E9F5</code></td><td><code>$7E:3842</code>～<code>$7E:385F</code></td></tr>
+	<tr><td><code>$DE:FA60</code>～<code>$DE:FA7D</code></td><td><code>$7E:3862</code>～<code>$7E:387F</code></td></tr>
+	<tr><td><code>$DE:FDE0</code>～<code>$DE:FDFD</code></td><td><code>$7E:3882</code>～<code>$7E:389F</code></td></tr>
+	<tr><td><code>$DE:F920</code>～<code>$DE:F93D</code></td><td><code>$7E:38A2</code>～<code>$7E:38BF</code></td></tr>
+	<tr><td><code>$DE:EA50</code>～<code>$DE:EA6D</code></td><td><code>$7E:38C2</code>～<code>$7E:38DF</code></td></tr>
+	<tr><td><code>$DE:EA6E</code>～<code>$DE:EA8B</code></td><td><code>$7E:38E2</code>～<code>$7E:38FF</code></td></tr>
+</tbody>
+</table>
+
+<p>以上、CGRAMについてまとめると、以下のようになる。</p>
+
+
+<table>
+<thead>
+	<tr><th>パレット<br>番号</th><th>元アドレス</th><th>WRAM</th><th>CGRAMアドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$0,$1</span></td><td><code>$CF:F920</code>～<code>$CF:F95F</code></td><td><code>$7E:3800</code>～<code>$7E:383F</code></td><td><code>$0000</code>～<code>$003F</code><br>※書き込み時WRAM経由なし</td></tr>
+	<tr><td><span class="formula">$2</span></td><td><code>$DE:E9D8</code>～<code>$DE:E9F5</code></td><td><code>$7E:3842</code>～<code>$7E:385F</code></td><td rowspan="6"><code>$0040</code>～<code>$00FF</code><br>※<code>$7E:3840</code>～<code>$7E:3841</code>など<br>頭2バイトには<span class="formula">$0000</span>が入っている</td></tr>
+	<tr><td><span class="formula">$3</span></td><td><code>$DE:FA60</code>～<code>$DE:FA7D</code></td><td><code>$7E:3862</code>～<code>$7E:387F</code></td></tr>
+	<tr><td><span class="formula">$4</span></td><td><code>$DE:FDE0</code>～<code>$DE:FDFD</code></td><td><code>$7E:3882</code>～<code>$7E:389F</code></td></tr>
+	<tr><td><span class="formula">$5</span></td><td><code>$DE:F920</code>～<code>$DE:F93D</code></td><td><code>$7E:38A2</code>～<code>$7E:38BF</code></td></tr>
+	<tr><td><span class="formula">$6</span></td><td><code>$DE:EA50</code>～<code>$DE:EA6D</code></td><td><code>$7E:38C2</code>～<code>$7E:38DF</code></td></tr>
+	<tr><td><span class="formula">$7</span></td><td><code>$DE:EA6E</code>～<code>$DE:EA8B</code></td><td><code>$7E:38E2</code>～<code>$7E:38FF</code></td></tr>
+	<tr><td><span class="formula">$8</span></td><td><code>$CF:F9C0</code>～<code>$CF:F9DF</code></td><td><code>$7E:3900</code>～<code>$7E:391F</code></td><td rowspan="3"><code>$0100</code>～<code>$01FF</code></td></tr>
+	<tr><td><span class="formula">$9</span>～<span class="formula">$C</span></td><td><code>$CF:FA60</code>～<code>$CF:FADF</code></td><td><code>$7E:3920</code>～<code>$7E:399F</code></td></tr>
+	<tr><td><span class="formula">$D</span>～<span class="formula">$F</span></td><td><code>$CF:FDE0</code>～<code>$CF:FE3F</code></td><td><code>$7E:39A0</code>～<code>$7E:39FF</code></td></tr>
+</tbody>
+</table>
+
+<p>最終的には<code>$7E:3800</code>～<code>$7E:39FF</code>の<span class="formula">$200</span>バイトが、CGRAMアドレス<code>$0000</code>～<code>$01FF</code>にそっくりコピーされたことになる。</p>
+
+<p>CGRAMアドレス<code>$0000</code>～<code>$00FF</code>に入るのが背景のカラーパレット、<code>$0100</code>～<code>$01FF</code>に入るのがスプライト（OBJ）のカラーパレットになるが、エンディングでのファミリオ村のシーンにはスプライトは表示されない。BG1とBG2ですべてのグラフィックを表示している。<br>
+よって、今回については、背景のカラーパレットを注目してみよう。<br>
+なお、CGRAM<code>$0000</code>～<code>$003F</code>に入るパレット番号<span class="formula">$0</span>, <span class="formula">$1</span>は共通部分（セリフウィンドウなど）のカラーパレットで、BG用ではない（はず）。<br>
+ということで、ファミリオ村のマップで使われているカラーパレット番号は実質<span class="formula">$2</span>～<span class="formula">$7</span>である。<br>
+カラーパレット番号<span class="formula">$2</span>～<span class="formula">$7</span>の値を更新することで、色味を最終編から中世編へと変化させていくのだろう、ということがここでだいたいわかる。</p>
+
+
+<h4>カラーパレット変更処理</h4>
+
+
+<p>では、どのようにしてカラーパレットの値を計算し更新しているのか。<br>
+サブルーチンを見ると、最終編の色→中世編の色への変更でカラーパレットを32回更新している。<br>
+（3フレームに1回更新だから、トータルで96フレーム、1.5秒くらいかけて変化している）<br>
+だが、カラーパレットが32個分用意してあるのではなく、最終編用カラーパレットと中世編用カラーパレットの値から変化中の色を計算している。</p>
+
+<p>また、GDMA転送処理を見ると、<code>$7E:3C00</code>～<code>$7E:3DFF</code>の<span class="formula">$200</span>バイトが、CGRAMアドレス<code>$0000</code>～<code>$01FF</code>に転送されている。<br>
+ファミリオ村表示の時は<code>$7E:3800</code>～<code>$7E:39FF</code>を転送していたから、WRAM内で何らかの計算をして<code>$7E:3C00</code>～<code>$7E:3DFF</code>に入った値を転送している、ということが予想できる。</p>
+
+<div class="code-container"><pre>
+$C0/C14F PHB                     ;DBレジスタをスタックにプッシュ
+$C0/C150 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C152 LDX #$3800              ;Xに$3800をロード
+$C0/C155 LDY #$3A00              ;Yに$3A00をロード
+$C0/C158 LDA #$01FF              ;Aに$01FFをロード
+$C0/C15B MVN 7E 7E               ;データ転送
+;A:転送データサイズ-1 $01FF
+;X:転送元アドレス $3800
+;Y:転送先アドレス $3A00
+;オペランド:転送元と転送先バンク 7E -&gt; 7E
+;$7E:3800 -&gt; $7E:3A00 +$01FFバイト
+$C0/C15E LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/C160 AND #$00FF              ;Aと$00FFで論理積
+$C0/C163 ASL A                   ;Aを算術左シフト *2
+$C0/C164 ASL A                   ;Aを算術左シフト *2
+$C0/C165 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/C167 ASL A                   ;Aを算術左シフト *2
+$C0/C168 ASL A                   ;Aを算術左シフト *2
+$C0/C169 STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/C16B ASL A                   ;Aを算術左シフト *2
+$C0/C16C STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/C16E ASL A                   ;Aを算術左シフト *2
+$C0/C16F ASL A                   ;Aを算術左シフト *2
+$C0/C170 CLC                     ;キャリーフラグクリア
+$C0/C171 ADC $30    [$00:0030]   ;A + [$00:0030]
+$C0/C173 CLC                     ;キャリーフラグクリア
+$C0/C174 ADC $32    [$00:0032]   ;A + [$00:0032]
+$C0/C176 CLC                     ;キャリーフラグクリア
+$C0/C177 ADC $34    [$00:0034]   ;A + [$00:0034]
+$C0/C179 CLC                     ;キャリーフラグクリア
+$C0/C17A ADC #$E000              ;A + $E000
+$C0/C17D TAX                     ;Aの値をXレジスタに転送
+$C0/C17E LDY #$3840              ;Yに$3840をロード
+$C0/C181 LDA #$0006              ;Aに$0006をロード
+$C0/C184 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;ループ処理開始
+$C0/C186 LDA #$0000              ;Aに$0000をロード
+$C0/C189 STA $0000,y[$7E:3840]   ;Aを[$7E:3840]に書き込み
+$C0/C18C INY                     ;Yをインクリメント +1
+$C0/C18D INY                     ;Yをインクリメント +1
+$C0/C18E LDA #$001D              ;Aに$001Dをロード
+$C0/C191 MVN DE 7E               ;データ転送
+;A:転送データサイズ-1 $001D
+;X:転送元アドレス $E870, $E88E, $E8AC, $E8CA, $E8E8, $E906
+;Y:転送先アドレス $3842, $3862, $3882, $38A2, $38C2, $38E2
+;オペランド:転送元と転送先バンク DE -&gt; 7E
+;$DE:E870 -&gt; $7E:3842 +$001Dバイト
+$C0/C194 DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/C196 BNE $EE    [$C186]      ;ゼロフラグが立っていないとき[$C186]分岐
+;ループ処理ここまで
+$C0/C198 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C19A LDA $21    [$00:0021]   ;Aに[$00:0021]をロード
+$C0/C19C AND #$1F                ;Aと$1Fで論理積
+$C0/C19E BEQ $72    [$C212]      ;ゼロフラグが立っているとき[$C212]分岐
+$C0/C212 PLB                     ;DBレジスタにスタックからプル
+$C0/C213 LDA #$20                ;Aに$20をロード
+$C0/C215 STA $0109  [$00:0109]   ;A($20)を[$00:0109]に書き込み
+$C0/C218 JSR $C2F5  [$C0:C2F5]   ;[$C0:C2F5]へジャンプ
+</pre></div>
+
+<p>まず最初の処理が以下になる。</p>
+
+<table>
+<thead>
+	<tr><th>転送元</th><th>転送先</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:3800</code>～<code>$7E:39FF</code></td><td><code>$7E:3A00</code>～<code>$7E:3BFF</code></td></tr>
+	<tr><td><code>$DE:E870</code>～<code>$DE:E88D</code></td><td><code>$7E:3842</code>～<code>$7E:385F</code></td></tr>
+	<tr><td><code>$DE:E88E</code>～<code>$DE:E8AB</code></td><td><code>$7E:3862</code>～<code>$7E:387F</code></td></tr>
+	<tr><td><code>$DE:E8AC</code>～<code>$DE:E8C9</code></td><td><code>$7E:3882</code>～<code>$7E:389F</code></td></tr>
+	<tr><td><code>$DE:E8CA</code>～<code>$DE:E8E7</code></td><td><code>$7E:38A2</code>～<code>$7E:38BF</code></td></tr>
+	<tr><td><code>$DE:E8E8</code>～<code>$DE:E905</code></td><td><code>$7E:38C2</code>～<code>$7E:38DF</code></td></tr>
+	<tr><td><code>$DE:E906</code>～<code>$DE:E923</code></td><td><code>$7E:38E2</code>～<code>$7E:38FF</code></td></tr>
+</tbody>
+</table>
+
+<p>最終編用にCGRAMに転送した<code>$7E:3800</code>～<code>$7E:39FF</code>を、<code>$7E:3A00</code>～<code>$7E:3BFF</code>へ丸ごとコピーする。<br>
+そして、<code>$7E:3800</code>～<code>$7E:39FF</code>のカラーパレット番号<span class="formula">$2</span>～<span class="formula">$7</span>にあたるアドレスだけ（<code>$7E:3840</code>～<code>$7E:38FF</code>）、上のように値を上書きする。<br>
+新たに<code>$7E:3840</code>～<code>$7E:38FF</code>に入ったのが中世編における背景用カラーパレットの値である。<br>
+<code>$7E:3800</code>～<code>$7E:383F</code>は変化なしだが、この領域はカラーパレット番号<span class="formula">$0</span>～<span class="formula">$1</span>で、システム関係領域にあたり、背景とは関係ないし、中世編でも最終編でも同一の値である。</p>
+
+<p>ということで、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7E:3A00</code>～<code>$7E:3BFF</code></td><td>最終編用カラーパレット（CGRAM<span class="formula">$200</span>バイト分のデータ）</td></tr>
+	<tr><td><code>$7E:3800</code>～<code>$7E:38FF</code></td><td>中世編用カラーパレット（CGRAM<span class="formula">$200</span>バイト分のデータ）</td></tr>
+</tbody>
+</table>
+
+<p>というように値が更新された、と見なして良い。<br>
+（ただし<code>$7E:3800</code>～<code>$7E:383F</code>と<code>$7E:3A00</code>～<code>$7E:3B3F</code>は同一）</p>
+
+<p>また、<code><span class="r">$C0/C213</span></code>～<code><span class="r">$C0/C215</span></code>の処理で、<code>[$00:0109]</code>に<span class="formula">$20</span>が書き込まれている。<br>
+これが実質、カラーパレットの色の変化回数であり、<code>[$00:0109]</code>の値をデクリメント（<span class="formula">-1</span>）しながら処理が進む。<br>
+<code>[$00:0109]</code>をデクリメントしてゼロフラグが立たない場合の処理の飛び先（つまりループ処理開始地点）も以下の<code><span class="r">$C0/C2F5</span></code>である。</p>
+
+<div class="code-container"><pre>
+$C0/C2F5 LDA #$10                ;Aに$10をロード
+$C0/C2F7 LDY #$3800              ;Yに$3800をロード
+$C0/C2FA STA $2A    [$00:002A]   ;A($10)を[$00:002A]に書き込み
+$C0/C2FC LDA $0109  [$00:0109]   ;Aに[$00:0109]($20)をロード
+$C0/C2FF STA $20    [$00:0020]   ;A($20)を[$00:0020]に書き込み
+$C0/C301 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/C302 LDA #$7E                ;Aに$7Eをロード
+$C0/C304 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/C305 PLB                     ;DBレジスタにスタックからプル
+$C0/C306 LDX #$4200              ;Xに$4200をロード
+$C0/C309 LDA #$10                ;Aに$10をロード
+$C0/C30B STA $2B    [$00:002B]   ;Aを[$00:002B]に書き込み
+$C0/C30D JSR $C36A  [$C0:C36A]   ;[$C0:C36A]へジャンプ
+</pre></div>
+
+<p>ここで先に述べた<code>[$00:0109]</code>（初期値<span class="formula">$20</span>）が、<code>[$00:0020]</code>にコピーされる。<br>
+<code>[$00:002A]</code>に<span class="formula">$10</span>が書き込まれるが、これはCGRAMのカラーパレットの個数。<br>
+また、<code>[$00:002B]</code>に<span class="formula">$10</span>が書き込まれるが、これは次の処理のループ回数にあたる。</p>
+
+<div class="code-container"><pre>
+;ループ処理開始（[$00:002B] = $10回分）
+$C0/C36A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C36C LDA $0000,y[$7E:3800]   ;Aに[$7E:3801+2n][$7E:3800+2n]をロード
+$C0/C36F CMP $0200,y[$7E:3A00]   ;Aと[$7E:3A01+2n][$7E:3A00+2n]を減算比較（ステータスレジスタ変更のみ）
+$C0/C372 BEQ $51    [$C3C5]      ;ゼロフラグが立っているとき[$C3C5]分岐
+;$C0/C372ゼロフラグON
+$C0/C3C5 STA $0400,y[$7E:3C00]   ;Aを[$7E:3C01+2n][$7E:3C00+2n]に書き込み
+$C0/C3C8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C3CA INY                     ;Yをインクリメント +1
+$C0/C3CB INY                     ;Yをインクリメント +1
+$C0/C3CC RTS                     ;サブルーチン戻り
+
+$C0/C310 DEC $2B    [$00:002B]   ;[$00:002B]をデクリメント -1
+$C0/C312 BNE $F9    [$C30D]      ;ゼロフラグが立っていないとき[$C30D]分岐
+$C0/C30D JSR $C36A  [$C0:C36A]   ;[$C0:C36A]へジャンプ
+;ループ処理ここまで
+</pre></div>
+
+<p>ここでループ処理に入る。<br>
+ループ中で<code><span class="r">$C0/C372</span></code>のゼロフラグ判定があり、ゼロフラグOFF時はループを抜けて別処理になる。<br>
+では、ループ内では何を判定しているのか。<br>
+見てみると、最初のループでは、</p>
+
+<p><code>[$7E:3801]</code><code>[$7E:3800]</code>と<code>[$7E:3A01]</code><code>[$7E:3A00]</code>を減算比較して、ゼロフラグが立つなら<code>[$7E:3801]</code><code>[$7E:3800]</code>を<code>[$7E:3C01]</code><code>[$7E:3C00]</code>に書き込む</p>
+
+<p>と、なっている。<br>
+先ほどの<code><span class="r">$C0/C14F</span></code>～<code><span class="r">$C0/C218</span></code>の処理から、</p>
+
+<p><span class="formula">4</span>バイト分（1色分）の「中世編用カラーパレットの値」と「最終編用カラーパレットの値」を比較して、同一なら「中世編用カラーパレットの値」を<code>[$7E:3C01]</code><code>[$7E:3C00]</code>に書き込む</p>
+
+<p>と、いうことになる。<br>
+後でわかるが、<code>$7E:3C00</code>～<code>$7E:3DFF</code>が「変化中のカラーパレットの値を書き込む領域」なのである。<br>
+上ループ処理は、中世編用カラーパレットと最終編用カラーパレットの同一部分を判別するためだったことがわかる。<br>
+同一箇所があるなら、カラーパレットの変更処理はしなくて良いので、中世編用カラーパレットの値をそのまま<code>$7E:3C00</code>～に書き込めば良い。</p>
+
+<p><code>$7E:3800</code>～<code>$7E:383F</code>と<code>$7E:3A00</code>～<code>$7E:3B3F</code>は同一なので、上処理でループを抜けることはない。<br>
+また、背景用のカラーパレットの1色目のデータは共通して<span class="formula">$0000</span>なので、これもループを抜けることはない。<br>
+最初にループを抜けるのは、<code>[$7E:3843]</code><code>[$7E:3842]</code>以降のはずだ。<br>
+実際そのとおりに<code>[$7E:3843]</code><code>[$7E:3842]</code>では<code><span class="r">$C0/C372</span></code>でゼロフラグがOFFになり、<code><span class="r">$C0/C374</span></code>に処理が進む。<br>
+その処理が以下である。</p>
+
+<div class="code-container"><pre>
+;$C0/C372ゼロフラグOFF
+$C0/C374 STA $30    [$00:0030]   ;Aを[$00:0031][$00:0030]に書き込み（[$7E:38nn+1][$7E:38nn]、中世編用カラーパレット）
+$C0/C376 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C378 LDA #$20                ;Aに$20をロード
+$C0/C37A SEC                     ;キャリーフラグON
+$C0/C37B SBC $20    [$00:0020]   ;A($20) - [$00:0020]($20)
+$C0/C37D JSR $C3CD  [$C0:C3CD]   ;[$C0:C3CD]へジャンプ
+</pre></div>
+
+<p>まず、相違が生じた中世編用カラーパレットの中の2バイト値を<code>[$00:0031]</code><code>[$00:0030]</code>に書き込む。<br>
+<code><span class="r">$C0/C37B</span></code>で <span class="formula">$20 - <code>[$00:0020]</code></span> を計算し、<code>A</code>レジスタに入った状態で、<code><span class="r">$C0/C3CD</span></code>へ進む。<br>
+<span class="formula">$20 - <code>[$00:0020]</code></span>だが、<code>[$00:0020]</code>は先の通り、<code>[$00:0109]</code>（初期値<span class="formula">$20</span>）をコピーしたアドレスで、この時点では<span class="formula">$20</span>だから、<code>A</code>レジスタに<span class="formula">$00</span>が入ることになる。</p>
+
+<div class="code-container"><pre>
+$C0/C3CD STA $02,x  [$00:4202]   ;A(00)を[$00:4202]に書き込み
+$C0/C3CF LDA $30    [$00:0030]   ;Aに[$00:0030]([$7E:38nn]、中世編用カラーパレット下1バイト)をロード
+$C0/C3D1 AND #$1F                ;Aと$1Fで論理積　★赤(R)5ビット値
+$C0/C3D3 STA $03,x  [$00:4203]   ;Aを[$00:4203]に書き込み
+;符号付8bit x 8bit
+;($20-(カラーパレット変化回数)) * [$00:0030](中世編用カラーパレット下1桁) &amp; $1F(★赤(R)5ビット値)
+$C0/C3D5 NOP                     ;計算待ち
+$C0/C3D6 NOP                     ;計算待ち
+$C0/C3D7 NOP                     ;計算待ち
+$C0/C3D8 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C3DA LDA $16,x  [$00:4216]   ;Aに[$00:4217][$00:4216]をロード 乗算結果
+$C0/C3DC STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み　A * [$00:0030] &amp; $1F
+$C0/C3DE LDA $30    [$00:0030]   ;Aに[$00:0031][$00:0030]（中世編用カラーパレット2バイト値）をロード
+$C0/C3E0 ASL A                   ;Aを算術左シフト *2
+$C0/C3E1 ASL A                   ;Aを算術左シフト *2
+$C0/C3E2 ASL A                   ;Aを算術左シフト *2
+$C0/C3E3 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C3E5 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/C3E6 AND #$1F                ;Aと$1Fで論理積　[$00:0031][$00:0030]*8/100 &$1F　★緑(G)5ビット値
+$C0/C3E8 STA $03,x  [$00:4203]   ;Aを[$00:4203]に書き込み
+;($20-(カラーパレット変化回数)) * ([$00:0031][$00:0030]*8/100 &amp; $1F)(★緑(G)5ビット値)
+$C0/C3EA NOP                     ;計算待ち
+$C0/C3EB NOP                     ;計算待ち
+$C0/C3EC NOP                     ;計算待ち
+$C0/C3ED REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C3EF LDA $16,x  [$00:4216]   ;Aに[$00:4217][$00:4216]をロード
+$C0/C3F1 STA $34    [$00:0034]   ;Aを[$00:0035][$00:0034]に書き込み
+$C0/C3F3 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C3F5 LDA $31    [$00:0031]   ;Aに[$00:0031]（中世編用カラーパレット上1バイト）をロード
+$C0/C3F7 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3F8 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3F9 AND #$1F                ;Aと$1Fで論理積　★青(B)5ビット値
+$C0/C3FB STA $03,x  [$00:4203]   ;Aを[$00:4203]に書き込み
+;($20-(カラーパレット変化回数)) * ([$00:0031]/4 &amp; $1F)(★青(B)5ビット値)
+$C0/C3FD NOP                     ;計算待ち
+$C0/C3FE NOP                     ;計算待ち
+$C0/C3FF NOP                     ;計算待ち
+$C0/C400 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C402 LDA $16,x  [$00:4216]   ;Aに[$00:4217][$00:4216]をロード
+$C0/C404 STA $36    [$00:0036]   ;Aを[$00:0037][$00:0036]に書き込み
+$C0/C406 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C408 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上処理を見ると、符号付8bit x 8bitの乗算を3回行っている。<br>
+<code>[$00:4202]</code>（被乗数）×<code>[$00:4203]</code>（乗数）の結果2バイトが<code>[$00:4217]</code><code>[$00:4216]</code>に入るようになっている。<br>
+<br>
+順に見ていくと、乗算3回とも、<code>[$00:4202]</code>の値は先に計算し<code>A</code>レジスタに入った「<span class="formula">$20 - <code>[$00:0020]</code></span>」で固定である。<br>
+ということは、上の乗算の結果は3回とも<span class="formula">0</span>を掛け算しているから、答えも<span class="formula">0</span>なのだが、それはさておき<code>[$00:4203]</code>に入る値は何になるのか。</p>
+
+<p>まず、<code><span class="r">$C0/C3D3</span></code>の時点だが、<code>[$00:4203]</code>に入るのは、</p>
+
+<span class="formula"><code>[$00:0030]</code>(中世編用カラーパレット下1バイト) &amp; $1F(%0001 1111)</span>
+
+<p>つまり下5ビットを取り出しているから、BGR555フォーマットの一番下、赤(R)の輝度の5ビット値である。<br>
+2回目の乗算、<code><span class="r">$C0/C3E8</span></code>の時点だと、</p>
+
+<p><span class="formula"><code>[$00:0031]</code><code>[$00:0030]</code>(中世編用カラーパレット2バイト)*8/$100 &amp; $1F</span></p>
+
+<p>ちょっとややこしいが、「<span class="formula">*8/$100</span>」は2バイト値を左に3ビット分ずらして上1バイトの値だけ取るのと同じことだから、<br>
+<span class="formula">%0000 0011 1110 0000</span><br>
+の<br>
+<span class="formula">%0001 1111</span><br>
+を取り出したのと同じことである。<br>
+これに先と同じく、下5ビットを取り出すため<span class="formula">$1F</span>と論理積を取るから、結局はBGR555フォーマットの中央、緑(G)の輝度の5ビット値である。</p>
+
+<p>最後の3回目の乗算、<code><span class="r">$C0/C3FB</span></code>の時点では、</p>
+
+<p><span class="formula"><code>[$00:0031]</code>(中世編用カラーパレット上1バイト)/4 &amp; $1F</span></p>
+
+<p>上1バイトを右に2ビット分ずらして、<span class="formula">$1F</span>と論理積を取るから、BGR555フォーマットの上の値、青(B)の輝度の5ビット値である。</p>
+
+<p>以上をまとめると、</p>
+
+<ul>
+	<li><span class="formula">($20 - <code>[$00:0020]</code>) * 中世編カラーパレットの赤(R)の輝度</span> → <code>[$00:0033]</code><code>[$00:0032]</code></li>
+	<li><span class="formula">($20 - <code>[$00:0020]</code>) * 中世編カラーパレットの緑(G)の輝度</span> → <code>[$00:0035]</code><code>[$00:0034]</code></li>
+	<li><span class="formula">($20 - <code>[$00:0020]</code>) * 中世編カラーパレットの青(B)の輝度</span> → <code>[$00:0037]</code><code>[$00:0036]</code></li>
+</ul>
+
+<p>という計算をして、<code>[$00:0032]</code>～<code>[$00:0037]</code>に書き込んでいることがわかる。</p>
+
+<p>この続き、<code><span class="r">$C0/C380</span></code>～<code><span class="r">$C0/C397</span></code>の処理は以下。</p>
+
+<div class="code-container"><pre>
+$C0/C380 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C382 LDA $32    [$00:0032]   ;Aに[$00:0033][$00:0032]をロード
+$C0/C384 STA $22    [$00:0022]   ;Aを[$00:0023][$00:0022]に書き込み
+$C0/C386 LDA $34    [$00:0034]   ;Aに[$00:0035][$00:0034]をロード
+$C0/C388 STA $24    [$00:0024]   ;Aを[$00:0025][$00:0024]に書き込み
+$C0/C38A LDA $36    [$00:0036]   ;Aに[$00:0037][$00:0036]をロード
+$C0/C38C STA $26    [$00:0026]   ;Aを[$00:0027][$00:0026]に書き込み
+$C0/C38E LDA $0200,y[$7E:3A42]   ;Aに[$7E:3A01+2n][$7E:3A00+2n]（最終編カラーパレット）をロード
+$C0/C391 STA $30    [$00:0030]   ;Aを[$00:0031][$00:0030]に書き込み
+$C0/C393 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C395 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/C397 JSR $C3CD  [$C0:C3CD]   ;[$C0:C3CD]へジャンプ
+</pre></div>
+
+<p>上での処理は、</p>
+
+<ul>
+	<li><code>[$00:0033]</code><code>[$00:0032]</code> → <code>[$00:0023]</code><code>[$00:0022]</code></li>
+	<li><code>[$00:0035]</code><code>[$00:0034]</code> → <code>[$00:0025]</code><code>[$00:0024]</code></li>
+	<li><code>[$00:0037]</code><code>[$00:0036]</code> → <code>[$00:0027]</code><code>[$00:0026]</code></li>
+	<li><code>[$7E:3A01+2n]</code><code>[$7E:3A00+2n]</code>（最終編カラーパレット） → <code>[$00:0031]</code><code>[$00:0030]</code></li>
+</ul>
+
+<p>という値のコピーである。</p>
+
+<p>この後、<code>A</code>に<code>[$00:0020]</code>をロードして、再び<code><span class="r">$C0/C3CD</span></code>にジャンプする。<br>
+つまり先の各輝度の乗算だが、今回は、</p>
+
+<ul>
+	<li><code>[$00:0031]</code><code>[$00:0030]</code>に<code>[$7E:3801+2n]</code><code>[$7E:3800+2n]</code>（最終編カラーパレット）</li>
+	<li><code>A</code>に<code>[$00:0020]</code>(<span class="formula">$20</span>)</li>
+</ul>
+
+<p>が入る。</p>
+
+<div class="code-container"><pre>
+$C0/C3CD STA $02,x  [$00:4202]   ;Aを[$00:4202]に書き込み
+$C0/C3CF LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/C3D1 AND #$1F                ;Aと$1Fで論理積
+$C0/C3D3 STA $03,x  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C0/C3D5 NOP                     ;計算待ち
+$C0/C3D6 NOP                     ;計算待ち
+$C0/C3D7 NOP                     ;計算待ち
+$C0/C3D8 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C3DA LDA $16,x  [$00:4216]   ;Aに[$00:4216]をロード
+$C0/C3DC STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/C3DE LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/C3E0 ASL A                   ;Aを算術左シフト *2
+$C0/C3E1 ASL A                   ;Aを算術左シフト *2
+$C0/C3E2 ASL A                   ;Aを算術左シフト *2
+$C0/C3E3 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C3E5 XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/C3E6 AND #$1F                ;Aと$1Fで論理積
+$C0/C3E8 STA $03,x  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C0/C3EA NOP                     ;計算待ち
+$C0/C3EB NOP                     ;計算待ち
+$C0/C3EC NOP                     ;計算待ち
+$C0/C3ED REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C3EF LDA $16,x  [$00:4216]   ;Aに[$00:4216]をロード
+$C0/C3F1 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/C3F3 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C3F5 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/C3F7 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3F8 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3F9 AND #$1F                ;Aと$1Fで論理積
+$C0/C3FB STA $03,x  [$00:4203]   ;Aを[$00:4203]に書き込み
+$C0/C3FD NOP                     ;計算待ち
+$C0/C3FE NOP                     ;計算待ち
+$C0/C3FF NOP                     ;計算待ち
+$C0/C400 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C402 LDA $16,x  [$00:4216]   ;Aに[$00:4216]をロード
+$C0/C404 STA $36    [$00:0036]   ;Aを[$00:0036]に書き込み
+$C0/C406 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C408 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>今回は、</p>
+
+<ul>
+	<li><span class="formula"><code>[$00:0020]</code> * 最終編カラーパレットの赤(R)の輝度</span> → <code>[$00:0033]</code><code>[$00:0032]</code></li>
+	<li><span class="formula"><code>[$00:0020]</code> * 最終編カラーパレットの緑(G)の輝度</span> → <code>[$00:0035]</code><code>[$00:0034]</code></li>
+	<li><span class="formula"><code>[$00:0020]</code> * 最終編カラーパレットの青(B)の輝度</span> → <code>[$00:0037]</code><code>[$00:0036]</code></li>
+</ul>
+
+<p>と、乗算を行うことになる。</p>
+
+<p>ここまでをまとめると以下のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0023]</code><code>[$00:0022]</code></td><td><span class="formula">($20 - <code>[$00:0020]</code>) * 中世編カラーパレットの赤(R)の輝度</span></td></tr>
+	<tr><td><code>[$00:0025]</code><code>[$00:0024]</code></td><td><span class="formula">($20 - <code>[$00:0020]</code>) * 中世編カラーパレットの緑(G)の輝度</span></td></tr>
+	<tr><td><code>[$00:0027]</code><code>[$00:0026]</code></td><td><span class="formula">($20 - <code>[$00:0020]</code>) * 中世編カラーパレットの青(B)の輝度</span></td></tr>
+	<tr><td><code>[$00:0033]</code><code>[$00:0032]</code></td><td><span class="formula"><code>[$00:0020]</code> * 最終編カラーパレットの赤(R)の輝度</span></td></tr>
+	<tr><td><code>[$00:0035]</code><code>[$00:0034]</code></td><td><span class="formula"><code>[$00:0020]</code> * 最終編カラーパレットの緑(G)の輝度</span></td></tr>
+	<tr><td><code>[$00:0037]</code><code>[$00:0036]</code></td><td><span class="formula"><code>[$00:0020]</code> * 最終編カラーパレットの青(B)の輝度</span></td></tr>
+</tbody>
+</table>
+
+<p>この表記だと長いので、以下は下のように少し省略表記する。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0023]</code><code>[$00:0022]</code></td><td><span class="formula">($20 - <code>[$00:0020]</code>) * 中世R</span></td></tr>
+	<tr><td><code>[$00:0025]</code><code>[$00:0024]</code></td><td><span class="formula">($20 - <code>[$00:0020]</code>) * 中世G</span></td></tr>
+	<tr><td><code>[$00:0027]</code><code>[$00:0026]</code></td><td><span class="formula">($20 - <code>[$00:0020]</code>) * 中世B</span></td></tr>
+	<tr><td><code>[$00:0033]</code><code>[$00:0032]</code></td><td><span class="formula"><code>[$00:0020]</code> * 最終R</span></td></tr>
+	<tr><td><code>[$00:0035]</code><code>[$00:0034]</code></td><td><span class="formula"><code>[$00:0020]</code> * 最終G</span></td></tr>
+	<tr><td><code>[$00:0037]</code><code>[$00:0036]</code></td><td><span class="formula"><code>[$00:0020]</code> * 最終B</span></td></tr>
+</tbody>
+</table>
+
+<div class="code-container"><pre>
+$C0/C39A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/C39C LDA $22    [$00:0022]   ;Aに[$00:0023][$00:0022]をロード
+$C0/C39E CLC                     ;キャリーフラグクリア
+$C0/C39F ADC $32    [$00:0032]   ;A + [$00:0033][$00:0032]
+$C0/C3A1 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3A2 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3A3 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3A4 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3A5 LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3A6 AND #$001F              ;Aと$001F(%0000 0000 0001 1111)で論理積
+$C0/C3A9 STA $22    [$00:0022]   ;Aを[$00:0023][$00:0022]に書き込み
+$C0/C3AB LDA $24    [$00:0024]   ;Aに[$00:0025][$00:0024]をロード
+$C0/C3AD CLC                     ;キャリーフラグクリア
+$C0/C3AE ADC $34    [$00:0034]   ;A + [$00:0035][$00:0034]
+$C0/C3B0 AND #$03E0              ;Aと$03E0(%0000 0011 1110 0000)で論理積
+$C0/C3B3 ORA $22    [$00:0022]   ;Aと[$00:0023][$00:0022]で論理和
+$C0/C3B5 STA $22    [$00:0022]   ;Aを[$00:0023][$00:0022]に書き込み
+$C0/C3B7 LDA $26    [$00:0026]   ;Aに[$00:0027][$00:0026]をロード
+$C0/C3B9 CLC                     ;キャリーフラグクリア
+$C0/C3BA ADC $36    [$00:0036]   ;A + [$00:0037][$00:0036]
+$C0/C3BC LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3BD LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3BE LSR A                   ;Aを論理右シフト　(/2)
+$C0/C3BF XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/C3C0 AND #$7C00              ;Aと$7C00(%0111 1100 0000 0000)で論理積
+$C0/C3C3 ORA $22    [$00:0022]   ;Aと[$00:0023][$00:0022]で論理和
+;処理合流
+$C0/C3C5 STA $0400,y[$7E:3C42]   ;Aを[$7E:3C01+2n][$7E:3C00+2n]に書き込み
+$C0/C3C8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/C3CA INY                     ;Yをインクリメント +1
+$C0/C3CB INY                     ;Yをインクリメント +1
+$C0/C3CC RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/C3C5</span></code>の処理合流まで、順に以下の計算をしている。</p>
+
+<ol>
+	<li><span class="formula">(<code>[$00:0023]</code><code>[$00:0022]</code> + <code>[$00:0033]</code><code>[$00:0032]</code>)/$20 &amp; $001F</span> → <code>[$00:0023]</code><code>[$00:0022]</code></li>
+	<li><span class="formula">((<code>[$00:0025]</code><code>[$00:0024]</code> + <code>[$00:0035]</code><code>[$00:0034]</code>) &amp; $03E0) &#x7c; <code>[$00:0023]</code><code>[$00:0022]</code></span> → <code>[$00:0023]</code><code>[$00:0022]</code></li>
+	<li><span class="formula">((<code>[$00:0027]</code><code>[$00:0026]</code> + <code>[$00:0037]</code><code>[$00:0036]</code>)/$8*$100 &amp; $7C00) &#x7c; <code>[$00:0023]</code><code>[$00:0022]</code></span> → <code>[$00:0023]</code><code>[$00:0022]</code></li>
+</ol>
+
+<p>最終的に、処理合流後に<code>[$00:0023]</code><code>[$00:0022]</code>が<code>[$7E:3C01+2n]</code><code>[$7E:3C00+2n]</code>に入る。<br>
+つまり、<code>[$00:0023]</code><code>[$00:0022]</code>が、「変化中のカラーパレットの値」になった。</p>
+
+<p>では上の計算は何をしているのか？<br>
+最初の、</p>
+
+<p><span class="formula">(<code>[$00:0023]</code><code>[$00:0022]</code> + <code>[$00:0033]</code><code>[$00:0032]</code>)/$20 &amp; $001F</span></p>
+
+<p>カッコ内の加算部分が、</p>
+
+<p><span class="formula">$20 - <code>[$00:0020]</code>) * 中世R + <code>[$00:0020]</code> * 最終R</span></p>
+
+<p>であるから、</p>
+
+<p><span class="formula">$20 - <code>[$00:0020]</code>) * 中世R + <code>[$00:0020]</code> * 最終R)/$20 &amp; $001F</span><br>
+<span class="formula">= ((1-<code>[$00:0020]</code>/$20) * 中世R + <code>[$00:0020]</code>/$20 * 最終R) &amp; $001F</span></p>
+
+<p><code>[$00:0020]</code>の初期値は<span class="formula">$20</span>で、後で紹介する通りカラーパレットの値が変更される度に<span class="formula">-1</span>されていく。<br>
+<span class="formula"><code>[$00:0020]</code> = $20</span>なら、</p>
+
+<p><span class="formula">((1-$20/$20) * 中世R + $20/$20 * 最終R) &amp; $001F</span><br>
+<span class="formula">= (0 * 中世R + 1 * 最終R) &amp; $001F</span></p>
+
+<p>最後に<span class="formula">$001F</span>との論理積を取るので、5ビット値となるが、これだけなら最終編の赤のカラーパレット値と変わらない。<br>
+<span class="formula"><code>[$00:0020]</code> = $1F</span>と値を<span class="formula">-1</span>すると、</p>
+
+<p><span class="formula">((1-$1F/$20) * 中世R + $1F/$20 * 最終R) &amp; $001F</span><br>
+<span class="formula">= (1/32 * 中世R + 31/32 * 最終R) &amp; $001F</span></p>
+
+<p>と、割合にして<span class="formula">1/32</span>は中世編の赤のカラーパレット値、<span class="formula">31/32</span>は最終編の赤のカラーパレット値となる。<br>
+このようにして、中世編の赤のカラーパレット値と、最終編の赤のカラーパレット値の割合を<span class="formula">1/32</span>ずつ変化させることで「変化中のカラーパレットの値」とし、32段階でカラーパレットを少しずつ変化させ最終編の色から中世編の色へと変更しているのである。</p>
+
+<p>以上から、赤は、</p>
+
+<p><span class="formula">(<code>[$00:0023]</code><code>[$00:0022]</code> + <code>[$00:0033]</code><code>[$00:0032]</code>)/$20 &amp; $001F → <code>[$00:0023]</code><code>[$00:0022]</code></span></p>
+
+<p>で「変化中のカラーパレットの値」となり、<code>[$00:0023]</code><code>[$00:0022]</code>に値が入った。つまりBit0～4に新たな赤の値が入った。<br>
+後は、緑、青の順に処理を続ける。</p>
+
+<p>緑は、</p>
+
+<p><span class="formula">((<code>[$00:0025]</code><code>[$00:0024]</code> + <code>[$00:0035]</code><code>[$00:0034]</code>) &amp; $03E0) &#x7c; <code>[$00:0023]</code><code>[$00:0022]</code></span><br>
+<span class="formula">= ((中世G + 最終G) &amp; $03E0) &#x7c; <code>[$00:0023]</code><code>[$00:0022]</code>(変化中のカラーパレットの値)</span></p>
+
+<p><span class="formula">$03E0 = %0000 0011 1110 0000</span>だから、ちょうどBGR555の中央の緑の5ビット分（Bit5～9）である。<br>
+赤の手順では、</p>
+
+<span class="formula">(<code>[$00:0023]</code><code>[$00:0022]</code> + <code>[$00:0033]</code><code>[$00:0032]</code>)/$20 &amp; $001F</span>
+
+<p>と、加算して<span class="formula">/$20</span>していたが、今回はその後に<span class="formula">*$20</span>してBGR555の中央の緑の5ビット分の位置（Bit5～9）に合わせる必要があるから、<span class="formula">/$20*$20</span>で結局計算の必要がない。<br>
+よって、</p>
+
+<p><span class="formula">((<code>[$00:0025]</code><code>[$00:0024]</code> + <code>[$00:0035]</code><code>[$00:0034]</code>) &amp; $03E0)</span></p>
+
+<p>これで、中世編の緑のカラーパレット値と、最終編の緑のカラーパレット値を割合で混ぜたことになる。<br>
+そして、既に赤のカラーパレットが入った、<code>[$00:0023]</code><code>[$00:0022]</code>との論理和を取ることで、Bit0～4に赤、Bit5～9に緑の値が入ったことになる。</p>
+
+<p>青は、</p>
+
+<p><span class="formula">((<code>[$00:0027]</code><code>[$00:0026]</code> + <code>[$00:0037]</code><code>[$00:0036]</code>)/$8*$100 &amp; $7C00) &#x7c; <code>[$00:0023]</code><code>[$00:0022]</code></span><br>
+<span class="formula">= ((中世B + 最終B)/$8*$100 &amp; $7C00) &#x7c; <code>[$00:0023]</code><code>[$00:0022]</code>(変化中のカラーパレットの値)</span></p>
+
+<p>今回は加算後、<span class="formula">/$20</span>して、Bit10～14位置に合わせるために<span class="formula">*$400</span>する必要がある。つまり<span class="formula">*$20</span>である。<br>
+<span class="formula">/$8*$100</span>でちょうど<span class="formula">*$20</span>である。<br>
+<span class="formula">$7C00 = %0111 1100 0000 0000</span>なので、BGR555の青の5ビット分（Bit10～14）と論理積を取る。<br>
+最後に、<code>[$00:0023]</code><code>[$00:0022]</code>との論理和を取ることで、Bit0～4に赤、Bit5～9に緑、Bit10～14に青の値が入った、「変化中のカラーパレットの値」が完成した。</p>
+
+<p>こうして計算した、新たなカラーパレット1色分の値<code>[$00:0023]</code><code>[$00:0022]</code>は、<code>[$7E:3C01+2n]</code><code>[$7E:3C00+2n]</code>に書き込まれる。</p>
+
+<div class="code-container"><pre>
+$C0/C310 DEC $2B    [$00:002B]   ;[$00:002B]をデクリメント -1
+$C0/C312 BNE $F9    [$C30D]      ;ゼロフラグが立っていないとき[$C30D]分岐
+;ゼロフラグOFF
+$C0/C30D JSR $C36A  [$C0:C36A]   ;[$C0:C36A]へジャンプ
+;ゼロフラグON
+$C0/C314 DEC $2A    [$00:002A]   ;[$00:002A]（カラーパレットの個数）をデクリメント -1
+$C0/C316 BEQ $03    [$C31B]      ;ゼロフラグが立っているとき[$C31B]分岐
+;ゼロフラグOFF
+$C0/C318 BRL $FFEE  [$C309]      ;フラグにかかわりなく常に分岐[$C309]（次のカラーパレット処理へ）
+;ゼロフラグON
+$C0/C31B PLB                     ;DBレジスタにスタックからプル
+$C0/C31C RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここで、<code>[$00:002B]</code>（初期値<span class="formula">$10</span>）が<span class="formula">-1</span>される。<br>
+1色の処理で<span class="formula">-1</span>されたから、<span class="formula">$10</span>色、つまりカラーパレット1個分の16色を処理し終えるまで上ループが続く。</p>
+
+<p><code><span class="r">$C0/C312</span></code>でゼロフラグONなら、カラーパレット1個分の処理が終了したということだから、<code>[$00:002A]</code>（カラーパレットの個数、初期値<span class="formula">$10</span>）が<span class="formula">-1</span>される。<br>
+カラーパレット<span class="formula">$10</span>個の処理が終わるまで、上ループが続き、最終的に<code>[$00:002A]</code>が<span class="formula">$00</span>になったらすべてのカラーパレットの処理終了である。<br>
+<code><span class="r">$C0/C31C</span></code>へ抜けて、「変化中のカラーパレット16色分」が<code>$7E:3C00</code>～<code>$7E:3DFF</code>に書き込まれた。</p>
+
+<p>後は、このカラーパレットの値をCGRAMへ転送すれば良い。</p>
+
+<div class="code-container"><pre>
+$C0/C425 LDA #$00                ;Aに$00をロード
+$C0/C427 STA $4300  [$00:4300]   ;Aを[$00:4300]に書き込み
+$C0/C42A LDA #$22                ;Aに$22をロード
+$C0/C42C STA $4301  [$00:4301]   ;Aを[$00:4301]に書き込み
+$C0/C42F LDX #$3C00              ;Xに$3C00をロード
+$C0/C432 STX $4302  [$00:4302]   ;Xを[$00:4303][$00:4302]に書き込み
+$C0/C435 LDA #$7E                ;Aに$7Eをロード
+$C0/C437 STA $4304  [$00:4304]   ;Aを[$00:4304]に書き込み
+$C0/C43A STZ $2121  [$00:2121]   ;[$00:2121]に$00を書き込み
+$C0/C43D LDX #$0200              ;Xに$0200をロード
+$C0/C440 STX $4305  [$00:4305]   ;Xを[$00:4305]に書き込み
+$C0/C443 LDA #$01                ;Aに$01をロード
+$C0/C445 STA $420B  [$00:420B]   ;Aを[$00:420B]に書き込み
+;
+;[$00:2121]	CGRAMのパレットアドレス開始位置 ※word単位	$00
+;[$00:4300]	GDMA / HDMA設定レジスタ	$00
+;[$00:4301]	転送先指定	$22=CGRAM
+;[$00:4303][$00:4302]	データ元アドレス（開始位置）	$3C00
+;[$00:4304]	データ元バンク	$7E
+;[$00:4306][$00:4305]	転送するデータ量	$0200
+;$7E:3C00 -&gt; CGRAM $00word($0000byte) +$0200byte
+;
+$C0/C448 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>$7E:3C00</code>～<code>$7E:3DFF</code>がCGRAMアドレス<code>$0000</code>～<code>$0200</code>に転送されている。つまりCGRAMを丸ごと上書きである。</p>
+
+<p>少し処理を飛ばして、転送後は、以下処理で<code>[$00:0109]</code>の値が<span class="formula">-1</span>される。</p>
+
+<div class="code-container"><pre>
+$C0/C266 LDA $0109  [$00:0109]   ;Aに[$00:0109]をロード
+$C0/C269 BEQ $34    [$C29F]      ;ゼロフラグが立っているとき[$C29F]分岐
+;ゼロフラグOFF
+$C0/C26B DEC A                   ;Aをデクリメント -1
+$C0/C26C STA $0109  [$00:0109]   ;Aを[$00:0109]に書き込み
+$C0/C26F JSR $C2F5  [$C0:C2F5]   ;[$C0:C2F5]へジャンプ
+;ゼロフラグON
+$C0/C29F RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>[$00:0109]</code>の初期値は<span class="formula">$20</span>で、カラーパレット処理が終わる度に<span class="formula">-1</span>される（3フレームに1回の処理）。<br>
+<code>[$00:0109]</code>の値が<span class="formula">$00</span>でなければ再びカラーパレット処理開始で、<span class="formula">$00</span>ならカラーパレット処理は終わり。<br>
+この時にカラーパレットは中世編の色に戻っているはずである。<br>
+<code>[$00:0109]</code>の値は<code>[$00:0020]</code>にコピーしてからカラーパレット処理を行うが、</p>
+
+<p><span class="formula"><code>[$00:0020]</code> = $20</span>なら、</p>
+
+<p><span class="formula">((1-$20/$20) * 中世R + $20/$20 * 最終R) &amp; $001F</span><br>
+<span class="formula">= (0 * 中世R + 1 * 最終R) &amp; $001F</span></p>
+
+<p><span class="formula"><code>[$00:0020]</code> = $00</span>なら、</p>
+
+<p><span class="formula">((1-$00/$20) * 中世R + $00/$20 * 最終R) &amp; $001F</span><br>
+<span class="formula">= (1 * 中世R + 0 * 最終R) &amp; $001F</span></p>
+
+<p>と、計算できるからだ。</p>
+
+<p>以上の処理により、ベストエンド時、最終編のカラーパレット→中世編のカラーパレットと、滑らかに色味が変化していくように見えている。</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="bg3.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="colormath2.html"><span class="button">&#9654;次 固定色</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<!-- <script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script> -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

@@ -175,6 +175,7 @@ table {
 		<li><a href="scroll.html">スクロール</a></li>
 		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
 		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">音</button>
@@ -985,7 +986,7 @@ ONだと<span class="formula">$01</span>が入り、OFFだと<span class="formul
 
 <h3 id="05">現代編</h3>
 
-<p>現代編のフラグは<code>$00:06B9</code>～<code>$00:06BF</code>の値でも判断されていると思われるため併記する。<br>
+<p>現代編のフラグはセーブされるフラグはセーブされるアドレスの<code>$00:0ABF</code>、<code>$00:1200</code>、<code>$00:1201</code>の他、<code>$00:06B9</code>～<code>$00:06BF</code>の値でも判断されている。<br>
 対戦相手IDは以下の通り。</p>
 
 <table>
@@ -1013,7 +1014,7 @@ ONだと<span class="formula">$01</span>が入り、OFFだと<span class="formul
 	<tr><td><code>$00:06BC</code></td><td>4番目に倒した対戦相手ID（4戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
 	<tr><td><code>$00:06BD</code></td><td>5番目に倒した対戦相手ID（5戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
 	<tr><td><code>$00:06BE</code></td><td>6番目に倒した対戦相手ID（6戦目終わるまでは<span class="formula">$FF</span>）</td></tr>
-
+	<tr><td><code>$00:0ABF</code></td><td>初期値<span class="formula">$00</span>、倒した対戦相手に対応したビットに<span class="formula">1</span>が立つ（Bit0～5）、オブライト戦前は<span class="formula">%00111111</span>（<span class="formula">$3F</span>）</td></tr>
 	<tr><td><code>$00:1200</code></td><td>現代編オープニング終了（メニュー画面表示でON）</td></tr>
 	<tr><td><code>$00:1201</code></td><td>6人の格闘家を撃破後、河原での会話イベント直前</td></tr>
 </tbody>
@@ -1032,8 +1033,19 @@ ONだと<span class="formula">$01</span>が入り、OFFだと<span class="formul
 
 <h4>マップタイマー</h4>
 
-<p>なし</p>
+<table>
+<thead>
+	<tr><th>No.</th><th>内容</th><th>タイマー時間</th></tr>
+</thead>
+<tbody>
+	<tr><td>-</td><td>ラストバトル（オブライト戦）に負けた時のカウントダウン<br>（9回繰り返し）</td><td>1秒</td></tr>
+</tbody>
+</table>
 
+<p><code>[$00:0592]</code>（<code>[$7E:2E78]</code>にコピー）に残り秒数が入る。<br>
+残り秒数は<span class="formula">$0A</span>から開始し、すぐに<span class="formula">-1</span>されて、画面上では<span class="formula">$09(10進数9)</span>から表示。<br>
+<code>[$00:0591]</code>に<span class="formula">1</span>秒=<span class="formula">60</span>フレーム分のカウントダウン用の値<span class="formula">$3C(10進数60)</span>が初期値として入り、1フレームにつき<span class="formula">-1</span>され、<span class="formula">$00</span>まで減ると<code>[$00:0592]</code>を<span class="formula">-1</span>していく仕組み。<br>
+10秒経過でカウントが0となってゲームオーバー。</p>
 
 <h3 id="06">ＳＦ編</h3>
 
