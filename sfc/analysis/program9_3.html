@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 特殊なマップタイマー">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップタイマー（仕様）">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; 特殊なマップタイマー</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<style>
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">フィールド関係</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="program9_1.html">マップタイマー</a> &gt; 特殊なマップタイマー</h1>
+<h2>特殊なマップタイマー</h2>
+
+<p><code>[$00:0AC0]</code>～<code>[$00:0AC1]</code>の2バイトで管理できるマップタイマーは合計16だが、ここではそれ以外で管理されるマップタイマーについて説明する。<br>
+<code>[$00:0AC0]</code>～<code>[$00:0AC1]</code>は各シナリオでのみ使用、かつセーブデータに記録する必要があるタイマーが管理されるのだろう、と推測できるが、複数シナリオで同じタイマーを使う場合（ポゴの匂いタイマー）、セーブデータに記録する必要がないタイマー（現代編ラストバトルに負けた時のカウントダウン）は、別に管理されているようだ。</p>
+
+<div id="captiondata"></div>
+
+<h3>現代編・ラストバトル敗北時カウントダウン</h3>
+
+<p>現代編ラストバトル（オディー・Ｏ戦）で負けると、9カウント（9秒）のカウントダウンが始まり、<span class="formula">0</span>になるまでにAボタンを押さない場合、ゲームオーバーとなってタイトル画面に戻る。Aボタンを押せば再戦可能。<br>
+格闘ゲームのコンティニュー画面のパロディになるが、ここでも1秒（60フレーム）毎のカウントダウンタイマーが動いている。</p>
+
+<p>現代編は戦闘のみのシナリオのため、プログラムも特殊で、対戦相手選択画面や、戦闘前後の場面なども、メニュー画面と同じバンク<span class="formula">$C2</span>に格納されたサブルーチンで動いている。<br>
+フィールド用のバンク<span class="formula">$C0</span>のプログラムは、高原のフィールド用スプライトが表示される、オープニングデモや、ラストバトル前後の河原でのシーンのみ。<br>
+ラストバトル敗北時カウントダウンも、バンク<span class="formula">$C2</span>のサブルーチンを使っている。</p>
+
+<h4>メモリアドレス</h4>
+
+<p>カウントダウンに関係するメモリアドレスは以下。</p>
+
+<h5><code>$00:0591</code></h5>
+
+<p>現代編　ラストバトル敗北時のカウントダウンタイマー、60フレーム分のカウントダウン用の値が入る。<br>
+初期値は<span class="formula">$3C</span>(10進数60)で、<span class="formula">1</span>フレームにつき<span class="formula">1</span>減る。</p>
+
+<h5><code>$00:0592</code>～<code>$00:0593</code></h5>
+
+<p>現代編ラストバトルで負けた時のカウントダウンタイマー、残り秒数が入る。<br>
+2バイト値だが、実質<code>$00:0592</code>の値しか使わない。<br>
+初期値は<span class="formula">$0A</span>だが、カウントダウン開始と同時に<span class="formula">-1</span>されて<span class="formula">$09</span>となり、9秒のカウントダウンを行う。<br>
+同じ値が<code>[$7E:2E79]</code><code>[$7E:2E78]</code>にコピーされて、グラフィックデータの表示処理に使用される。</p>
+
+<h5><code>$7E:0ABE</code></h5>
+
+<p>現代編戦闘開始時、対戦相手の値<span class="formula">$00</span>～<span class="formula">$07</span>が入る。<br>
+ラストバトルのカウントダウンのサブルーチンは、現代編で対戦相手に負けた時の分岐処理になるため、「誰に負けたか」の判定・分岐処理に使う。</p>
+
+<table>
+<thead>
+	<tr><th>対戦相手</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>ナムキャット</td><td><span class="formula">$00</span></td></tr>
+	<tr><td>グレートエイジャ</td><td><span class="formula">$01</span></td></tr>
+	<tr><td>トゥーラ・ハン</td><td><span class="formula">$02</span></td></tr>
+	<tr><td>森部　生士</td><td><span class="formula">$03</span></td></tr>
+	<tr><td>マックスモーガン</td><td><span class="formula">$04</span></td></tr>
+	<tr><td>Ｊ・イヤウケア</td><td><span class="formula">$05</span></td></tr>
+	<tr><td>オディー・Ｏ</td><td><span class="formula">$07</span></td></tr>
+</tbody>
+</table>
+
+<h5><code>$7E:0ABF</code></h5>
+
+<p>現代編において、初期値<span class="formula">$00</span>、倒した対戦相手に対応したビットに<span class="formula">1</span>が立つ（Bit0～6）、オブライト戦前は<span class="formula">%0011 1111</span>（<span class="formula">$3F</span>）<br>
+今回の判定には関わらないが、現代編でのフラグ判定として重要なアドレスなので参考までに。</p>
+
+
+<h4>サブルーチン</h4>
+
+<p>以降は、カウントダウン中にAボタンが押されず、<span class="formula">0</span>までカウントダウンされてゲームオーバーになる場合の処理。<br>
+途中でAボタンを押したらカウントダウンは中断される。</p>
+
+<p>敗北時、対戦相手がオディー・Ｏという判定をまず紹介しておく。<br>
+敗北し戦闘画面が暗転した直後、以下判定が入る。</p>
+
+<div class="code-container"><pre>
+$C2/281C LDA $0ABE  [$7E:0ABE]   ;Aに[$7E:0ABF][$7E:0ABE](オディー・Ｏだと[$7E:0ABE]は$07)をロード
+$C2/281F AND #$000F              ;Aと$000Fで論理積
+$C2/2822 CMP #$0007              ;Aと$0007を減算比較（ステータスレジスタ変更のみ）
+$C2/2825 BEQ $32    [$2859]      ;ゼロフラグが立っているとき[$2859]分岐
+;ゼロフラグON　対戦相手がオディー・Ｏ
+$C2/2859 JSR $56C8  [$C2:56C8]   ;[$C2:56C8]へジャンプ
+</pre></div>
+
+<p>オディー・Ｏと対戦中は、<code>[$7E:0ABE]</code>に<span class="formula">$07</span>が入るため、<code><span class="r">$C2/2825</span></code>でゼロフラグが立ち分岐する。<br>
+ここが、ラストバトルとラストバトル以外での分岐ということでもある。</p>
+
+<p>この後にサウンド処理、グラフィック処理などが挟まり、タイマー関係の処理が始まる。</p>
+
+<div class="code-container"><pre>
+$C2/286B LDA #$003C              ;Aに$003Cをロード
+$C2/286E STA $90    [$00:0590]   ;Aを[$00:0591][$00:0590]（タイマー/フレーム単位）に書き込み
+$C2/2870 STA $91    [$00:0591]   ;Aを[$00:0592][$00:0591]（タイマー/フレーム単位）に書き込み
+$C2/2872 LDA #$000A              ;Aに$000Aをロード
+$C2/2875 STA $92    [$00:0592]   ;Aを[$00:0593][$00:0592]に書き込み（タイマー/秒単位）
+$C2/2877 LDA #$0080              ;Aに$0080をロード
+$C2/287A TSB $8F    [$00:058F]   ;Aと[$00:0590][$00:058F]で論理和を取り、メモリに書き戻し
+$C2/287C JSR $564F  [$C2:564F]   ;[$C2:564F]へジャンプ
+</pre></div>
+
+<code><span class="r">$C2/286B</span></code>～<code><span class="r">$C2/287C</span></code>がタイマーの初期値書き込みで、まとめると、
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:0590]</code></td><td><span class="formula">$3C</span></td><td>タイマー/フレーム単位（<span class="formula">$3C = 10進数60</span>）</td></tr>
+	<tr><td><code>[$00:0591]</code></td><td><span class="formula">$3C</span></td><td>タイマー/フレーム単位（<span class="formula">$3C = 10進数60</span>）</td></tr>
+	<tr><td><code>[$00:0592]</code></td><td><span class="formula">$0A</span></td><td>タイマー/秒単位（<span class="formula">$0A = 10進数10</span>）</td></tr>
+</tbody>
+</table>
+
+<p>である。<br>
+（<code>[$00:0593]</code>にも<span class="formula">$00</span>が入るが、カウントダウン中は値は変動しない）<br>
+タイマーとして実際に変動するのは<code>[$00:0591]</code>と<code>[$00:0592]</code>で、<code>[$00:0590]</code>はタイマー初期値として<span class="formula">$3C</span>のまま残される。</p>
+
+<p><code><span class="r">$C2/2877</span></code>～<code><span class="r">$C2/287A</span></code>で処理される<code>[$00:0590]</code><code>[$00:058F]</code>だが、通常<span class="formula">$0000</span>が入っていて、このタイミングで<span class="formula">$0000</span>と<span class="formula">$0080</span>の論理和を取り<code>[$00:0590]</code><code>[$00:058F]</code>に書き戻すため、<code>[$00:0590]</code>が<span class="formula">$00</span>、<code>[$00:058F]</code>が<span class="formula">$80</span>となる。<br>カウントダウン中かどうかの判定値になるようである。</p>
+
+<div class="code-container"><pre>
+$C2/564F PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/5650 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/5652 LDA $92    [$00:0592]   ;Aに[$00:0593][$00:0592]をロード
+$C2/5654 DEC A                   ;Aをデクリメント -1
+$C2/5655 BPL $03    [$565A]      ;ネガティブフラグが立っていないとき[$565A]分岐
+;ネガティブフラグOFF
+$C2/565A STA $2E78  [$7E:2E78]   ;Aを[$7E:2E79][$7E:2E78]に書き込み（残り時間）
+$C2/565D SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/565F LDA #$06                ;Aに$06をロード
+$C2/5661 STA $2E7A  [$7E:2E7A]   ;Aを[$7E:2E7A]に書き込み
+$C2/5664 LDA #$08                ;Aに$08をロード
+$C2/5666 STA $2E7B  [$7E:2E7B]   ;Aを[$7E:2E7B]に書き込み
+$C2/5669 JSR $5671  [$C2:5671]   ;[$C2:5671]へジャンプ
+</pre></div>
+
+<p>続けて、<code><span class="r">$C2/564F</span></code>～で最初のカウントダウン処理が入り、<code>[$00:0592]</code>の値が<code>A</code>に呼び出され、デクリメント（<span class="formula">-1</span>）される。<br>
+ただし上処理では、<code>[$00:0592]</code>自体はデクリメントされていない、という点に注意。<br>
+<code><span class="r">$C2/5655</span></code>ではデクリメント後のネガティブフラグ判定がある。初期値<span class="formula">$0A</span>をデクリメントしていって、ネガティブフラグが立つのは、<span class="formula">$00</span>をデクリメントして<span class="formula">$FF</span>になった時（同時にキャリーフラグもON）である。<br>
+ここの分岐で、残り秒数が<span class="formula">0</span>かどうかを判定するのだろう、ということがだいたいわかる。</p>
+
+<p>最初のデクリメントでは初期値<span class="formula">$0A</span>→<span class="formula">$09</span>なので、ネガティブフラグは立たない。<br>
+よって<code><span class="r">$C2/565A</span></code>に進み、残り秒数が2バイト値で<code>[$7E:2E79]</code><code>[$7E:2E78]</code>に入る。つまり<span class="formula">$0009</span>が書き込まれる。<br>
+実質、これがカウントダウン初期値（初期秒数）である。<br>
+<code>[$7E:2E79]</code><code>[$7E:2E78]</code>の値から、表示する数字のグラフィックなどが算出されるが、ここではグラフィック処理などは省略する。<br>
+<code><span class="r">$C2/565F</span></code>～の<code>[$7E:2E7A]</code>、<code>[$7E:2E7B]</code>の書き込みもグラフィック関連である。</p>
+
+<p>後は、<span class="formula">1</span>フレーム経過毎に、<code>[$00:0591]</code>の判定を行っていく。<br>
+最初の判定時は<code>[$00:0592]</code>にはまだ<span class="formula">$0A</span>が入っている点に注意。</p>
+
+<div class="code-container"><pre>
+$C2/50D6 LDA $91    [$00:0591]   ;Aに[$00:0591]をロード（タイマー/フレーム単位）
+$C2/50D8 BEQ $0B    [$50E5]      ;ゼロフラグが立っているとき[$50E5]分岐
+;ゼロフラグOFF　タイマー/フレーム単位が1以上
+$C2/50DA BMI $09    [$50E5]      ;ネガティブフラグが立っているとき[$50E5]分岐
+;ネガティブフラグOFF　タイマー/フレーム単位が1以上
+$C2/50DC DEC A                   ;Aをデクリメント -1
+$C2/50DD BEQ $06    [$50E5]      ;ゼロフラグが立っているとき[$50E5]分岐
+;ゼロフラグOFF　タイマー/フレーム単位が1以上
+$C2/50DF BMI $04    [$50E5]      ;ネガティブフラグが立っているとき[$50E5]分岐
+;ネガティブフラグOFF　タイマー/フレーム単位が1以上
+$C2/50E1 STA $91    [$00:0591]   ;Aを[$00:0591]に書き込み
+$C2/50E3 BRA $19    [$50FE]      ;フラグにかかわりなく常に分岐[$50FE]→処理終了
+;ゼロフラグON　タイマー/フレーム単位が0（またはそれ以下）まで減った
+$C2/50E5 LDA $90    [$00:0590]   ;Aに[$00:0590]をロード（タイマー初期値$3C）
+$C2/50E7 STA $91    [$00:0591]   ;Aを[$00:0591]に書き込み（タイマー初期値$3Cを上書き）
+$C2/50E9 LDA $92    [$00:0592]   ;Aに[$00:0592]をロード（タイマー/秒単位）
+$C2/50EB BEQ $0B    [$50F8]      ;ゼロフラグが立っているとき[$50F8]分岐
+;ゼロフラグOFF　タイマー/秒単位が1以上
+$C2/50ED BMI $09    [$50F8]      ;ネガティブフラグが立っているとき[$50F8]分岐
+;ネガティブフラグOFF　タイマー/秒単位が1以上
+$C2/50EF DEC A                   ;Aをデクリメント -1
+$C2/50F0 BEQ $06    [$50F8]      ;ゼロフラグが立っているとき[$50F8]分岐
+;ゼロフラグOFF　タイマー/秒単位が1以上
+$C2/50F2 BMI $04    [$50F8]      ;ネガティブフラグが立っているとき[$50F8]分岐
+;ネガティブフラグOFF　タイマー/秒単位が1以上
+$C2/50F4 STA $92    [$00:0592]   ;Aを[$00:0592]に書き込み
+$C2/50F6 BRA $02    [$50FA]      ;フラグにかかわりなく常に分岐[$50FA]
+;ゼロフラグON/ネガティブフラグON　タイマー/秒単位が0（またはそれ以下）まで減った
+$C2/50F8 STZ $92    [$00:0592]   ;[$00:0592]に$00書き込み
+;処理合流
+$C2/50FA LDA #$01                ;Aに$01をロード
+$C2/50FC TSB $8F    [$00:058F]   ;Aと[$00:058F](カウントダウン中$80)で論理和を取り、メモリに書き戻し→$01 | $80 = $81
+;$C2/50E3ジャンプ先
+$C2/50FE RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>分岐が多くてややこしいが、まとめてみると以下のようになる。</p>
+
+<ul>
+	<li><code>[$00:0591]</code>（タイマー/フレーム単位）が2以上なら、<code>[$00:0591]</code>を<span class="formula">-1</span>して処理終了</li>
+	<li><code>[$00:0591]</code>（タイマー/フレーム単位）が1（以下）なら、<code>[$00:0591]</code>を<span class="formula">-1</span>して（残り<span class="formula">0</span>フレームになる）、<code>[$00:0591]</code>に再度初期値<span class="formula">$3C</span>を上書きする。</li>
+	<ul>
+		<li><code>[$00:0592]</code>（タイマー/秒単位）が2以上なら、<code>[$00:0592]</code>を<span class="formula">-1</span>、<code>[$00:058F]</code>に<span class="formula">$81</span>書き込み</li>
+		<li><code>[$00:0592]</code>（タイマー/秒単位）が1（以下）なら、<code>[$00:0592]</code>に<span class="formula">$00</span>書き込み、<code>[$00:058F]</code>に<span class="formula">$81</span>書き込み</li>
+	</ul>
+</ul>
+
+<p><code>[$00:0591]</code>（タイマー/フレーム単位）が<span class="formula">$02</span>～<span class="formula">$3C</span>なら、<code>[$00:0591]</code>を<span class="formula">-1</span>するだけで、<code>[$00:0592]</code>（タイマー/秒単位）に対して何か処理する必要はない。<br>
+だが、<code>[$00:0591]</code>（タイマー/フレーム単位）が<span class="formula">$01</span>の時は、<span class="formula">-1</span>すると<span class="formula">$00</span>、つまりフレーム単位でのカウントダウンが終了となる（1秒が経過したことになる）。<br>
+この場合、<code>[$00:0592]</code>（タイマー/秒単位）は<span class="formula">-1</span>し、<code>[$00:0592]</code>（タイマー/秒単位）には<span class="formula">$3C</span>を上書きして、再び60フレームのカウントダウンを開始させることになる。</p>
+
+<p>ここではじめて、<code>[$00:0592]</code>を減少させる、という点に注意。<br>
+最初に<code>[$00:0592]</code>が<span class="formula">-1</span>されるのは、<span class="formula">$0A</span>が書き込まれてから60フレーム経過後の上処理で、<span class="formula">$09</span>が入ることになる。</p>
+
+<p>残り0秒になった時のみ、<code><span class="r">$C2/50F8</span></code>の処理で<code>[$00:0592]</code>に<span class="formula">$00</span>が入る。</p>
+
+<p><code>[$00:0592]</code>（タイマー/秒単位）を<span class="formula">-1</span>した時だけ、<code>[$00:058F]</code>に<span class="formula">$81</span>を書き込む処理が入るのがポイント。</p>
+
+<div class="code-container"><pre>
+$C2/0602 LDA #$7E                ;Aに$7Eをロード
+;（中略　押したボタン判定）
+$C2/0626 JMP ($0532)[$C2:06F4]   ;[$C2:06F4]へジャンプ(レジスタをスタックに積まない)
+$C2/06F4 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/06F6 LDA $8F    [$00:058F]   ;Aに[$00:058F]をロード　カウントダウン中、$80または$81
+$C2/06F8 BMI $03    [$06FD]      ;ネガティブフラグが立っているとき[$06FD]分岐
+;ネガティブフラグON　[$00:058F]が$80または$81
+$C2/06FD AND #$01                ;Aと$01で論理積
+$C2/06FF BNE $03    [$0704]      ;ゼロフラグが立っていないとき[$0704]分岐
+;ゼロフラグON　[$00:058F]が$80
+$C2/0701 JMP $05FB  [$C2:05FB]   ;[$C2:05FB]へジャンプ(レジスタをスタックに積まない)
+;ゼロフラグOFF　[$00:058F]が$81
+$C2/0704 LDX #$705C              ;Xに$705Cをロード
+$C2/0707 LDA $42    [$00:0542]   ;Aに[$00:0542]をロード
+$C2/0709 JSR $0723  [$C2:0723]   ;[$C2:0723]へジャンプ
+</pre></div>
+
+<p>ここで、<code>[$00:058F]</code>の値の分岐が発生する。<br>
+<code>[$00:0592]</code>（タイマー/秒単位）を<span class="formula">-1</span>した時は、<code>[$00:058F]</code>が<span class="formula">$81</span>なので、最終的に<code><span class="r">$C2/0709</span></code>まで処理が進んで、<code><span class="r">$C2/0723</span></code>にジャンプする。</p>
+
+<p><code><span class="r">$C2/0723</span></code>にジャンプ後は、<code><span class="r">$C2/0731</span></code>～<code><span class="r">$C2/0751</span></code>、<code><span class="r">$C2/0726</span></code>～<code><span class="r">$C2/072B</span></code>の後、<code><span class="r">$C2/28E6</span></code> JSR $564Fで<code><span class="r">$C2/564F</span></code>にジャンプする。<br>
+つまり秒数の処理へ飛ぶ。<br>
+<code>[$00:058F]</code>が<span class="formula">$80</span>の時には、秒数処理へは飛ばない、ということでもある。</p>
+
+<div class="code-container"><pre>
+$C2/564F PHP                     ;ステータスレジスタをスタックへプッシュ
+$C2/5650 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C2/5652 LDA $92    [$00:0592]   ;Aに[$00:0593][$00:0592]（タイマー/秒単位）をロード
+$C2/5654 DEC A                   ;Aをデクリメント -1
+$C2/5655 BPL $03    [$565A]      ;ネガティブフラグが立っていないとき[$565A]分岐
+;ネガティブフラグON　残り0秒
+$C2/5657 LDA #$0000              ;Aに$0000をロード
+;ネガティブフラグOFF　残り1秒以上
+$C2/565A STA $2E78  [$7E:2E78]   ;Aを[$7E:2E79][$7E:2E78]に書き込み
+$C2/565D SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/565F LDA #$06                ;Aに$06をロード
+$C2/5661 STA $2E7A  [$7E:2E7A]   ;Aを[$7E:2E7A]に書き込み
+$C2/5664 LDA #$08                ;Aに$08をロード
+$C2/5666 STA $2E7B  [$7E:2E7B]   ;Aを[$7E:2E7B]に書き込み
+$C2/5669 JSR $5671  [$C2:5671]   ;[$C2:5671]へジャンプ
+</pre></div>
+
+<p>ここで、<code>[$00:0592]</code>（タイマー/秒単位）を<span class="formula">-1</span>した値が、再び<code>[$7E:2E79]</code><code>[$7E:2E78]</code>に入ることになる。<br>
+ただ、先の<code><span class="r">$C2/50D6</span></code>～で、<code>[$00:0592]</code>（タイマー/秒単位）が残り0秒だと、<code><span class="r">$C2/5655</span></code>で<code>A</code>に<span class="formula">$FFFF</span>が入り、ネガティブフラグが立つので、<span class="formula">$0000</span>を<code>[$7E:2E79]</code><code>[$7E:2E78]</code>に書き込むよう分岐処理が入る。</p>
+
+<p>ちなみに、<code>[$7E:2E7A]</code>に書き込む<span class="formula">$06</span>と、<code>[$7E:2E7B]</code>に書き込む<span class="formula">$08</span>は、スプライトのオブジェクト属性におけるVRAMのスプライトのアドレス（byte2）。<br>
+カウントダウンの数字は7×5のドットを数字に見せて光らせているように表示するが、そのドットの光る丸が<span class="formula">$06</span>、暗い丸が<span class="formula">$08</span>にあたる。<br>
+座標はそのままで、1秒毎にスプライトのアドレスだけ入れ替えてドット毎に光らせたり暗くしたりしているようである。<br>
+デジタル数字用のスプライトのデータは、ラストバトル開始時にVRAMに転送させているが、ここではそのあたりは省略。</p>
+
+<div class="code-container"><pre>
+$C2/28E9 LDA $0ABE  [$7E:0ABE]   ;Aに[$7E:0ABF][$7E:0ABE]をロード
+$C2/28EC AND #$000F              ;Aと$000Fで論理積
+$C2/28EF CMP #$0007              ;Aと$0007を減算比較（ステータスレジスタ変更のみ）
+$C2/28F2 BEQ $22    [$2916]      ;ゼロフラグが立っているとき[$2916]分岐
+;ゼロフラグON　対戦相手がオディー・Ｏ
+$C2/2916 RTS                     ;サブルーチン戻り
+
+$C2/072E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/0730 RTS                     ;サブルーチン戻り
+
+$C2/070C SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/070E LDA #$01                ;Aに$01をロード
+$C2/0710 TRB $8F    [$00:058F]   ;Aのビット反転値(%1111 1110)と[$00:058F]で論理積を取り書き戻し　$81→$80
+$C2/0712 LDA $92    [$00:0592]   ;Aに[$00:0592]（タイマー/秒単位）をロード
+$C2/0714 BEQ $03    [$0719]      ;ゼロフラグが立っているとき[$0719]分岐
+;ゼロフラグOFF　カウントダウン中
+$C2/0716 JMP $05FB  [$C2:05FB]   ;[$C2:05FB]へジャンプ(レジスタをスタックに積まない)
+;ゼロフラグON　カウントダウン終了
+$C2/0719 STZ $8F    [$00:058F]   ;[$00:058F]に$00を書き込み
+$C2/071B LDX #$7060              ;Xに$7060をロード
+$C2/071E LDA $42    [$00:0542]   ;Aに[$00:0542]をロード
+$C2/0720 JMP $064E  [$C2:064E]   ;[$C2:064E]へジャンプ(レジスタをスタックに積まない)
+$C2/064E JSR $0731  [$C2:0731]   ;[$C2:0731]へジャンプ
+</pre></div>
+
+<p>ここが、カウントダウンが続くか終了するかの分岐処理である。<br>
+<code><span class="r">$C2/28E9</span></code>～<code><span class="r">$C2/2916</span></code>は、<code>[$7E:0ABE]</code>の値で対戦相手がオディー・Ｏかどうかの分岐。<br>
+<code><span class="r">$C2/070C</span></code>以降で分岐が発生し、<code>[$00:058F]</code>の値を<span class="formula">$81</span>から<span class="formula">$80</span>に書き直した後、<code>[$00:0592]</code>の値が<span class="formula">0</span>かどうかでゼロフラグ分岐となる。<br>
+<code>[$00:0592]</code>が<span class="formula">1</span>以上ならカウントダウン処理へ戻り、<code>[$00:0592]</code>が<span class="formula">$00</span>ならカウントダウン処理終了、ゲームオーバー処理へ進む。<br>
+この時、<code>[$00:0591]</code>にはいずれも<span class="formula">$3C</span>が上書きされているが、<code>[$00:0592]</code>が<span class="formula">$00</span>の場合は<code>[$00:0591]</code>が<span class="formula">$3C</span>のままゲームオーバー、ということになる。</p>
+
+<p>なお、カウントダウン中の分岐は<code><span class="r">$C2/0716</span></code>→<code><span class="r">$C2/05FB</span></code>とジャンプするが、</p>
+
+<div class="code-container"><pre>
+$C2/05FB SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C2/05FD REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C2/05FF JSR $4B22  [$C2:4B22]   ;[$C2:4B22]へジャンプ
+</pre></div>
+
+<p>次のジャンプ先の<code><span class="r">$C2/4B22</span></code>はHDMA転送＆NMIによる割り込み待ち用ループで、この後にグラフィック関係の転送処理などが入り、再びカウントダウン処理へ、とループすることになる。<br>
+以上が現代編ラストバトル敗北時カウントダウン処理である。</p>
+
+
+<h3>ポゴの匂いタイマー</h3>
+
+<p>ポゴが匂いを嗅ぐと（フィールドでYボタン）、<span class="formula">360</span>フレーム（<span class="formula">6</span>秒）の間、匂いが漂う。<br>
+この時のタイマーは<code>$00:0ACA</code>～<code>$00:0ACB</code>を使っている。<br>
+タイマーのカウントダウン関係の処理とともに、Yボタンを押した時の判定・分岐処理についても大まかに説明する。</p>
+
+<h4>匂いを嗅げるかどうか</h4>
+
+<p>Yボタンを押した時にポゴが匂いを嗅げるかどうかのフラグは、<code>[$00:0AC7]</code>に入る。<br>
+原始編を開始した時点では<span class="formula">$00</span>が入っており、序盤の狩場でのイベントでYボタンで匂いが嗅げるようになったタイミングで（長老がYボタンを押すことを教えてくれるタイミング）、以下の処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/27FB LDA $000AC7[$00:0AC7]   ;Aに[$00:0AC7]($00)をロード
+$C0/27FF AND #$01                ;Aと$01で論理積 $00 &amp; $01 = $00
+$C0/2801 EOR #$01                ;Aと$01で排他的論理和XOR $00 XOR $01 = $01
+$C0/2803 STA $000AC7[$00:0AC7]   ;Aを[$00:0AC7]に書き込み
+</pre></div>
+
+<p>以降は<code>[$00:0AC7]</code>に<span class="formula">$01</span>が入ったままで、最終編開始時にも引き継がれる。<br>
+（途中で原始編をプレイし直すと、開始時に<span class="formula">$00</span>が入るが、原始編含め7つのシナリオをクリアしていないと中世編・最終編が出現しないから、最終編開始時は<span class="formula">$01</span>が入ったまま）</p>
+
+<p>だが、最終編、魔王山山頂のオディオが出現すると、同じサブルーチンで<code>[$00:0AC7]</code>に<span class="formula">$00</span>が書き込まれる。</p>
+
+<div class="code-container"><pre>
+$C0/27FB LDA $000AC7[$00:0AC7]   ;Aに[$00:0AC7]($01)をロード
+$C0/27FF AND #$01                ;Aと$01で論理積 $01 &amp; $01 = $01
+$C0/2801 EOR #$01                ;Aと$01で排他的論理和XOR $01 XOR $01 = $00
+$C0/2803 STA $000AC7[$00:0AC7]   ;Aを[$00:0AC7]に書き込み
+</pre></div>
+
+<p>このため、オディオが出現すると、パーティにポゴがいる状態でYボタンを押しても匂いが嗅げない。<br>
+（アキラがいる時は、Yボタンで心が読めない時はAボタンと同じく話しかける役割になるので、オディオに隣接してYを押すと会話が始まる）<br>
+以降、ピュアオディオを撃破してからエンディングまでは<code>[$00:0AC7]</code>に<span class="formula">$00</span>が入ったままのため、匂いが嗅げなくなる。</p>
+
+<p>オディオ出現後は手前に（下に）引き返して階段に入ると、異次元空間へ飛ばされるが、この時には以下処理が入って、<code>[$00:0AC7]</code>に再び<span class="formula">$01</span>が入る。<br>
+これ以降は匂いが嗅げるようになる。</p>
+
+<div class="code-container"><pre>
+$C0/061B LDA $0AC7  [$00:0AC7]   ;Aに[$00:0AC7]($00)をロード
+$C0/061E AND #$7F                ;Aと$7Fで論理積
+$C0/0620 STA $0AC7  [$00:0AC7]   ;Aを[$00:0AC7]($00)に書き込み
+$C0/0623 JSR $9A06  [$C0:9A06]   ;[$C0:9A06]へジャンプ
+;
+;（中略）
+;
+$C0/27FB LDA $000AC7[$00:0AC7]   ;Aに[$00:0AC7]($00)をロード
+$C0/27FF AND #$01                ;Aと$01で論理積 $00 &amp; $01 = $00
+$C0/2801 EOR #$01                ;Aと$01で排他的論理和XOR $00 XOR $01 = $01
+$C0/2803 STA $000AC7[$00:0AC7]   ;Aを[$00:0AC7]に書き込み
+</pre></div>
+
+<p><code>[$00:0AC7]</code>はポゴが匂いを嗅ぐ能力を持っているかどうか、というフラグなので、最終編の場合、Yボタンを押せば必ず発動ではなく、ポゴがパーティにいるかどうかはもちろん、アキラの「心を読む」が優先になるか、といった分岐処理が発生する。<br>
+この先は<code>[$00:0AC7]</code>に<span class="formula">$01</span>が書き込まれている前提で、匂いを嗅いだ時のタイマー処理について記す。</p>
+
+<h4>Yボタンを押して匂いを嗅ぐ</h4>
+
+<p>匂いを嗅ぐ処理は、原始編でも最終編でも以下で共通。</p>
+
+<div class="code-container"><pre>
+;（前略）
+$C0/139C JSR $1B74  [$C0:1B74]   ;[$C0:1B74]へジャンプ
+;
+;（匂いかぐモーション処理）
+;
+$C0/139F JSR $468F  [$C0:468F]   ;[$C0:468F]へジャンプ
+;
+;（$C0/468F～$C0/476B）
+;
+$C0/13A2 LDA $24    [$00:0024]   ;Aに[$00:0024]をロード
+$C0/13A4 BEQ $0E    [$13B4]      ;ゼロフラグが立っているとき[$13B4]分岐
+$C0/13A6 LDA $0AC7  [$00:0AC7]   ;Aに[$00:0AC7]($01)をロード
+$C0/13A9 ORA #$80                ;Aと$80で論理和
+$C0/13AB STA $0AC7  [$00:0AC7]   ;Aを[$00:0AC7]($81)に書き込み
+$C0/13AE LDX #$0168              ;Xに$0168をロード
+$C0/13B1 STX $0ACA  [$00:0ACA]   ;Xを[$00:0ACB][$00:0ACA]に書き込み
+$C0/13B4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/13AE</span></code>～<code><span class="r">$C0/13B1</span></code>で、<code>[$00:0ACB]</code><code>[$00:0ACA]</code>に<span class="formula">$0168</span>（10進数<span class="formula">360</span>）が入り、<span class="formula">1</span>フレームに<span class="formula">1</span>ずつ減って6秒のカウントダウンとなり、6秒間は匂いが漂う。<br>
+また、匂いが表示されている間だけ、<code>[$00:0AC7]</code>に<span class="formula">$81</span>が書き込まれる。</p>
+
+<p><code><span class="r">$C0/139C</span></code>までの処理は原始編・最終編で分岐処理がある。<br>
+その説明は後回しにして、カウントダウン処理について説明する。<br>
+1フレームに1回、以下処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/4669 LDA $0AC7  [$00:0AC7]   ;Aに[$00:0AC7](カウントダウン中$81)をロード
+$C0/466C CMP #$81                ;Aと$81を減算比較（ステータスレジスタ変更のみ）
+$C0/466E BNE $13    [$4683]      ;ゼロフラグが立っていないとき[$4683]分岐
+;ゼロフラグON　6秒のカウントダウン中
+$C0/4670 LDX $0ACA  [$00:0ACA]   ;Xに[$00:0ACB][$00:0ACA]をロード
+$C0/4673 DEX                     ;Xをデクリメント -1
+$C0/4674 STX $0ACA  [$00:0ACA]   ;Xを[$00:0ACB][$00:0ACA]に書き込み
+$C0/4677 BNE $0A    [$4683]      ;ゼロフラグが立っていないとき[$4683]分岐
+;ゼロフラグON　カウントダウン終了
+$C0/4679 LDA $0AC7  [$00:0AC7]   ;Aに[$00:0AC7]($81)をロード
+$C0/467C AND #$7F                ;Aと$7Fで論理積 $81 &amp; $7F = $01
+$C0/467E STA $0AC7  [$00:0AC7]   ;Aを[$00:0AC7]に書き込み
+$C0/4681 BRA $01    [$4684]      ;フラグにかかわりなく常に分岐[$4684]
+;ゼロフラグOFF　カウントダウン続行　
+$C0/4683 RTS                     ;サブルーチン戻り
+
+;$C0/4681ジャンプ先（カウントダウン終了処理）
+$C0/4684 STZ $20    [$00:0020]   ;[$00:0020]に$00を書き込み
+（中略）
+$C0/476B RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>[$00:0AC7]</code>に<span class="formula">$81</span>が入っている時のみ、<code>[$00:0ACB]</code><code>[$00:0ACA]</code>を<span class="formula">-1</span>して、</p>
+
+<ul>
+	<li><span class="formula">0</span>まで減少したら（ゼロフラグがONなら）、<code>[$00:0AC7]</code>を<span class="formula">$01</span>に戻しカウントダウン終了処理<code><span class="r">$C0/4679</span></code>へ</li>
+	<li><span class="formula">1</span>以上なら（ゼロフラグがOFFなら）、カウントダウン継続の<code><span class="r">$C0/4683</span></code>へ</li>
+</ul>
+
+<p>と、分岐する処理になる。<br>
+カウントダウン処理自体はシンプル。<br>
+ややこしいのは、匂いを嗅ぐまでの分岐処理である。<br>
+カウントダウンの処理とは直接関係はないが、以下で解説しておく。</p>
+
+<h4>匂いを嗅ぐまでの分岐処理</h4>
+
+<p>ポゴがパーティにいて、原始編イベント後にYボタンを押すと匂いを嗅げるようになったタイミング以降でも、匂いが嗅げない時がある。<br>
+また、最終編では、本能のダンジョン関係の分岐もある。<br>
+それらの判定をざっと紹介する。</p>
+
+<p>まず重要なのが<code>[$00:0A0F]</code>（Yボタン判定フラグ）である。</p>
+
+<h5>Yボタン判定フラグ</h5>
+
+<p>最終編で本能のダンジョンまたは心のダンジョンに入ると、最終編開始時に初期値で<span class="formula">$00</span>が入っていた<code>$00:0A0F</code>に<span class="formula">$01</span>が書き込まれ、以降は変更されない。</p>
+
+<div class="code-container"><pre>
+$C0/1C62 LDA #$01                ;Aに$01をロード
+$C0/1C64 STA $000A0F[$00:0A0F]   ;Aを[$00:0A0F]に書き込み
+$C0/1C68 BRL $FF36  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p>ちなみに、近未来編では開始時に同処理で<code>[$00:0A0F]</code>に<span class="formula">$01</span>が入るが、アキラ主人公で最終編を始めても<code>[$00:0A0F]</code>に<span class="formula">$01</span>は入らない。</p>
+
+<p>本能のダンジョンと心のダンジョンでは、アキラがいるとYボタンで心が読める場面があるが、それ以外ではポゴの匂いを嗅ぐ方が優先される。<br>
+この優先順位判断用のフラグ値である。<br>
+ということで、便宜上、「Yボタン判定フラグ」という名称にしておく。</p>
+
+<h5>サブルーチン</h5>
+
+<p>フィールド上でYボタンを押した時の処理からざっと説明していく。</p>
+
+<div class="code-container"><pre>
+;ボタン判定
+$C0/B83E LDA #$01                ;Aに$01をロード
+$C0/B840 BIT $4212  [$00:4212]   ;Aと[$00:4212]で論理積（ステータスフラグ変更のみ）
+$C0/B843 BNE $FB    [$B840]      ;ゼロフラグが立っていないとき[$B840]分岐
+$C0/B845 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/B847 LDA $4218  [$00:4218]   ;Aに[$00:4219][$00:4218]をロード　コントローラ1のボタン
+$C0/B84A BIT #$000F              ;Aと$000Fで論理積（ステータスフラグ変更のみ）
+$C0/B84D BEQ $03    [$B852]      ;ゼロフラグが立っているとき[$B852]分岐
+;ゼロフラグON　何かのボタンが押された
+$C0/B852 TAX                     ;Aの値をXレジスタに転送
+$C0/B853 EOR $00    [$00:0000]   ;Aと[$00:0001][$00:0000]で排他的論理和XOR　コントローラ1のボタン
+$C0/B855 STX $00    [$00:0000]   ;Xを[$00:0001][$00:0000]に書き込み
+$C0/B857 AND $00    [$00:0000]   ;Aと[$00:0001][$00:0000]で論理積
+$C0/B859 STA $04    [$00:0004]   ;Aを[$00:0005][$00:0004]に書き込み　コントローラ1のボタン
+$C0/B85B STA $08    [$00:0008]   ;Aを[$00:0009][$00:0008]に書き込み　コントローラ1のボタン
+$C0/B85D LDA $421A  [$00:421A]   ;Aに[$00:421B][$00:421A]をロード　コントローラ2判定
+$C0/B860 BIT #$000F              ;Aと$000Fで論理積（ステータスフラグ変更のみ）
+$C0/B863 BEQ $03    [$B868]      ;ゼロフラグが立っているとき[$B868]分岐
+$C0/B868 TAX                     ;Aの値をXレジスタに転送
+$C0/B869 EOR $02    [$00:0002]   ;Aと[$00:0003][$00:0002]で排他的論理和XOR
+$C0/B86B STX $02    [$00:0002]   ;Xを[$00:0003][$00:0002]に書き込み
+$C0/B86D AND $02    [$00:0002]   ;Aと[$00:0003][$00:0002]で論理積
+$C0/B86F STA $06    [$00:0006]   ;Aを[$00:0007][$00:0006]に書き込み
+$C0/B871 STA $0A    [$00:000A]   ;Aを[$00:000B][$00:000A]に書き込み
+$C0/B873 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/B875 LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/B877 BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C0/B879 BEQ $16    [$B891]      ;ゼロフラグが立っているとき[$B891]分岐
+;ゼロフラグON 上キーではない
+$C0/B891 LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/B893 BIT #$04                ;Aと$04で論理積（ステータスフラグ変更のみ）
+$C0/B895 BEQ $16    [$B8AD]      ;ゼロフラグが立っているとき[$B8AD]分岐
+;ゼロフラグON 下キーではない
+$C0/B8AD LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/B8AF BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C0/B8B1 BEQ $16    [$B8C9]      ;ゼロフラグが立っているとき[$B8C9]分岐
+;ゼロフラグON 左キーではない
+$C0/B8C9 LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/B8CB BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C0/B8CD BEQ $16    [$B8E5]      ;ゼロフラグが立っているとき[$B8E5]分岐
+;ゼロフラグON 右キーではない
+$C0/B8E5 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>自動ジョイパッド読み取り機能（<code>$00:4200</code>の下1ビット）がONの時に、<code>[$00:4219]</code><code>[$00:4218]</code>にコントローラ1のボタンの状態が出力されるので、もし何かしらのボタンが押されていたら<code><span class="r">$C0/B852</span></code>～の処理へ進む。<br>
+Yボタンのみ押された場合、<code>[$00:4219]</code><code>[$00:4218]</code>に$4000が出力される。</p>
+
+<p><code><span class="r">$C0/B875</span></code>～以降で十字ボタン（方向キー）が押されていないかの判定が行われ、Yボタンの場合は判定を抜けて<code><span class="r">$C0/B8E5</span></code>でサブルーチンが終わり、次の処理に進む。</p>
+
+<div class="code-container"><pre>
+$C0/0C86 LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/0C88 BNE $14    [$0C9E]      ;ゼロフラグが立っていないとき[$0C9E]分岐
+;ゼロフラグON　デモ画面ではない
+$C0/0C8A LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/0C8D BEQ $0E    [$0C9D]      ;ゼロフラグが立っているとき[$0C9D]分岐
+;ゼロフラグON　キャラをフィールド上で操作可能
+$C0/0C9D RTS                     ;サブルーチン戻り
+
+$C0/0831 LDA $05    [$00:0005]   ;Aに[$00:0005]をロード
+$C0/0833 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/0835 BEQ $03    [$083A]      ;ゼロフラグが立っているとき[$083A]分岐
+;ゼロフラグOFF コントローラ1のYボタンが押されている
+$C0/0837 JSR $135C  [$C0:135C]   ;[$C0:135C]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/0C86</span></code>～<code><span class="r">$C0/0C9D</span></code>はデモ画面やイベントシーンではないか（プレイヤーがフィールドで何かしらの操作をできる状態であるかどうか）の判定。<br>
+<code><span class="r">$C0/0831</span></code>～から、十字ボタン以外のボタン判定になる。<br>
+最初に<code>[$00:4219]</code>のコピー先である<code>[$00:0005]</code>と<span class="formula">$40</span>(<span class="formula">%0100 0000</span>)の論理積を取ってゼロフラグ判定だが、Yボタンを押すと<code>[$00:0005]</code>のBit6に<span class="formula">1</span>が立つから、ここで必ずゼロフラグが立たず、<code><span class="r">$C0/0837</span></code>に進んで<code><span class="r">$C0/135C</span></code>にジャンプする。</p>
+
+<p>つまり、十字ボタンの次に、Yボタンの判定が優先になり、もしYボタンとXやAボタンなどを同時押しした場合、Yボタンの処理をまず行う、ということになる。<br>
+プレイして試してもらえればわかるが、Yボタンで何らかのコマンドが発動する時（匂いを嗅ぐ以外、心を読む、隠れ蓑使用も含む）、同時にXボタンを押してみると、メニュー画面は開かず、Yボタンのコマンドが実行されるはずである。</p>
+
+<p>それはさておき、次の<code><span class="r">$C0/135C</span></code>～がフィールドでYボタンを押した時の処理である。<br>
+ポゴやアキラなどYボタンでコマンドを発動できるキャラがいるかどうかの判定は最後の方。<br>
+パーティメンバーが誰であっても、Yボタンを押すと以下の判定が必ず行われる。</p>
+
+<div class="code-container"><pre>
+;Yボタンを押した時の判定
+$C0/135C LDA $0A0F  [$00:0A0F]   ;Aに[$00:0A0F]をロード　Yボタン判定フラグ
+$C0/135F BEQ $05    [$1366]      ;ゼロフラグが立っているとき[$1366]分岐
+;ゼロフラグOFF　近未来編または最終編でYボタン判定フラグが立っている
+$C0/1361 STA $0201  [$00:0201]   ;Aを[$00:0201]に書き込み
+$C0/1364 BRA $52    [$13B8]      ;フラグにかかわりなく常に分岐[$13B8]
+;ゼロフラグON　原始編　または最終編でYボタン判定フラグOFF　または幕末編隠れ蓑
+$C0/1366 LDA $0AC7  [$00:0AC7]   ;Aに[$00:0AC7]をロード
+$C0/1369 BEQ $49    [$13B4]      ;ゼロフラグが立っているとき[$13B4]分岐
+;（$C0/13B4 RTS                     ;サブルーチン戻り）
+;ゼロフラグOFF ポゴが匂いを嗅ぐ能力を所持している([$00:0AC7]が$01)
+$C0/136B LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード　シナリオID
+$C0/136E CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/1370 BEQ $07    [$1379]      ;ゼロフラグが立っているとき[$1379]分岐
+;ゼロフラグOFF　原始編
+$C0/1372 LDA #$01                ;Aに$01をロード
+$C0/1374 STA $01B8  [$00:01B8]   ;Aを[$00:01B8]に書き込み
+$C0/1377 BRA $23    [$139C]      ;フラグにかかわりなく常に分岐[$139C]
+;ゼロフラグON　最終編でYボタン判定フラグOFF
+$C0/1379 LDA $0A14  [$00:0A14]   ;Aに[$00:0A14]をロード　パーティの人数
+$C0/137C INC A                   ;Aをインクリメント +1
+$C0/137D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/137F LDA #$01                ;Aに$01をロード
+$C0/1381 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1383 LDX #$0A10              ;Xに$0A10をロード
+$C0/1386 LDA #$01                ;Aに$01をロード
+;ループ処理（ポゴがいるか）
+$C0/1388 CMP $00,x  [$00:0A10]   ;Aと[$00:0A10]～[$00:0A13]を減算比較（ステータスレジスタ変更のみ）
+$C0/138A BEQ $09    [$1395]      ;ゼロフラグが立っているとき[$1395]分岐
+$C0/138C INX                     ;Xをインクリメント +1
+$C0/138D INC $31    [$00:0031]   ;[$00:0031]をインクリメント +1
+$C0/138F DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/1391 BNE $F5    [$1388]      ;ゼロフラグが立っていないとき[$1388]分岐
+;ループ処理ここまで
+$C0/1393 BRA $1F    [$13B4]      ;フラグにかかわりなく常に分岐[$13B4]
+;処理合流
+$C0/1395 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/1397 STA $01B8  [$00:01B8]   ;Aを[$00:01B8]に書き込み
+$C0/139A LDA #$F1                ;Aに$F1をロード
+$C0/139C JSR $1B74  [$C0:1B74]   ;[$C0:1B74]へジャンプ
+</pre></div>
+
+<p>分岐が何度もあるが、整理してみると、以下のようになる。<br>
+ややこしくなるので、ここでは匂いを嗅ぐ関係の分岐中心で記す。</p>
+
+<ul>
+	<li>近未来編または最終編でYボタン判定フラグが立っている（<code>[$00:0A0F]</code>が<span class="formula">$01</span>）<br>
+	→近未来編なら、マップの座標から対象がいるか判定し、アキラの「心を読む」<br>
+	→最終編なら、マップの座標とパーティメンバーから、アキラの「心を読む」かポゴの「匂いを嗅ぐ」のいずれかの処理へ</li>
+	
+	<li>Yボタン判定フラグなし、かつ、ポゴが匂いを嗅ぐ能力を所持している（<code>[$00:0AC7]</code>が<span class="formula">$01</span>）、かつ原始編<br>
+	→匂いを嗅ぐ処理へ</li>
+
+	<li>Yボタン判定フラグなし、かつ、最終編でYボタン判定フラグOFF<br>
+	→ポゴがパーティにいるか判定して、ポゴがいるなら匂いを嗅ぐ処理へ</li>
+</ul>
+
+<p>というような感じになる。<br>
+最終編においてポゴがいるかどうかの判定は、<code><span class="r">$C0/1379</span></code>～<code><span class="r">$C0/1393</span></code>で行っている。<br>
+ループ処理を見るとわかるが、<code>A</code>に<span class="formula">$01</span>をロードし、<code>[$00:0A10]</code>～<code>[$00:0A13]</code>と減算比較している。<br>
+<code>$00:0A10</code>～<code>$00:0A13</code>は最終編における現在のパーティメンバーのキャラIDであり、<span class="formula">$01</span>はポゴだから、「ポゴがパーティ内にいるかどうか」をループ処理で判定している。<br>
+ポゴがいなければ<code><span class="r">$C0/1393</span></code>→<code><span class="r">$C0/13B4</span></code>と抜けて、何もしない。<br>
+ポゴがいる場合は、<code><span class="r">$C0/138A</span></code>→<code><span class="r">$C0/1395</span></code>とループ処理を抜けて、匂いを嗅ぐ処理へ進むことになる。</p>
+
+<p>最終編でYボタン判定フラグが立っている時が一番ややこしく、マップと座標から「心を読む」か「匂いを嗅ぐ」が発動可能と判定した場合、上の<code><span class="r">$C0/1364</span></code>から<code><span class="r">$C0/13B8</span></code>へジャンプする。<br>
+マップと座標の計算については端折るが、最終的に、匂いが嗅げる場合は<code><span class="r">$C0/1366</span></code>へ処理が戻り、後の処理は共通となる。</p>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.querySelectorAll(".maincontents h3, .maincontents h4, .maincontents h5");if(0===t.length||!e)return;let l=document.createElement("ul"),n=[{ul:l,level:3}],a=[0,0,0];t.forEach(e=>{let t=parseInt(e.tagName.substring(1),10),l=t-3;a[l]++;for(let i=l+1;i<a.length;i++)a[i]=0;let h=a.slice(0,l+1),d=`c${h.join("-")}`;e.id=d;let o=n[n.length-1];if(t>o.level){let p=document.createElement("ul"),r=o.ul.lastElementChild;r?r.appendChild(p):o.ul.appendChild(p),n.push({ul:p,level:t}),o=n[n.length-1]}else if(t<o.level){for(;n.length>1&&n[n.length-1].level>t;)n.pop();o=n[n.length-1]}let c=document.createElement("li"),u=document.createElement("a");u.href=`#${d}`,u.textContent=e.textContent,c.appendChild(u),o.ul.appendChild(c)}),e.appendChild(l)});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="program9_2.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="program11.html"><span class="button">&#9654;次　セレクトバグ</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
