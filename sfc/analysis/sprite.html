@@ -413,9 +413,73 @@ F480FC787C807A98FE0C1E045E4434E0<br>
 その計算し直した<code>$7E:8000</code>～を、VRAMに送り、スプライトに変換している。<br>
 サンダウンのように左右対称部分が多いキャラはROMに入っているデータの大半がVRAMにコピーされることになるが、おぼろ丸のように髪型から左右非対称のキャラなどはROMに入っているデータとは別物のデータがVRAMに入ることもある。</p>
 
+<h4>VRAM内のスプライトのタイルデータについて</h4>
+
 <p>ここでVRAMについてざっと説明する。<br>
 VRAMの容量は<span class="formula">64</span>KB、グラフィックデータを置けるのはメモリアドレス<span class="formula">$0000</span>～<span class="formula">$FFFF</span>の領域ということになる。<br>
-<span class="formula">$0000</span>～<span class="formula">$BFFF</span>がBG（背景）用、<span class="formula">$C000</span>～<span class="formula">$FFFF</span>がスプライト用である。</p>
+VRAMの中は、BG（背景）用とスプライト用に領域が分かれているが、領域を決めるのはI/Oメモリアドレスの<code>$00:2101</code>（スプライトサイズ・データ領域選択）と、<code>$00:2107</code>～<code>$00:210A</code>（BG1～4タイルマップアドレスとサイズ）に書き込む値である。<br>
+BGについては、<a href="bg.html">背景グラフィックと効果</a>で説明している。<br>
+スプライトの場合は<code>$00:2101</code>で指定するが、<code>$00:2101</code>には3種類のデータが格納されている。</p>
+
+<ul>
+	<li>Bit0～2：VRAMにおけるスプライトのタイルデータ前半部開始位置</li>
+	<li>Bit3～4：タイルデータ前後半がどれだけ離れているか</li>
+	<li>Bit5～7：スプライトサイズ指定（※<a href="#03">OAMについて</a>で説明）</li>
+</ul>
+
+<p>VRAMにおけるスプライトのタイルデータ開始位置は、<code>$00:2101</code>の下3ビットで指定するが、実際には、</p>
+
+<p><span class="formula"><code>$00:2101</code>の下3ビット * $4000</span></p>
+
+がVRAMの開始位置アドレスとなる。
+<p>フィールドの場合、ゲーム開始時、セーブデータからのロード時などで、<code>[$00:2101]</code>に<span class="formula">$63</span>が書き込まれる。</p>
+
+<div class="code-container"><pre>
+$C0/0DE3 LDA #$8F                ;Aに$8Fをロード
+$C0/0DE5 STA $2100  [$00:2100]   ;Aを[$00:2100]に書き込み スクリーン初期化
+$C0/0DE8 LDA #$63                ;Aに$63をロード
+$C0/0DEA STA $2101  [$00:2101]   ;Aを[$00:2101]に書き込み スプライトサイズ・データ領域選択
+$C0/0DED STZ $2102  [$00:2102]   ;[$00:2102]に$00を書き込み OAM下位アドレス
+$C0/0DF0 STZ $2103  [$00:2103]   ;[$00:2103]に$00を書き込み OAM上位アドレスとスプライト優先順位
+$C0/0DF3 JSR $0FB1  [$C0:0FB1]   ;[$C0:0FB1]へジャンプ
+</pre></div>
+
+<p><span class="formula">$63 = %0110 0011</span>だから、Bit0～2は<span class="formula">%011（$3）</span>である。</p>
+
+<p><span class="formula"><code>$00:2101</code>の下3ビット * $4000</span><br>
+<span class="formula">= $3 * $4000</span><br>
+<span class="formula">= $C000</span></p>
+
+<p>となり、フィールドではVRAMアドレスの<span class="formula">$C000</span>が、フィールド用スプライトのタイルデータ開始位置として設定される。</p>
+
+<p>戦闘なら、</p>
+
+<div class="code-container"><pre>
+$C1/F338 LDA #$21                ;Aに$21をロード
+$C1/F33A STA $2101  [$00:2101]   ;Aを[$00:2101]に書き込み スプライトサイズ・データ領域選択
+（後略）
+</pre></div>
+
+<p><span class="formula">$21 = %0010 0001</span>、Bit0～2は<span class="formula">%001（$1）</span>である。<br>
+よって、<span class="formula">$1 * $4000 = $4000</span>で、戦闘ではVRAMアドレスの<span class="formula">$4000</span>が、スプライトのタイルデータ開始位置になる。</p>
+
+<p>メニュー画面なら、</p>
+
+<div class="code-container"><pre>
+$C2/05C4 LDA $C20001,x[$C2:6C67] ;Aに[$C2:6C67]($62)をロード
+$C2/05C8 STA $0000,y[$00:0635]   ;Aを[$00:0635]に書き込み
+;
+;（中略）
+;
+$C2/4FC4 LDA $35    [$00:0635]   ;Aに[$00:0635]($62)をロード
+$C2/4FC6 STA $2101  [$00:2101]   ;Aを[$00:2101]に書き込み スプライトサイズ・データ領域選択
+</pre></div>
+
+<p><span class="formula">$62 = %0110 0010</span>、Bit0～2は<span class="formula">%010（$2）</span>である。<br>
+よって、<span class="formula">$2 * $4000 = $8000</span>で、メニュー画面ではVRAMアドレスの<span class="formula">$8000</span>が、スプライトのタイルデータ開始位置になる。</p>
+
+<p>というように、場面によりスプライトのタイルデータの開始位置は異なる。<br>
+ただ、フィールドであればどこでもVRAMアドレス<span class="formula">$C000</span>が開始位置だし、戦闘ならどの戦闘でもVRAMアドレス<span class="formula">$4000</span>が開始位置である（はず）。</p>
 
 <p>VRAMに送るデータは、キャラ1人分のスプライトだけではない。<br>
 例えば西部編なら、西部編を開始した時点で、VRAMのスプライトの領域にサンダウン、マッドドッグ、サクセズタウンの人々、馬など、<span class="formula">$C000</span>～<span class="formula">$FFFF</span>に一斉に設置される。<br>
@@ -469,6 +533,15 @@ F480FC787C807A98FE0C1E045E4434E0<br>
 
 <p>に入っているデータなのである。<br>
 VRAMからスプライトを読み取るなら上の点に注意しなければならない。</p>
+
+<p>フィールドであれば、ほとんどの場合、VRAMアドレスの<span class="formula">$C000</span>～に以下のようにタイルデータが入るようである。<br>
+（四角形1個が16×16ピクセルに対応）</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/vram_OBJ_f.png" class="modal-link">
+		<img src="img/vram_OBJ_f.png" alt="フィールドVRAMアドレス$C000～" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
 
 <h3 id="02">色のデータとCGRAM</h3>
 
@@ -700,6 +773,22 @@ OAMに記録されるデータはオブジェクト属性（Object Attribute）�
 <p>1バイト目の、ピクセル単位の水平位置（X座標）だが、スーパーファミコンの画面サイズが横256×縦224ピクセルのため、X方向にキャラを少しはみ出した状態にしたい時など、X座標が<span class="formula">$FF</span>を越えることがあるため、上位テーブルに<span class="formula">$FF</span>以上の値がはみ出した時のための1ビットの値が確保してある。つまり9ビット表示である。<br>
 ちなみに座標は負の値を設定でき、その場合はキャラを画面隅に一部だけ表示させたり、一時的に非表示にする、といったことが可能。</p>
 
+<p>3バイト目と4バイト目のbit0の合計9ビットで、VRAMの中のスプライトのアドレス位置を表している（CHAR）。<br>
+つまり、CHAR<span class="formula"> = $000～$1FF</span>が表現できるが、</p>
+
+<p><span class="formula">VRAMにおけるスプライトのタイルデータ開始アドレス + CHAR * $20</span></p>
+
+<p>がVRAMでの実際のアドレスになる。<br>
+実質、CHARはタイルの番号と考えて構わない。<br>
+たとえば、フィールドにおいて、あるスプライトのCHARが<span class="formula">$002</span>と指定されている場合、VRAMにおけるスプライトのタイルデータ開始アドレスに<span class="formula">$002</span>バイトを加算した位置がスプライトの位置ではない。<br>
+これまでの説明の通り、スプライトのデータは8×8ピクセルサイズで<span class="formula">$20</span>バイトであり、1つの単位である。<span class="formula">2</span>バイトずらしただけでは何のデータにもならない。<br>
+実際には、</p>
+
+<p><span class="formula">VRAMにおけるスプライトのタイルデータ開始アドレス$C000 + $002 * $20</span><br>
+<span class="formula">= $C040</span></p>
+
+<p>が開始位置で、<span class="formula">$C040</span>～, <span class="formula">$C060</span>～, <span class="formula">$C440</span>～, <span class="formula">$C460</span>～, の4つのタイルの16×16ピクセルのスプライトを指定している。</p>
+
 <p>bit4-5の背景に対する優先度だが、2ビット（つまり<span class="formula">0～3</span>）で、背景とスプライトの重ね順を表す。<br>
 基本は値が大きいほど、スプライトが手前側、つまり重ねた時に上に設置されることになる。<br>
 背景にも1枚ずつ優先度が設定されているので、そちらと合わせて実際の重ね順を判定することになるのだが、ここでは詳細は省く。<br>
@@ -744,7 +833,7 @@ OAMに記録されるデータはオブジェクト属性（Object Attribute）�
 <ul>
 	<li>X座標：<span class="formula">$78</span>(<span class="formula">120</span>)<br>※下位テーブルbit0は<span class="formula">0</span>なので<span class="formula">$78 = %0111 1000</span>の頭に<span class="formula">0</span>をつける、つまり<span class="formula">$78</span>そのままで問題ない</li>
 	<li>Y座標：<span class="formula">$5D</span>(<span class="formula">93</span>)</li>
-	<li>VRAMの中スプライトのアドレス位置：<span class="formula">$00</span><br>（一番最初の位置のスプライトにあたる）</li>
+	<li>VRAMの中スプライトのアドレス位置：<span class="formula">$000</span><br>（一番最初の位置のスプライトにあたる）</li>
 	<li>カラーパレットNo.：<span class="formula">%010</span>（カラーパレットNo.A）</li>
 	<li>背景に対する優先度：<span class="formula">%10</span>（優先度は2）</li>
 	<li>スプライトをX軸反転：<span class="formula">%0</span>（反転しない）</li>
@@ -827,9 +916,9 @@ VRAMにコピーする時に横の横8×縦32ピクセル分の透過部分を�
 
 <p>次ページでは、<a href="sprite2.html">サブルーチン</a>を紹介する。</p>
 
-<!-- <script>//ソースコード色分け処理
+<script>//ソースコード色分け処理
 window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
-</script> -->
+</script>
 
 <div class="pagelink">
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
