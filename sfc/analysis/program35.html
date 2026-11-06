@@ -159,7 +159,7 @@ table {
 		<li><a href="program45.html">技モーション</a></li>
 	</ul>
 </li>
-<li class="here"><button type="button">フィールド関係</button>
+<li class="here"><button type="button">フィールド</button>
 	<ul>
 		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
 		<li><a href="program7.html">マップ乱数について</a></li>
@@ -172,7 +172,12 @@ table {
 		<li><a href="program42.html">アイテム並び替え</a></li>
 		<li><a href="program43.html">隊形</a></li>
 		<li><a href="program46.html">音声</a></li>
-<li><a href="program35.html">セーブ・ロード</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">マップ</button>
+	<ul>
+		<li><a href="map01.html">マップ構造とスプライトの配置</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -345,24 +350,63 @@ $CE/CDC0 BNE $E6    [$CDA8]      ;ゼロフラグが立っていないとき[$CD
 <p>というデータ圧縮を行う。<br>
 これで、<code>$00:1200</code>～<code>$00:130F</code>（<span class="formula">272</span>バイト）が、セーブデータに記録される<code>$00:10FE</code>～<code>$00:10FF</code>・<code>$00:11D0</code>～<code>$00:11EF</code>(<span class="formula">34</span>バイト)の領域に収まったことになる。</p>
 
-<p><code><span class="r">$CE/CDC2</span></code>～はシナリオによる分岐があり、どれが何なのか、詳細は未確認なので省略。<br>
-<code><span class="r">$CE/CDC2</span></code>～<code><span class="r">$CE/CE30</span></code>あたりが分岐で、<code><span class="r">$CE/CE32</span></code>～<code><span class="r">$CE/CE61</span></code>で転送処理を行う。<br>
-例えば最終編だと、</p>
+<p>その後も各種データがコピーされるが、最後の<code><span class="r">$CE/CE3E</span></code>～<code><span class="r">$CE/CE61</span></code>が、現在のマップにおけるスプライトの配置の保存である。</p>
 
-<table>
-<thead>
-	<tr><th>コピー元</th><th>コピー先</th></tr>
-</thead>
-<tbody>
-	<tr><td><code>$00:132E</code>～<code>$00:1336</code></td><td><code>$00:0FC0</code>～<code>$00:0FC7</code></td></tr>
-	<tr><td><code>$00:133F</code>～<code>$00:1347</code></td><td><code>$00:0FC8</code>～<code>$00:0FCF</code></td></tr>
-	<tr><td><code>$00:1350</code>～<code>$00:1357</code></td><td><code>$00:0FD0</code>～<code>$00:0FD7</code></td></tr>
-</tbody>
-</table>
+<div class="code-container"><pre>
+$CE/CE3E LDA $0A03  [$00:0A03]   ;Aに[$00:0A03]をロード　マップスプライト総数
+$CE/CE41 BEQ $1E    [$CE61]      ;ゼロフラグが立っているとき[$CE61]分岐
+$CE/CE43 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み　マップスプライト総数
+$CE/CE45 STZ $21    [$00:0021]   ;[$00:0021]に$00を書き込み
+$CE/CE47 LDX #$132E              ;Xに$132Eをロード
+$CE/CE4A LDY #$0FC0              ;Yに$0FC0をロード
+$CE/CE4D REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+;ループ処理開始　マップスプライト総数分繰り返し
+$CE/CE4F LDA #$0007              ;Aに$0007をロード
+$CE/CE52 MVN 00 00               ;データ転送
+;A:転送データサイズ-1 $0007
+;X:転送元アドレス $132E + $0011*n
+;Y:転送先アドレス $0FC0 + $0008*n
+;オペランド:転送元と転送先バンク 00 -> 00
+;$00:132E → $00:0FC0 +$0005バイト
+$CE/CE55 TXA                     ;Xレジスタの値をAレジスタに転送
+$CE/CE56 CLC                     ;キャリーフラグクリア
+$CE/CE57 ADC #$0009              ;A + $0009
+$CE/CE5A TAX                     ;Aの値をXレジスタに転送
+$CE/CE5B DEC $20    [$00:0020]   ;[$00:0020]をデクリメント -1
+$CE/CE5D BNE $F0    [$CE4F]      ;ゼロフラグが立っていないとき[$CE4F]分岐
+;ループ処理ここまで
+$CE/CE5F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/CE61 RTL                     ;サブルーチン戻り
+</pre></div>
 
-<p>というようにコピーが行われる。<br>
-シナリオ別キャラデータが<code>$00:0FBF</code>まで入っているので、その直後の<code>$00:0FC0</code>～に<code>$00:13??</code>の重要なデータをコピーしているようだ。</p>
+<p><code>[$00:0A03]</code>は、現在いるマップのスプライト総数（操作しているパーティメンバー除く、画面表示外のスプライトや非表示中のスプライト含む）。<br>
+いわゆる、町の人とかモブキャラのスプライトにあたる。<br>
+ＳＦ編のように扉がスプライトを使って表示している場合も含まれる。<br>
+1個のマップに設置可能なスプライトは<span class="formula">$24</span>（<span class="formula">36</span>）個なので、<code>[$00:0A03]</code>にはマップにより<span class="formula">$00</span>～<span class="formula">$24</span>が入る。</p>
 
+<p>転送元になる<code>$00:132E</code>～にはマップにいるスプライトの状態が入る。<br>
+1個のスプライトで<span class="formula">$11</span>(<span class="formula">17</span>)バイトの領域を使うので、<code>$00:132E</code>～<code>$00:133E</code>, <code>$00:133F</code>～<code>$00:134F</code>, <code>$00:1350</code>～<code>$00:1360</code>……<code>$00:1592</code>～<code>$00:15A2</code>にスプライトの状態が入る。<br>
+<span class="formula">$11</span>(<span class="formula">17</span>)バイトの中で、最初の<span class="formula">8</span>バイトだけがセーブデータに記録される。<br>
+詳細は省略するが、</p>
+
+<ul>
+	<li>スプライトの表示・非表示</li>
+	<li>スプライトの向き</li>
+	<li>スプライトのモーションとモーション切り替えタイマー値</li>
+	<li>マップ座標（マス目単位）</li>
+</ul>
+
+<p>が含まれているので、シンボルエンカウントにおける敵シンボル位置などもここで記録できることになる。</p>
+
+<p>データ転送は、<code><span class="r">$CE/CE4F</span></code>～<code><span class="r">$CE/CE5D</span></code>のループにより、8バイトずつ、<code>$00:0FC0</code>～に入る。</p>
+
+<p><code>$00:132E</code>～<code>$00:1336</code>→<code>$00:0FC0</code>～<code>$00:0FC7</code><br>
+<code>$00:133F</code>～<code>$00:1347</code>→<code>$00:0FC8</code>～<code>$00:0FCF</code><br>
+<code>$00:1350</code>～<code>$00:1360</code>→<code>$00:0FD0</code>～<code>$00:0FD7</code><br>
+……<br>
+<code>$00:1592</code>～<code>$00:15A2</code>→<code>$00:10D8</code>～<code>$00:10DF</code></p>
+
+<p>ということになり、<code>$00:0FC0</code>～<code>$00:10DF</code>の領域はセーブした時点でのマップのスプライトの状況をセーブデータ用にコピーしたアドレスということになる。</p>
 
 <h3>セーブ処理</h3>
 
@@ -876,6 +920,7 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 		<li><a href="d5.html">各種データアドレス</a></li>
 		<li><a href="fontdata.html">文字データ</a></li>
 		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="map01.html">マップ構造</a></li>
 		<li><a href="graphic.html">グラフィックについて</a></li>
 		<li><a href="sound.html">サウンドについて</a></li>
 	</ul>
