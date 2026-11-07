@@ -181,6 +181,8 @@ table {
 <li class="here"><button type="button">マップ</button>
 	<ul>
 		<li><a href="map01.html">マップ構造とスプライトの配置</a></li>
+		<li><a href="map02.html">スプライト処理</a></li>
+		<li><a href="map03.html">ランダム移動</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -448,7 +450,7 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 	<tr><td>Ev02</td><td>移動中座標計算値（初期値<span class="formula">$00</span>）</td></tr>
 	<tr><td>Ev03</td><td>移動中座標計算値（初期値<span class="formula">$00</span>）</td></tr>
 	<tr><td>Ev04</td><td>移動中座標計算値（初期値<span class="formula">$00</span>）</td></tr>
-	<tr><td>00</td><td>Bit7:キャラ表示(<span class="formula">1</span>で表示、<span class="formula">0</span>は非表示)<br>Bit0～1:向き <span class="formula">%00</span>:下 <span class="formula">%01</span>:上 <span class="formula">%10</span>:左 <span class="formula">%11</span>:右</td></tr>
+	<tr><td>00</td><td>Bit7:スプライト存在(<span class="formula">1</span>で存在、<span class="formula">0</span>は存在しない)<br>Bit0～1:向き <span class="formula">%00</span>:下 <span class="formula">%01</span>:上 <span class="formula">%10</span>:左 <span class="formula">%11</span>:右</td></tr>
 	<tr><td>01</td><td>当たり判定及びモーション切り替え値<br>初期値が<span class="formula">$01</span>は当たり判定なし、<span class="formula">$00</span>と<span class="formula">$02</span>は当たり判定あり</td></tr>
 	<tr><td>02</td><td>モーション切り替えタイマー1</td></tr>
 	<tr><td>03</td><td>モーション切り替えタイマー2</td></tr>
@@ -521,8 +523,8 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 	<tr><td>Bit6</td><td><span class="formula">1</span>を立てると、スプライトを2パターンから切り替え（Bit5か4も設定）</td></tr>
 	<tr><td>Bit5</td><td>（Bit6が<span class="formula">1</span>、かつ）<span class="formula">1</span>を立てると、スプライト番号<span class="formula">+$10</span>のスプライトと切り替え</td></tr>
 	<tr><td>Bit4</td><td>（Bit6が<span class="formula">1</span>、かつ）<span class="formula">1</span>を立てると、スプライト番号<span class="formula">+$01</span>のスプライトと切り替え</td></tr>
-	<tr><td>Bit3</td><td>？（キャラの向きと移動方向が一致しなくなる？）</td></tr>
-	<tr><td>Bit2</td><td>1を立てると、操作キャラのスプライトの位置を目標にして移動（追尾タイプ）</td></tr>
+	<tr><td>Bit3</td><td><span class="formula">1</span>を立てると、スプライトを左右反転表示</td></tr>
+	<tr><td>Bit2</td><td><span class="formula">1</span>を立てると、操作キャラのスプライトの位置を目標にして移動（追尾タイプ）</td></tr>
 	<tr><td>Bit0～1</td><td>モーション切り替え及び移動速度　下表参照<br><span class="formula">%00</span>：通常、<span class="formula">%01</span>：速度2倍、<span class="formula">%10</span>：速度1/2倍、<span class="formula">%11</span>：速度1/4倍</td></tr>
 </tbody>
 </table>
@@ -545,19 +547,25 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 
 <p>Bit0～1の<span class="formula">2</span>ビットでスプライトの切り替え速度（切り替え時間）を指定する。切り替え速度の指定は、そのまま移動速度の指定でもある。<br>
 スプライトの切り替え速度（移動速度）の詳細は以下。<br>
-<span class="formula">%00</span>の通常速度＝プレイヤーキャラのダッシュ速度（おぼろ丸以外）　になる。<br>
-通常速度なら<span class="formula">1</span>フレームで<span class="formula">4</span>ピクセル移動。<br>
-1マス（<span class="formula">16</span>ピクセル）移動に<span class="formula">4</span>フレームかかる。</p>
+1マス移動中、1マスの半分、つまり8ピクセル移動したらスプライトを切り替えるようになっている。16ピクセル（1マス）移動したら元に戻る。</p>
+
+<p><span class="formula">%00</span>の通常速度＝プレイヤーキャラの歩行速度（おぼろ丸以外）　になる。<br>
+通常速度なら<span class="formula">1</span>フレームで<span class="formula">1</span>ピクセル移動。<br>
+1マス（<span class="formula">16</span>ピクセル）移動に<span class="formula">16</span>フレームかかる。</p>
+
+<p>下表の通り、スプライトの移動速度は4段階設定可能ということになり、最も速いのはプレイヤーキャラのダッシュ速度になる。<br>
+おぼろ丸のダッシュ速度は更にこの2倍であり（4フレームで1マス移動）、敵シンボルなどでおぼろ丸のダッシュ速度は設定できないようだ。<br>
+幕末編の忍者など移動速度が高い敵シンボルがいるが、実際にはおぼろ丸のダッシュ速度の半分ということになる。</p>
 
 <table>
 <thead>
-	<tr><th>OBJマップデータ10の<br>Bit0～1</th><th>1フレームあたりの<br>移動ピクセル<br><code>[$00:010D]</code></th><th>切り替え時間</th><th>内容</th></tr>
+	<tr><th>OBJマップデータ10の<br>Bit0～1</th><th>1フレームあたりの<br>タイマー減少量<br><code>[$00:010D]</code></th><th>スプライト<br>切り替え時間</th><th>移動速度</th><th>内容</th></tr>
 </thead>
 <tbody>
-	<tr><td><span class="formula">%00</span></td><td><span class="formula">$04</span></td><td><span class="formula">$08</span>(<span class="formula">8</span>)フレーム</td><td>通常</td></tr>
-	<tr><td><span class="formula">%01</span></td><td><span class="formula">$08</span></td><td><span class="formula">$04</span>(<span class="formula">4</span>)フレーム</td><td>速度2倍</td></tr>
-	<tr><td><span class="formula">%10</span></td><td><span class="formula">$02</span></td><td><span class="formula">$10</span>(<span class="formula">16</span>)フレーム</td><td>速度1/2倍</td></tr>
-	<tr><td><span class="formula">%11</span></td><td><span class="formula">$01</span></td><td><span class="formula">$20</span>(<span class="formula">32</span>)フレーム</td><td>速度1/4倍</td></tr>
+	<tr><td><span class="formula">%00</span></td><td><span class="formula">$04</span></td><td><span class="formula">$08</span>(<span class="formula">8</span>)フレーム</td><td><span class="formula">1</span>フレームで<span class="formula">1</span>ピクセル<br><span class="formula">1</span>マスあたり<span class="formula">16</span>フレーム（キャラの歩行）</td><td>通常</td></tr>
+	<tr><td><span class="formula">%01</span></td><td><span class="formula">$08</span></td><td><span class="formula">$04</span>(<span class="formula">4</span>)フレーム</td><td><span class="formula">1</span>フレームで<span class="formula">2</span>ピクセル<br><span class="formula">1</span>マスあたり<span class="formula">8</span>フレーム（キャラのダッシュ）</td><td>速度2倍</td></tr>
+	<tr><td><span class="formula">%10</span></td><td><span class="formula">$02</span></td><td><span class="formula">$10</span>(<span class="formula">16</span>)フレーム</td><td><span class="formula">2</span>フレームで<span class="formula">1</span>ピクセル<br><span class="formula">1</span>マスあたり<span class="formula">32</span>フレーム</td><td>速度1/2倍</td></tr>
+	<tr><td><span class="formula">%11</span></td><td><span class="formula">$01</span></td><td><span class="formula">$20</span>(<span class="formula">32</span>)フレーム</td><td><span class="formula">4</span>フレームで<span class="formula">1</span>ピクセル<br><span class="formula">1</span>マスあたり<span class="formula">64</span>フレーム</td><td>速度1/4倍</td></tr>
 </tbody>
 </table>
 
@@ -567,7 +575,7 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 <p>モーション指定その2。<br>
 移動するかどうか、移動タイプなどの指定。<br>
 Bit0～2（下3ビット）でCGRAMのカラーパレット番号を指定する。オブジェクト属性下位テーブル4バイト目のBit1～3に対応。<br>
-カラーパレットに<span class="formula">%000</span>を指定すると非表示（透明）になる。原始編の見えない敵シンボルは、カラーパレットを<span class="formula">%000</span>にすることで画面では見えないが存在している扱いとしている。</p>
+カラーパレットに<span class="formula">%000</span>を指定すると、存在はしているが非表示（透明）になる。原始編の見えない敵シンボルは、カラーパレットを<span class="formula">%000</span>にすることで画面では見えないが存在している扱いとしている。</p>
 
 <p>移動するスプライトで、移動→停止を繰り返すタイプがあるが、移動速度などに関わらず、停止時間は<span class="formula">60</span>フレーム（<span class="formula">1</span>秒）で固定のようである。</p>
 
@@ -1630,9 +1638,8 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 </script>
 
 <div class="pagelink">
-<!-- 	<div id="pageprev"><a href="program42.html"><span class="button">&#9664;戻る</span></a></div> -->
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-<!-- 	<div id="pagenext"><a href="program44.html"><span class="button">&#9654;次 戦闘コマンド</span></a></div> -->
+	<div id="pagenext"><a href="map02.html"><span class="button">&#9654;次 スプライト処理1</span></a></div>
 </div>
 
 </div>

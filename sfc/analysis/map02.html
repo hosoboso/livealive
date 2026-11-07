@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; スプライトの例その1：移動なし足踏み">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; スプライトの例その1：移動なし足踏み">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; スプライトの例その1：移動なし足踏み</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.apu_code-container,
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.apu_code-container pre,
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">マップ</button>
+	<ul>
+		<li><a href="map01.html">マップ構造とスプライトの配置</a></li>
+		<li><a href="map02.html">スプライト処理</a></li>
+		<li><a href="map03.html">ランダム移動</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="map01.html">マップ構造とスプライトの配置</a> &gt; スプライトの例その1</h1>
+<h2>マップ構造とスプライトの配置 &gt; スプライトの例その1：移動なし足踏み</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="map01.html">前ページ</a>で近未来編・壽商会の初期配置について説明したので、当ページでは引き続き、実際に藤兵衛が<span class="formula">1</span>フレーム毎にどのように表示されるか処理を見てみよう。<br>
+処理がややこしくなるので、操作キャラは移動させず停止した状態、かつ、籐兵衛はゲーム画面内にいる状態とする。<br>
+（操作キャラが移動する場合、マップ座標は変化しないが、水平スクロール量や垂直スクロール量の考慮が必要になるため、最終的にスプライトのオブジェクト属性における座標計算に影響してくる）</p>
+
+<p>藤兵衛は移動や向き変えはせず、一定時間毎に足踏みする。<br>
+スプライトのオブジェクト属性の中で、スプライト番号のみ、一定時間毎に切り替えているはずだ。<br>
+<code>$00:133F</code>～<code>$00:134A</code>から、スプライトのオブジェクト属性を計算していくはずであるが、OAMへ転送するスプライト用データは<code>$00:0700</code>～<code>$00:0920</code>に書き込まれ、毎フレームOAMに転送される。</p>
+
+<p>近未来編でのフィールドではだいたいの場合、VRAMの<code>$E800</code>～から籐兵衛のスプライトのタイルデータが並ぶ。<br>
+最初のデータは籐兵衛の正面（下）向き。<br>
+そこから<span class="formula">+$400</span>バイト区切りで、正面向き反転、後ろ向き、後ろ向き反転、左向き、左向き反転、と6パターンが並ぶ。<br>
+反転といっても単純に左右反転ではなく、歩行グラフィックで右足と左足が交互に前に出ている表現である。<br>
+髪型・顔が左右非対称のキャラだと、ただ左右反転させているだけではないことがわかりやすい。<br>
+藤兵衛の場合だと、頭の光り（光の反射）が片側にしかない左右非対称グラフィックなのでよく見るとわかる。</p>
+
+<p>下図で言えば、籐兵衛の正面（下）向き足踏みモーションは、<code>$E800</code>～と<code>$EC00</code>～のタイル位置のスプライトを切り替えることで成り立っている。<br>
+タイル番号<span class="formula">$140</span>と<span class="formula">$160</span>が開始位置にあたる。<br>
+OBJマップデータ08のスプライト番号では<span class="formula">$A0</span>と<span class="formula">$B0</span>の切り替え。<br>
+オブジェクト属性の下位テーブル4バイトの3バイト目と、4バイト目のBit0の合わせて9ビットでスプライトの開始位置タイル番号を指定しているので、足踏みモーションを行う場合、OBJマップデータ08からオブジェクト属性へデータの計算・書き込みを行うはずだ。<br>
+（移動するキャラも通常は足踏みモーションを行うので、同様の処理をするはず）</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/vram_OBJ_fno.png" class="modal-link">
+		<img src="img/vram_OBJ_fno.png" alt="スプライト配置" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<h3>サブルーチン</h3>
+
+
+<p>毎フレーム、以下処理でマップ上のスプライト位置の判定・計算を行う。<br>
+<code><span class="r">$C0/8E4F</span></code>で、マップに入った時に書き込まれた<code>[$00:0A03]</code>の値、つまりパーティメンバーのスプライト以外のスプライトの数が<span class="formula">1</span>以上なら、スプライトの位置などの判定が行われることになる。</p>
+
+<div class="code-container"><pre>
+$C0/0ADB JSR $8E49  [$C0:8E49]   ;[$C0:8E49]へジャンプ
+
+$C0/8E49 STZ $010A  [$00:010A]   ;[$00:010A]に$00を書き込み
+$C0/8E4C LDA $0A03  [$00:0A03]   ;Aに[$00:0A03]をロード スプライト数
+$C0/8E4F BNE $03    [$8E54]      ;ゼロフラグが立っていないとき[$8E54]分岐
+;ゼロフラグOFF マップ上スプライト数がパーティメンバー以外に1以上
+$C0/8E54 STA $2C    [$00:002C]   ;Aを[$00:002C]に書き込み スプライト数
+$C0/8E56 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/8E58 LDA $0158  [$00:0158]   ;Aに[$00:0159][$00:0158]をロード 0000
+$C0/8E5B ASL A                   ;Aを算術左シフト *2
+$C0/8E5C ASL A                   ;Aを算術左シフト *2
+$C0/8E5D ASL A                   ;Aを算術左シフト *2
+$C0/8E5E ASL A                   ;Aを算術左シフト *2
+$C0/8E5F CLC                     ;キャリーフラグクリア
+$C0/8E60 ADC $0A40  [$00:0A40]   ;A(0000) + [$00:0A41][$00:0A40](1F00)　
+$C0/8E63 AND #$FFF0              ;Aと$FFF0で論理積
+$C0/8E66 SEC                     ;キャリーフラグON
+$C0/8E67 SBC #$0080              ;A(1F00) - $0080
+$C0/8E6A STA $28    [$00:0028]   ;A(1E80)を[$00:0029][$00:0028]に書き込み
+$C0/8E6C LDA $015C  [$00:015C]   ;Aに[$00:015D][$00:015C]をロード 0000
+$C0/8E6F ASL A                   ;Aを算術左シフト *2
+$C0/8E70 ASL A                   ;Aを算術左シフト *2
+$C0/8E71 ASL A                   ;Aを算術左シフト *2
+$C0/8E72 ASL A                   ;Aを算術左シフト *2
+$C0/8E73 CLC                     ;キャリーフラグクリア
+$C0/8E74 ADC $0A42  [$00:0A42]   ;A(0000) + [$00:0A43][$00:0A42](1400)
+$C0/8E77 AND #$FFF0              ;Aと$FFF0で論理積
+$C0/8E7A SEC                     ;キャリーフラグON
+$C0/8E7B SBC #$00D0              ;A(1400) - $00D0
+$C0/8E7E STA $2A    [$00:002A]   ;A(1330)を[$00:002B][$00:002A]に書き込み
+$C0/8E80 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/8E82 LDX #$1329              ;Xに$1329をロード
+$C0/8E85 LDY #$4E40              ;Yに$4E40をロード
+;ループ処理開始
+$C0/8E88 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8E8B BNE $27    [$8EB4]      ;ゼロフラグが立っていないとき[$8EB4]分岐
+;ゼロフラグON プレイヤーがキャラ操作可能
+$C0/8E8D LDA $05,x  [$00:132E]   ;Aに[$00:132E]をロード　OBJマップデータ00 
+$C0/8E8F BPL $1D    [$8EAE]      ;ネガティブフラグが立っていないとき[$8EAE]分岐
+;ネガティブフラグOFF　該当スプライトは非表示
+$C0/8EAE BRL $0660  [$9511]      ;フラグにかかわりなく常に分岐[$9511]
+$C0/9511 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9513 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/9514 CLC                     ;キャリーフラグクリア
+$C0/9515 ADC #$0011              ;A + $0011　次スプライト呼び出しアドレスは+$11バイト
+$C0/9518 TAX                     ;Aの値をXレジスタに転送
+$C0/9519 TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/951A CLC                     ;キャリーフラグクリア
+$C0/951B ADC #$002E              ;A + $002E
+$C0/951E TAY                     ;Aの値をYレジスタに転送
+$C0/951F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9521 DEC $2C    [$00:002C]   ;[$00:002C]をデクリメント -1　スプライト数
+$C0/9523 BEQ $03    [$9528]      ;ゼロフラグが立っているとき[$9528]分岐
+$C0/9525 BRL $F960  [$8E88]      ;フラグにかかわりなく常に分岐[$8E88]
+;ループ処理ここまで
+</pre></div>
+
+<p>最初に、<code><span class="r">$C0/8E4F</span></code>で<code>[$00:0A03]</code>の値のゼロフラグ判定をしている。<br>
+マップ上スプライト数がパーティメンバー以外に<span class="formula">1</span>以上なら、ゼロフラグはOFFで、<code>[$00:0A03]</code>の値が<code>[$00:002C]</code>にコピーされる。<br>
+<code>[$00:002C]</code>はこの後、スプライト1個ずつの処理をするループ処理回数になる。<br>
+今回の壽商会でいえば<code>[$00:002C]</code>に入る初期値は<span class="formula">$03</span>で、1個目と3個目のスプライトは非表示、2個目のスプライトが藤兵衛である。</p>
+
+<p><code><span class="r">$C0/8E54</span></code>～<code><span class="r">$C0/8E7E</span></code>はスクロール量関係。<br>
+今回については、操作キャラは移動しない、かつ、藤兵衛は動かず足踏みだけなので、ゲーム画面基準の座標も、マップ基準の座標も変化しない。つまり座標計算をし直す必要もないし、移動可能なマスなどの判定も必要ない。<br>
+移動や当たり判定などについては、別途解説する。</p>
+
+<p><code><span class="r">$C0/8E88</span></code>～<code><span class="r">$C0/9525</span></code>が1スプライトあたりの処理になる。<br>
+今回、壽商会には籐兵衛のスプライトしかなく、1番目のスプライトのOBJマップデータ00<code>[$00:132E]</code>は上1ビットが<span class="formula">0</span>で、非表示を意味する。<br>
+非表示のスプライトに対し、移動などの処理をする必要がないため、最初の分岐として<code><span class="r">$C0/8E8F</span></code>でネガティブフラグ判定があり、ネガティブフラグOFFなら移動処理などせず<code><span class="r">$C0/8EAE</span></code>にジャンプ。<br>
+後は次のスプライトを呼び出すためのアドレス計算をし、<code><span class="r">$C0/9521</span></code>で<code>[$00:002C]</code>をデクリメント（<span class="formula">-1</span>）して、<code><span class="r">$C0/8E88</span></code>のループ頭に戻る。</p>
+
+<p>ということで、次のループ処理、<code><span class="r">$C0/8E88</span></code>からが藤兵衛のスプライト処理にあたる。<br>
+分岐処理がある場合は★をつけた箇所が藤兵衛の場合の処理。</p>
+
+<div class="code-container"><pre>
+;ループ処理開始
+$C0/8E88 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8E8B BNE $27    [$8EB4]      ;ゼロフラグが立っていないとき[$8EB4]分岐
+;★ゼロフラグON プレイヤーがキャラ操作可能
+$C0/8E8D LDA $05,x  [$00:133F]   ;Aに[$00:133F]をロード OBJマップデータ00 
+$C0/8E8F BPL $1D    [$8EAE]      ;ネガティブフラグが立っていないとき[$8EAE]分岐
+;★ネガティブフラグON　該当スプライト表示
+$C0/8E91 LDA $010A  [$00:010A]   ;Aに[$00:010A]をロード $00
+$C0/8E94 BNE $1B    [$8EB1]      ;ゼロフラグが立っていないとき[$8EB1]分岐
+;★ゼロフラグON（$C0/8E49処理より）
+$C0/8E96 LDA $0F,x  [$00:1349]   ;Aに[$00:1349]をロード OBJマップデータ10 = $60
+$C0/8E98 BIT #$40                ;Aと$40(0100 0000)で論理積（ステータスフラグ変更のみ）
+$C0/8E9A BNE $0E    [$8EAA]      ;ゼロフラグが立っていないとき[$8EAA]分岐
+;★ゼロフラグOFF スプライトを2パターンから切り替え
+$C0/8EAA LDA $0F,x  [$00:1349]   ;Aに[$00:1349]をロード OBJマップデータ10 = $60
+$C0/8EAC BRA $0D    [$8EBB]      ;フラグにかかわりなく常に分岐[$8EBB]
+$C0/8EBB AND #$03                ;Aと$03で論理積
+$C0/8EBD BEQ $14    [$8ED3]      ;ゼロフラグが立っているとき[$8ED3]分岐
+;★ゼロフラグON モーション切り替え%00:通常
+$C0/8ED3 LDA #$10                ;Aに$10をロード
+$C0/8ED5 STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み
+$C0/8ED7 STZ $25    [$00:0025]   ;[$00:0025]に$00を書き込み
+$C0/8ED9 LSR A                   ;Aを論理右シフト　(/2)
+$C0/8EDA LSR A                   ;Aを論理右シフト　(/2) $10/4
+$C0/8EDB STA $010D  [$00:010D]   ;A($04)を★[$00:010D]に書き込み
+$C0/8EDE LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8EE1 BNE $03    [$8EE6]      ;ゼロフラグが立っていないとき[$8EE6]分岐
+;★ゼロフラグON プレイヤーがキャラ操作可能
+$C0/8EE3 BRL $0288  [$916E]      ;フラグにかかわりなく常に分岐[$916E]
+$C0/916E LDA $0A03  [$00:0A03]   ;Aに[$00:0A03]をロード　スプライト数
+$C0/9171 SEC                     ;キャリーフラグON
+$C0/9172 SBC $2C    [$00:002C]   ;A - [$00:002C]　残りループ回数
+$C0/9174 CMP $0A16  [$00:0A16]   ;Aと[$00:0A16]を減算比較（ステータスレジスタ変更のみ）
+$C0/9177 BNE $0B    [$9184]      ;ゼロフラグが立っていないとき[$9184]分岐
+;★ゼロフラグOFF
+$C0/9184 STZ $32    [$00:0032]   ;[$00:0032]に$00を書き込み
+$C0/9186 LDA $0F,x  [$00:1349]   ;Aに[$00:1349]をロード OBJマップデータ10 = $60
+$C0/9188 BMI $56    [$91E0]      ;ネガティブフラグが立っているとき[$91E0]分岐
+;★ネガティブフラグOFF 当たり判定無視でマップをランダム移動ではない
+$C0/918A LDA $10,x  [$00:134A]   ;Aに[$00:134A]をロード OBJマップデータ11 = $4D(0100 1101)
+$C0/918C AND #$C0                ;Aと$C0(1100 0000)で論理積
+$C0/918E BEQ $50    [$91E0]      ;ゼロフラグが立っているとき[$91E0]分岐
+;★ゼロフラグOFF 移動しない
+$C0/9190 CMP #$C0                ;Aと$C0を減算比較（ステータスレジスタ変更のみ）
+$C0/9192 BEQ $4C    [$91E0]      ;ゼロフラグが立っているとき[$91E0]分岐
+;★ゼロフラグOFF 移動しない
+$C0/9194 LDA $10,x  [$00:134A]   ;Aに[$00:134A]をロード OBJマップデータ11 = $4D
+$C0/9196 BIT #$08                ;Aと$08(0000 1000)で論理積（ステータスフラグ変更のみ）
+$C0/9198 BNE $38    [$91D2]      ;ゼロフラグが立っていないとき[$91D2]分岐
+;★ゼロフラグON キャラ接触時に同時にAボタン判定ではない
+$C0/91D2 JSR $95D2  [$C0:95D2]   ;[$C0:95D2]へジャンプ
+</pre></div>
+
+<p>OBJマップデータ10とOBJマップデータ11で多数の分岐があるが、ここでの藤兵衛の場合、</p>
+
+<ol>
+	<li>スプライトを2パターンから切り替える（足踏み）</li>
+	<li>モーション切り替え速度は<span class="formula">%00</span>:通常</li>
+	<li>当たり判定無視でマップをランダム移動ではない</li>
+	<li>スプライトは移動しない</li>
+	<li>キャラ接触時に同時にAボタン判定ではない</li>
+</ol>
+
+<p>という判定の末に、<code><span class="r">$C0/95D2</span></code>にジャンプする。</p>
+
+<p>また、モーション切り替え速度が<span class="formula">%00</span>:通常だと、<code><span class="r">$C0/8ED3</span></code>～<code><span class="r">$C0/8EDB</span></code>で、<span class="formula">$10/$04 = $04</span>が<code>[$00:010D]</code>に書き込まれる。<br>
+これが足踏みモーション切り替えで必要な値である。<br>
+ちなみにここの分岐は以下のようになる。</p>
+
+<div class="code-container"><pre>
+$C0/8EAA LDA $0F,x               ;Aに$0F,xをロード OBJマップデータ10
+$C0/8EAC BRA $0D    [$8EBB]      ;フラグにかかわりなく常に分岐[$8EBB]
+$C0/8EBB AND #$03                ;Aと$03で論理積
+$C0/8EBD BEQ $14    [$8ED3]      ;ゼロフラグが立っているとき[$8ED3]分岐
+;ゼロフラグOFF
+$C0/8EBF CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/8EC1 BEQ $0C    [$8ECF]      ;ゼロフラグが立っているとき[$8ECF]分岐
+;ゼロフラグOFF
+$C0/8EC3 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/8EC5 BEQ $04    [$8ECB]      ;ゼロフラグが立っているとき[$8ECB]分岐
+;ゼロフラグOFF モーション切り替え%11:速度1/4倍
+$C0/8EC7 LDA #$04                ;Aに$04をロード
+$C0/8EC9 BRA $0A    [$8ED5]      ;フラグにかかわりなく常に分岐[$8ED5]
+;$C0/8EC5ゼロフラグON モーション切り替え%10:速度1/2倍
+$C0/8ECB LDA #$08                ;Aに$08をロード
+$C0/8ECD BRA $06    [$8ED5]      ;フラグにかかわりなく常に分岐[$8ED5]
+;$C0/8EC1ゼロフラグON モーション切り替え%01:速度2倍
+$C0/8ECF LDA #$20                ;Aに$20をロード
+$C0/8ED1 BRA $02    [$8ED5]      ;フラグにかかわりなく常に分岐[$8ED5]
+;$C0/8EBDでゼロフラグON モーション切り替え%00:通常
+$C0/8ED3 LDA #$10                ;Aに$10をロード
+;処理合流
+$C0/8ED5 STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み
+</pre></div>
+
+<p><code>[$00:0024]</code>に書き込む値の分岐であり、OBJマップデータ10のBit0～1こと下2ビット（モーション切り替え速度）の値で変わる。</p>
+
+<table>
+<thead>
+	<tr><th>OBJマップデータ10の<br>Bit0～1</th><th><code>[$00:0024]</code></th><th><code>[$00:010D]</code></th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td><span class="formula">$10</span></td><td><span class="formula">$04</span></td><td>通常</td></tr>
+	<tr><td><span class="formula">%01</span></td><td><span class="formula">$20</span></td><td><span class="formula">$08</span></td><td>速度2倍</td></tr>
+	<tr><td><span class="formula">%10</span></td><td><span class="formula">$08</span></td><td><span class="formula">$02</span></td><td>速度1/2倍</td></tr>
+	<tr><td><span class="formula">%11</span></td><td><span class="formula">$04</span></td><td><span class="formula">$01</span></td><td>速度1/4倍</td></tr>
+</tbody>
+</table>
+
+<p><code>[$00:0024]</code>を<span class="formula">4</span>で割った値が<code>[$00:010D]</code>に入る。</p>
+
+<p>さて、続きのジャンプ先<code><span class="r">$C0/95D2</span></code>で、モーション切り替えタイマーの処理が行われる。</p>
+
+<div class="code-container"><pre>
+$C0/95D2 LDA $08,x  [$00:1342]   ;Aに[$00:1342]をロード OBJマップデータ03
+$C0/95D4 SEC                     ;キャリーフラグON
+$C0/95D5 SBC $010D  [$00:010D]   ;A - [$00:010D]($04)
+$C0/95D8 BCS $0C    [$95E6]      ;キャリーフラグが立っているとき[$95E6]分岐 (減算結果が0か正の数)
+;キャリーフラグOFF モーション切り替えタイマー残り時間が負
+$C0/95DA ADC #$20                ;A + $20
+$C0/95DC STA $08,x  [$00:1342]   ;Aを[$00:1342]に書き込み OBJマップデータ03 モーション切り替えタイマー
+$C0/95DE LDA $06,x  [$00:1340]   ;Aに[$00:1340]をロード OBJマップデータ01 モーション切り替え値
+$C0/95E0 EOR #$04                ;Aと$04で排他的論理和XOR
+$C0/95E2 STA $06,x  [$00:1340]   ;Aを[$00:1340]に書き込み OBJマップデータ01 モーション切り替え値
+$C0/95E4 BRA $04    [$95EA]      ;フラグにかかわりなく常に分岐[$95EA]
+$C0/95EA SEC                     ;キャリーフラグON
+$C0/95EB RTS                     ;サブルーチン戻り
+;キャリーフラグON モーション切り替えタイマー残り時間が0以上
+$C0/95E6 STA $08,x  [$00:1342]   ;Aを[$00:1342]に書き込み OBJマップデータ03 モーション切り替えタイマー
+$C0/95E8 CLC                     ;キャリーフラグクリア
+$C0/95E9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/95D2</span></code>で、<code>[$00:1342]</code>（OBJマップデータ03）がロードされる。<br>
+先に説明した通り、この値はマップ乱数から計算された、<span class="formula">$01</span>～<span class="formula">$20</span>（<span class="formula">1</span>～<span class="formula">32</span>）の乱数である。<br>
+<code><span class="r">$C0/95D5</span></code>で、乱数から<code>[$00:010D]</code>を減算し、<code><span class="r">$C0/95D8</span></code>でキャリーフラグ判定を行う。<br>
+藤兵衛の場合（速度：通常）、<span class="formula"><code>[$00:010D]</code> = $04</span>だから、</p>
+
+<p><span class="formula">OBJマップデータ03 - <code>[$00:010D]</code>($04)</span></p>
+
+<p>最初に生成したOBJマップデータ03が<span class="formula">$01</span>～<span class="formula">$03</span>なら負となるからキャリーフラグは立たない。<br>
+<span class="formula">$04</span>～<span class="formula">$20</span>ならキャリーフラグが立つ。</p>
+
+<p>キャリーフラグが立たない時は<code><span class="r">$C0/95DA</span></code>に進み、<span class="formula">+$20</span>して<code>[$00:1342]</code>に上書きする。<br>
+また、<code>[$00:1340]</code>（OBJマップデータ01、初期値<span class="formula">$00</span>）と<span class="formula">$04</span>で排他的論理和XORを取って<code>[$00:1340]</code>に上書きする。<br>
+つまり、<code>[$00:1342]</code>（OBJマップデータ03）が負になったら<code>[$00:1340]</code>の値も変更される。<br>
+OBJマップデータ01は初期値<span class="formula">$00</span>だから、最初の更新だと、<br><span class="formula">$00 XOR $04 = $04</span><br>
+逆に<span class="formula">$04</span>の時は、<br><span class="formula">$04 XOR $04 = $00</span><br>である。<br>
+つまり、<span class="formula">$00</span>→<span class="formula">$04</span>→<span class="formula">$00</span>→<span class="formula">$04</span>→……の繰り返しである。</p>
+
+<p>一方、キャリーフラグが立つ場合は以上の処理は行わず、OBJマップデータ03を減算するのみである。</p>
+
+<p>以上から、OBJマップデータ03はモーション切り替えタイマーで、初期値は<span class="formula">$01</span>～<span class="formula">$20</span>（<span class="formula">1</span>～<span class="formula">32</span>）。<br>
+毎フレーム、<code>[$00:010D]</code>の値だけ減算し、負の値になったらタイマーは<span class="formula">+$20</span>される。<br>
+また、この時同時に<code>[$00:1340]</code>（OBJマップデータ01、初期値<span class="formula">$00</span>）が<span class="formula">$00</span>→<span class="formula">$04</span>→<span class="formula">$00</span>→<span class="formula">$04</span>→……と切り替わって、籐兵衛のモーションが変化する。<br>
+最初の切り替えは乱数次第だが（<span class="formula">$00</span>～<span class="formula">$08</span>フレーム後）、次からは<span class="formula">$20/$4 = $08</span>フレーム毎に藤兵衛のモーションが変わる、つまり足踏みする。</p>
+
+<p>先の<code>[$00:010D]</code>の算出方法から、モーション切り替えのタイミングは以下のようになることがわかる。</p>
+
+<table>
+<thead>
+	<tr><th>OBJマップデータ10の<br>Bit0～1</th><th><code>[$00:010D]</code></th><th>切り替え時間</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td><span class="formula">$04</span></td><td><span class="formula">$08</span>(<span class="formula">8</span>)フレーム</td><td>通常</td></tr>
+	<tr><td><span class="formula">%01</span></td><td><span class="formula">$08</span></td><td><span class="formula">$04</span>(<span class="formula">4</span>)フレーム</td><td>速度2倍</td></tr>
+	<tr><td><span class="formula">%10</span></td><td><span class="formula">$02</span></td><td><span class="formula">$10</span>(<span class="formula">16</span>)フレーム</td><td>速度1/2倍</td></tr>
+	<tr><td><span class="formula">%11</span></td><td><span class="formula">$01</span></td><td><span class="formula">$20</span>(<span class="formula">32</span>)フレーム</td><td>速度1/4倍</td></tr>
+</tbody>
+</table>
+
+<p>マップ上のキャラのモーション切り替え時間は、以上4段階になる。<br>
+この切り替えタイミング（時間）は、移動する場合、移動速度に比例はするが同値ではない。</p>
+
+<div class="code-container"><pre>
+$C0/91D5 BRL $0269  [$9441]      ;フラグにかかわりなく常に分岐[$9441]
+$C0/9441 STZ $21    [$00:0021]   ;[$00:0021]に$00を書き込み
+$C0/9443 LDA $05,x  [$00:133F]   ;Aに[$00:133F]をロード OBJマップデータ00 = $80
+$C0/9445 BMI $03    [$944A]      ;ネガティブフラグが立っているとき[$944A]分岐
+;ネガティブフラグOFF キャラ非表示
+$C0/9447 BRL $00C7  [$9511]      ;フラグにかかわりなく常に分岐[$9511]→スプライト処理終了
+;★ネガティブフラグON キャラ表示
+$C0/944A LDA $10,x  [$00:134A]   ;Aに[$00:134A]をロード OBJマップデータ11
+$C0/944C AND #$07                ;Aと$07(%0000 0111)で論理積 カラーパレット
+$C0/944E BEQ $F7    [$9447]      ;ゼロフラグが立っているとき[$9447]分岐→スプライト処理終了
+;★ゼロフラグOFF カラーパレットは$01以上
+$C0/9450 LDA $0F,x  [$00:1349]   ;Aに[$00:1349]をロード OBJマップデータ10 = $60
+$C0/9452 BPL $06    [$945A]      ;ネガティブフラグが立っていないとき[$945A]分岐
+;ネガティブフラグON 当たり判定無視でマップをランダム移動
+$C0/9454 LDA $21    [$00:0021]   ;Aに[$00:0021]をロード
+$C0/9456 ORA #$80                ;Aと$80で論理和
+$C0/9458 STA $21    [$00:0021]   ;Aを[$00:0021]に書き込み
+;★ネガティブフラグOFF 当たり判定無視でマップをランダム移動ではない
+$C0/945A STZ $20    [$00:0020]   ;[$00:0020]に$00を書き込み
+$C0/945C LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード BG1のサイズ決定値
+$C0/945F BEQ $78    [$94D9]      ;ゼロフラグが立っているとき[$94D9]分岐
+;★ゼロフラグON　（マップ移動時に$C0/497Eで[$00:0114]に$00書き込み）
+$C0/94D9 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/94DB LDA $0B,x  [$00:1345]   ;Aに[$00:1346][$00:1345](1500)をロード OBJマップデータ06-07 Y座標
+$C0/94DD SEC                     ;キャリーフラグON
+$C0/94DE SBC $2A    [$00:002A]   ;A(1500) - [$00:002B][$00:002A](1330)
+$C0/94E0 CMP #$0F00              ;A(01D0)と$0F00を減算比較（ステータスレジスタ変更のみ）
+$C0/94E3 BCS $2E    [$9513]      ;キャリーフラグが立っているとき[$9513]分岐
+;★キャリーフラグOFF　Y座標は画面内
+$C0/94E5 STA $30    [$00:0030]   ;A(01D0)を[$00:0031][$00:0030]に書き込み
+$C0/94E7 LDA $09,x  [$00:1343]   ;Aに[$00:1344][$00:1343](2000)をロード OBJマップデータ04-05 X座標
+$C0/94E9 SEC                     ;キャリーフラグON
+$C0/94EA SBC $28    [$00:0028]   ;A(2000) - [$00:0029][$00:0028](1E80)
+$C0/94EC CMP #$1100              ;A(0180)と$1100を減算比較（ステータスレジスタ変更のみ）
+$C0/94EF BCS $22    [$9513]      ;キャリーフラグが立っているとき[$9513]分岐
+;★キャリーフラグOFF　X座標は画面内
+</pre></div>
+
+<p>これ以降は、OBJマップデータから、スプライトのオブジェクト属性の計算を行っている。<br>
+<code><span class="r">$C0/94E3</span></code>と<code><span class="r">$C0/94EF</span></code>の判定で、藤兵衛が現在ゲーム画面内に表示されているかどうかを判定している（はず）。<br>
+マップ全体の各スプライトの位置を<span class="formula">1</span>フレーム毎に判定・処理しているが、中には画面の外のスプライトも含まれる。<br>
+壽商会であれば、入ってすぐに右隅に移動すれば、籐兵衛のスプライトは画面外である。<br>
+スプライトをグラフィックとして表示する場合はスプライトのオブジェクト属性の計算をして、VRAM・OAMなどにデータを転送しなければならない。<br>
+だが、画面外なら、グラフィック処理は必要ない。<br>
+よって、ここで分岐処理がある。<br>
+ここでは、籐兵衛が画面内にいるとして処理の続きを見ていく。</p>
+
+<div class="code-container"><pre>
+$C0/94EF BCS $22    [$9513]      ;キャリーフラグが立っているとき[$9513]分岐
+;★キャリーフラグOFF　X座標は画面内
+$C0/94F1 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F2 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F3 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F4 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F5 SEC                     ;キャリーフラグON
+$C0/94F6 SBC #$0010              ;A(0018) - $0010
+$C0/94F9 AND #$01FF              ;A(0008)と$01FFで論理積
+$C0/94FC ORA $20    [$00:0020]   ;Aと[$00:0021][$00:0020]で論理和
+$C0/94FE STA $20    [$00:0020]   ;A(0008)を[$00:0021][$00:0020]に書き込み
+$C0/9500 LDA $30    [$00:0030]   ;Aに[$00:0031][$00:0030](01D0)をロード
+$C0/9502 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9503 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9504 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9505 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9506 SEC                     ;キャリーフラグON
+$C0/9507 SBC #$0010              ;A(001D) - $0010
+$C0/950A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/950C STA $22    [$00:0022]   ;A(1D)を[$00:0022]に書き込み
+$C0/950E JSR $95EC  [$C0:95EC]   ;[$C0:95EC]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/91D5</span></code>～<code><span class="r">$C0/950E</span></code>は座標計算になる。<br>
+藤兵衛は移動しないため、座標変動はない。<br>
+OBJマップデータでの座標はマス単位なので、オブジェクト属性用にピクセル単位に変換しているのが上の処理である。</p>
+
+<p><code>[$00:0021]</code><code>[$00:0020]</code>がX座標（ピクセル単位, 9ビット値）<br>
+<code>[$00:0022]</code>がY座標（ピクセル単位, 8ビット値）</p>
+
+<p>となる。</p>
+
+<div class="code-container"><pre>
+$C0/95EC PHX                     ;Xレジスタをスタックにプッシュ
+$C0/95ED LDA $10E3  [$00:10E3]   ;Aに[$00:10E3](00)をロード
+$C0/95F0 BPL $06    [$95F8]      ;ネガティブフラグが立っていないとき[$95F8]分岐
+;ネガティブフラグON
+$C0/95F2 LDA $21    [$00:0021]   ;Aに[$00:0021]をロード
+$C0/95F4 ORA #$80                ;Aと$80で論理和
+$C0/95F6 STA $21    [$00:0021]   ;Aを[$00:0021]に書き込み
+;★ネガティブフラグOFF
+$C0/95F8 LDA $21    [$00:0021]   ;Aに[$00:0021]($00)をロード
+$C0/95FA BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/95FC BNE $16    [$9614]      ;ゼロフラグが立っていないとき[$9614]分岐
+;★ゼロフラグON
+$C0/95FE LDA $06,x  [$00:1340]   ;Aに[$00:1340]をロード OBJマップデータ00 モーション切り替え値=$00または$04
+$C0/9600 AND #$03                ;Aと$03(0000 0011)で論理積
+$C0/9602 BNE $08    [$960C]      ;ゼロフラグが立っていないとき[$960C]分岐
+;★ゼロフラグON（$00または$04どちらでもゼロフラグON）
+$C0/9604 LDA $10,x  [$00:134A]   ;Aに[$00:134A]をロード OBJマップデータ11 = $4D %0100 1101
+$C0/9606 AND #$07                ;Aと$07(0000 0111)で論理積 カラーパレット
+$C0/9608 ORA #$10                ;Aと$10(0001 0000)で論理和
+$C0/960A BRA $12    [$961E]      ;フラグにかかわりなく常に分岐[$961E]
+$C0/961E STA $25    [$00:0025]   ;A($15)を[$00:0025]に書き込み 
+$C0/9620 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/9623 BEQ $6E    [$9693]      ;ゼロフラグが立っているとき[$9693]分岐
+;★ゼロフラグON プレイヤーがキャラ操作可能
+$C0/9693 LDA $0F,x  [$00:1349]   ;Aに[$00:1349]をロード OBJマップデータ10
+$C0/9695 BIT #$08                ;Aと$08(0000 1000)で論理積（ステータスフラグ変更のみ）
+$C0/9697 BEQ $06    [$969F]      ;ゼロフラグが立っているとき[$969F]分岐
+;ゼロフラグOFF
+$C0/9699 LDA $25    [$00:0025]   ;Aに[$00:0025]をロード
+$C0/969B EOR #$20                ;Aと$20で排他的論理和XOR
+$C0/969D STA $25    [$00:0025]   ;Aを[$00:0025]に書き込み
+;★ゼロフラグON 
+$C0/969F LDA $0D,x  [$00:1347]   ;Aに[$00:1347](A0)をロード OBJマップデータ08 スプライト番号指定
+$C0/96A1 ASL A                   ;Aを算術左シフト *2 $140
+$C0/96A2 STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み $40（$140のキャリーの1が下移動）
+$C0/96A4 ROL $25    [$00:0025]   ;[$00:0025]をキャリーフラグを含めた9bitで左ローテート 1 0001 0101→ 00101011 = 2B
+$C0/96A6 LDA $0F,x  [$00:1349]   ;Aに[$00:1349](60)をロード  OBJマップデータ10
+$C0/96A8 AND #$30                ;Aと$30(0011 0000)で論理積
+$C0/96AA BEQ $2A    [$96D6]      ;ゼロフラグが立っているとき[$96D6]分岐
+;★ゼロフラグOFF スプライト番号+nとスプライト入れ替え
+$C0/96AC CMP #$20                ;Aと$20(0010 0000)を減算比較（ステータスレジスタ変更のみ）
+$C0/96AE BEQ $3A    [$96EA]      ;ゼロフラグが立っているとき[$96EA]分岐
+;★ゼロフラグON スプライト番号+$20と切り替え
+$C0/96EA LDA $05,x  [$00:133F]   ;Aに[$00:133F]をロード OBJマップデータ00
+$C0/96EC AND #$03                ;Aと$03(0000 0011)で論理積 向き
+$C0/96EE STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/96F0 LDA $0F,x  [$00:1349]   ;Aに[$00:1349]をロード OBJマップデータ10
+$C0/96F2 BIT #$40                ;Aと$40(0100 0000)で論理積（ステータスフラグ変更のみ）
+$C0/96F4 BEQ $15    [$970B]      ;ゼロフラグが立っているとき[$970B]分岐
+;★ゼロフラグOFF スプライトを2パターンから切り替え
+$C0/96F6 LDA $06,x  [$00:1340]   ;Aに[$00:1340]をロード OBJマップデータ01
+$C0/96F8 BIT #$04                ;Aと$04(0000 0100)で論理積（ステータスフラグ変更のみ）
+$C0/96FA BEQ $0F    [$970B]      ;ゼロフラグが立っているとき[$970B]分岐
+;★ゼロフラグOFF [$00:1340]が$04（2回目のモーション時）
+$C0/96FC LDA $24    [$00:0024]   ;Aに[$00:0024]をロード $40
+$C0/96FE CLC                     ;キャリーフラグクリア
+$C0/96FF ADC #$20                ;A + $20
+$C0/9701 STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み $60
+$C0/9703 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード 向き$00（下）
+$C0/9705 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/9707 BCC $02    [$970B]      ;キャリーフラグが立っていないとき[$970B]分岐
+;キャリーフラグON（[$00:0030]の向きが$02（左）か$03（右））
+$C0/9709 INC $22    [$00:0022]   ;[$00:0022]をインクリメント+1
+;$C0/9707でキャリーフラグOFF
+;★$C0/96FAでゼロフラグON [$00:1340]が$04以外
+$C0/970B LDA $30    [$00:0030]   ;Aに[$00:0030]をロード　向き
+$C0/970D BEQ $19    [$9728]      ;ゼロフラグが立っているとき[$9728]分岐
+;ゼロフラグOFF 向き$00（下）ではない
+$C0/970F CMP #$03                ;Aと$03を減算比較（ステータスレジスタ変更のみ）
+$C0/9711 BEQ $08    [$971B]      ;ゼロフラグが立っているとき[$971B]分岐
+;ゼロフラグOFF 向き$03（右）ではない
+$C0/9713 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/9715 BEQ $0A    [$9721]      ;ゼロフラグが立っているとき[$9721]分岐
+;ゼロフラグOFF 向き$01（上）
+$C0/9717 LDA #$40                ;Aに$40をロード
+$C0/9719 BRA $08    [$9723]      ;フラグにかかわりなく常に分岐[$9723]
+;$C0/9711ゼロフラグON 向き$03（右）
+$C0/971B LDA $25    [$00:0025]   ;Aに[$00:0025]をロード
+$C0/971D ORA #$40                ;Aと$40で論理和
+$C0/971F STA $25    [$00:0025]   ;Aを[$00:0025]に書き込み
+;$C0/9715ゼロフラグON 向き$02（左）
+$C0/9721 LDA #$80                ;Aに$80をロード
+$C0/9723 CLC                     ;キャリーフラグクリア
+$C0/9724 ADC $24    [$00:0024]   ;A + [$00:0024]
+$C0/9726 STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み
+;★ゼロフラグON　向き$00（下）
+$C0/9728 JSR $BAE2  [$C0:BAE2]   ;[$C0:BAE2]へジャンプ
+</pre></div>
+
+<p>引き続き、オブジェクト属性への変換を行っている。<br>
+ここでは座標以外の値を計算しており、</p>
+
+<ul>
+	<li><code>[$00:0024]</code>：スプライトの開始位置タイル番号の下1バイト</li>
+	<li><code>[$00:0025]</code>：Bit0:タイル番号上1ビット、Bit1-3:カラーパレット番号3ビット, Bit4-5:<span class="formula">%10</span> (背景に対する優先度)</li>
+</ul>
+
+<p>が、入る。</p>
+
+<p>藤兵衛の場合、足踏みで変更されるのはスプライトの開始位置タイル番号のみ。<br>
+<code><span class="r">$C0/969F</span></code>～の処理がスプライト変更処理である。<br>
+<span class="formula"><code>[$00:1347]</code>(OBJマップデータ08) *2</span><br>
+が<code>[$00:0024]</code>に入っているが、乗算結果でキャリーフラグが立った場合は下2桁しか<code>[$00:0024]</code>に書き込まれない。<br>
+藤兵衛の場合、<br>
+<span class="formula"><code>[$00:1347]</code>(OBJマップデータ08) = $A0</span><br>
+だから、<br>
+<span class="formula">$A0*2 = $140</span><br>
+であり、<code>[$00:0024]</code>には下2桁の<span class="formula">$40</span>のみ入り、キャリーフラグが立つ。<br>
+この<span class="formula">$140</span>こそが、オブジェクト属性におけるスプライトの開始位置タイル番号である。</p>
+
+<p>上1ビット分の処理は、<code><span class="r">$C0/96A4</span></code>で行っている。<br>
+<code><span class="r">$C0/96A4</span></code>は、<code>[$00:0025]</code>をキャリーフラグを含めた9bitで左ローテートの処理。<br>
+<code>[$00:0025]</code>にはここまでの処理で、カラーパレット番号が下3ビット（Bit0～2）に、更にBit4に<span class="formula">1</span>を書き込んでいる（これが後で背景に対する優先度になる）。<br>
+これをキャリーフラグ込みで左ローテートすると、</p>
+
+<ul>
+	<li>カラーパレット番号……Bit0～2→Bit1～3</li>
+	<li>背景に対する優先度……Bit3～4→Bit4～5(<span class="formula">%10</span>)</li>
+</ul>
+
+<p>そして、Bit0にキャリーフラグの<span class="formula">0</span>または<span class="formula">1</span>が入るから、籐兵衛の場合Bit0に<span class="formula">1</span>が入る。<br>
+これがそのまま、オブジェクト属性下位テーブル4バイトの4バイト目の値になる。</p>
+
+<div class="code-container"><pre>
+$C0/BAE2 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/BAE4 LDA $0100  [$00:0100]   ;Aに[$00:0100]をロード 02
+$C0/BAE7 ASL A                   ;Aを算術左シフト *2
+$C0/BAE8 ASL A                   ;Aを算術左シフト *2
+$C0/BAE9 CLC                     ;キャリーフラグクリア
+$C0/BAEA ADC $0100  [$00:0100]   ;A + [$00:0100]
+$C0/BAED CLC                     ;キャリーフラグクリア
+$C0/BAEE ADC #$1A00              ;A + $1A00
+$C0/BAF1 TAX                     ;Aの値をXレジスタに転送
+$C0/BAF2 INC $0100  [$00:0100]   ;A[$00:0100]をインクリメント +1
+$C0/BAF5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/BAF7 LDA $21    [$00:0021]   ;Aに[$00:0021]をロード 00
+$C0/BAF9 BPL $03    [$BAFE]      ;ネガティブフラグが立っていないとき[$BAFE]分岐
+$C0/BAFE STA $00,x  [$00:1A0A]   ;Aを[$00:1A0A]に書き込み
+$C0/BB00 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード 08
+$C0/BB02 STA $01,x  [$00:1A0B]   ;Aを[$00:1A0B]に書き込み
+$C0/BB04 LDA $22    [$00:0022]   ;Aに[$00:0022]をロード 0D
+$C0/BB06 STA $02,x  [$00:1A0C]   ;Aを[$00:1A0C]に書き込み
+$C0/BB08 LDA $24    [$00:0024]   ;Aに[$00:0024]をロード $60または$40
+$C0/BB0A STA $03,x  [$00:1A0D]   ;Aを[$00:1A0D]に書き込み
+$C0/BB0C LDA $25    [$00:0025]   ;Aに[$00:0025]をロード $2B
+$C0/BB0E STA $04,x  [$00:1A0E]   ;Aを[$00:1A0E]に書き込み
+$C0/BB10 RTS                     ;サブルーチン戻り
+
+$C0/972B PLX                     ;Xレジスタにスタックからプル
+$C0/972C RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>最終的に、</p>
+
+<ul>
+	<li><code>[$00:0021]</code>→<code>[$00:1A0A]</code> X座標（上1ビット）</li>
+	<li><code>[$00:0020]</code>→<code>[$00:1A0B]</code> X座標（下8ビット）</li>
+	<li><code>[$00:0022]</code>→<code>[$00:1A0C]</code> Y座標</li>
+	<li><code>[$00:0024]</code>→<code>[$00:1A0D]</code> スプライトの開始位置タイル番号の下1バイト</li>
+	<li><code>[$00:0025]</code>→<code>[$00:1A0E]</code> Bit0:タイル番号上1ビット、Bit1-3:カラーパレット番号3ビット, Bit4-5:<span class="formula">%10</span> (背景に対する優先度)</li>
+</ul>
+
+<p>これが後々でほぼそのままオブジェクト属性の値になる。</p>
+
+<p>非表示のスプライトの場合、<code><span class="r">$C0/9447</span></code>から<code><span class="r">$C0/9511</span></code>にジャンプするのでここで処理合流。</p>
+
+<div class="code-container"><pre>
+$C0/9511 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9513 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/9514 CLC                     ;キャリーフラグクリア
+$C0/9515 ADC #$0011              ;A + $0011
+$C0/9518 TAX                     ;Aの値をXレジスタに転送
+$C0/9519 TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/951A CLC                     ;キャリーフラグクリア
+$C0/951B ADC #$002E              ;A + $002E
+$C0/951E TAY                     ;Aの値をYレジスタに転送
+$C0/951F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9521 DEC $2C    [$00:002C]   ;[$00:002C]をデクリメント -1
+$C0/9523 BEQ $03    [$9528]      ;ゼロフラグが立っているとき[$9528]分岐
+$C0/9525 BRL $F960  [$8E88]      ;フラグにかかわりなく常に分岐[$8E88]
+;ループ処理ここまで
+</pre></div>
+
+<p>ここまでで藤兵衛のスプライトの処理分が終了。</p>
+
+<div class="code-container"><pre>
+;ループ処理開始
+$C0/8E88 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8E8B BNE $27    [$8EB4]      ;ゼロフラグが立っていないとき[$8EB4]分岐
+$C0/8E8D LDA $05,x  [$00:1350]   ;Aに[$00:1350]をロード
+$C0/8E8F BPL $1D    [$8EAE]      ;ネガティブフラグが立っていないとき[$8EAE]分岐
+$C0/8EAE BRL $0660  [$9511]      ;フラグにかかわりなく常に分岐[$9511]
+$C0/9511 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9513 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/9514 CLC                     ;キャリーフラグクリア
+$C0/9515 ADC #$0011              ;A + $0011
+$C0/9518 TAX                     ;Aの値をXレジスタに転送
+$C0/9519 TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/951A CLC                     ;キャリーフラグクリア
+$C0/951B ADC #$002E              ;A + $002E
+$C0/951E TAY                     ;Aの値をYレジスタに転送
+$C0/951F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9521 DEC $2C    [$00:002C]   ;[$00:002C]をデクリメント -1
+$C0/9523 BEQ $03    [$9528]      ;ゼロフラグが立っているとき[$9528]分岐
+;ループ処理ここまで
+$C0/9528 RTS                     ;サブルーチン戻り
+
+$C0/06B2 JSR $BB15  [$C0:BB15]   ;[$C0:BB15]へジャンプ
+</pre></div>
+
+<p>最後のループが<code><span class="r">$C0/8E88</span></code>～<code><span class="r">$C0/9523</span></code>で、3個目のスプライト（非表示）の処理が終わり、全スプライトの処理が終わって<code><span class="r">$C0/9528</span></code>でサブルーチンが戻る。<br>
+この後は<code><span class="r">$C0/06B2</span></code>→<code><span class="r">$C0/BB15</span></code>とジャンプするが、<code><span class="r">$C0/BB15</span></code>から、OAMに送るデータ<code>$00:0700</code>～<code>$00:0920</code>を更新する。</p>
+
+<div class="code-container"><pre>
+$C0/BB15 STZ $0103  [$00:0103]   ;[$00:0103]に$00を書き込み
+;（中略）
+$C0/BBFF LDA $00,x  [$00:1A0A]   ;Aに[$00:1A0B][$00:1A0A]をロード $0800
+$C0/BC01 BIT #$0080              ;Aと$0080で論理積（ステータスフラグ変更のみ）
+$C0/BC04 BNE $56    [$BC5C]      ;ゼロフラグが立っていないとき[$BC5C]分岐
+$C0/BC06 LDA $01,x  [$00:1A0B]   ;Aに[$00:1A0C][$00:1A0B]をロード $0D08
+$C0/BC08 STA $0000,y[$00:0708]   ;Aを[$00:0709][$00:0708]に書き込み
+$C0/BC0B LDA $03,x  [$00:1A0D]   ;Aに[$00:1A0E][$00:1A0D]をロード $60または$40　[$00:1A0E]は$2B
+$C0/BC0D STA $0002,y[$00:070A]   ;Aを[$00:070B][$00:070A]に書き込み
+$C0/BC10 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/BC12 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/BC13 LDY $32    [$00:0032]   ;Yに[$00:0032]をロード
+$C0/BC15 LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/BC17 BEQ $32    [$BC4B]      ;ゼロフラグが立っているとき[$BC4B]分岐
+$C0/BC19 DEC A                   ;をデクリメント -1
+$C0/BC1A BEQ $24    [$BC40]      ;ゼロフラグが立っているとき[$BC40]分岐
+$C0/BC1C DEC A                   ;をデクリメント -1
+$C0/BC1D BEQ $14    [$BC33]      ;ゼロフラグが立っているとき[$BC33]分岐
+$C0/BC33 LDA $00,x  [$00:1A0A]   ;Aに[$00:1A0A]をロード 00
+$C0/BC35 AND #$03                ;Aと$03で論理積
+$C0/BC37 ASL A                   ;Aを算術左シフト *2
+$C0/BC38 ASL A                   ;Aを算術左シフト *2
+$C0/BC39 ASL A                   ;Aを算術左シフト *2
+$C0/BC3A ASL A                   ;Aを算術左シフト *2
+$C0/BC3B ORA $0000,y[$00:0900]   ;Aと[$00:0900]で論理和
+$C0/BC3E BRA $0F    [$BC4F]      ;フラグにかかわりなく常に分岐[$BC4F]
+$C0/BC4F STA $0000,y[$00:0900]   ;Aを[$00:0900]に書き込み
+$C0/BC52 INC $34    [$00:0034]   ;A[$00:0034]をインクリメント +1
+$C0/BC54 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/BC56 PLA                     ;Aレジスタにスタックからプル
+$C0/BC57 CLC                     ;キャリーフラグクリア
+$C0/BC58 ADC #$0004              ;A + $0004
+$C0/BC5B TAY                     ;Aの値をYレジスタに転送
+$C0/BC5C TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/BC5D CLC                     ;キャリーフラグクリア
+$C0/BC5E ADC #$0005              ;A + $0005
+$C0/BC61 TAX                     ;Aの値をXレジスタに転送
+$C0/BC62 DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/BC64 BNE $99    [$BBFF]      ;ゼロフラグが立っていないとき[$BBFF]分岐
+$C0/BC66 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/BC68 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>上処理を追ってみると、</p>
+
+<table>
+<thead>
+	<tr><th>オブジェクト属性</th><th>下位テーブル4バイト</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:1A0B]</code>→<code>[$00:0708]</code></td><td>X座標（下8ビット）</td></tr>
+	<tr><td><code>[$00:1A0C]</code>→<code>[$00:0709]</code></td><td>Y座標</td></tr>
+	<tr><td><code>[$00:1A0D]</code>→<code>[$00:070A]</code></td><td>スプライトの開始位置タイル番号の下1バイト</td></tr>
+	<tr><td><code>[$00:1A0E]</code>→<code>[$00:070B]</code></td><td>Bit0:タイル番号上1ビット<br>Bit1-3:カラーパレット番号3ビット<br>Bit4-5:<span class="formula">%10</span> (背景に対する優先度)</td></tr>
+</tbody>
+</table>
+
+<p>オブジェクト属性 上位テーブル2ビット：<br>
+<span class="formula">(<code>[$00:1A0A]</code> &amp; $03)/$10 | <code>[$00:0900]</code>→<code>[$00:0900]</code></span></p>
+
+<p>となる。<br>
+以上がオブジェクト属性3キャラ目の値である。<br>
+（今回は1～2キャラ目に、アキラとタロイモのオブジェクト属性が入る）</p>
+
+<p>これが<span class="formula">1</span>フレーム毎のスプライトの処理となる。<br>
+今回は移動なしタイプのスプライトの処理だが、次は<a href="map03.html">移動するスプライトの処理</a>を紹介する。</p>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="map01.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+	<div id="pagenext"><a href="map03.html"><span class="button">&#9654;次 ランダム移動</span></a></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="map01.html">マップ構造</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>

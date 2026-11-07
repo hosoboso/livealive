@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; スプライトの例その2：ランダム移動">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; スプライトの例その2：ランダム移動">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; スプライトの例その2：ランダム移動</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.apu_code-container,
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.apu_code-container pre,
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">マップ</button>
+	<ul>
+		<li><a href="map01.html">マップ構造とスプライトの配置</a></li>
+		<li><a href="map02.html">スプライト処理</a></li>
+		<li><a href="map03.html">ランダム移動</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="map01.html">マップ構造とスプライトの配置</a> &gt; スプライトの例その2</h1>
+<h2>マップ構造とスプライトの配置 &gt; スプライトの例その2：ランダム移動</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><a href="map02.html">前ページ</a>では近未来編の壽商会の藤兵衛（足踏みのみで向き変えや移動はしない）を例に、大まかなスプライトの処理を紹介した。<br>
+ここでは移動するスプライトについて記す。<br>
+移動する場合、</p>
+
+<ul>
+	<li>モブキャラが当たり判定をしつつランダムに移動（街の人など）</li>
+	<li>スプライトが当たり判定なしでランダムに移動（ポゴが匂いを嗅いだ時の煙）</li>
+	<li>敵シンボルがプレイヤーキャラの座標へ向けて移動</li>
+</ul>
+
+<p>といったパターンがあり、それぞれで移動速度が異なる。<br>
+移動と停止を繰り返す処理が組み合わさることもある。</p>
+
+<p>また、壁にぶつかった時に移動方向を変えるといった、マス毎の当たり判定はどう決めているか、つまりマップの構造も必要になる。<br>
+当たり判定については、<span class="tri"><a href="map01.html">マップ構造とスプライトの配置</a></span>にて、マス属性値で決まることを説明している。まずはそちらも読んでいただきたい。</p>
+
+
+<h3>スプライトのランダム移動</h3>
+
+<p>狭いマップの方が当たり判定の処理がわかりやすいので、ここでは、原始編のポゴの集落における、20人部屋（原始人を増やして素材がもらえる部屋）の処理を追ってみよう。<br>
+先の方法で、20人部屋のBG1のマップ部分だけ画像にしてみた。</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/room20nin.png" class="modal-link">
+		<img src="img/room20nin.png" alt="20人部屋" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>白色マスはマス属性値が<span class="formula">$80</span>、黄色マスはマス属性値が<span class="formula">$00</span>で、いずれも通過可能で当たり判定なし。<br>
+灰色はマス属性値が<span class="formula">$C0</span>なので、当たり判定ありで通過不可。どの方向からも入れない。<br>
+<span class="formula">$5B</span>が入っているマスは焚き火で、当たり判定があり移動不可である。<br>
+赤丸は最初から走っている原始人の初期位置。<br>
+20人部屋に入ると赤丸位置から走り出す。<br>
+この部屋に限らないが、部屋に入り直すとスプライトは初期配置にリセットされる。</p>
+
+<p>原始人を増やす前に、まず、原始人1人のみの初期状態を確認してみる。<br>
+<span class="formula"><code>[$00:0A03]</code> = $18(24)</span>であり、スプライト数は24ということになるが、これは20人増える原始人＋夜に寝ている原始人4人で、トータル24キャラ分のスプライトが設置される、ということである。<br>
+夜なら寝ている4人のみ表示、昼なら最初は走り回る1人～話しかけることで最大20人表示、ということになる。</p>
+
+<h4>OBJマップ初期データ</h4>
+
+<p><code>$00:14B5</code>～</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">01</span></td><td><span class="formula">50 03 17 59 20 6C</span></td><td>夜に寝ている原始人01</td></tr>
+	<tr><td><span class="formula">02</span></td><td><span class="formula">50 06 17 09 20 6C</span></td><td>夜に寝ている原始人02</td></tr>
+	<tr><td><span class="formula">03</span></td><td><span class="formula">50 03 1A 09 20 6C</span></td><td>夜に寝ている原始人03</td></tr>
+	<tr><td><span class="formula">04</span></td><td><span class="formula">50 06 1A 09 20 6C</span></td><td>夜に寝ている原始人04</td></tr>
+	<tr><td><span class="formula">05</span></td><td><span class="formula">50 05 16 D7 E1 2C</span></td><td>初期から走っている原始人01</td></tr>
+	<tr><td><span class="formula">06</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人02</td></tr>
+	<tr><td><span class="formula">07</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人03</td></tr>
+	<tr><td><span class="formula">08</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人04</td></tr>
+	<tr><td><span class="formula">09</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人05</td></tr>
+	<tr><td><span class="formula">10</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人06</td></tr>
+	<tr><td><span class="formula">11</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人07</td></tr>
+	<tr><td><span class="formula">12</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人08</td></tr>
+	<tr><td><span class="formula">13</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人09</td></tr>
+	<tr><td><span class="formula">14</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人10</td></tr>
+	<tr><td><span class="formula">15</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人11</td></tr>
+	<tr><td><span class="formula">16</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人12</td></tr>
+	<tr><td><span class="formula">17</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人13</td></tr>
+	<tr><td><span class="formula">18</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人14</td></tr>
+	<tr><td><span class="formula">19</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人15</td></tr>
+	<tr><td><span class="formula">20</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人16</td></tr>
+	<tr><td><span class="formula">21</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人17</td></tr>
+	<tr><td><span class="formula">22</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人18</td></tr>
+	<tr><td><span class="formula">23</span></td><td><span class="formula">50 08 1D D7 65 2C</span></td><td>増える原始人19</td></tr>
+	<tr><td><span class="formula">24</span></td><td><span class="formula">50 08 1D D8 65 0C</span></td><td>増える原始人20</td></tr>
+</tbody>
+</table>
+
+
+<h4>OBJマップデータ（No.00～11のみ）</h4>
+
+<p>RRは乱数（<span class="formula">$01</span>～<span class="formula">$20</span>）</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>数値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">01</span></td><td><span class="formula">00 00 01 01 00 03 00 17 A0 59 20 6C</span></td><td>夜に寝ている原始人01</td></tr>
+	<tr><td><span class="formula">02</span></td><td><span class="formula">00 00 01 01 00 06 00 17 A0 09 20 6C</span></td><td>夜に寝ている原始人02</td></tr>
+	<tr><td><span class="formula">03</span></td><td><span class="formula">00 00 01 01 00 03 00 1A A0 09 20 6C</span></td><td>夜に寝ている原始人03</td></tr>
+	<tr><td><span class="formula">04</span></td><td><span class="formula">00 00 01 01 00 06 00 1A A0 09 20 6C</span></td><td>夜に寝ている原始人04</td></tr>
+	<tr><td><span class="formula">05</span></td><td><span class="formula">80 02 01 RR 00 05 00 16 A0 D7 61 2C</span></td><td>初期から走っている原始人01</td></tr>
+	<tr><td><span class="formula">06</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人02</td></tr>
+	<tr><td><span class="formula">07</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人03</td></tr>
+	<tr><td><span class="formula">08</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人04</td></tr>
+	<tr><td><span class="formula">09</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人05</td></tr>
+	<tr><td><span class="formula">10</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人06</td></tr>
+	<tr><td><span class="formula">11</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人07</td></tr>
+	<tr><td><span class="formula">12</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人08</td></tr>
+	<tr><td><span class="formula">13</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人09</td></tr>
+	<tr><td><span class="formula">14</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人10</td></tr>
+	<tr><td><span class="formula">15</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人11</td></tr>
+	<tr><td><span class="formula">16</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人12</td></tr>
+	<tr><td><span class="formula">17</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人13</td></tr>
+	<tr><td><span class="formula">18</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人14</td></tr>
+	<tr><td><span class="formula">19</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人15</td></tr>
+	<tr><td><span class="formula">20</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人16</td></tr>
+	<tr><td><span class="formula">21</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人17</td></tr>
+	<tr><td><span class="formula">22</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人18</td></tr>
+	<tr><td><span class="formula">23</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D7 61 2C</span></td><td>増える原始人19</td></tr>
+	<tr><td><span class="formula">24</span></td><td><span class="formula">01 00 01 RR 00 08 00 1D A0 D8 61 0C</span></td><td>増える原始人20</td></tr>
+</tbody>
+</table>
+
+<p>今回は、「初期から走っている原始人01」の動きを確認してみる。<br>
+OBJマップデータ00～11は<code>$00:1372</code>～<code>$00:1382</code>に入る。<br>
+初期値の</p>
+
+<div class="mono">80 02 01 RR 00 05 00 16 A0 D7 61 2C</div>
+
+<p>から、以下がわかる。</p>
+
+<h5>OBJマップデータ</h5>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>00</td><td><span class="formula">$80</span>(<span class="formula">%1000 0000</span>)</td><td>Bit7:スプライト存在(<span class="formula">1</span>で表示) / Bit0～1:向き <span class="formula">%00</span>:下</td></tr>
+	<tr><td>01</td><td><span class="formula">$02</span></td><td>当たり判定及びモーション切り替え値（初期値が<span class="formula">$01</span>は当たり判定なし、<span class="formula">$00</span>と<span class="formula">$02</span>は当たり判定あり）</td></tr>
+	<tr><td>02</td><td><span class="formula">$01</span></td><td>モーションのみありキャラは乱数<span class="formula">$01</span>～<span class="formula">$20</span> / それ以外は<span class="formula">$01</span></td></tr>
+	<tr><td>03</td><td><span class="formula">$01</span>～<span class="formula">$20</span></td><td>モーション切り替えタイマー：モーションや移動なしキャラは<span class="formula">$01</span> / モーションありキャラは乱数<span class="formula">$01</span>～<span class="formula">$20</span></td></tr>
+	<tr><td>04～05</td><td><span class="formula">$0005</span></td><td>X座標</td></tr>
+	<tr><td>06～07</td><td><span class="formula">$0016</span></td><td>Y座標</td></tr>
+	<tr><td>08</td><td><span class="formula">$A0</span></td><td>スプライト番号指定</td></tr>
+	<tr><td>09</td><td><span class="formula">$D7</span></td><td>-</td></tr>
+	<tr><td>10</td><td><span class="formula">$61</span>(<span class="formula">%0110 0001</span>)</td><td>Bit2～7:モーション指定1 / Bit0～1:モーション切り替え及び移動速度</td></tr>
+	<tr><td>11</td><td><span class="formula">$2C</span>(<span class="formula">%0010 1100</span>)</td><td>Bit4～7:モーション指定2 / Bit0～3:カラーパレット(<span class="formula">%100</span>)</td></tr>
+</tbody>
+</table>
+
+<h5>No.10</h5>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit7</td><td><span class="formula">%0</span></td><td>当たり判定無視でマップをランダム移動しない</td></tr>
+	<tr><td>Bit6</td><td><span class="formula">%1</span></td><td>スプライトを2パターンから切り替え</td></tr>
+	<tr><td>Bit5</td><td><span class="formula">%1</span></td><td>スプライト番号<span class="formula">+$10</span>のスプライトと切り替え（足踏みする）</td></tr>
+	<tr><td>Bit4</td><td><span class="formula">%0</span></td><td>スプライト番号<span class="formula">+$1</span>のスプライトと切り替えではない</td></tr>
+	<tr><td>Bit3</td><td><span class="formula">%0</span></td><td>スプライトを左右反転表示しない</td></tr>
+	<tr><td>Bit2</td><td><span class="formula">%0</span></td><td>操作キャラ（味方キャラ）のスプライトの位置を目標にして移動しない</td></tr>
+	<tr><td>Bit0～1</td><td><span class="formula">%01</span></td><td>モーション切り替え及び移動速度（<span class="formula">%00</span>:通常、<span class="formula">%01</span>:速度2倍、<span class="formula">%10</span>:速度1/2倍、<span class="formula">%11</span>:速度1/4倍）</td></tr>
+</tbody>
+</table>
+
+<h5>No.11</h5>
+
+<table>
+<thead>
+	<tr><th>Bit</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>Bit6～7</td><td><span class="formula">%00</span></td><td><span class="formula">%00</span>と<span class="formula">%11</span>は当たり判定ありでランダム移動</td></tr>
+	<tr><td>Bit5</td><td><span class="formula">%1</span></td><td>？</td></tr>
+	<tr><td>Bit4</td><td><span class="formula">%0</span></td><td>キャラ接触時に同時にAボタン判定ではない（話しかけてこない）</td></tr>
+	<tr><td>Bit3</td><td><span class="formula">%1</span></td><td>1が立つと移動し続ける</td></tr>
+	<tr><td>Bit0～2</td><td><span class="formula">%100</span></td><td>カラーパレット(<span class="formula">$4</span>)</td></tr>
+</tbody>
+</table>
+
+
+<p>大まかにまとめると、速度2倍（キャラのダッシュ速度）で足踏みしながら当たり判定ありでランダム方向に走り続ける、ということになる。<br>
+操作キャラを目標にはしない（追尾タイプではない）、当たっても話しかけてこない（敵シンボルのような動きではない）。</p>
+
+<p>「ランダム方向」がここでの問題。<br>
+どのタイミングで、どういう方法で移動方向を決めるのか？<br>
+また、移動方向が当たり判定ありだった場合は移動方向を変更するはずだが、その場合の処理はどうなるのか？</p>
+
+<p>ランダムで移動するモブキャラは多く存在しているが、よく見ると、移動し続けるスプライトの場合、ランダムで向き変えするものの、割とまっすぐ走っているモブキャラが多いようにも見える。<br>
+何マスか走ってからランダムに向き変え、という処理のように見える。<br>
+実際その処理で正解なのは、後々で説明する。</p>
+
+<p>では、サブルーチンを確認してみよう。<br>
+初期配置後、1フレーム後の動きを計算する部分である。<br>
+このタイミングで、原始人は最初に移動する方向を決めて動き始めるはずだ。</p>
+
+<div class="code-container"><pre>
+$C0/0ADB JSR $8E49  [$C0:8E49]   ;[$C0:8E49]へジャンプ
+
+$C0/8E49 STZ $010A  [$00:010A]   ;[$00:010A]に$00を書き込み
+$C0/8E4C LDA $0A03  [$00:0A03]   ;Aに[$00:0A03]をロード　18
+$C0/8E4F BNE $03    [$8E54]      ;ゼロフラグが立っていないとき[$8E54]分岐
+$C0/8E54 STA $2C    [$00:002C]   ;Aを[$00:002C]に書き込み
+$C0/8E56 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/8E58 LDA $0158  [$00:0158]   ;Aに[$00:0158]をロード
+$C0/8E5B ASL A                   ;Aを算術左シフト *2
+$C0/8E5C ASL A                   ;Aを算術左シフト *2
+$C0/8E5D ASL A                   ;Aを算術左シフト *2
+$C0/8E5E ASL A                   ;Aを算術左シフト *2
+$C0/8E5F CLC                     ;キャリーフラグクリア
+$C0/8E60 ADC $0A40  [$00:0A40]   ;A + [$00:0A40]
+$C0/8E63 AND #$FFF0              ;Aと$FFF0で論理積
+$C0/8E66 SEC                     ;キャリーフラグON
+$C0/8E67 SBC #$0080              ;A - $0080
+$C0/8E6A STA $28    [$00:0028]   ;Aを[$00:0029][$00:0028]に書き込み　A:FF80
+$C0/8E6C LDA $015C  [$00:015C]   ;Aに[$00:015D][$00:015C]をロード
+$C0/8E6F ASL A                   ;Aを算術左シフト *2
+$C0/8E70 ASL A                   ;Aを算術左シフト *2
+$C0/8E71 ASL A                   ;Aを算術左シフト *2
+$C0/8E72 ASL A                   ;Aを算術左シフト *2
+$C0/8E73 CLC                     ;キャリーフラグクリア
+$C0/8E74 ADC $0A42  [$00:0A42]   ;A + [$00:0A42]
+$C0/8E77 AND #$FFF0              ;Aと$FFF0で論理積
+$C0/8E7A SEC                     ;キャリーフラグON
+$C0/8E7B SBC #$00D0              ;A - $00D0
+$C0/8E7E STA $2A    [$00:002A]   ;Aを[$00:002B][$00:002A]に書き込み
+$C0/8E80 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/8E82 LDX #$1329              ;Xに$1329をロード
+$C0/8E85 LDY #$4E40              ;Yに$4E40をロード
+$C0/8E88 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8E8B BNE $27    [$8EB4]      ;ゼロフラグが立っていないとき[$8EB4]分岐
+
+;初期から走っている原始人01（スプライト5番目　$00:1372-$00:1382）
+;ループ処理開始
+
+$C0/8E88 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8E8B BNE $27    [$8EB4]      ;ゼロフラグが立っていないとき[$8EB4]分岐
+;ゼロフラグON プレイヤーがキャラ操作可能
+$C0/8E8D LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード OBJマップデータ00 = $80
+$C0/8E8F BPL $1D    [$8EAE]      ;ネガティブフラグが立っていないとき[$8EAE]分岐
+;ネガティブフラグON　該当スプライト表示
+$C0/8E91 LDA $010A  [$00:010A]   ;Aに[$00:010A]をロード
+$C0/8E94 BNE $1B    [$8EB1]      ;ゼロフラグが立っていないとき[$8EB1]分岐
+;ゼロフラグON
+$C0/8E96 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61
+$C0/8E98 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/8E9A BNE $0E    [$8EAA]      ;ゼロフラグが立っていないとき[$8EAA]分岐
+;ゼロフラグOFF スプライトを2パターンから切り替え
+$C0/8EAA LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61
+$C0/8EAC BRA $0D    [$8EBB]      ;フラグにかかわりなく常に分岐[$8EBB]
+$C0/8EBB AND #$03                ;Aと$03で論理積
+$C0/8EBD BEQ $14    [$8ED3]      ;ゼロフラグが立っているとき[$8ED3]分岐
+;ゼロフラグOFF モーション切り替え及び移動速度%01:速度2倍
+$C0/8EBF CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/8EC1 BEQ $0C    [$8ECF]      ;ゼロフラグが立っているとき[$8ECF]分岐
+;ゼロフラグON モーション切り替え及び移動速度%01:速度2倍
+$C0/8ECF LDA #$20                ;Aに$20をロード
+$C0/8ED1 BRA $02    [$8ED5]      ;フラグにかかわりなく常に分岐[$8ED5]
+$C0/8ED5 STA $24    [$00:0024]   ;A($20)を[$00:0024]に書き込み
+$C0/8ED7 STZ $25    [$00:0025]   ;[$00:0025]に$00を書き込み
+$C0/8ED9 LSR A                   ;Aを論理右シフト　(/2)
+$C0/8EDA LSR A                   ;Aを論理右シフト　(/2)
+$C0/8EDB STA $010D  [$00:010D]   ;A($08)を[$00:010D]に書き込み
+$C0/8EDE LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8EE1 BNE $03    [$8EE6]      ;ゼロフラグが立っていないとき[$8EE6]分岐
+;ゼロフラグON プレイヤーがキャラ操作可能
+$C0/8EE3 BRL $0288  [$916E]      ;フラグにかかわりなく常に分岐[$916E]
+$C0/916E LDA $0A03  [$00:0A03]   ;Aに[$00:0A03](18)をロード
+$C0/9171 SEC                     ;キャリーフラグON
+$C0/9172 SBC $2C    [$00:002C]   ;A - [$00:002C]
+$C0/9174 CMP $0A16  [$00:0A16]   ;Aと[$00:0A16]を減算比較（ステータスレジスタ変更のみ）
+$C0/9177 BNE $0B    [$9184]      ;ゼロフラグが立っていないとき[$9184]分岐
+;ゼロフラグOFF
+$C0/9184 STZ $32    [$00:0032]   ;[$00:0032]に$00を書き込み
+$C0/9186 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61
+$C0/9188 BMI $56    [$91E0]      ;ネガティブフラグが立っているとき[$91E0]分岐
+;ネガティブフラグOFF 当たり判定無視でマップをランダム移動ではない
+$C0/918A LDA $10,x  [$00:137D]   ;Aに[$00:137D]をロード OBJマップデータ11 = $2C
+$C0/918C AND #$C0                ;Aと$C0(1100 0000)で論理積
+$C0/918E BEQ $50    [$91E0]      ;ゼロフラグが立っているとき[$91E0]分岐
+</pre></div>
+
+<p>ここまでは、移動なしで足踏みのみの藤兵衛とほとんど同じ処理分岐である。<br>
+異なるのは、モーション切り替え及び移動速度が<span class="formula">%01</span>であることで、<code>[$00:010D]</code>に<span class="formula">$08</span>が入る。</p>
+
+<p>分岐が起こるのは、<code><span class="r">$C0/918E</span></code>の、OBJマップデータ11の上2ビット値の判定から。<br>
+ここがランダム移動するかしないかの分岐である。</p>
+
+<div class="code-container"><pre>
+;★ここから籐兵衛（移動しないキャラ）とは分岐
+;ゼロフラグON %00と%11は当たり判定ありでランダム移動
+$C0/91E0 LDA $09,x  [$00:1376]   ;Aに[$00:1376]をロード OBJマップデータ04 = $00 X座標(ピクセル単位)
+$C0/91E2 BNE $F9    [$91DD]      ;ゼロフラグが立っていないとき[$91DD]分岐
+;ゼロフラグON
+$C0/91E4 LDA $0B,x  [$00:1378]   ;Aに[$00:1378]をロード OBJマップデータ06 = $00 Y座標(ピクセル単位)
+$C0/91E6 BNE $F5    [$91DD]      ;ゼロフラグが立っていないとき[$91DD]分岐
+;ゼロフラグON
+</pre></div>
+
+<p>OBJマップデータ04とOBJマップデータ06は、上1桁がピクセル単位でのマス移動（<span class="formula">$00</span>～<span class="formula">$F0</span>）の値。<br>
+スプライトの初期配置はマップ上の16×16ピクセルのマス単位にぴったり合わせるので（ズレる時もあるかもしれないが）、OBJマップデータ04・06ともに<span class="formula">$00</span>である。<br>
+<span class="formula">$00</span>以外が入っている時は、16×16ピクセルのマス単位からズレた位置、つまりマスとマスの間を移動している最中である。<br>
+マスとマスの間を移動している最中は、1フレーム後に移動する場所は決まっている。<br>
+逆に、マス単位にぴったり合っている時は、次にどこのマスへ移動するか決める必要がある。<br>
+という判定をしているのが、上の<code><span class="r">$C0/91E0</span></code>～<code><span class="r">$C0/91E6</span></code>である。<br>
+つまり、ランダム移動するスプライトは、1マス移動しては次に移動するマスを決定、を繰り返している。<br>
+原始人は味方キャラのダッシュと同速度で動き回っているので、8フレームで1マス移動する。<br>
+ということは、基本的に、8フレームに1回、<code><span class="r">$C0/91E6</span></code>まで進んでゼロフラグが立ち、次にどのマスに進むか決めるはずだ。</p>
+
+<p>ちなみにマスとマスの間を移動している最中の分岐先である<code><span class="r">$C0/91DD</span></code>の処理は以下。</p>
+
+<div class="code-container"><pre>
+$C0/91DD BRL $025B  [$943B]      ;フラグにかかわりなく常に分岐[$943B]
+$C0/943B JSR $9529  [$C0:9529]   ;[$C0:9529]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/9529</span></code>にジャンプしているが、これは次の処理など諸々をスキップして、座標計算に移ることを意味する。</p>
+
+<p>では、<code><span class="r">$C0/91E6</span></code>でゼロフラグが立った場合、つまり次に進むマスを決める処理を見ていく。</p>
+
+<div class="code-container"><pre>
+$C0/91E6 BNE $F5    [$91DD]      ;ゼロフラグが立っていないとき[$91DD]分岐
+;ゼロフラグON
+$C0/91E8 LDA $06,x  [$00:1373]   ;Aに[$00:1373]をロード OBJマップデータ01 = $02　当たり判定及びモーション切り替え値
+$C0/91EA BPL $2F    [$921B]      ;ネガティブフラグが立っていないとき[$921B]分岐
+;ネガティブフラグOFF
+$C0/921B LDA $10,x  [$00:137D]   ;Aに[$00:137D]をロード OBJマップデータ11 = $2C
+$C0/921D BIT #$08                ;Aと$08(0000 1000)で論理積（ステータスフラグ変更のみ）
+$C0/921F BNE $1F    [$9240]      ;ゼロフラグが立っていないとき[$9240]分岐
+;ゼロフラグOFF Bit3：0が立つと1マスずつ移動と停止繰り返し　1が立つと移動し続ける
+$C0/9240 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/9242 BIT #$04                ;Aと$04(0000 0100)で論理積（ステータスフラグ変更のみ）
+$C0/9244 BEQ $4B    [$9291]      ;ゼロフラグが立っているとき[$9291]分岐
+;ゼロフラグON 操作キャラへ向けて移動しない（1を立てると、操作キャラ位置を目標にして移動）
+$C0/9291 DEC $07,x  [$00:1374]   ;[$00:1374]をデクリメント -1 OBJマップデータ02 = $01
+$C0/9293 BEQ $1A    [$92AF]      ;ゼロフラグが立っているとき[$92AF]分岐
+;ゼロフラグON　OBJマップデータ02が$01→$00になったのでゼロフラグ立つ
+$C0/92AF LDA $32    [$00:0032]   ;Aに[$00:0032]($00)をロード
+$C0/92B1 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/92B2 PHX                     ;Xレジスタをスタックにプッシュ
+$C0/92B3 LDX #$0100              ;Xに$0100をロード
+$C0/92B6 JSR $B900  [$C0:B900]   ;[$C0:B900]へジャンプ
+</pre></div>
+
+<p>移動するタイミングであることが判定されると、OBJマップデータ02に入った初期値が<span class="formula">$01</span>→<span class="formula">$00</span>になり、マップ乱数生成を行う。<br>
+<code><span class="r">$C0/B900</span></code>にジャンプする前に<code>X</code>に<span class="formula">$0100</span>をロードしているから、生成する乱数は<span class="formula">$00</span>～<span class="formula">$FF</span>である。</p>
+
+<div class="code-container"><pre>
+;マップ乱数計算　X:0100なので$00～$FFの乱数
+$C0/B900 PHA                     ;Aレジスタをスタックにプッシュ
+;(中略)
+$C0/B911 JSR $BA16  [$C0:BA16]   ;[$C0:BA16]へジャンプ
+
+$C0/BA16 PHX                     ;Xレジスタをスタックにプッシュ
+;(中略)
+$C0/BA75 RTS                     ;サブルーチン戻り
+
+$C0/B914 LDX $34    [$00:0034]   ;Xに[$00:0034]をロード
+;(中略)
+$C0/B91D JSR $BA16  [$C0:BA16]   ;[$C0:BA16]へジャンプ
+
+$C0/BA16 PHX                     ;Xレジスタをスタックにプッシュ
+;(中略)
+$C0/BA75 RTS                     ;サブルーチン戻り
+
+$C0/B920 PLB                     ;DBレジスタにスタックからプル
+$C0/B921 LDX $36    [$00:0036]   ;Xに[$00:0036]をロード $00～$FFの乱数
+$C0/B923 PLA                     ;Aレジスタにスタックからプル
+$C0/B924 RTS                     ;サブルーチン戻り
+
+$C0/92B9 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/92BA PLX                     ;Xレジスタにスタックからプル
+$C0/92BB AND #$07                ;Aと$07(0000 0111)で論理積 乱数 &amp; $07で、$00～$07の乱数
+$C0/92BD INC A                   ;Aをインクリメント +1　$01～$08の乱数
+$C0/92BE ORA $07,x  [$00:1374]   ;Aと[$00:1374]で論理和　OBJマップデータ02(00)
+$C0/92C0 STA $07,x  [$00:1374]   ;Aを[$00:1374]に書き込み　$00 | ($01～$08の乱数)
+</pre></div>
+
+<p><span class="formula">(乱数$00～$FF &amp; $07) +1</span><br>
+と、OBJマップデータ02の論理和を取った値が新たなOBJマップデータ02になっていることがわかる。<br>
+<span class="formula">(乱数$00～$FF &amp; $07) +1</span>は、結果として<span class="formula">$01</span>～<span class="formula">$08</span>の乱数にあたる。<br>
+先の乱数計算前に、OBJマップデータ02は初期値が<span class="formula">$01</span>→<span class="formula">$00</span>と変わったから、</p>
+
+<p><span class="formula">OBJマップデータ02 = $00 | ($01～$08の乱数)</span><br>
+<span class="formula">= $01～$08の乱数</span></p>
+
+<p>である。<br>
+結局のところ、OBJマップデータ02は「ランダム移動時、向き変えまでの残り歩数」のようなもので、ランダム移動するなら、</p>
+
+<ol>
+	<li>OBJマップデータ02は初期値<span class="formula">$01</span>である</li>
+	<li>OBJマップデータ02は1マス移動すると<span class="formula">-1</span>され、<span class="formula">$00</span>の時のみ、ランダム向き変え処理をする（<code><span class="r">$C0/92AF</span></code>～）</li>
+	<li>OBJマップデータ02は<span class="formula">-1</span>された後、<span class="formula">OBJマップデータ02 | ($01～$08の乱数)</span>を新たなOBJマップデータ02にする</li>
+</ol>
+
+<p>ということがわかる。<br>
+ただし、当たり判定がある場合はOBJマップデータ02の残り歩数に関係なくランダム向き変え処理をする。<br>
+その場合、OBJマップデータ02が<span class="formula">$01</span>以上で、</p>
+
+<p><span class="formula">OBJマップデータ02 | ($01～$08の乱数)</span></p>
+
+<p>を計算することになるから、状況により、OBJマップデータ02が<span class="formula">$08</span>以上の値を取る可能性がある。<br>
+例えばOBJマップデータ02が<span class="formula">$07</span>の時に当たり判定にぶつかると、まず<span class="formula">-1</span>されて<span class="formula">$06</span>になる。<br>
+(<span class="formula">$01</span>～<span class="formula">$08</span>の乱数)が<span class="formula">$08</span>だった時、</p>
+
+<p><span class="formula">OBJマップデータ02 | ($01～$08の乱数)</span><br>
+<span class="formula">= $06 | $08</span> <br>
+<span class="formula">= $0E</span></p>
+
+<p>ということになる。<br>
+もし狭い部屋とか他にぶつかりそうなスプライトがたくさんある場合（それこそ20人部屋など）、OBJマップデータ02が<span class="formula">$08</span>以上になる可能性は上がるが、必ず<span class="formula">$01</span>～<span class="formula">$08</span>との論理和を取るという計算式のため、<span class="formula">$0F</span>(<span class="formula">%0000 1111</span>)以上になることはない。<br>
+プログラム的には、移動し続けるスプライトに、「何かの当たり判定にぶつかるか、ぶつからないなら<span class="formula">$01</span>～<span class="formula">$0F</span>マス移動後に強制的に向き変え処理を行う」という処理をしたかったのだろう（と思う）。<br>
+なので、OBJマップデータ02が一定値以上に増えさえしなければ特に問題はないはず。</p>
+
+<p>この処理により、もし当たり判定がないとしたら、「<span class="formula">$01</span>～<span class="formula">$08</span>の乱数」マス移動してはランダム方向に向き変え、を繰り返すことになる。<br>
+20人部屋の原始人を見ているとわかるが、割とまっすぐ向き変えせずに走っていることも多い。<br>
+これは、壁にぶつからない限り、「1～8マス（状況によってはもう少し増える）移動してからランダム方向に向き変え」を繰り返しているからである。<br>
+他シナリオでも同じで、例えば幕末編で隠れ蓑を使うと追尾タイプの敵シンボルがランダム移動になるが、蔵1の一階に出現する忍者が扉付近の狭い空間にハマりがちになるのも、平均して4～5マスくらいは直線で移動するので、うまく向き変えタイミングが合わず当たり判定に囲まれた狭い空間ばかり移動するハメになっているのである。</p>
+
+<p>なお、今回はOBJマップデータ02が残り歩数カウンターのような役割をしているが、「移動・停止を繰り返す」タイプのスプライトだと、OBJマップデータ02が停止時間をカウントするタイマーになる。<br>
+スプライトの挙動によりOBJマップデータ02の役割は変わるということである。<br>
+何にしてもタイマー的な役割であることに代わりはない。</p>
+
+<div class="code-container"><pre>
+$C0/92C2 PLA                     ;Aレジスタにスタックからプル
+$C0/92C3 BEQ $09    [$92CE]      ;ゼロフラグが立っているとき[$92CE]分岐
+;ゼロフラグON
+$C0/92CE LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード
+$C0/92D1 BMI $06    [$92D9]      ;ネガティブフラグが立っているとき[$92D9]分岐
+;ネガティブフラグOFF
+$C0/92D3 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/92D5 BIT #$04                ;Aと$04(0000 0100)で論理積（ステータスフラグ変更のみ）
+$C0/92D7 BNE $5E    [$9337]      ;ゼロフラグが立っていないとき[$9337]分岐
+;ゼロフラグON 1を立てると、操作キャラ（味方キャラ）のスプライトの位置を目標にして移動
+$C0/92D9 LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード OBJマップデータ00 = $80
+$C0/92DB AND #$FC                ;Aと$FC(1111 1100)で論理積
+$C0/92DD STA $05,x  [$00:1372]   ;Aを[$00:1372]に書き込み 下2ビットの向きに%00書き込み
+$C0/92DF PHX                     ;Xレジスタをスタックにプッシュ
+$C0/92E0 LDX #$0100              ;Xに$0100をロード
+$C0/92E3 JSR $B900  [$C0:B900]   ;[$C0:B900]へジャンプ
+
+;マップ乱数計算
+$C0/B900 PHA                     ;Aレジスタをスタックにプッシュ
+;(中略)
+$C0/B911 JSR $BA16  [$C0:BA16]   ;[$C0:BA16]へジャンプ
+
+$C0/BA16 PHX                     ;Xレジスタをスタックにプッシュ
+;(中略)
+$C0/BA75 RTS                     ;サブルーチン戻り
+
+$C0/B914 LDX $34    [$00:0034]   ;Xに[$00:0034]をロード
+;(中略)
+$C0/B91D JSR $BA16  [$C0:BA16]   ;[$C0:BA16]へジャンプ
+
+$C0/BA16 PHX                     ;Xレジスタをスタックにプッシュ
+;(中略)
+$C0/BA75 RTS                     ;サブルーチン戻り
+
+$C0/B920 PLB                     ;DBレジスタにスタックからプル
+$C0/B921 LDX $36    [$00:0036]   ;Xに[$00:0036]をロード $00～$FFの乱数
+$C0/B923 PLA                     ;Aレジスタにスタックからプル
+$C0/B924 RTS                     ;サブルーチン戻り
+
+$C0/92E6 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/92E7 PLX                     ;Xレジスタにスタックからプル
+$C0/92E8 AND #$03                ;A($00～$FF)と$03(0000 0011)で論理積 0～3の乱数
+$C0/92EA ORA $05,x  [$00:1372]   ;Aと[$00:1372]で論理和 OBJマップデータ00の向きなしデータ
+$C0/92EC STA $05,x  [$00:1372]   ;Aを[$00:1372]に書き込み　向きがランダムで00～03に変更される
+$C0/92EE LDA $011C  [$00:011C]   ;Aに[$00:011C](01)をロード $C0/497Eで処理
+$C0/92F1 EOR #$0B                ;Aと$0Bで排他的論理和XOR
+$C0/92F3 STA $011D  [$00:011D]   ;A(0A)を[$00:011D]に書き込み
+$C0/92F6 JSR $6C45  [$C0:6C45]   ;[$C0:6C45]へジャンプ
+</pre></div>
+
+<p>ここで、新たな移動方向（移動するマス）を計算する。<br>
+<code><span class="r">$C0/92D7</span></code>で、移動がランダム移動か、操作キャラへ向かって移動かで分岐判定があるが、今回はランダム移動なので<code><span class="r">$C0/92D9</span></code>に進む。<br>
+（敵シンボルなど、操作キャラへ向かって移動してくる場合は別ページで説明する）</p>
+
+<p><code><span class="r">$C0/92D9</span></code>からの処理で、<code>[$00:1372]</code>（OBJマップデータ00）と<span class="formula">$FC</span>(<span class="formula">%1111 1100</span>)の論理積を取っている。<br>
+OBJマップデータ00の下2ビットは、スプライトの向きである。<br>
+その2ビット分の値を一時的に<span class="formula">%00</span>に変更している。<br>
+向き変更前の初期化ということになる。</p>
+
+<p><code><span class="r">$C0/92E0</span></code>～はマップ乱数計算。乱数(<span class="formula">$00</span>～<span class="formula">$FF</span>)の生成である。<br>
+生成したら、<br>
+<span class="formula">乱数($00～$FF) &amp; $03</span><br>
+を計算して（乱数が<span class="formula">%0000 0000</span>～<span class="formula">%0000 0011</span>になる）、先程初期化した<code>[$00:1372]</code>（OBJマップデータ00）と論理和を取って更新している。<br>
+つまり、ここで、新たな向き（<span class="formula">%00</span>:下 <span class="formula">%01</span>:上 <span class="formula">%10</span>:左 <span class="formula">%11</span>:右）がOBJマップデータ00に入ったことになる。<br>
+向きは確率<span class="formula">1/4</span>で均等に4方向から1方向が決まることもわかる。</p>
+
+<p>この時点では向きを決めただけで、行く方向の当たり判定は見ていない。<br>
+その判定が次から行われる。<br>
+原始人の初期位置は、ちょうど部屋の上隅なので、上方向へ向かう場合は当たり判定ありで移動ができない。<br>
+他3方向への移動はできる。</p>
+
+<div class="code-container"><pre>
+$C0/6C45 LDA $0114  [$00:0114]   ;Aに[$00:0114](00)をロード
+$C0/6C48 BEQ $1B    [$6C65]      ;ゼロフラグが立っているとき[$6C65]分岐
+
+;$C0/6C48ゼロフラグOFF
+$C0/6C4A LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード
+$C0/6C4C AND #$03                ;Aと$03で論理積
+$C0/6C4E BEQ $6D    [$6CBD]      ;ゼロフラグが立っているとき[$6CBD]分岐
+$C0/6C50 CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/6C52 BEQ $4C    [$6CA0]      ;ゼロフラグが立っているとき[$6CA0]分岐
+$C0/6C54 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/6C56 BEQ $2B    [$6C83]      ;ゼロフラグが立っているとき[$6C83]分岐
+$C0/6C58 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード　OBJマップデータ05　X座標（05）
+$C0/6C5A INC A                   ;Aをインクリメント +1
+$C0/6C5B CMP $012C  [$00:012C]   ;Aと[$00:012C]($0E)を減算比較（ステータスレジスタ変更のみ） 表示終了X座標（+1）
+$C0/6C5E BCC $1B    [$6C7B]      ;キャリーフラグが立っていないとき[$6C7B]分岐
+$C0/6C60 SBC $0131  [$00:0131]   ;A - [$00:0131] マップ構造X軸表示幅（マス目単位）
+$C0/6C63 BRA $16    [$6C7B]      ;フラグにかかわりなく常に分岐[$6C7B]
+
+;★$C0/6C48ゼロフラグON
+$C0/6C65 LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード OBJマップデータ00（向き更新済み）
+$C0/6C67 AND #$03                ;Aと$03で論理積
+$C0/6C69 BEQ $5F    [$6CCA]      ;ゼロフラグが立っているとき[$6CCA]分岐
+;★$C0/6C69ゼロフラグOFF 下向き以外
+$C0/6C6B CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/6C6D BEQ $41    [$6CB0]      ;ゼロフラグが立っているとき[$6CB0]分岐
+;★$C0/6C6DゼロフラグOFF 下/上向き以外
+$C0/6C6F CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/6C71 BEQ $20    [$6C93]      ;ゼロフラグが立っているとき[$6C93]分岐
+;★$C0/6C71ゼロフラグOFF 右向き
+$C0/6C73 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード　OBJマップデータ05　X座標（05）
+$C0/6C75 INC A                   ;Aをインクリメント +1
+$C0/6C76 CMP $012C  [$00:012C]   ;Aと[$00:012C]($0E)を減算比較（ステータスレジスタ変更のみ） 表示終了X座標（+1）
+$C0/6C79 BCS $3F    [$6CBA]      ;キャリーフラグが立っているとき[$6CBA]分岐
+;★キャリーフラグOFF
+$C0/6C7B STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/6C7D LDA $0C,x  [$00:1379]   ;Aに[$00:1379]をロード　OBJマップデータ07　Y座標（16）
+$C0/6C7F STA $22    [$00:0022]   ;Aを[$00:0022]に書き込み
+$C0/6C81 BRA $55    [$6CD8]      ;フラグにかかわりなく常に分岐[$6CD8]
+
+;$C0/6C56ゼロフラグON
+$C0/6C83 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード　OBJマップデータ05　X座標（05）
+$C0/6C85 BEQ $06    [$6C8D]      ;ゼロフラグが立っているとき[$6C8D]分岐
+$C0/6C87 DEC A                   ;Aをデクリメント -1
+$C0/6C88 CMP $0128  [$00:0128]   ;Aと[$00:0128](00)を減算比較（ステータスレジスタ変更のみ） 表示開始X座標
+$C0/6C8B BCS $EE    [$6C7B]      ;キャリーフラグが立っているとき[$6C7B]分岐
+$C0/6C8D CLC                     ;キャリーフラグクリア
+$C0/6C8E ADC $0131  [$00:0131]   ;A + [$00:0131] マップ構造X軸表示幅（マス目単位）
+$C0/6C91 BRA $E8    [$6C7B]      ;フラグにかかわりなく常に分岐[$6C7B]
+
+;★$C0/6C71ゼロフラグOFF 左向き
+$C0/6C93 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード　OBJマップデータ05　X座標（05）
+$C0/6C95 BEQ $23    [$6CBA]      ;ゼロフラグが立っているとき[$6CBA]分岐
+$C0/6C97 DEC A                   ;Aをデクリメント -1
+$C0/6C98 CMP $0128  [$00:0128]   ;Aと[$00:0128](00)を減算比較（ステータスレジスタ変更のみ）　表示開始X座標
+$C0/6C9B BCS $DE    [$6C7B]      ;キャリーフラグが立っているとき[$6C7B]分岐
+;★キャリーフラグOFF
+$C0/6C9D BRL $01B8  [$6E58]      ;フラグにかかわりなく常に分岐[$6E58]
+
+;$C0/6C52ゼロフラグON
+$C0/6CA0 LDA $0C,x  [$00:1379]   ;Aに[$00:1379]をロード　OBJマップデータ07　Y座標（16）
+$C0/6CA2 BEQ $06    [$6CAA]      ;ゼロフラグが立っているとき[$6CAA]分岐
+$C0/6CA4 DEC A                   ;Aをデクリメント -1
+$C0/6CA5 CMP $012A  [$00:012A]   ;Aと[$00:012A]($12)を減算比較（ステータスレジスタ変更のみ） 表示開始Y座標
+$C0/6CA8 BCS $28    [$6CD2]      ;キャリーフラグが立っているとき[$6CD2]分岐
+$C0/6CAA CLC                     ;キャリーフラグクリア
+$C0/6CAB ADC $0133  [$00:0133]   ;A + [$00:0133] マップ構造Y軸表示幅（マス目単位）
+$C0/6CAE BRA $22    [$6CD2]      ;フラグにかかわりなく常に分岐[$6CD2]
+
+;★$C0/6C6DゼロフラグON 上向き
+$C0/6CB0 LDA $0C,x  [$00:1379]   ;Aに[$00:1379]をロード　OBJマップデータ07　Y座標（16）
+$C0/6CB2 BEQ $06    [$6CBA]      ;ゼロフラグが立っているとき[$6CBA]分岐
+$C0/6CB4 DEC A                   ;Aをデクリメント -1
+$C0/6CB5 CMP $012A  [$00:012A]   ;Aと[$00:012A]($12)を減算比較（ステータスレジスタ変更のみ） 表示開始Y座標
+$C0/6CB8 BCS $18    [$6CD2]      ;キャリーフラグが立っているとき[$6CD2]分岐
+;★キャリーフラグOFF
+$C0/6CBA BRL $019B  [$6E58]      ;フラグにかかわりなく常に分岐[$6E58]
+
+;$C0/6C4EゼロフラグON
+$C0/6CBD LDA $0C,x  [$00:1379]   ;Aに[$00:1379]をロード　OBJマップデータ07　Y座標（16）
+$C0/6CBF INC A                   ;Aをインクリメント +1
+$C0/6CC0 CMP $012E  [$00:012E]   ;Aと[$00:012E]を減算比較（ステータスレジスタ変更のみ） 表示終了Y座標（+1）
+$C0/6CC3 BCC $0D    [$6CD2]      ;キャリーフラグが立っていないとき[$6CD2]分岐
+$C0/6CC5 SBC $0133  [$00:0133]   ;A - [$00:0133] マップ構造Y軸表示幅（マス目単位）
+$C0/6CC8 BRA $08    [$6CD2]      ;フラグにかかわりなく常に分岐[$6CD2]
+
+;★$C0/6C69ゼロフラグON　下向き
+$C0/6CCA LDA $0C,x  [$00:1379]   ;Aに[$00:1379]をロード　OBJマップデータ07　Y座標（16）
+$C0/6CCC INC A                   ;Aをインクリメント +1
+$C0/6CCD CMP $012E  [$00:012E]   ;Aと[$00:012E](1E)を減算比較（ステータスレジスタ変更のみ） 表示終了Y座標（+1）
+$C0/6CD0 BCS $E8    [$6CBA]      ;キャリーフラグが立っているとき[$6CBA]分岐
+;★キャリーフラグOFF
+$C0/6CD2 STA $22    [$00:0022]   ;Aを[$00:0022]に書き込み
+$C0/6CD4 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード　OBJマップデータ05　X座標（05）
+$C0/6CD6 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+;移動予定時の処理合流
+$C0/6CD8 STZ $21    [$00:0021]   ;[$00:0021]に$00を書き込み
+</pre></div>
+
+<p><code><span class="r">$C0/6C45</span></code>～<code><span class="r">$C0/6CF4</span></code>までの判定で、最初に紹介した<code>$00:0128</code>～<code>$00:0133</code>の値が出てくるが、以下のようになっている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+	<tr><td><code>$00:0128</code></td><td>マップ構造における、現在のマップの表示開始X座標</td></tr>
+	<tr><td><code>$00:012A</code></td><td>マップ構造における、現在のマップの表示開始Y座標</td></tr>
+	<tr><td><code>$00:012C</code></td><td>マップ構造における、現在のマップの表示終了X座標（<span class="formula">+1</span>）</td></tr>
+	<tr><td><code>$00:012E</code></td><td>マップ構造における、現在のマップの表示終了Y座標（<span class="formula">+1</span>）</td></tr>
+	<tr><td><code>$00:0131</code></td><td>マップ構造X軸表示幅（マス目単位）<span class="formula"><code>[$00:012C]</code> - <code>[$00:0128]</code></span></td></tr>
+	<tr><td><code>$00:0133</code></td><td>マップ構造Y軸表示幅（マス目単位）<span class="formula"><code>[$00:012E]</code> - <code>[$00:012A]</code></span></td></tr>
+</tbody>
+</table>
+
+<p>要するにスプライトの移動先のマスが、表示されているマップの中に入っているかどうか？　という判定である。<br>
+マップの表示外に出る（座標がはみ出す）ことがあるのか？　というと、最終編開始時の異次元空間など、X軸方向やY軸方向が無限ループなどでつながっている場合が該当する。<br>
+そういうマップは<code>[$00:0114]</code>に<span class="formula">$01</span>が入るので、まず<code><span class="r">$C0/6C48</span></code>の時点で分岐する（無限ループでないマップだと<code>[$00:0114]</code>に<span class="formula">$00</span>が入る）。<br>
+また、無限ループでつながっているのなら、当たり判定がない限り制限なく移動ができることになる。</p>
+
+<p>大半のマップは無限ループではないから、<code><span class="r">$C0/6C65</span></code>に処理が進む。<br>
+無限ループではない時の分岐先には★をつけておいた。<br>
+今回の原始編の20人部屋も無限ループではないから、<code><span class="r">$C0/6C65</span></code>に処理が進む。<br>
+上下左右どちら向きかで処理が分岐するが、いずれも共通して、現在のX座標またはY座標をインクリメントまたはデクリメントする処理である。</p>
+
+<p>たとえば、左に向いたのであれば、<code><span class="r">$C0/6C71</span></code>→<code><span class="r">$C0/6C93</span></code>に進む。</p>
+
+<div class="code-container"><pre>
+;★$C0/6C71ゼロフラグOFF 左向き
+$C0/6C93 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード　OBJマップデータ05　X座標（05）
+$C0/6C95 BEQ $23    [$6CBA]      ;ゼロフラグが立っているとき[$6CBA]分岐
+$C0/6C97 DEC A                   ;Aをデクリメント -1
+$C0/6C98 CMP $0128  [$00:0128]   ;Aと[$00:0128](00)を減算比較（ステータスレジスタ変更のみ）　表示開始X座標
+$C0/6C9B BCS $DE    [$6C7B]      ;キャリーフラグが立っているとき[$6C7B]分岐
+;★キャリーフラグOFF
+$C0/6C9D BRL $01B8  [$6E58]      ;フラグにかかわりなく常に分岐[$6E58]
+</pre></div>
+
+<p>まず、現在のOBJマップデータ05（X座標）自体が<span class="formula">0</span>ではないかの分岐がある。<br>
+X座標が<span class="formula">0</span>ならマップ構造の左端にいるということなので、それ以上左に移動できない。<br>
+その場合、<code><span class="r">$C0/6CBA</span></code>にジャンプ→<code><span class="r">$C0/6E58</span></code>に進むのだが、<code><span class="r">$C0/6E58</span></code>へのジャンプが指示される場合は共通して処理終了である。</p>
+
+<div class="code-container"><pre>
+$C0/6E58 SEC                     ;キャリーフラグON
+$C0/6E59 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>向き変更判定が終わるといっても、移動し続けるスプライトなので移動を終わらせることはできない。<br>
+つまり、再判定へ進むことになる。<br>
+そちらについては後で説明する。<br>
+現在のX座標が<span class="formula">0</span>でないのなら、OBJマップデータ05（X座標）をデクリメント（<span class="formula">-1</span>）する。<br>
+X軸は右が正、左が負なので、左に1マス移動だと<span class="formula">-1</span>する。<br>
+この値と、<code>[$00:0128]</code>（マップ構造表示開始X座標）を減算比較する。<br>
+マップの表示範囲より左にはみ出さないかの確認である。<br>
+20人部屋は左端が座標<span class="formula">$00</span>だから、減算結果が負になる（キャリーフラグが立たない）ことはない。<br>
+必ず<code><span class="r">$C0/6C7B</span></code>にジャンプするはずである。<br>
+マップの表示範囲より左にはみ出すのであれば、キャリーフラグが立つから、<code><span class="r">$C0/6C9D</span></code>→<code><span class="r">$C0/6E58</span></code>、つまり再判定ということになる。<br>
+というような判定が上下左右すべての方向で行われる。</p>
+
+<p>左に移動可能である場合は<code><span class="r">$C0/6C7B</span></code>に進むが、ここは右へ移動可能な場合と処理合流である。</p>
+
+<div class="code-container"><pre>
+$C0/6C7B STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+$C0/6C7D LDA $0C,x  [$00:1379]   ;Aに[$00:1379]をロード　OBJマップデータ07　Y座標（16）
+$C0/6C7F STA $22    [$00:0022]   ;Aを[$00:0022]に書き込み
+$C0/6C81 BRA $55    [$6CD8]      ;フラグにかかわりなく常に分岐[$6CD8]
+</pre></div>
+
+<p>移動予定のX座標を<code>[$00:0020]</code>へ書き込み、上下移動はないのでY座標はそのままOBJマップデータ07→<code>[$00:0022]</code>へ書き込んで、<code><span class="r">$C0/6CD8</span></code>に進む。<br>
+上下移動の場合は、</p>
+
+<div class="code-container"><pre>
+$C0/6CD2 STA $22    [$00:0022]   ;Aを[$00:0022]に書き込み
+$C0/6CD4 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード　OBJマップデータ05　X座標（05）
+$C0/6CD6 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み
+</pre></div>
+
+<p>移動予定のY座標を<code>[$00:0022]</code>に書き込み、左右移動はないのでX座標はそのままOBJマップデータ05→<code>[$00:0020]</code>へ書き込み、となる。<br>
+つまり、移動予定の(X,Y) = (<code>[$00:0020]</code>, <code>[$00:0022]</code>)である。</p>
+
+<p>なお、20人部屋に最初に入った場合、原始人の初期位置である(X, Y) = (<span class="formula">$05</span>, <span class="formula">$16</span>)は、上下左右いずれの方向に<span class="formula">+1</span>マスしても、マップの表示外に出ることはない。<br>
+このため、最終的に<code><span class="r">$C0/6CD8</span></code>に処理が進む。</p>
+
+<div class="code-container"><pre>
+;移動予定時の処理合流
+$C0/6CD8 STZ $21    [$00:0021]   ;[$00:0021]に$00を書き込み
+$C0/6CDA STZ $23    [$00:0023]   ;[$00:0023]に$00を書き込み
+$C0/6CDC LDA $06,x  [$00:1373]   ;Aに[$00:1373]をロード OBJマップデータ01 = $02　モーション切り替え値
+$C0/6CDE AND #$03                ;Aと$03(0000 0011)で論理積
+$C0/6CE0 STA $38    [$00:0038]   ;Aを[$00:0038]に書き込み 02
+$C0/6CE2 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/6CE3 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/6CE5 BMI $2B    [$6D12]      ;ネガティブフラグが立っているとき[$6D12]分岐
+;ネガティブフラグOFF 当たり判定無視でマップをランダム移動ではない
+$C0/6CE7 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/6CE9 LDA $21    [$00:0021]   ;Aに[$00:0022][$00:0021]をロード　（移動予定のY座標+00）
+$C0/6CEB LSR A                   ;Aを論理右シフト　(/2)
+$C0/6CEC LSR A                   ;Aを論理右シフト　(/2)
+$C0/6CED CLC                     ;キャリーフラグクリア
+$C0/6CEE ADC $20    [$00:0020]   ;A + [$00:0021][$00:0020]（移動予定のX座標）
+$C0/6CF0 TAY                     ;Aの値をYレジスタに転送 
+$C0/6CF1 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/6CF3 PHX                     ;Xレジスタをスタックにプッシュ
+$C0/6CF4 JSR $6E92  [$C0:6E92]   ;[$C0:6E92]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/6CE0</span></code>で、OBJマップデータ01 &amp; <span class="formula">$03</span>を<code>[$00:0038]</code>に書き込む。<br>
+OBJマップデータ01の初期値は<span class="formula">$02</span>だから（※初期位置マスのマス判定値から計算した値）、<code>[$00:0038]</code>に入るのも<span class="formula">$02</span>。<br>
+<code><span class="r">$C0/6CE5</span></code>の分岐はOBJマップデータ10の上1ビット、つまりネガティブフラグ判定だから、スプライトが当たり判定無視でマップをランダム移動かどうか。<br>
+今回はネガティブフラグOFF、当たり判定が有効である。<br>
+（当たり判定無効で移動するのは、ポゴが匂いを嗅いだ時の匂いの煙など）</p>
+
+<p>当たり判定有効だと、<code><span class="r">$C0/6CE7</span></code>～<code><span class="r">$C0/6CEE</span></code>で、16ビット値で、<br>
+<span class="formula">(移動予定のY座標)*$40 + (移動予定のX座標)</span><br>
+を計算し、<code><span class="r">$C0/6CF0</span></code>でYレジスタに転送する。<br>
+これは、この後で<code>$7F:3800</code>以降のマップ構造でのマス判定値アドレス用に計算した値。<br>
+横方向<span class="formula">$40</span>（<span class="formula">64</span>）マスをX軸とした方眼紙のマス計算のため、「<span class="formula">(移動予定のY座標)*$40 + (移動予定のX座標)</span>」が必要なのである。<br>
+ここから先は、マス判定値から、移動先のマスの当たり判定を調べることになる。</p>
+
+<div class="code-container"><pre>
+$C0/6E92 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/6E93 LDA #$7F                ;Aに$7Fをロード
+$C0/6E95 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/6E96 PLB                     ;DBレジスタにスタックからプル
+$C0/6E97 LDA $0000,y             ;Aに[$7F:0000 + y]をロード
+$C0/6E9A STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+</pre></div>
+
+<p><code><span class="r">$C0/6E97</span></code>でロードされる<code>[$7F:0000 + y]</code>は、</p>
+
+<div class="modal-set">
+	<div class="imgbox"><a href="img/room20nin.png" class="modal-link">
+		<img src="img/room20nin.png" alt="20人部屋" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
+	</div>
+</div>
+
+<p>この図における、初期位置マス(<code>$7F:0585</code>)の上下左右どれかのアドレスになる。<br>
+（真上は座標表示と被っているが<span class="formula">$75</span>である）<br>
+つまり、</p>
+
+<table>
+<thead>
+	<tr><th>方向</th><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>上</td><td><code>$7F:0545</code></td><td><span class="formula">$75</span></td></tr>
+	<tr><td>下</td><td><code>$7F:05C5</code></td><td><span class="formula">$95</span></td></tr>
+	<tr><td>右</td><td><code>$7F:0586</code></td><td><span class="formula">$86</span></td></tr>
+	<tr><td>左</td><td><code>$7F:0584</code></td><td><span class="formula">$87</span></td></tr>
+</tbody>
+</table>
+
+<p>が、<code>[$00:0034]</code>に書き込まれる。<br>
+<code>A</code>レジスタにも入ったまま。</p>
+
+<div class="code-container"><pre>
+$C0/6E9C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/6E9E AND #$00FF              ;Aと$00FFで論理積
+$C0/6EA1 ASL A                   ;Aを算術左シフト *2
+$C0/6EA2 TAX                     ;Aの値をXレジスタに転送
+$C0/6EA3 LDA $3800,x[$7F:392A]   ;Aに[$7F:3800,x+1][$7F:3800,x]をロード 0080
+$C0/6EA6 STA $36    [$00:0036]   ;Aを[$00:0037][$00:0036]に書き込み
+$C0/6EA8 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/6EAA PLB                     ;DBレジスタにスタックからプル
+</pre></div>
+
+<p><code><span class="r">$C0/6EA3</span></code>で、<br>
+<code>$7F:(3800+呼び出した値*2)</code><br>
+のアドレスを2バイト値で呼び出す。<br>
+これがマス判定値である。<br>
+マス判定値が入る<code>$7F:3800</code>～は2バイト値。</p>
+
+<table>
+<thead>
+	<tr><th>方向</th><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>上</td><td><span class="formula"><code>$7F:3800</code> + $75*2 = <code>$7F:38EA</code></span></td><td><span class="formula">$00C0</span></td></tr>
+	<tr><td>下</td><td><span class="formula"><code>$7F:3800</code> + $95*2 = <code>$7F:392A</code></span></td><td><span class="formula">$0080</span></td></tr>
+	<tr><td>右</td><td><span class="formula"><code>$7F:3800</code> + $86*2 = <code>$7F:390C</code></span></td><td><span class="formula">$0080</span></td></tr>
+	<tr><td>左</td><td><span class="formula"><code>$7F:3800</code> + $87*2 = <code>$7F:390E</code></span></td><td><span class="formula">$0080</span></td></tr>
+</tbody>
+</table>
+
+<p>となり、上方向だけ<span class="formula">$00C0</span>、他3方向は<span class="formula">$0080</span>である。<br>
+この2バイト値は<code>[$00:0037]</code><code>[$00:0036]</code>に書き込まれる。</p>
+
+
+<div class="code-container"><pre>
+$C0/6EAB LDA $38    [$00:0038]   ;Aに[$00:0038](02)をロード
+$C0/6EAD BEQ $22    [$6ED1]      ;ゼロフラグが立っているとき[$6ED1]分岐
+;$C0/6EADゼロフラグOFF（$00ではない）
+$C0/6EAF CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/6EB1 BEQ $18    [$6ECB]      ;ゼロフラグが立っているとき[$6ECB]分岐
+;$C0/6EB1ゼロフラグOFF（$01ではない）
+$C0/6EB3 LDA $36    [$00:0036]   ;Aに[$00:0036]をロード
+$C0/6EB5 AND #$C0                ;Aと$C0で論理積
+$C0/6EB7 BEQ $2A    [$6EE3]      ;ゼロフラグが立っているとき[$6EE3]分岐
+;ゼロフラグOFF [$00:0036]の上2ビットが%00ではない
+$C0/6EB9 CMP #$C0                ;Aと$C0を減算比較（ステータスレジスタ変更のみ）
+$C0/6EBB BEQ $36    [$6EF3]      ;ゼロフラグが立っているとき[$6EF3]分岐
+;ゼロフラグOFF [$00:0036]が$C0ではない
+$C0/6EBD CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C0/6EBF BEQ $04    [$6EC5]      ;ゼロフラグが立っているとき[$6EC5]分岐
+;$C0/6EBFゼロフラグOFF [$00:0036]が$40ではない（$80である）
+$C0/6EC1 STZ $38    [$00:0038]   ;[$00:0038]に$00を書き込み
+$C0/6EC3 BRA $1E    [$6EE3]      ;フラグにかかわりなく常に分岐[$6EE3]
+;$C0/6EBFゼロフラグON [$00:0036]が$40
+$C0/6EC5 LDA #$01                ;Aに$01をロード
+$C0/6EC7 STA $38    [$00:0038]   ;Aを[$00:0038]に書き込み
+$C0/6EC9 BRA $18    [$6EE3]      ;フラグにかかわりなく常に分岐[$6EE3]
+;$C0/6EB1でゼロフラグON（[$00:0038]が00）
+$C0/6ECB LDA $36    [$00:0036]   ;Aに[$00:0036]をロード
+$C0/6ECD BPL $08    [$6ED7]      ;ネガティブフラグが立っていないとき[$6ED7]分岐
+$C0/6ECF BRA $14    [$6EE5]      ;フラグにかかわりなく常に分岐[$6EE5]
+;$C0/6EADゼロフラグON（[$00:0038] = $00）
+$C0/6ED1 LDA $36    [$00:0036]   ;Aに[$00:0036]をロード
+$C0/6ED3 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/6ED5 BNE $0E    [$6EE5]      ;ゼロフラグが立っていないとき[$6EE5]分岐
+;ゼロフラグOFF　[$00:0036]が$80または$00
+$C0/6ED7 BIT #$20                ;Aと$20で論理積（ステータスフラグ変更のみ）
+$C0/6ED9 BNE $08    [$6EE3]      ;ゼロフラグが立っていないとき[$6EE3]分岐
+;ゼロフラグON
+$C0/6EDB AND #$C0                ;Aと$C0で論理積
+$C0/6EDD BNE $04    [$6EE3]      ;ゼロフラグが立っていないとき[$6EE3]分岐
+;$C0/6EDDゼロフラグOFF [$00:0036]は$00
+$C0/6EDF LDA #$02                ;Aに$02をロード
+$C0/6EE1 STA $38    [$00:0038]   ;Aを[$00:0038]に書き込み
+;$C0/6EDDゼロフラグON [$00:0036]は$80
+$C0/6EE3 CLC                     ;キャリーフラグクリア
+$C0/6EE4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/6EAD</span></code>は、<code>[$00:0038]</code>（<span class="formula">OBJマップデータ01 &amp; $03</span>）の値でゼロフラグ分岐。<br>
+先ほど<span class="formula">$02</span>が書き込まれたので、原始人初回移動時は必ずゼロフラグがOFFで<code><span class="r">$C0/6EAF</span></code>に進む。<br>
+ゼロフラグが立っている場合は<code><span class="r">$C0/6ED1</span></code>にジャンプして別処理。</p>
+
+<p><code><span class="r">$C0/6EB1</span></code>は、<code>[$00:0038]</code>が<span class="formula">$01</span>かどうかの分岐。<br>
+ここでもゼロフラグOFFで、<code><span class="r">$C0/6EB3</span></code>に進む。<br>
+<code><span class="r">$C0/6EB3</span></code>からが、先ほどロードした当たり判定値<code>[$00:0036]</code>の分岐。</p>
+
+<p><code>[$00:0036]</code>が<span class="formula">$80</span>：<code>[$00:0038]</code>に<span class="formula">$00</span>を書き込んでから<code><span class="r">$C0/6EC3</span></code>→<code><span class="r">$C0/6EE3</span></code><br>
+<code>[$00:0036]</code>が<span class="formula">$C0</span>：<code><span class="r">$C0/6EBB</span></code>→<code><span class="r">$C0/6EF3</span></code></p>
+
+<p>と、分岐している。</p>
+
+<div class="code-container"><pre>
+;$C0/6EB7ゼロフラグON, $C0/6ED9ゼロフラグOFF, $C0/6EDDゼロフラグOFF
+$C0/6EE3 CLC                     ;キャリーフラグクリア
+$C0/6EE4 RTS                     ;サブルーチン戻り
+
+;ゼロフラグOFF [$00:0036]が$C0
+$C0/6EF3 SEC                     ;キャリーフラグON
+$C0/6EF4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>いずれにしてもサブルーチンを抜けるのだが、</p>
+
+<p><code>[$00:0036]</code>が<span class="formula">$80</span>なら、<code>[$00:0038]</code>に<span class="formula">$00</span>を上書きして、キャリーフラグをクリア<br>
+<code>[$00:0036]</code>が<span class="formula">$C0</span>なら、<code>[$00:0036]</code>は変更せず、キャリーフラグON</p>
+
+<p>という相違点がある。</p>
+
+<p>なお、今回は<code>[$00:0036]</code>が<span class="formula">$80</span>と<span class="formula">$C0</span>のみの分岐だったが、<code>[$00:0036]</code>に<span class="formula">$00</span>, <span class="formula">$20</span>, <span class="formula">$40</span>が入っていた時の分岐は以下のようになる。</p>
+
+<p><code>[$00:0036]</code>に<span class="formula">$00</span>か<span class="formula">$20</span>：</p>
+
+<div class="code-container"><pre>
+;$C0/6EB7ゼロフラグON [$00:0036]の上2ビットが00
+$C0/6EE3 CLC                     ;キャリーフラグクリア
+$C0/6EE4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>[$00:0036]</code>に<span class="formula">$40</span>：</p>
+
+<div class="code-container"><pre>
+;$C0/6EBFゼロフラグON [$00:0036]が$40
+$C0/6EC5 LDA #$01                ;Aに$01をロード
+$C0/6EC7 STA $38    [$00:0038]   ;Aを[$00:0038]に書き込み
+$C0/6EC9 BRA $18    [$6EE3]      ;フラグにかかわりなく常に分岐[$6EE3]
+</pre></div>
+
+<p>ということも合わせて考えると、</p>
+
+<p><code>[$00:0038]</code>が<span class="formula">$00</span>以外：</p>
+
+<table>
+<thead>
+	<tr><th><code>[$00:0036]</code></th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span>,<span class="formula">$20</span></td><td><code>[$00:0038]</code>は変更せず、キャリーフラグをクリア</td></tr>
+	<tr><td><span class="formula">$40</span></td><td><code>[$00:0038]</code>に<span class="formula">$01</span>を上書きして、キャリーフラグをクリア</td></tr>
+	<tr><td><span class="formula">$80</span></td><td><code>[$00:0038]</code>に<span class="formula">$00</span>を上書きして、キャリーフラグをクリア</td></tr>
+	<tr><td><span class="formula">$C0</span></td><td><code>[$00:0038]</code>は変更せず、キャリーフラグON</td></tr>
+</tbody>
+</table>
+
+<p>以上のように分岐することがわかった。<br>
+<code>[$00:0038]</code>の上2ビットだけで判定しており、4パターンに分かれることがわかる。<br>
+サブルーチンを戻って<code><span class="r">$C0/6CF7</span></code>に進む。</p>
+
+<div class="code-container"><pre>
+$C0/6CF7 BCS $15    [$6D0E]      ;キャリーフラグが立っているとき[$6D0E]分岐
+;$C0/6CF7キャリーフラグOFF [$00:0036]が$00, $40, $80
+$C0/6CF9 LDA $36    [$00:0036]   ;Aに[$00:0036]をロード
+$C0/6CFB BIT #$10                ;Aと$10(0001 0000)で論理積（ステータスフラグ変更のみ）
+$C0/6CFD BEQ $0A    [$6D09]      ;ゼロフラグが立っているとき[$6D09]分岐
+;$C0/6CFDゼロフラグON
+$C0/6CFF PLX                     ;Xレジスタにスタックからプル
+$C0/6D00 LDA $06,x  [$00:0114]   ;Aに[$00:0114]をロード 無限ループマップ判定
+$C0/6D02 AND #$03                ;Aと$03で論理積
+$C0/6D04 STA $38    [$00:0038]   ;Aを[$00:0038]に書き込み
+$C0/6D06 BRL $014E  [$6E57]      ;フラグにかかわりなく常に分岐[$6E57]
+;$C0/6CFDゼロフラグOFF [$00:0036]が$00, $40, $80
+$C0/6D09 JSR $617F  [$C0:617F]   ;[$C0:617F]へジャンプ
+;$C0/6CF7キャリーフラグON [$00:0036]が$C0
+$C0/6D0E BRL $0145  [$6E56]      ;フラグにかかわりなく常に分岐[$6E56]
+</pre></div>
+
+<p>まず、<code><span class="r">$C0/6CF7</span></code>でキャリーフラグ分岐がある。<br>
+<code>[$00:0036]</code>が<span class="formula">$C0</span>の時だけ、キャリーフラグがONになったから、<code><span class="r">$C0/6D0E</span></code>にジャンプ。<br>
+更に<code><span class="r">$C0/6E56</span></code>に進む。<br>
+この場合、</p>
+
+<div class="code-container"><pre>
+$C0/6E56 PLX                     ;Xレジスタにスタックからプル
+$C0/6E57 PLY                     ;Yレジスタにスタックからプル
+$C0/6E58 SEC                     ;キャリーフラグON
+$C0/6E59 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code>X</code>レジスタ・<code>Y</code>レジスタの値をスタックから戻して、<code><span class="r">$C0/6E58</span></code>に進むが、<code><span class="r">$C0/6E58</span></code>は先に紹介した、「移動先が座標範囲外」の時。<br>
+この先は移動先再判定である。<br>
+以上から、<code>$7F:3800</code>～の下1バイトのBit6～7に<span class="formula">%11</span>が入っている（<span class="formula">$C0</span>）マスは「当たり判定があり移動不可」であることがわかった。</p>
+
+<p>今回の20人部屋にはないが、<span class="formula">$40</span>が入るマスも「上に乗れるがある方向からは当たり判定がある」という別処理マスになる。<br>
+これについては別に説明する。</p>
+
+<p>キャリーフラグOFFの<code><span class="r">$C0/6CF9</span></code>～では、<code>$7F:3800</code>～の下1バイトBit4判定で分岐があるが、今回はBit6～7にしか値が入っていないのでとりあえず横に置く。<br>
+<code><span class="r">$C0/6CFD</span></code>から<code><span class="r">$C0/6D09</span></code>にジャンプ、更に<code><span class="r">$C0/617F</span></code>にジャンプするが、この時点で当たり判定なしは確定である。</p>
+
+<div class="code-container"><pre>
+$C0/617F LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/6181 CMP #$40                ;Aと$40を減算比較（ステータスレジスタ変更のみ）
+$C0/6183 BCS $12    [$6197]      ;キャリーフラグが立っているとき[$6197]分岐
+;キャリーフラグOFF　[$00:0034]が$00～$3F
+$C0/6185 STZ $35    [$00:0035]   ;[$00:0035]に$00を書き込み
+$C0/6187 LDX $34    [$00:0034]   ;Xに[$00:0034]($00～$3F)をロード
+$C0/6189 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/618A LDA #$C0                ;Aに$C0をロード
+$C0/618C PHA                     ;Aレジスタをスタックにプッシュ
+$C0/618D PLB                     ;DBレジスタにスタックからプル
+$C0/618E LDA $6EF5,x[$C0:6F0C]   ;Aに[$6EF5,x]をロード（$C0:6EF5～$C0:6F34のいずれか）
+$C0/6191 PLB                     ;DBレジスタにスタックからプル
+$C0/6192 AND $011D  [$00:011D]   ;Aと[$00:011D]([$00:011C] XOR $0A)で論理積
+$C0/6195 BEQ $02    [$6199]      ;ゼロフラグが立っているとき[$6199]分岐
+;キャリーフラグON　[$00:0034]が$40～$FF
+$C0/6197 CLC                     ;キャリーフラグクリア
+$C0/6198 RTS                     ;サブルーチン戻り
+;$C0/6195でゼロフラグON
+$C0/6199 SEC                     ;キャリーフラグON
+$C0/619A RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ジャンプ先の<code><span class="r">$C0/617F</span></code>で、<code>[$00:0034]</code>の値判定がある。先に書き込まれた下の値である。</p>
+
+<table>
+<thead>
+	<tr><th>方向</th><th>アドレス</th><th>値（<code>[$00:0034]</code>へ）</th></tr>
+</thead>
+<tbody>
+	<tr><td>上</td><td><code>$7F:0545</code></td><td><span class="formula">$75</span></td></tr>
+	<tr><td>下</td><td><code>$7F:05C5</code></td><td><span class="formula">$95</span></td></tr>
+	<tr><td>右</td><td><code>$7F:0586</code></td><td><span class="formula">$86</span></td></tr>
+	<tr><td>左</td><td><code>$7F:0584</code></td><td><span class="formula">$87</span></td></tr>
+</tbody>
+</table>
+
+<p><code><span class="r">$C0/6181</span></code>で<span class="formula">$40</span>未満か以上かの分岐があるが、今回はすべて<span class="formula">$40</span>以上だから<code><span class="r">$C0/6197</span></code>へ進む。<br>
+ただし、20人部屋は<span class="formula">$40</span>未満のマスもある。<br>
+その場合は<code><span class="r">$C0/6185</span></code>へ分岐し、<code><span class="r">$C0/618E</span></code>で<code>$C0:6EF5</code>～<code>$C0:6F34</code>の値を呼び出して、<code>[$00:011D]</code>との論理積でまた分岐になる。<br>
+ここでゼロフラグが立たないのなら結局<code><span class="r">$C0/6197</span></code>に進むが、ゼロフラグが立つ時との差はキャリーフラグがONかOFFかのみ。<br>
+この後の処理を見るとわかるとおり、ゼロフラグがONの時は移動不可で再判定に進む。</p>
+
+<div class="code-container"><pre>
+$C0/6D0C BCC $03    [$6D11]      ;キャリーフラグが立っていないとき[$6D11]分岐
+;キャリーフラグON
+$C0/6D0E BRL $0145  [$6E56]      ;フラグにかかわりなく常に分岐[$6E56]→移動不可
+;キャリーフラグOFF
+</pre></div>
+
+<p>ここまででマスの当たり判定関係の処理は終了。<br>
+続きは、移動先のマスに既に他のスプライトがいるかどうかの判定である。</p>
+
+<div class="code-container"><pre>
+$C0/6D11 PLX                     ;Xレジスタにスタックからプル
+$C0/6D12 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード　移動予定のX座標
+$C0/6D14 INC A                   ;Aをインクリメント +1
+$C0/6D15 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/6D17 LDA $22    [$00:0022]   ;Aに[$00:0022]をロード　移動予定のY座標
+$C0/6D19 INC A                   ;Aをインクリメント +1
+$C0/6D1A STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/6D1C LDA $10,x  [$00:137D]   ;Aに[$00:137D]をロード　 OBJマップデータ11 = $2C
+$C0/6D1E AND #$C0                ;Aと$C0で論理積
+$C0/6D20 CMP #$80                ;Aと$80を減算比較（ステータスレジスタ変更のみ）
+$C0/6D22 BNE $26    [$6D4A]      ;ゼロフラグが立っていないとき[$6D4A]分岐
+;ゼロフラグON　当たり判定ありでランダム移動
+$C0/6D4A LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード
+$C0/6D4D BMI $77    [$6DC6]      ;ネガティブフラグが立っているとき[$6DC6]分岐
+$C0/6D4F STZ $26    [$00:0026]   ;[$00:0026]に$00を書き込み
+;ループ処理開始
+$C0/6D51 JSR $7A8A  [$C0:7A8A]   ;[$C0:7A8A]へジャンプ
+
+$C0/7A8A LDA #$00                ;Aに$00をロード
+$C0/7A8C XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/7A8D LDA $26    [$00:0026]   ;Aに[$00:0026]をロード $00
+$C0/7A8F TAY                     ;Aの値をYレジスタに転送
+$C0/7A90 BEQ $04    [$7A96]      ;ゼロフラグが立っているとき[$7A96]分岐
+$C0/7A96 RTS                     ;サブルーチン戻り
+
+$C0/6D54 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/6D56 BMI $11    [$6D69]      ;ネガティブフラグが立っているとき[$6D69]分岐
+$C0/6D58 LDA $0A30,y[$00:0A30]   ;Aに[$00:0A30]をロード
+$C0/6D5B CMP $38    [$00:0038]   ;Aと[$00:0038]を減算比較（ステータスレジスタ変更のみ）
+$C0/6D5D BEQ $0A    [$6D69]      ;ゼロフラグが立っているとき[$6D69]分岐
+;$C0/6D5DゼロフラグOFF
+$C0/6D5F CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/6D61 BEQ $06    [$6D69]      ;ゼロフラグが立っているとき[$6D69]分岐
+$C0/6D63 LDA $38    [$00:0038]   ;Aに[$00:0038]をロード　02
+$C0/6D65 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/6D67 BNE $54    [$6DBD]      ;ゼロフラグが立っていないとき[$6DBD]分岐
+;$C0/6D5DゼロフラグON　または　$C0/6D67ゼロフラグON
+$C0/6D69 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/6D6B TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/6D6C ASL A                   ;Aを算術左シフト *2
+$C0/6D6D TAY                     ;Aの値をYレジスタに転送
+$C0/6D6E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/6D70 LDA $0A29,y[$00:0A29]   ;Aに[$00:0A29]をロード キャラ1　マップのY座標（マス目）
+$C0/6D73 CMP $32    [$00:0032]   ;Aと[$00:0032]を減算比較（ステータスレジスタ変更のみ）移動予定Y座標+1
+$C0/6D75 BCS $46    [$6DBD]      ;キャリーフラグが立っているとき[$6DBD]分岐
+;キャリーフラグOFF（味方キャラ1のY座標 - (移動予定Y座標+1)が負）
+$C0/6D77 INC A                   ;Aをインクリメント +1　マップのY座標（マス目）+1
+$C0/6D78 CMP $22    [$00:0022]   ;Aと[$00:0022]を減算比較（ステータスレジスタ変更のみ）
+$C0/6D7A BCC $41    [$6DBD]      ;キャリーフラグが立っていないとき[$6DBD]分岐
+;キャリーフラグON（味方キャラ1のY座標 - 移動予定Y座標が0か正の数）
+$C0/6D7C BNE $05    [$6D83]      ;ゼロフラグが立っていないとき[$6D83]分岐
+;ゼロフラグOFF 味方キャラ1のY座標 - 移動予定Y座標 = 0
+$C0/6D83 LDA $0A21,y[$00:0A21]   ;Aに[$00:0A21]をロード　キャラ1　マップのX座標（マス目）
+$C0/6D86 CMP $30    [$00:0030]   ;Aと[$00:0030]を減算比較（ステータスレジスタ変更のみ）　移動予定X座標+1
+$C0/6D88 BCS $33    [$6DBD]      ;キャリーフラグが立っているとき[$6DBD]分岐
+;キャリーフラグOFF（味方キャラ1のX座標 - (移動予定X座標+1)が負）
+$C0/6D8A INC A                   ;Aをインクリメント +1
+$C0/6D8B CMP $20    [$00:0020]   ;Aと[$00:0020]を減算比較（ステータスレジスタ変更のみ）
+$C0/6D8D BCC $2E    [$6DBD]      ;キャリーフラグが立っていないとき[$6DBD]分岐
+;キャリーフラグON（味方キャラ1のX座標 - 移動予定X座標が0か正の数）
+$C0/6D8F BNE $05    [$6D96]      ;ゼロフラグが立っていないとき[$6D96]分岐
+;ゼロフラグOFF 味方キャラ1のX座標 - 移動予定X座標 = 0
+$C0/6D96 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/6D98 BMI $0D    [$6DA7]      ;ネガティブフラグが立っているとき[$6DA7]分岐
+;ネガティブフラグOFF　当たり判定無視でマップをランダム移動ではない
+$C0/6D9A LDA $10,x  [$00:137D]   ;Aに[$00:137D]をロード OBJマップデータ11 = $2C
+$C0/6D9C BIT #$10                ;Aと$10(0001 0000)で論理積（ステータスフラグ変更のみ）
+$C0/6D9E BEQ $04    [$6DA4]      ;ゼロフラグが立っているとき[$6DA4]分岐
+;ゼロフラグON　スプライト番号+$1のスプライトと切り替えではない
+$C0/6DA4 BRL $00B0  [$6E57]      ;フラグにかかわりなく常に分岐[$6E57]
+;$C0/6D67ゼロフラグOFF, $C0/6D75, $C0/6D88, キャリーフラグON $C0/6D7A, $C0/6D8DキャリーフラグOFF
+$C0/6DBD LDA $26    [$00:0026]   ;Aに[$00:0026]をロード
+$C0/6DBF INC $26    [$00:0026]   ;A[$00:0026]をインクリメント +1
+$C0/6DC1 CMP $0A14  [$00:0A14]   ;Aと[$00:0A14]（パーティの人数）を減算比較（ステータスレジスタ変更のみ）
+$C0/6DC4 BNE $8B    [$6D51]      ;ゼロフラグが立っていないとき[$6D51]分岐
+;ループここまで
+</pre></div>
+
+<p>上のループ処理は、マス属性値判定と、移動先のマスに味方キャラ（最大でパーティ人数4キャラ分）がいるかどうかの判定である。<br>
+<code><span class="r">$C0/6D58</span></code>で判定する、<code>$00:0A30</code>（パーティメンバーにより～<code>$00:0A33</code>まで）だが、ここには、味方キャラがいる位置における、スプライトで言うところのOBJマップデータ01（当たり判定及びモーション切り替え値）が入る。つまり（基本的には）<span class="formula">$00</span>～<span class="formula">$02</span>が入る。<br>
+<code><span class="r">$C0/6D5B</span></code>で<code>[$00:0038]</code>と減算比較なのだが、先の処理で<code>[$00:0038]</code>に<span class="formula">$00</span>か<span class="formula">$02</span>が入っているはずなので分岐になる。<br>
+20人部屋は通過可能なマスのマス属性値のほとんどが<span class="formula">$80</span>なのだが、なぜか4マスだけ、マス属性値が<span class="formula">$00</span>に設定されているので分岐になる。<br>
+だが、処理を追ってみると、結局<code><span class="r">$C0/6D69</span></code>で合流するので変化はないようである。</p>
+
+<p><code><span class="r">$C0/6D69</span></code>～からが味方キャラの座標の判定。<br>
+20人部屋に入ってすぐのタイミングでは、ポゴがダッシュしようが何をしようが、1人だけいる原始人の近くに移動はできないから、ポゴやゴリにぶつかることはない。<br>
+<code><span class="r">$C0/6D75</span></code>→<code><span class="r">$C0/6DBD</span></code>に進んでループを抜けるが、これは入口入ってすぐの位置にポゴがいると（Y座標<span class="formula">$1C</span>）、移動先のマスのY座標のいずれとも一致しないため。</p>
+
+<p>とりあえず処理を見ていくと、移動先のY座標及びY座標<span class="formula">+1</span>、X座標及びX座標<span class="formula">+1</span>と、味方キャラの座標が被らないかどうかの判定になっている。<br>
+移動中も考慮しての判定になるようである。<br>
+<code><span class="r">$C0/6DBD</span></code>に分岐する場合は被りなし扱い。</p>
+
+<p>座標被りがある場合、<code><span class="r">$C0/6DA4</span></code>に進む。</p>
+
+<div class="code-container"><pre>
+;$C0/6DA4ジャンプ先の$C0/6E57
+$C0/6E57 PLY                     ;Yレジスタにスタックからプル
+$C0/6E58 SEC                     ;キャリーフラグON
+$C0/6E59 RTS                     ;サブルーチン戻り→味方キャラと被り
+</pre></div>
+
+<p>となりサブルーチンを抜ける。つまり、再判定行きである。</p>
+
+<p>味方キャラ分のループを抜ける、つまりスプライトと味方キャラとの被りなしの場合、<code><span class="r">$C0/6DC6</span></code>に処理が進む。</p>
+
+<div class="code-container"><pre>
+$C0/6DC6 LDA $0A14  [$00:0A14]   ;Aに[$00:0A14]をロード
+$C0/6DC9 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/6DCB BNE $18    [$6DE5]      ;ゼロフラグが立っていないとき[$6DE5]分岐
+$C0/6DE5 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/6DE7 BMI $62    [$6E4B]      ;ネガティブフラグが立っているとき[$6E4B]分岐
+;ネガティブフラグOFF 当たり判定無視でマップをランダム移動ではない
+$C0/6DE9 PHX                     ;Xレジスタをスタックにプッシュ
+$C0/6DEA LDA $0A03  [$00:0A03]   ;Aに[$00:0A03]をロード　スプライト数$18
+$C0/6DED STA $26    [$00:0026]   ;Aを[$00:0026]に書き込み
+$C0/6DEF LDX #$1329              ;Xに$1329をロード
+;ループ処理開始
+$C0/6DF2 LDA $05,x  [$00:132E]   ;Aに[$00:132E + $0011n]をロード　OBJマップデータ00
+$C0/6DF4 BPL $46    [$6E3C]      ;ネガティブフラグが立っていないとき[$6E3C]分岐
+;ネガティブフラグON　スプライトが存在する
+$C0/6DF6 LDA $2C    [$00:002C]   ;Aに[$00:002C]をロード
+$C0/6DF8 CMP $26    [$00:0026]   ;Aと[$00:0026]を減算比較（ステータスレジスタ変更のみ）
+$C0/6DFA BEQ $40    [$6E3C]      ;ゼロフラグが立っているとき[$6E3C]分岐
+;ゼロフラグOFF
+$C0/6DFC LDA $0F,x  [$00:1338]   ;Aに[$00:1338]をロード　OBJマップデータ10
+$C0/6DFE BMI $1A    [$6E1A]      ;ネガティブフラグが立っているとき[$6E1A]分岐
+;ネガティブフラグOFF　当たり判定無視でマップをランダム移動ではない
+$C0/6E00 LDA $10,x  [$00:1339]   ;Aに[$00:1339]をロード　OBJマップデータ11
+$C0/6E02 AND #$C0                ;Aと$C0で論理積
+$C0/6E04 CMP #$80                ;Aと$80を減算比較（ステータスレジスタ変更のみ）
+$C0/6E06 BEQ $34    [$6E3C]      ;ゼロフラグが立っているとき[$6E3C]分岐
+;ゼロフラグOFF　移動せず当たり判定なしではない
+$C0/6E08 LDA $06,x  [$00:132F]   ;Aに[$00:132F]をロード　OBJマップデータ01
+$C0/6E0A AND #$03                ;Aと$03で論理積
+$C0/6E0C CMP $38    [$00:0038]   ;Aと[$00:0038]を減算比較（ステータスレジスタ変更のみ）
+$C0/6E0E BEQ $0A    [$6E1A]      ;ゼロフラグが立っているとき[$6E1A]分岐
+;ゼロフラグOFF
+$C0/6E10 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/6E12 BEQ $06    [$6E1A]      ;ゼロフラグが立っているとき[$6E1A]分岐
+;ゼロフラグOFF
+$C0/6E14 LDA $38    [$00:0038]   ;Aに[$00:0038]をロード
+$C0/6E16 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/6E18 BNE $22    [$6E3C]      ;ゼロフラグが立っていないとき[$6E3C]分岐
+;ゼロフラグON
+$C0/6E1A LDA $0C,x  [$00:1335]   ;Aに[$00:1335]をロード　Y座標
+$C0/6E1C CMP $32    [$00:0032]   ;Aと[$00:0032]を減算比較（ステータスレジスタ変更のみ）
+$C0/6E1E BCS $1C    [$6E3C]      ;キャリーフラグが立っているとき[$6E3C]分岐
+;キャリーフラグOFF
+$C0/6E20 INC A                   ;Aをインクリメント +1
+$C0/6E21 CMP $22    [$00:0022]   ;Aと[$00:0022]を減算比較（ステータスレジスタ変更のみ）
+$C0/6E23 BCC $17    [$6E3C]      ;キャリーフラグが立っていないとき[$6E3C]分岐
+;キャリーフラグON
+$C0/6E25 BNE $04    [$6E2B]      ;ゼロフラグが立っていないとき[$6E2B]分岐
+;キャリーフラグOFF
+$C0/6E27 LDA $0B,x  [$00:1334]   ;Aに[$00:1334]をロード　Y座標ピクセル単位
+$C0/6E29 BEQ $11    [$6E3C]      ;ゼロフラグが立っているとき[$6E3C]分岐
+;ゼロフラグOFF
+$C0/6E2B LDA $0A,x  [$00:1333]   ;Aに[$00:1333]をロード　X座標
+$C0/6E2D CMP $30    [$00:0030]   ;Aと[$00:0030]を減算比較（ステータスレジスタ変更のみ）
+$C0/6E2F BCS $0B    [$6E3C]      ;キャリーフラグが立っているとき[$6E3C]分岐
+;キャリーフラグOFF
+$C0/6E31 INC A                   ;Aをインクリメント +1
+$C0/6E32 CMP $20    [$00:0020]   ;Aと[$00:0020]を減算比較（ステータスレジスタ変更のみ）
+$C0/6E34 BCC $06    [$6E3C]      ;キャリーフラグが立っていないとき[$6E3C]分岐
+;キャリーフラグON
+$C0/6E36 BNE $1E    [$6E56]      ;ゼロフラグが立っていないとき[$6E56]分岐→再判定
+;ゼロフラグON
+$C0/6E38 LDA $09,x  [$00:1332]   ;Aに[$00:1332]をロード　X座標ピクセル単位
+$C0/6E3A BNE $1A    [$6E56]      ;ゼロフラグが立っていないとき[$6E56]分岐→再判定
+;$C0/6DF4 ネガティブフラグOFF　OBJマップデータ00の上1ビットが0＝そのスプライトは存在しない
+$C0/6E3C REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/6E3E TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/6E3F CLC                     ;キャリーフラグクリア
+$C0/6E40 ADC #$0011              ;A + $0011
+$C0/6E43 TAX                     ;Aの値をXレジスタに転送
+$C0/6E44 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/6E46 DEC $26    [$00:0026]   ;[$00:0026]をデクリメント -1
+$C0/6E48 BNE $A8    [$6DF2]      ;ゼロフラグが立っていないとき[$6DF2]分岐
+;ループ処理ここまで ループ回数はスプライト数
+
+;$C0/6E36ゼロフラグOFF、$C0/6E3A　再判定ジャンプ先
+$C0/6E56 PLX                     ;Xレジスタにスタックからプル
+$C0/6E57 PLY                     ;Yレジスタにスタックからプル
+$C0/6E58 SEC                     ;キャリーフラグON
+$C0/6E59 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここが、味方キャラ以外の他スプライトとの座標被り判定。<br>
+初期状態の原始人1人なら、他スプライトは存在しない、つまりOBJマップデータ00の上1ビットが<span class="formula">0</span>なので、<code><span class="r">$C0/6DF4</span></code>→<code><span class="r">$C0/6E3C</span></code>へ抜けてループが1回分終わる。</p>
+
+<p>原始人を増やすと、最大で19人分との当たり判定をすることになる。<br>
+処理自体は味方キャラの判定と同じで、他スプライトの座標と被りがないか順に判定していく。<br>
+座標被りがある場合は再判定行きで<code><span class="r">$C0/6E56</span></code>にジャンプする。</p>
+
+<p>ここを抜ければ、「移動先のマスは移動可能マスで、プレイヤーキャラも、他スプライトもいない」ことが確定になり、実際に移動することになる。</p>
+
+<div class="code-container"><pre>
+$C0/6E4A PLX                     ;Xレジスタにスタックからプル
+$C0/6E4B PLY                     ;Yレジスタにスタックからプル
+$C0/6E4C LDA $06,x  [$00:1373]   ;Aに[$00:1373]をロード OBJマップデータ01　モーション切り替え値（初期値$02）
+$C0/6E4E AND #$FC                ;Aと$FC(1111 1100)で論理積
+$C0/6E50 ORA $38    [$00:0038]   ;Aと[$00:0038]（OBJマップデータ01 &amp; $03）で論理和
+$C0/6E52 STA $06,x  [$00:1373]   ;Aを[$00:1373]に書き込み
+$C0/6E54 CLC                     ;キャリーフラグクリア
+$C0/6E55 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>最後に、<br>
+<span class="formula">(OBJマップデータ01 &amp; $FC(%1111 1100)) | <code>[$00:0038]</code></span><br>
+を、新たなOBJマップデータ01として上書きする。<br>
+<code>[$00:0038]</code>だが、<code><span class="r">$C0/6CE0</span></code>で<br>
+<span class="formula"><code>[$00:0038]</code> = OBJマップデータ01 &amp; $03</span><br>
+を書き込んだ。<br>
+だが、その後に、<code>[$00:0036]</code>の値により<code>[$00:0038]</code>が変更されている場合があることに注意。</p>
+
+<table>
+<thead>
+	<tr><th><code>[$00:0036]</code></th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td><code>[$00:0038]</code>は変更せず、キャリーフラグをクリア</td></tr>
+	<tr><td><span class="formula">$40</span></td><td><code>[$00:0038]</code>に<span class="formula">$01</span>を上書きして、キャリーフラグをクリア</td></tr>
+	<tr><td><span class="formula">$80</span></td><td><code>[$00:0038]</code>に<span class="formula">$00</span>を上書きして、キャリーフラグをクリア</td></tr>
+	<tr><td><span class="formula">$C0</span></td><td><code>[$00:0038]</code>は変更せず、キャリーフラグON</td></tr>
+</tbody>
+</table>
+
+
+<p>今回は、OBJマップデータ01の初期値が<span class="formula">$02</span>、移動先マスは<span class="formula"><code>[$00:0036]</code> = $80</span>だったので<code>[$00:0038]</code>に<span class="formula">$00</span>が書き込まれた。<br>
+よって、</p>
+
+<p><span class="formula">(OBJマップデータ01 &amp; $FC(%1111 1100)) | <code>[$00:0038]</code></span><br>
+<span class="formula">= ($02 &amp; $FC) | $00</span><br>
+<span class="formula">= $00 | $00</span><br>
+<span class="formula">= $00</span></p>
+
+<p>である。<br>
+これが新たなOBJマップデータ01になる。</p>
+
+<p><span class="formula">$40</span>が書き込まれたマスだったら、<br>
+<span class="formula">$00 | $01 = $01</span><br>
+が新たなOBJマップデータ01になったはずだ。</p>
+
+<div class="code-container"><pre>
+$C0/92F9 BCC $39    [$9334]      ;キャリーフラグが立っていないとき[$9334]分岐
+;キャリーフラグOFF
+$C0/9334 BRL $0104  [$943B]      ;フラグにかかわりなく常に分岐[$943B]
+$C0/943B JSR $9529  [$C0:9529]   ;[$C0:9529]へジャンプ
+
+$C0/9529 LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード OBJマップデータ00　下2ビット向き
+$C0/952B AND #$03                ;Aと$03で論理積　向き判定
+$C0/952D BEQ $78    [$95A7]      ;ゼロフラグが立っているとき[$95A7]分岐
+;$C0/952DでゼロフラグOFF　下向き以外
+$C0/952F CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/9531 BEQ $4B    [$957E]      ;ゼロフラグが立っているとき[$957E]分岐
+;$C0/9531ゼロフラグOFF(OBJマップデータ00が$01ではない)
+$C0/9533 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/9535 BEQ $1E    [$9555]      ;ゼロフラグが立っているとき[$9555]分岐
+;ゼロフラグOFF（向き03:右向き）
+$C0/9537 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9539 LDA $09,x  [$00:1376]   ;Aに[$00:1377][$00:1376]をロード OBJマップデータ04 = $00 X座標(ピクセル単位)
+$C0/953B CLC                     ;キャリーフラグクリア
+$C0/953C ADC $24    [$00:0024]   ;A + [$00:0025][$00:0024]　[$00:0024] = $20（速度2倍時）
+$C0/953E STA $09,x  [$00:1376]   ;Aを[$00:1377][$00:1376]に書き込み
+$C0/9540 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9542 LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード 無限ループマップ判定
+$C0/9545 BEQ $7C    [$95C3]      ;ゼロフラグが立っているとき[$95C3]分岐
+;$C0/9545ゼロフラグOFF 無限ループマップ
+$C0/9547 LDA $0A,x  [$00:1377]   ;Aに[$00:1377]をロード
+$C0/9549 CMP $012C  [$00:012C]   ;Aと[$00:012C]を減算比較（ステータスレジスタ変更のみ）
+$C0/954C BCC $75    [$95C3]      ;キャリーフラグが立っていないとき[$95C3]分岐
+$C0/954E SBC $0131  [$00:0131]   ;A - [$00:0131]
+$C0/9551 STA $0A,x  [$00:1377]   ;Aを[$00:1377]に書き込み
+$C0/9553 BRA $6E    [$95C3]      ;フラグにかかわりなく常に分岐[$95C3]
+;$C0/9535ゼロフラグON（向き02:左向き）
+$C0/9555 LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード 無限ループマップ判定
+$C0/9558 BNE $0D    [$9567]      ;ゼロフラグが立っていないとき[$9567]分岐
+$C0/955A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/955C LDA $09,x  [$00:1376]   ;Aに[$00:1377][$00:1376]をロード OBJマップデータ04 = $00 X座標(ピクセル単位)
+$C0/955E SEC                     ;キャリーフラグON
+$C0/955F SBC $24    [$00:0024]   ;A - [$00:0025][$00:0024]　[$00:0024] = $20（速度2倍時）
+$C0/9561 STA $09,x  [$00:1376]   ;Aを[$00:1377][$00:1376]に書き込み
+$C0/9563 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9565 BRA $5C    [$95C3]      ;フラグにかかわりなく常に分岐[$95C3]
+;$C0/9531ゼロフラグON（向き01:上向き）
+$C0/957E LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード 無限ループマップ判定
+$C0/9581 BNE $0D    [$9590]      ;ゼロフラグが立っていないとき[$9590]分岐
+$C0/9583 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9585 LDA $0B,x  [$00:1378]   ;Aに[$00:1379][$00:1378]をロード OBJマップデータ06 = $00 Y座標(ピクセル単位)
+$C0/9587 SEC                     ;キャリーフラグON
+$C0/9588 SBC $24    [$00:0024]   ;A - [$00:0025][$00:0024]　[$00:0024] = $20（速度2倍時）
+$C0/958A STA $0B,x  [$00:1378]   ;Aを[$00:1378]に書き込み
+$C0/958C SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/958E BRA $33    [$95C3]      ;フラグにかかわりなく常に分岐[$95C3]
+;$C0/952DでゼロフラグOFF（向き00:下向き）
+$C0/95A7 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/95A9 LDA $0B,x  [$00:1378]   ;Aに[$00:1379][$00:1378]をロード OBJマップデータ06 = $00 Y座標(ピクセル単位)
+$C0/95AB CLC                     ;キャリーフラグクリア
+$C0/95AC ADC $24    [$00:0024]   ;A + [$00:0025][$00:0024]　[$00:0024] = $20（速度2倍時）
+$C0/95AE STA $0B,x  [$00:1378]   ;Aを[$00:1379][$00:1378]に書き込み OBJマップデータ06 = $00 Y座標(ピクセル単位)
+$C0/95B0 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/95B2 LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード 無限ループマップ判定
+$C0/95B5 BEQ $0C    [$95C3]      ;ゼロフラグが立っているとき[$95C3]分岐
+;$C0/95B5ゼロフラグOFF 無限ループマップ
+$C0/95B7 LDA $0C,x  [$00:1379]   ;Aに[$00:1379]をロード
+$C0/95B9 CMP $012E  [$00:012E]   ;Aと[$00:012E]を減算比較（ステータスレジスタ変更のみ）
+$C0/95BC BCC $05    [$95C3]      ;キャリーフラグが立っていないとき[$95C3]分岐
+$C0/95BE SBC $0133  [$00:0133]   ;A - [$00:0133]
+$C0/95C1 STA $0C,x  [$00:1379]   ;Aを[$00:1379]に書き込み
+;ゼロフラグON 無限ループマップではない
+;処理合流
+$C0/95C3 RTS                     ;サブルーチン戻り
+
+$C0/943E JSR $95CC  [$C0:95CC]   ;[$C0:95CC]へジャンプ
+</pre></div>
+
+<p>ここで、移動方向により分岐し座標であるOBJマップデータ04～07を更新する。</p>
+
+<table>
+<thead>
+	<tr><th>No.</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>04</td><td>X座標 上1桁がピクセル単位でのマス移動（<span class="formula">$00</span>～<span class="formula">$F0</span>）</td></tr>
+	<tr><td>05</td><td>X座標 マス目単位</td></tr>
+	<tr><td>06</td><td>Y座標 上1桁がピクセル単位でのマス移動（<span class="formula">$00</span>～<span class="formula">$F0</span>）</td></tr>
+	<tr><td>07</td><td>Y座標 マス目単位</td></tr>
+</tbody>
+</table>
+
+<p>である。<br>
+04～05を2バイト値としてみれば、上3桁がピクセル単位でのX座標であり、06～07を2バイト値としてみれば、上3桁がピクセル単位でのY座標である。<br>
+そこで、1フレーム分の移動距離を2バイト値に加算または減算して、座標を変更する。</p>
+
+<p>1フレーム分の移動距離は、<code><span class="r">$C0/8ED5</span></code>で<code>[$00:0024]</code>に書き込まれている。<br>
+<code>[$00:0025]</code>には<span class="formula">$00</span>が入っている。</p>
+
+
+<table>
+<thead>
+	<tr><th>OBJマップデータ10のBit0～1</th><th><code>[$00:0024]</code></th><th><code>[$00:010D]</code></th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td><span class="formula">$10</span></td><td><span class="formula">$04</span></td><td>通常</td></tr>
+	<tr><td><span class="formula">%01</span></td><td><span class="formula">$20</span></td><td><span class="formula">$08</span></td><td>速度2倍</td></tr>
+	<tr><td><span class="formula">%10</span></td><td><span class="formula">$08</span></td><td><span class="formula">$02</span></td><td>速度1/2倍</td></tr>
+	<tr><td><span class="formula">%11</span></td><td><span class="formula">$04</span></td><td><span class="formula">$01</span></td><td>速度1/4倍</td></tr>
+</tbody>
+</table>
+
+
+<p>原始人の場合は<span class="formula"><code>[$00:0024]</code> = $20</span>であり、1フレームで2ピクセル移動する。<br>
+8フレームで1マス分の移動である。<br>
+つまり、</p>
+
+
+<table>
+<thead>
+	<tr><th>OBJマップデータ10のBit0～1</th><th><code>[$00:0024]</code></th><th><code>[$00:010D]</code></th><th>移動距離</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">%00</span></td><td><span class="formula">$10</span></td><td><span class="formula">$04</span></td><td>1フレームで1ピクセル</td></tr>
+	<tr><td><span class="formula">%01</span></td><td><span class="formula">$20</span></td><td><span class="formula">$08</span></td><td>1フレームで2ピクセル</td></tr>
+	<tr><td><span class="formula">%10</span></td><td><span class="formula">$08</span></td><td><span class="formula">$02</span></td><td>2フレームで1ピクセル</td></tr>
+	<tr><td><span class="formula">%11</span></td><td><span class="formula">$04</span></td><td><span class="formula">$01</span></td><td>4フレームで1ピクセル</td></tr>
+</tbody>
+</table>
+
+<p><code>[$00:0024]</code>が<span class="formula">$08</span>だと2フレームで<span class="formula">$08</span> + <span class="formula">$08</span> = <span class="formula">$10</span>だから、2フレームで1ピクセルしか移動しない、ということになる。<br>
+<span class="formula">$04</span>だと4フレームに1ピクセルの移動となる。<br>
+よって移動速度が低いと座標処理が2フレームに1回になったり、4フレームに1回になる、ということである。<br>
+原始人の場合は毎フレーム座標が変動することになる。</p>
+
+<p><code><span class="r">$C0/9529</span></code>～の処理を追っていくと、</p>
+
+<ul>
+	<li>左方向へ移動：<span class="formula"><code>[$00:1377]</code><code>[$00:1376]</code>（X座標） - <code>[$00:0025]</code><code>[$00:0024]</code></span></li>
+	<li>右方向へ移動：<span class="formula"><code>[$00:1377]</code><code>[$00:1376]</code>（X座標） + <code>[$00:0025]</code><code>[$00:0024]</code></span></li>
+	<li>上方向へ移動：<span class="formula"><code>[$00:1379]</code><code>[$00:1378]</code>（Y座標） - <code>[$00:0025]</code><code>[$00:0024]</code></span></li>
+	<li>下方向へ移動：<span class="formula"><code>[$00:1379]</code><code>[$00:1378]</code>（Y座標） + <code>[$00:0025]</code><code>[$00:0024]</code></span></li>
+</ul>
+
+<p>となる。<br>
+右方向へ移動の時、例えば<code>[$00:1377]</code><code>[$00:1376]</code>が<span class="formula">$01E0</span>だったら、<br>
+<span class="formula">$01E0 + $0020 = $0200</span><br>
+となって、<code>[$00:1377]</code>（マスの座標）も変動するが、同時に<code>[$00:1376]</code>は<span class="formula">$00</span>になる。</p>
+
+<p>ここで処理の最初を思い出していただきたいのだが、</p>
+
+<div class="code-container"><pre>
+;ゼロフラグON %00と%11は当たり判定ありでランダム移動
+$C0/91E0 LDA $09,x  [$00:1376]   ;Aに[$00:1376]をロード OBJマップデータ04 = $00 X座標(ピクセル単位)
+$C0/91E2 BNE $F9    [$91DD]      ;ゼロフラグが立っていないとき[$91DD]分岐
+;ゼロフラグON
+$C0/91E4 LDA $0B,x  [$00:1378]   ;Aに[$00:1378]をロード OBJマップデータ06 = $00 Y座標(ピクセル単位)
+$C0/91E6 BNE $F5    [$91DD]      ;ゼロフラグが立っていないとき[$91DD]分岐
+;ゼロフラグON
+</pre></div>
+
+<p><code>[$00:1376]</code>と<code>[$00:1378]</code>が両方とも<span class="formula">$00</span>の時しか、その後の移動方向判定を行わなかった。<br>
+最初の移動で<code>[$00:1376]</code>は<span class="formula">+$20</span>されて<span class="formula">$20</span>になるか、<span class="formula">-$20</span>されて<span class="formula">$E0</span>になるかのいずれかである。<br>
+だから、移動が決まって1フレーム移動した後は、方向判定なしである。<br>
+……という移動処理をひたすらこの後も繰り返すことになる。</p>
+
+<div class="code-container"><pre>
+$C0/95CC LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/95CE BIT #$40                ;Aと$40(0100 0000)で論理積（ステータスフラグ変更のみ）
+$C0/95D0 BEQ $18    [$95EA]      ;ゼロフラグが立っているとき[$95EA]分岐
+;ゼロフラグOFF　スプライトを2パターンから切り替え
+$C0/95D2 LDA $08,x  [$00:1375]   ;Aに[$00:1375]をロード OBJマップデータ03　モーション切り替えタイマー（$01～$20）
+$C0/95D4 SEC                     ;キャリーフラグON
+$C0/95D5 SBC $010D  [$00:010D]   ;A - [$00:010D]($08)
+$C0/95D8 BCS $0C    [$95E6]      ;キャリーフラグが立っているとき[$95E6]分岐
+;キャリーフラグOFF モーション切り替えタイマー残り時間が負
+$C0/95DA ADC #$20                ;A + $20
+$C0/95DC STA $08,x  [$00:1375]   ;Aを[$00:1375]に書き込み OBJマップデータ03 モーション切り替えタイマー
+$C0/95DE LDA $06,x  [$00:1373]   ;Aに[$00:1373]をロード OBJマップデータ01 モーション切り替え値
+$C0/95E0 EOR #$04                ;Aと$04で排他的論理和XOR
+$C0/95E2 STA $06,x  [$00:1373]   ;Aを[$00:1373]に書き込み OBJマップデータ01 モーション切り替え値
+$C0/95E4 BRA $04    [$95EA]      ;フラグにかかわりなく常に分岐[$95EA]
+;キャリーフラグON モーション切り替えタイマー残り時間が0以上
+$C0/95E6 STA $08,x  [$00:1375]   ;Aを[$00:1375]に書き込み OBJマップデータ03 モーション切り替えタイマー
+$C0/95E8 CLC                     ;キャリーフラグクリア
+$C0/95E9 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>ここで、原始人のスプライトを切り替える処理を行う。<br>
+<code><span class="r">$C0/95D2</span></code>からは籐兵衛の足踏みモーション切り替えと処理が合流している。<br>
+つまり処理は同じで、最初に乱数（<span class="formula">$01</span>～<span class="formula">$20</span>）を書き込んだOBJマップデータ03を減算し判定するが、原始人のモーション切り替え速度は籐兵衛より速い。<br>
+<code>[$00:010D]</code>には<span class="formula">$08</span>が入っており、</p>
+
+<p><span class="formula">OBJマップデータ03 - <code>[$00:010D]</code>($08)</span></p>
+
+<p>最初に生成したOBJマップデータ03が<span class="formula">$01</span>～<span class="formula">$07</span>なら負となるからキャリーフラグは立たない。<br>
+<span class="formula">$08</span>～<span class="formula">$20</span>ならキャリーフラグが立つ。<br>
+4フレームに1回、</p>
+
+<p><span class="formula">OBJマップデータ01 XOR $04</span></p>
+
+<p>でOBJマップデータ01を更新し、スプライトを足踏みさせて切り替えることになる。</p>
+
+<p>ただ、籐兵衛のように<span class="formula">$00</span>と<span class="formula">$04</span>を繰り返すのではない。<br>
+藤兵衛の時と異なるのは、OBJマップデータ01（モーション切り替え値）が別処理で変更されるケースがあるという点。<br>
+<code><span class="r">$C0/6E4A</span></code>～<code><span class="r">$C0/6E55</span></code>で、</p>
+
+<p><span class="formula">OBJマップデータ01 = (OBJマップデータ01 &amp; $FC(%1111 1100)) | <code>[$00:0038]</code></p>
+
+<p><code>[$00:0036]</code>（当たり判定値）によって、<code>[$00:0038]</code>が変わる。<br>
+20人部屋では当たり判定なしのマスの大半が、<span class="formula"><code>[$00:0036]</code> = $80</span>だが、4ヶ所だけなぜか<span class="formula"><code>[$00:0036]</code> = $00</span>である。<br>
+<span class="formula"><code>[$00:0036]</code> = $00</span>だと、<code>[$00:0038]</code>に<span class="formula">$02</span>を書き込む時があるので（<code><span class="r">$C0/6EDF</span></code>）、OBJマップデータ01が<span class="formula">$02</span>や<span class="formula">$06</span>になる時もたまにある。<br>
+いずれにしても<code>[$00:1373]</code>の値が偶数ならこの後の分岐に影響はないようである。</p>
+
+<p>以降も藤兵衛の処理と共通。</p>
+
+<div class="code-container"><pre>
+;OBJマップデータから、スプライトのオブジェクト属性の計算
+$C0/9441 STZ $21    [$00:0021]   ;[$00:0021]に$00を書き込み
+$C0/9443 LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード
+$C0/9445 BMI $03    [$944A]      ;ネガティブフラグが立っているとき[$944A]分岐
+;ネガティブフラグON キャラ表示
+$C0/944A LDA $10,x  [$00:137D]   ;Aに[$00:137D]をロード OBJマップデータ11
+$C0/944C AND #$07                ;Aと$07で論理積
+$C0/944E BEQ $F7    [$9447]      ;ゼロフラグが立っているとき[$9447]分岐
+;ゼロフラグOFF カラーパレットは$01以上
+$C0/9450 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/9452 BPL $06    [$945A]      ;ネガティブフラグが立っていないとき[$945A]分岐
+;ネガティブフラグOFF 当たり判定無視でマップをランダム移動ではない
+$C0/945A STZ $20    [$00:0020]   ;[$00:0020]に$00を書き込み
+$C0/945C LDA $0114  [$00:0114]   ;Aに[$00:0114]をロード
+$C0/945F BEQ $78    [$94D9]      ;ゼロフラグが立っているとき[$94D9]分岐
+;ゼロフラグON　（マップ移動時に$C0/497Eで[$00:0114]に$00書き込み）
+$C0/94D9 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/94DB LDA $0B,x  [$00:1378]   ;Aに[$00:1379][$00:1378]をロード OBJマップデータ06-07 Y座標
+$C0/94DD SEC                     ;キャリーフラグON
+$C0/94DE SBC $2A    [$00:002A]   ;A - [$00:002B][$00:002A](1530) $C0/8E7Eで書き込み
+$C0/94E0 CMP #$0F00              ;Aと$0F00を減算比較（ステータスレジスタ変更のみ）
+$C0/94E3 BCS $2E    [$9513]      ;キャリーフラグが立っているとき[$9513]分岐
+;キャリーフラグOFF　Y座標は画面内
+$C0/94E5 STA $30    [$00:0030]   ;Aを[$00:0031][$00:0030]に書き込み　A:00F0
+$C0/94E7 LDA $09,x  [$00:1376]   ;Aに[$00:1344][$00:1376]をロード OBJマップデータ04-05 X座標
+$C0/94E9 SEC                     ;キャリーフラグON
+$C0/94EA SBC $28    [$00:0028]   ;A - [$00:0029][$00:0028](FF80)
+$C0/94EC CMP #$1100              ;Aと$1100を減算比較（ステータスレジスタ変更のみ）
+$C0/94EF BCS $22    [$9513]      ;キャリーフラグが立っているとき[$9513]分岐
+;キャリーフラグOFF　X座標は画面内
+$C0/94F1 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F2 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F3 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F4 LSR A                   ;Aを論理右シフト　(/2)
+$C0/94F5 SEC                     ;キャリーフラグON
+$C0/94F6 SBC #$0010              ;A - $0010
+$C0/94F9 AND #$01FF              ;Aと$01FFで論理積
+$C0/94FC ORA $20    [$00:0020]   ;Aと[$00:0021][$00:0020]で論理和
+$C0/94FE STA $20    [$00:0020]   ;Aを[$00:0021][$00:0020]に書き込み
+$C0/9500 LDA $30    [$00:0030]   ;Aに[$00:0031][$00:0030]をロード
+$C0/9502 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9503 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9504 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9505 LSR A                   ;Aを論理右シフト　(/2)
+$C0/9506 SEC                     ;キャリーフラグON
+$C0/9507 SBC #$0010              ;A - $0010
+$C0/950A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/950C STA $22    [$00:0022]   ;Aを[$00:0023][$00:0022]に書き込み A:FFFF
+$C0/950E JSR $95EC  [$C0:95EC]   ;[$C0:95EC]へジャンプ
+
+$C0/95EC PHX                     ;Xレジスタをスタックにプッシュ
+$C0/95ED LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード
+$C0/95F0 BPL $06    [$95F8]      ;ネガティブフラグが立っていないとき[$95F8]分岐
+;ネガティブフラグOFF
+$C0/95F8 LDA $21    [$00:0021]   ;Aに[$00:0021]をロード
+$C0/95FA BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/95FC BNE $16    [$9614]      ;ゼロフラグが立っていないとき[$9614]分岐
+;ゼロフラグON
+$C0/95FE LDA $06,x  [$00:1373]   ;Aに[$00:1373]をロード OBJマップデータ00 モーション切り替え値=$00,$04,$02,$06
+$C0/9600 AND #$03                ;Aと$03で論理積
+$C0/9602 BNE $08    [$960C]      ;ゼロフラグが立っていないとき[$960C]分岐
+;ゼロフラグON（$00,$04,$02,$06どれでもゼロフラグON）
+$C0/9604 LDA $10,x  [$00:137D]   ;Aに[$00:137D]をロード　OBJマップデータ11
+$C0/9606 AND #$07                ;Aと$07で論理積 カラーパレット
+$C0/9608 ORA #$10                ;Aと$10で論理和
+$C0/960A BRA $12    [$961E]      ;フラグにかかわりなく常に分岐[$961E]
+$C0/961E STA $25    [$00:0025]   ;Aを[$00:0025]に書き込み
+$C0/9620 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/9623 BEQ $6E    [$9693]      ;ゼロフラグが立っているとき[$9693]分岐
+;ゼロフラグON プレイヤーがキャラ操作可能
+$C0/9693 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/9695 BIT #$08                ;Aと$08(0000 1000)で論理積（ステータスフラグ変更のみ）
+$C0/9697 BEQ $06    [$969F]      ;ゼロフラグが立っているとき[$969F]分岐
+;ゼロフラグON 
+$C0/969F LDA $0D,x  [$00:137A]   ;Aに[$00:137A]をロード OBJマップデータ08 スプライト番号指定
+$C0/96A1 ASL A                   ;Aを算術左シフト *2
+$C0/96A2 STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み
+$C0/96A4 ROL $25    [$00:0025]   ;A[$00:0025]をキャリーフラグを含めた9bitで左ローテート
+$C0/96A6 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/96A8 AND #$30                ;Aと$30で論理積
+$C0/96AA BEQ $2A    [$96D6]      ;ゼロフラグが立っているとき[$96D6]分岐
+;ゼロフラグOFF スプライト番号+nとスプライト入れ替え
+$C0/96AC CMP #$20                ;Aと$20を減算比較（ステータスレジスタ変更のみ）
+$C0/96AE BEQ $3A    [$96EA]      ;ゼロフラグが立っているとき[$96EA]分岐
+;ゼロフラグON スプライト番号+$20と切り替え
+$C0/96EA LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード
+$C0/96EC AND #$03                ;Aと$03で論理積
+$C0/96EE STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/96F0 LDA $0F,x  [$00:137C]   ;Aに[$00:137C]をロード OBJマップデータ10 = $61(0110 0001)
+$C0/96F2 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/96F4 BEQ $15    [$970B]      ;ゼロフラグが立っているとき[$970B]分岐
+;ゼロフラグOFF スプライトを2パターンから切り替え
+$C0/96F6 LDA $06,x  [$00:1373]   ;Aに[$00:1373]をロード OBJマップデータ01
+$C0/96F8 BIT #$04                ;Aと$04で論理積（ステータスフラグ変更のみ）
+$C0/96FA BEQ $0F    [$970B]      ;ゼロフラグが立っているとき[$970B]分岐
+$C0/970B LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/970D BEQ $19    [$9728]      ;ゼロフラグが立っているとき[$9728]分岐
+$C0/9728 JSR $BAE2  [$C0:BAE2]   ;[$C0:BAE2]へジャンプ
+
+;オブジェクト属性用
+$C0/BAE2 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/BAE4 LDA $0100  [$00:0100]   ;Aに[$00:0100]をロード
+$C0/BAE7 ASL A                   ;Aを算術左シフト *2
+$C0/BAE8 ASL A                   ;Aを算術左シフト *2
+$C0/BAE9 CLC                     ;キャリーフラグクリア
+$C0/BAEA ADC $0100  [$00:0100]   ;A + [$00:0100]
+$C0/BAED CLC                     ;キャリーフラグクリア
+$C0/BAEE ADC #$1A00              ;A + $1A00
+$C0/BAF1 TAX                     ;Aの値をXレジスタに転送
+$C0/BAF2 INC $0100  [$00:0100]   ;A[$00:0100]をインクリメント +1
+$C0/BAF5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/BAF7 LDA $21    [$00:0021]   ;Aに[$00:0021]をロード
+$C0/BAF9 BPL $03    [$BAFE]      ;ネガティブフラグが立っていないとき[$BAFE]分岐
+$C0/BAFE STA $00,x  [$00:1A0A]   ;Aを[$00:1A0A]に書き込み
+$C0/BB00 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$C0/BB02 STA $01,x  [$00:1A0B]   ;Aを[$00:1A0B]に書き込み
+$C0/BB04 LDA $22    [$00:0022]   ;Aに[$00:0022]をロード
+$C0/BB06 STA $02,x  [$00:1A0C]   ;Aを[$00:1A0C]に書き込み
+$C0/BB08 LDA $24    [$00:0024]   ;Aに[$00:0024]をロード
+$C0/BB0A STA $03,x  [$00:1A0D]   ;Aを[$00:1A0D]に書き込み
+$C0/BB0C LDA $25    [$00:0025]   ;Aに[$00:0025]をロード
+$C0/BB0E STA $04,x  [$00:1A0E]   ;Aを[$00:1A0E]に書き込み
+$C0/BB10 RTS                     ;サブルーチン戻り
+
+$C0/972B PLX                     ;Xレジスタにスタックからプル
+$C0/972C RTS                     ;サブルーチン戻り
+
+$C0/9511 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9513 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/9514 CLC                     ;キャリーフラグクリア
+$C0/9515 ADC #$0011              ;A + $0011
+$C0/9518 TAX                     ;Aの値をXレジスタに転送
+$C0/9519 TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/951A CLC                     ;キャリーフラグクリア
+$C0/951B ADC #$002E              ;A + $002E
+$C0/951E TAY                     ;Aの値をYレジスタに転送
+$C0/951F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9521 DEC $2C    [$00:002C]   ;[$00:002C]をデクリメント -1
+$C0/9523 BEQ $03    [$9528]      ;ゼロフラグが立っているとき[$9528]分岐
+$C0/9525 BRL $F960  [$8E88]      ;フラグにかかわりなく常に分岐[$8E88]
+;ループ処理ここまで
+</pre></div>
+
+<p>これで1フレーム分の移動処理が完了となる。</p>
+
+<h3>再判定処理</h3>
+
+<p>さて、途中の分岐にもあったが、乱数で決まった行き先マスが移動不可の時には再判定を行う。</p>
+
+<p><code><span class="r">$C0/92F6</span> JSR $6C45</code> までで乱数計算を行って、<code><span class="r">$C0/6C45</span></code>～から行く方向により、行き先の座標がマップ外ではないか、当たり判定ありマスではないか、……といった判定を行った。<br>
+もし、行き先の座標が移動できない時は、必ず<code>RTS</code>でサブルーチンを抜ける。<br>
+つまり、<code><span class="r">$C0/92F6</span> JSR $6C45</code>の続きに飛ぶ時は、再判定確定なのである。<br>
+<code><span class="r">$C0/92F6</span></code>の続きは<code><span class="r">$C0/92F9</span></code>である。</p>
+
+<div class="code-container"><pre>
+$C0/92F9 BCC $39    [$9334]      ;キャリーフラグが立っていないとき[$9334]分岐
+;キャリーフラグOFF
+$C0/9334 BRL $0104  [$943B]      ;フラグにかかわりなく常に分岐[$943B]
+$C0/943B JSR $9529  [$C0:9529]   ;[$C0:9529]へジャンプ（向き変え処理スキップ）
+;キャリーフラグON
+$C0/92FB LDA $0AC4  [$00:0AC4]   ;Aに[$00:0AC4](通常$00)をロード
+$C0/92FE BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C0/9300 BNE $2F    [$9331]      ;ゼロフラグが立っていないとき[$9331]分岐
+;ゼロフラグON
+$C0/9302 LDA $05,x  [$00:1372]   ;Aに[$00:1372]をロード OBJマップデータ00
+$C0/9304 EOR #$01                ;Aと$01で排他的論理和XOR
+$C0/9306 STA $05,x  [$00:1372]   ;Aを[$00:1372]に書き込み OBJマップデータ00
+$C0/9308 JSR $6C45  [$C0:6C45]   ;[$C0:6C45]へジャンプ
+</pre></div>
+
+<p>分岐があるが、処理上、乱数生成後に行き先が当たり判定ありマスだった時、<code><span class="r">$C0/9302</span></code>に進む（はず）。<br>
+すると、</p>
+
+<p><span class="formula">OBJマップデータ00 XOR $01</span></p>
+
+<p>を計算し、新たなOBJマップデータ00として、<code><span class="r">$C0/6C45</span></code>にジャンプする。<br>
+つまり、当たり判定ありで行けなかった向き（<span class="formula">$00</span>～<span class="formula">$03</span>）に対し、<span class="formula">$01</span>と論理和を取って新たな向きに変更する。</p>
+
+<table>
+<thead>
+	<tr><th>元向き</th><th>変更後</th></tr>
+</thead>
+<tbody>
+	<tr><td>下</td><td><span class="formula">$00</span> → <span class="formula">$00 XOR $01 = $01</span> 上へ変更</td></tr>
+	<tr><td>上</td><td><span class="formula">$01</span> → <span class="formula">$01 XOR $01 = $00</span> 下へ変更</td></tr>
+	<tr><td>左</td><td><span class="formula">$02</span> → <span class="formula">$02 XOR $01 = $03</span> 右へ変更</td></tr>
+	<tr><td>右</td><td><span class="formula">$03</span> → <span class="formula">$03 XOR $01 = $02</span> 左へ変更</td></tr>
+</tbody>
+</table>
+
+<p>ということで、逆方向に向きを変えることがわかる。<br>
+つまり、原始人初期位置のように、上方向だけ当たり判定ありで移動不可の時は下へ移動することになる。<br>
+実質、確率は、</p>
+
+<ul>
+	<li>右へ移動……<span class="formula">1/4</span></li>
+	<li>左へ移動……<span class="formula">1/4</span></li>
+	<li>下へ移動……<span class="formula">1/2</span></li>
+</ul>
+
+<p>と考えて良いことになる。</p>
+
+<p>先に、幕末編の蔵の忍者の移動について記したが、狭い場所で詰まると、左右移動を繰り返したり、上下移動を繰り返すことが割と多いのも、上処理のためであろう。<br>
+タイマーでの向き変えもあるため、ずっと左右移動を行うとか、上下移動を続けるといったことはないはずである。</p>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="map02.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="map03.html"><span class="button">&#9654;次 </span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="map01.html">マップ構造</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
