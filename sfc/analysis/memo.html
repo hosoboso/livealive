@@ -182,6 +182,7 @@ table {
 		<li><a href="map02.html">スプライト処理</a></li>
 		<li><a href="map03.html">ランダム移動</a></li>
 		<li><a href="map04.html">追尾タイプの移動</a></li>
+		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -229,49 +230,6 @@ table {
 
 <div id="captiondata"></div>
 
-<h3>異次元空間＆ヘッドプラッカー</h3>
-
-<p>最終編で最初に飛ばされる真っ暗な異次元空間について。<br>
-ここは真っ暗で、どちらに進んでも行き止まりがない。<br>
-最終編のカウンターのアドレス<code>$00:11F0</code>には、異空間での歩数の値が入る。<br>
-初期値は<span class="formula">$00</span>で、<span class="formula">$32</span>（10進数<span class="formula">50</span>）以上だと背景（各シナリオの一部分）が表示されるようになり、<span class="formula">$64</span>（10進数<span class="formula">100</span>）まで増加すると階段が出現する。</p>
-
-<p>各マップは左上隅を座標(<span class="formula">X,Y</span>) = (<span class="formula">$00,$00</span>)として、味方キャラ1人目（主人公）のいる座標が(X,Y)=(<code>$00:0A21</code>,<code>$00:0A29</code>)に入るが、異次元空間に飛ばされた時点での座標は、(<span class="formula">X,Y</span>)=(<span class="formula">$09,$1A</span>)【※10進数(<span class="formula">9,26</span>)】である。<br>
-座標からもわかるのだが、この空間はX方向が<span class="formula">0～31</span>、Yが<span class="formula">0～63</span>まであり、Xが<span class="formula">31</span>の時に更に右に移動すると<span class="formula">0</span>に戻るし、Yが<span class="formula">63</span>の時に更に下に移動すると0に戻るため、<br>
-「横32マス、縦64マスのマップが上下左右に無限ループ」<br>
-している空間である。<br>
-このため、上下左右がうまく繋がるよう、50マス以上移動時の背景画像が作られている。</p>
-
-<p>100マス移動すると階段が出現するが、階段出現位置は100マス移動した時の主人公の座標で決まるので、マップ上で固定ではないことになる。</p>
-
-<p>ヘッドプラッカーが出現する時の異次元空間だが、ヘッドプラッカーの座標は(<span class="formula">X,Y</span>) = (<code>$00:13CC</code>, <code>$00:13CE</code>)である。<br>
-このアドレスはヘッドプラッカーで固定ではなく、<code>$00:1300</code>～あたりにはマップ上のキャラクター（敵シンボルも、普通の街の人なども含む）の座標などが入っていて、異次元空間ではヘッドプラッカーの座標が入るアドレスである。<br>
-初期位置は(<code>$00:13CC</code>, <code>$00:13CE</code>) = (<span class="formula">$00,$00</span>)である。<br>
-つまりヘッドプラッカー初期位置は、異次元空間マップの原点位置になる。<br>
-図で示すと以下の通りになる。</p>
-
-<div class="modal-set">
-	<div class="imgbox"><a href="img/ijigenmap.png" class="modal-link">
-		<img src="img/ijigenmap.png" alt="異次元空間マップ" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
-	</div>
-</div>
-
-<p>ヘッドプラッカーは主人公たちの座標へ向けて移動していく。<br>
-移動速度はおそらく味方キャラの歩行速度の1/2である。<br>
-つまり、ヘッドプラッカーが1マス移動する間に、味方は歩行だと2マス、ダッシュだと4マス、おぼろ丸のダッシュだと8マス移動できる。<br>
-おぼろ丸の場合は上にひたすら上へダッシュ移動でも、100マス移動時にヘッドプラッカーに接触せず階段が出現して脱出できるが、他キャラの場合はただ上ダッシュしているだけだと100マス移動前にヘッドプラッカーに遭遇する。<br>
-というのは、異次元空間に入ってからすぐ上にダッシュ移動し続けた場合、下図のようになってしまうのである。</p>
-
-<div class="modal-set">
-	<div class="imgbox"><a href="img/ijigenmap_2.png" class="modal-link">
-		<img src="img/ijigenmap_2.png" alt="異次元空間マップ　ヘッドプラッカー遭遇" class="thumbnail"><span class="imgboxico"><img alt="zoom_in" src="../icon/mark_zoom_in.svg" width="24px"></span></a>
-	</div>
-</div>
-
-<p>味方キャラのダッシュ速度だと、ちょうど異次元空間を1周＋10～16マス（75～80マス移動）くらいのあたりで、原点位置から移動してきたヘッドプラッカーに接触してしまうのである。<br>
-（ヘッドプラッカーの移動は上図とは必ずしも一致しない。右移動と下移動を繰り返してだいたい上くらいの位置で味方キャラに接触する）</p>
-
-<p>ちなみに階段出現後は、階段を障害物とすることでヘッドプラッカーの移動を阻止することも可能。</p>
 
 
 <h3><span id="chusei_maou">戦闘開始時の状態異常</span></h3>
@@ -833,65 +791,114 @@ ROM容量は2048KBということになる。</p>
 ここでいうRAMというのはカセット内部のSRAM、セーブデータ保存用RAMの領域の意味である。<br>
 ただ、実際には<a href="program35.html">セーブ・ロード</a>の通り、セーブデータには2KB分の領域しか使っていないようである。他にも何かしらに使っているかどうかは筆者にはわからない。</p>
 
-<h3>サウンド転送初期化</h3>
 
-<ul>
-	<li><a href="https://ja.wikipedia.org/wiki/SPU" target="_blank">SPU - Wikipedia</a></li>
-	<li><a href="https://wiki.superfamicom.org/sfc-sound-manual" target="_blank">SFC サウンドマニュアル | Super Famicom Development Wiki</a></li>
-	<li><a href="https://wiki.superfamicom.org/transferring-data-from-rom-to-the-snes-apu" target="_blank">Transferring Data from ROM to the SNES APU | Super Famicom Development Wiki</a></li>
-</ul>
+<h3>隠れ蓑切り替え</h3>
 
-<p>スーパーファミコンのサウンドは、スーパーファミコン自体のCPUから、スーパーファミコンのサウンド用CPU（SPU700、APU）へ、4種類のポート(I/Oレジスタ)を通してデータのやりとりをする。<br>
-CPUのメモリアドレスだと<code>$00:2140</code>～<code>$00:2143</code>の4種のアドレスが、APUとのI/Oレジスタにあたる。<br>
-（<code>$00:2144</code>～<code>$00:217F</code>は<code>$00:2140</code>～<code>$00:2143</code>をミラーリング）</p>
-
-<p>このAPUを初期化するためのゲーム開始直後の処理が以下。<br>
-スーパーファミコンの仕様に従った処理なので、どのゲームでも似たような処理は行っていると思われる。</p>
-
-<p>この処理の後、実際のサウンドデータ転送を行うことになる。</p>
-
+<br>
 <div class="code-container"><pre>
-$C3/0000 JMP $0034  [$C3:0034]   ;[$C3:0034]へジャンプ(レジスタをスタックに積まない)
+;隠れ蓑ON
+;ボタンの値からイベント分岐処理
+$C0/0831 LDA $05    [$00:0005]   A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aに[$00:0005]をロード　コントローラ1のボタン判定用　Yボタン:$40
+$C0/0833 BIT #$40                A:0040 X:0000 Y:0AE0 P:envMxdIzc;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/0835 BEQ $03    [$083A]      A:0040 X:0000 Y:0AE0 P:envMxdIzc;ゼロフラグが立っているとき[$083A]分岐
+;ゼロフラグOFF　Yボタン判定
+$C0/0837 JSR $135C  [$C0:135C]   A:0040 X:0000 Y:0AE0 P:envMxdIzc;[$C0:135C]へジャンプ
 
-;サウンド転送初期化
-$C3/0034 PHB                     ;DBレジスタをスタックにプッシュ
-$C3/0035 PHD                     ;Dレジスタの値をスタックに積み
-$C3/0036 PHP                     ;ステータスレジスタをスタックへプッシュ
-$C3/0037 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
-$C3/0039 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
-$C3/003B PHA                     ;Aをスタックにプッシュ
-$C3/003C PHX                     ;Xをスタックにプッシュ
-$C3/003D PHY                     ;Yをスタックへプッシュ
-$C3/003E SEP #$20                ;MフラグON　Aレジスタは8bit幅
-$C3/0040 LDA #$00                ;Aに$00をロード
-$C3/0042 PHA                     ;Aをスタックにプッシュ
-$C3/0043 PLB                     ;DBレジスタに値をプル
-$C3/0044 LDX #$1D00              ;Xに$1D00をロード
-$C3/0047 PHX                     ;Xをスタックにプッシュ
-$C3/0048 PLD                     ;Dレジスタにスタックからプル
-$C3/0049 LDX #$BBAA              ;Xに$BBAAをロード
-$C3/004C LDY #$F0FF              ;Yに$F0FFをロード
-$C3/004F STY $2140  [$00:2140]   ;Y($F0FF)を[$00:2140]に書き込み
-$C3/0052 CPX $2140  [$00:2140]   ;X($BBAA)と[$00:2140]を減算比較（ステータスレジスタ変更のみ）
-$C3/0055 BNE $F8    [$004F]      ;ゼロフラグが立っていないとき[$004F]分岐
-;ゼロフラグON [$00:2141][$00:2140]=$BBAA, プログラム初期化完了
-$C3/0057 LDX #$0000              ;Xに$0000をロード
-;転送先アドレス書き込み[$C3:001C][$C3:001D]→[$00:2142][$00:2143]
-$C3/005A LDA $C3001C[$C3:001C]   ;Aに[$C3:001C]をロード
-$C3/005E STA $2142  [$00:2142]   ;A($00)を[$00:2142]に書き込み
-$C3/0061 LDA $C3001D[$C3:001D]   ;Aに[$C3:001D]をロード
-$C3/0065 STA $2143  [$00:2143]   ;A($02)を[$00:2143]に書き込み
-;[$00:2141]に$CCを書き込み（0以外の任意の値書き込み）
-$C3/0068 LDA #$CC                ;Aに$CCをロード
-$C3/006A STA $2141  [$00:2141]   ;A($CC)を[$00:2141]に書き込み
-;[$00:2140]に$CCを書き込み
-$C3/006D STA $2140  [$00:2140]   ;Aを[$00:2140]に書き込み
-;ループ処理 [$00:2140]が$CCになるまで待機
-$C3/0070 CMP $2140  [$00:2140]   ;Aと[$00:2140]を減算比較（ステータスレジスタ変更のみ）
-$C3/0073 BNE $FB    [$0070]      ;ゼロフラグが立っていないとき[$0070]分岐
-;ループ処理ここまで
-;サウンド転送初期化完了
+$C0/135C LDA $0A0F  [$00:0A0F]   A:0040 X:0000 Y:0AE0 P:envMxdIzc;Aに[$00:0A0F]をロード
+$C0/135F BEQ $05    [$1366]      A:0000 X:0000 Y:0AE0 P:envMxdIZc;ゼロフラグが立っているとき[$1366]分岐
+$C0/1366 LDA $0AC7  [$00:0AC7]   A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aに[$00:0AC7]をロード
+$C0/1369 BEQ $49    [$13B4]      A:0000 X:0000 Y:0AE0 P:envMxdIZc;ゼロフラグが立っているとき[$13B4]分岐
+$C0/13B4 RTS                     A:0000 X:0000 Y:0AE0 P:envMxdIZc;サブルーチン戻り
+
+$C0/083A LDA $10E3  [$00:10E3]   A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aに[$00:10E3]をロード　隠れ蓑判定値
+$C0/083D BEQ $3E    [$087D]      A:0001 X:0000 Y:0AE0 P:envMxdIzc;ゼロフラグが立っているとき[$087D]分岐
+;ゼロフラグOFF隠れ蓑所持
+$C0/083F LDA $01    [$00:0001]   A:0001 X:0000 Y:0AE0 P:envMxdIzc;Aに[$00:0001]をロード　コントローラ1のボタンを押した判定
+$C0/0841 BIT #$40                A:0040 X:0000 Y:0AE0 P:envMxdIzc;Aと$40で論理積（ステータスフラグ変更のみ）Yボタン:$40
+$C0/0843 BEQ $29    [$086E]      A:0040 X:0000 Y:0AE0 P:envMxdIzc;ゼロフラグが立っているとき[$086E]分岐
+;ゼロフラグON　Yボタン:$40
+$C0/0845 LDA $10E3  [$00:10E3]   A:0040 X:0000 Y:0AE0 P:envMxdIzc;Aに[$00:10E3]をロード　隠れ蓑判定値
+$C0/0848 BPL $03    [$084D]      A:0001 X:0000 Y:0AE0 P:envMxdIzc;ネガティブフラグが立っていないとき[$084D]分岐
+;$C0/0848ネガティブフラグON　隠れ蓑で消えている状態
+$C0/084A BRL $019F  [$09EC]      A:0001 X:0000 Y:0AE0 P:envMxdIzc;フラグにかかわりなく常に分岐[$09EC]
+;$C0/0848ネガティブフラグOFF　隠れ蓑で消えている状態ではない
+$C0/084D LDA #$04                A:0001 X:0000 Y:0AE0 P:envMxdIzc;Aに$04をロード　スプライト番号加算値 = $04は水中の筒
+$C0/084F CMP $0A18  [$00:0A18]   A:0004 X:0000 Y:0AE0 P:envMxdIzc;Aと[$00:0A18]を減算比較（ステータスレジスタ変更のみ）キャラ1表示スプライト番号加算値
+$C0/0852 BEQ $29    [$087D]      A:0004 X:0000 Y:0AE0 P:envMxdIzC;ゼロフラグが立っているとき[$087D]分岐
+$C0/0854 CMP $0A19  [$00:0A19]   A:0004 X:0000 Y:0AE0 P:envMxdIzC;Aと[$00:0A19]を減算比較（ステータスレジスタ変更のみ）キャラ2表示スプライト番号加算値
+$C0/0857 BEQ $24    [$087D]      A:0004 X:0000 Y:0AE0 P:envMxdIzC;ゼロフラグが立っているとき[$087D]分岐
+$C0/0859 CMP $0A1A  [$00:0A1A]   A:0004 X:0000 Y:0AE0 P:envMxdIzC;Aと[$00:0A1A]を減算比較（ステータスレジスタ変更のみ）キャラ3表示スプライト番号加算値
+$C0/085C BEQ $1F    [$087D]      A:0004 X:0000 Y:0AE0 P:envMxdIzC;ゼロフラグが立っているとき[$087D]分岐
+$C0/085E LDA #$01                A:0004 X:0000 Y:0AE0 P:envMxdIzC;Aに$01をロード
+$C0/0860 JSR $1B74  [$C0:1B74]   A:0001 X:0000 Y:0AE0 P:envMxdIzC;[$C0:1B74]へジャンプ
+;
+;（中略　隠れ蓑処理）
+;
+$C0/0863 LDA $10E3  [$00:10E3]   A:1310 X:138F Y:0A38 P:envMxdIzC;Aに[$00:10E3]をロード
+$C0/0866 ORA #$80                A:1301 X:138F Y:0A38 P:envMxdIzC;Aと$80で論理和
+$C0/0868 STA $10E3  [$00:10E3]   A:1381 X:138F Y:0A38 P:eNvMxdIzC;Aを[$00:10E3]に書き込み
+$C0/086B BRL $017E  [$09EC]      A:1381 X:138F Y:0A38 P:eNvMxdIzC;フラグにかかわりなく常に分岐[$09EC]
+$C0/09EC JSR $0AC9  [$C0:0AC9]   A:1381 X:138F Y:0A38 P:eNvMxdIzC;[$C0:0AC9]へジャンプ
 </pre></div>
+
+<br>
+<div class="code-container"><pre>
+;隠れ蓑OFF
+;ボタンの値からイベント分岐処理
+$C0/0831  LDA $05    [$00:0005]   A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aに[$00:0005]をロード
+$C0/0833  BIT #$40                A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/0835  BEQ $03    [$083A]      A:0000 X:0000 Y:0AE0 P:envMxdIZc;ゼロフラグが立っているとき[$083A]分岐
+;ゼロフラグON Yボタン押されていない
+$C0/083A  LDA $10E3  [$00:10E3]   A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aに[$00:10E3]をロード
+$C0/083D  BEQ $3E    [$087D]      A:0081 X:0000 Y:0AE0 P:eNvMxdIzc;ゼロフラグが立っているとき[$087D]分岐
+;ゼロフラグOFF　隠れ蓑使える状態
+$C0/083F  LDA $01    [$00:0001]   A:0081 X:0000 Y:0AE0 P:eNvMxdIzc;Aに[$00:0001]をロード
+$C0/0841  BIT #$40                A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/0843  BEQ $29    [$086E]      A:0000 X:0000 Y:0AE0 P:envMxdIZc;ゼロフラグが立っているとき[$086E]分岐
+;ゼロフラグON Yボタン押されていない
+$C0/086E  LDA $10E3  [$00:10E3]   A:0000 X:0000 Y:0AE0 P:envMxdIZc;Aに[$00:10E3]をロード
+$C0/0871  BPL $0A    [$087D]      A:0081 X:0000 Y:0AE0 P:eNvMxdIzc;ネガティブフラグが立っていないとき[$087D]分岐
+;ネガティブフラグON　隠れ蓑で隠れていた
+$C0/0873  AND #$7F                A:0081 X:0000 Y:0AE0 P:eNvMxdIzc;Aと$7Fで論理積
+$C0/0875  STA $10E3  [$00:10E3]   A:0001 X:0000 Y:0AE0 P:envMxdIzc;Aを[$00:10E3]に書き込み　$81 & $7F = $01
+$C0/0878  LDA #$02                A:0001 X:0000 Y:0AE0 P:envMxdIzc;Aに$02をロード
+$C0/087A  JSR $1B74  [$C0:1B74]   A:0002 X:0000 Y:0AE0 P:envMxdIzc;[$C0:1B74]へジャンプ
+;
+;（中略　隠れ蓑処理）
+;
+$C0/087D LDA $04    [$00:0004]   A:1310 X:138F Y:0A38 P:envMxdIzC;Aに[$00:0004]をロード
+$C0/087F BPL $03    [$0884]      A:1300 X:138F Y:0A38 P:envMxdIZC;ネガティブフラグが立っていないとき[$0884]分岐
+$C0/0884 LDA $0A1F  [$00:0A1F]   A:1300 X:138F Y:0A38 P:envMxdIZC;Aに[$00:0A1F]をロード
+$C0/0887 BNE $0D    [$0896]      A:1300 X:138F Y:0A38 P:envMxdIZC;ゼロフラグが立っていないとき[$0896]分岐
+$C0/0889 LDA $01    [$00:0001]   A:1300 X:138F Y:0A38 P:envMxdIZC;Aに[$00:0001]をロード
+$C0/088B BPL $0E    [$089B]      A:1300 X:138F Y:0A38 P:envMxdIZC;ネガティブフラグが立っていないとき[$089B]分岐
+$C0/089B LDX #$0010              A:1300 X:138F Y:0A38 P:envMxdIZC;Xに$0010をロード
+$C0/089E BRA $08    [$08A8]      A:1300 X:0010 Y:0A38 P:envMxdIzC;フラグにかかわりなく常に分岐[$08A8]
+$C0/08A8 STX $01A8  [$00:01A8]   A:1300 X:0010 Y:0A38 P:envMxdIzC;Xを[$00:01A8]に書き込み
+$C0/08AB STX $01AE  [$00:01AE]   A:1300 X:0010 Y:0A38 P:envMxdIzC;Xを[$00:01AE]に書き込み
+$C0/08AE LDA $04    [$00:0004]   A:1300 X:0010 Y:0A38 P:envMxdIzC;Aに[$00:0004]をロード
+$C0/08B0 BIT #$40                A:1300 X:0010 Y:0A38 P:envMxdIZC;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/08B2 BEQ $17    [$08CB]      A:1300 X:0010 Y:0A38 P:envMxdIZC;ゼロフラグが立っているとき[$08CB]分岐
+$C0/08CB LDA $0A1C  [$00:0A1C]   A:1300 X:0010 Y:0A38 P:envMxdIZC;Aに[$00:0A1C]をロード
+$C0/08CE BEQ $56    [$0926]      A:1300 X:0010 Y:0A38 P:envMxdIZC;ゼロフラグが立っているとき[$0926]分岐
+$C0/0926 LDA $01    [$00:0001]   A:1300 X:0010 Y:0A38 P:envMxdIZC;Aに[$00:0001]をロード
+$C0/0928 STA $020A  [$00:020A]   A:1300 X:0010 Y:0A38 P:envMxdIZC;Aを[$00:020A]に書き込み
+$C0/092B LDA $020A  [$00:020A]   A:1300 X:0010 Y:0A38 P:envMxdIZC;Aに[$00:020A]をロード
+$C0/092E BIT #$08                A:1300 X:0010 Y:0A38 P:envMxdIZC;Aと$08で論理積（ステータスフラグ変更のみ）
+$C0/0930 BEQ $2C    [$095E]      A:1300 X:0010 Y:0A38 P:envMxdIZC;ゼロフラグが立っているとき[$095E]分岐
+$C0/095E LDA $020A  [$00:020A]   A:1300 X:0010 Y:0A38 P:envMxdIZC;Aに[$00:020A]をロード
+$C0/0961 BIT #$04                A:1300 X:0010 Y:0A38 P:envMxdIZC;Aと$04で論理積（ステータスフラグ変更のみ）
+$C0/0963 BEQ $27    [$098C]      A:1300 X:0010 Y:0A38 P:envMxdIZC;ゼロフラグが立っているとき[$098C]分岐
+$C0/098C LDA $020A  [$00:020A]   A:1300 X:0010 Y:0A38 P:envMxdIZC;Aに[$00:020A]をロード
+$C0/098F BIT #$02                A:1300 X:0010 Y:0A38 P:envMxdIZC;Aと$02で論理積（ステータスフラグ変更のみ）
+$C0/0991 BEQ $29    [$09BC]      A:1300 X:0010 Y:0A38 P:envMxdIZC;ゼロフラグが立っているとき[$09BC]分岐
+$C0/09BC LDA $020A  [$00:020A]   A:1300 X:0010 Y:0A38 P:envMxdIZC;Aに[$00:020A]をロード
+$C0/09BF BIT #$01                A:1300 X:0010 Y:0A38 P:envMxdIZC;Aと$01で論理積（ステータスフラグ変更のみ）
+$C0/09C1 BEQ $29    [$09EC]      A:1300 X:0010 Y:0A38 P:envMxdIZC;ゼロフラグが立っているとき[$09EC]分岐
+$C0/09EC JSR $0AC9  [$C0:0AC9]   A:1300 X:0010 Y:0A38 P:envMxdIZC;[$C0:0AC9]へジャンプ
+</pre></div>
+
+
 
 <script>//リストタイトル静的生成
 document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`captionlist_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
