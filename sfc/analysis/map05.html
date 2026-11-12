@@ -185,6 +185,7 @@ table {
 		<li><a href="map03.html">ランダム移動</a></li>
 		<li><a href="map04.html">追尾タイプの移動</a></li>
 		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
+		<li><a href="map06.html">隠れ蓑</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -319,8 +320,8 @@ OBJマップデータは<code>$00:13D8</code>～<code>$00:13E3</code>に入る�
 <tbody>
 	<tr><td>00</td><td><code>$00:13D8</code></td><td><span class="formula">$83</span></td><td>Bit7:スプライト存在(<span class="formula">1</span>で存在、<span class="formula">0</span>は存在しない) / Bit0～1:向き <span class="formula">%11</span>:右</td></tr>
 	<tr><td>01</td><td><code>$00:13D9</code></td><td><span class="formula">$00</span></td><td>当たり判定及びモーション切り替え値</td></tr>
-	<tr><td>02</td><td><code>$00:13DA</code></td><td><span class="formula">$01</span></td><td>モーション切り替えタイマー1</td></tr>
-	<tr><td>03</td><td><code>$00:13DB</code></td><td><span class="formula">RR</span></td><td>モーション切り替えタイマー2</td></tr>
+	<tr><td>02</td><td><code>$00:13DA</code></td><td><span class="formula">$01</span></td><td>モーション切り替えタイマーA</td></tr>
+	<tr><td>03</td><td><code>$00:13DB</code></td><td><span class="formula">RR</span></td><td>モーション切り替えタイマーB</td></tr>
 	<tr><td>04</td><td><code>$00:13DC</code></td><td><span class="formula">$00</span></td><td>X座標</td></tr>
 	<tr><td>05</td><td><code>$00:13DD</code></td><td><span class="formula">$07</span></td><td>X座標</td></tr>
 	<tr><td>06</td><td><code>$00:13DE</code></td><td><span class="formula">$00</span></td><td>Y座標</td></tr>
@@ -475,14 +476,14 @@ $C0/9221 DEC $07,x  [$00:13DA]   ;[$00:13DA]をデクリメント -1　OBJマッ
 $C0/9223 BNE $AA    [$91CF]      ;ゼロフラグが立っていないとき[$91CF]分岐
 ;ゼロフラグON　OBJマップデータ02が00になった
 $C0/9225 LDA #$3C                ;Aに$3C(60)をロード 停止時間（フレーム）
-$C0/9227 STA $07,x  [$00:13DA]   ;Aを[$00:13DA]に書き込み　OBJマップデータ02 モーション切り替えタイマー1
+$C0/9227 STA $07,x  [$00:13DA]   ;Aを[$00:13DA]に書き込み　OBJマップデータ02 モーション切り替えタイマーA
 $C0/9229 LDA $05,x  [$00:13D8]   ;Aに [$00:13D8]をロード OBJマップデータ00 = $83
 $C0/922B AND #$03                ;Aと$03で論理積　向き　%00:下 %01:上 %10:左 %11:右
 $C0/922D CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
 $C0/922F BCC $0A    [$923B]      ;キャリーフラグが立っていないとき[$923B]分岐
 ;キャリーフラグON 向きが右または左（03か02）
 $C0/9231 LDA #$01                ;Aに$01をロード
-$C0/9233 STA $08,x  [$00:13DB]   ;Aを[$00:13DB]に書き込み　OBJマップデータ03　モーション切り替えタイマー2
+$C0/9233 STA $08,x  [$00:13DB]   ;Aを[$00:13DB]に書き込み　OBJマップデータ03　モーション切り替えタイマーB
 $C0/9235 LDA $06,x  [$00:13D9]   ;Aに[$00:13D9]をロード OBJマップデータ01　モーション切り替え値（初期値00）
 $C0/9237 AND #$F3                ;A(00)と$F3(1111 0011)で論理積
 $C0/9239 STA $06,x  [$00:13D9]   ;Aを[$00:13D9]に書き込み　OBJマップデータ01　モーション切り替え値(00)
@@ -596,7 +597,7 @@ $C0/92F6 JSR $6C45  [$C0:6C45]   ;[$C0:6C45]へジャンプ
 （<code><span class="r">$C0/6C45</span></code>～）</p>
 
 <p>移動可能である場合は座標計算まで進む。<br>
-つまり、OBJマップデータ02（モーション切り替えタイマー1）が<span class="formula">$00</span>まで減った時は、タイマーに<span class="formula">$3C</span>(<span class="formula">60</span>)をセットし、向きを決めて移動を開始。<br>
+つまり、OBJマップデータ02（モーション切り替えタイマーA）が<span class="formula">$00</span>まで減った時は、タイマーに<span class="formula">$3C</span>(<span class="formula">60</span>)をセットし、向きを決めて移動を開始。<br>
 移動終了してから（1マス移動してから）、タイマーのカウントダウンで停止、という手順になる。<br>
 ここでは下に移動開始したという例で見てみよう。<br>
 1フレームで1ピクセル移動だから、初期位置のX座標のピクセル単位の値<code>[$00:13DC]</code>（OBJマップデータ04）が<span class="formula">$00</span>から<span class="formula">$10</span>に更新される。</p>
@@ -637,7 +638,7 @@ $C0/95CC LDA $0F,x  [$00:13E2]   ;Aに[$00:13E2]をロード OBJマップデー�
 $C0/95CE BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
 $C0/95D0 BEQ $18    [$95EA]      ;ゼロフラグが立っているとき[$95EA]分岐
 ;ゼロフラグOFF　スプライトを2パターンから切り替え
-$C0/95D2 LDA $08,x  [$00:13DB]   ;Aに[$00:13DB]をロード OBJマップデータ03 モーション切り替えタイマー2
+$C0/95D2 LDA $08,x  [$00:13DB]   ;Aに[$00:13DB]をロード OBJマップデータ03 モーション切り替えタイマーB
 $C0/95D4 SEC                     ;キャリーフラグON
 $C0/95D5 SBC $010D  [$00:010D]   ;A - [$00:010D]($04)
 $C0/95D8 BCS $0C    [$95E6]      ;キャリーフラグが立っているとき[$95E6]分岐
@@ -733,9 +734,9 @@ window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(
 </script>
 
 <div class="pagelink">
-	<div id="pageprev"><a href="map03.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pageprev"><a href="map04.html"><span class="button">&#9664;戻る</span></a></div>
 	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
-<!-- 	<div id="pagenext"><a href="map05.html"><span class="button">&#9654;次 </span></a></div> -->
+	<div id="pagenext"><a href="map06.html"><span class="button">&#9654;次 隠れ蓑</span></a></div>
 </div>
 
 </div>

@@ -185,6 +185,7 @@ table {
 		<li><a href="map03.html">ランダム移動</a></li>
 		<li><a href="map04.html">追尾タイプの移動</a></li>
 		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
+		<li><a href="map06.html">隠れ蓑</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -375,12 +376,14 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 
 <h4>マス属性値</h4>
 
-
 <p><code>$7F:0000</code>～<code>$7F:1FFF</code>に入る背景1マスのデータ番号（<span class="formula">$00</span>～<span class="formula">$FF</span>）の当たり判定（など）が書き込まれているのが、<code>$7F:3800</code>～<code>$7F:39FF</code>のマス属性値である。<br>
 データ番号1個につき、<span class="formula">2</span>バイトのデータになる。<br>
 最初の<span class="formula">1</span>バイトが当たり判定用の値で（当たり判定値はおそらく上3ビットのみ）、<span class="formula">$C0</span> (<span class="formula">%1100 0000</span>) だとどの方向からでも当たり判定がありプレイヤーキャラ（モブキャラ）は通過できない。<br>
 <span class="formula">$40</span>の場合は、踏めるが特定方向に当たり判定があり移動できない。例えば、近未来編の公園のたい焼き屋屋台は、無法松が立っているマスや左隣のマスに立つことはできるが、そこから下への移動はできない。段差や崖による境界線なども該当する。<br>
-<span class="formula">$00</span>や<span class="formula">$80</span>は通過可能マスになる。</p>
+<span class="formula">$00</span>や<span class="formula">$80</span>は通過可能マスになる。<br>
+<span class="formula">$00</span>は、<span class="formula">$40</span>マスと一緒に当たり判定に使う。<br>
+<span class="formula">$40</span>で指定されたマスに、<span class="formula">$00</span>マスが隣り合っていれば、<span class="formula">$40</span>マス↔<span class="formula">$00</span>は通り抜けられる（当たり判定なし）。<br>
+だが、<span class="formula">$40</span>マスと<span class="formula">$80</span>マスが隣接している場合は、そこが境界線扱いで（当たり判定）、通り抜けできない。</p>
 
 <p>下1バイトに値が入るのはエンカウント関連の値のようである。</p>
 
@@ -454,8 +457,8 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 	<tr><td>Ev04</td><td>移動中座標計算値（初期値<span class="formula">$00</span>）</td></tr>
 	<tr><td>00</td><td>Bit7:スプライト存在(<span class="formula">1</span>で存在、<span class="formula">0</span>は存在しない)<br>Bit0～1:向き <span class="formula">%00</span>:下 <span class="formula">%01</span>:上 <span class="formula">%10</span>:左 <span class="formula">%11</span>:右</td></tr>
 	<tr><td>01</td><td>当たり判定及びモーション切り替え値<br>初期値が<span class="formula">$01</span>は当たり判定なし、<span class="formula">$00</span>と<span class="formula">$02</span>は当たり判定あり</td></tr>
-	<tr><td>02</td><td>モーション切り替えタイマー1</td></tr>
-	<tr><td>03</td><td>モーション切り替えタイマー2</td></tr>
+	<tr><td>02</td><td>モーション切り替えタイマーA</td></tr>
+	<tr><td>03</td><td>モーション切り替えタイマーB</td></tr>
 	<tr><td>04</td><td rowspan="2">X座標（2バイト値）　マップ構造基準座標、<span class="formula">ピクセル単位*$10</span><br>上1バイトがマス目単位、下1バイトがマスとマスの間の<span class="formula">ピクセル単位*$10</span>に相当</td></tr>
 	<tr><td>05</td></tr>
 	<tr><td>06</td><td rowspan="2">Y座標（2バイト値）　マップ構造基準座標、<span class="formula">ピクセル単位*$10</span><br>上1バイトがマス目単位、下1バイトがマスとマスの間の<span class="formula">ピクセル単位*$10</span>に相当</td></tr>
@@ -485,14 +488,15 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 
 <h5>No.02</h5>
 
-<p>モーション切り替えタイマー1：<br>
-常に移動するスプライトは初期値<span class="formula">$01</span>、以降は向き変え判定までの残り歩数（乱数<span class="formula">$01</span>～<span class="formula">$08</span>）。<br>
-ランダム移動でも操作キャラ目標移動でもこのタイマーを使う。</p>
+<p>モーション切り替えタイマーA：<br>
+常に移動するスプライトは初期値<span class="formula">$01</span>。
+以降は、ランダム移動なら向き変え判定までの残り歩数（<span class="formula">モーション切り替えタイマーA = モーション切り替えタイマーA | ($01～$08の乱数)</span>）。<br>
+追尾移動は停止時間<span class="formula">60</span>フレーム用タイマー。</p>
 
 <h5>No.03</h5>
 
-<p>モーション切り替えタイマー2：<br>
-足踏みなどで2パターンのスプライトを切り替える場合のタイマー（1フレームあたりの減少量はNo.10の移動速度で決まる）。<br>
+<p>モーション切り替えタイマーB：<br>
+移動せず、かつ足踏みなどで2パターンのスプライトを切り替える場合のタイマー（1フレームあたりの減少量はNo.10の移動速度で決まる）。<br>
 乱数<span class="formula">$01</span>～<span class="formula">$20</span></p>
 
 <h5>No.08</h5>
@@ -559,7 +563,7 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 おぼろ丸のダッシュ速度は更にこの2倍であり（4フレームで1マス移動）、敵シンボルなどでおぼろ丸のダッシュ速度は設定できないようだ。<br>
 幕末編の忍者など移動速度が高い敵シンボルがいるが、実際にはおぼろ丸のダッシュ速度の半分ということになる。</p>
 
-<table>
+<table id="speed">
 <thead>
 	<tr><th>OBJマップデータ10の<br>Bit0～1</th><th>1フレームあたりの<br>タイマー減少量<br><code>[$00:010D]</code></th><th>スプライト<br>切り替え時間</th><th>移動速度</th><th>内容</th></tr>
 </thead>
@@ -594,17 +598,55 @@ Bit0～2（下3ビット）でCGRAMのカラーパレット番号を指定する
 </tbody>
 </table>
 
-<p>No.10とNo.11の値の組み合わせ次第で、様々なスプライトの移動（モーション）パターンが設定できることになる。</p>
+<h3>スプライトの移動（モーション）パターン</h3>
 
-<p>スプライトが移動する場合、移動し続けるパターンと、移動と停止を繰り返すパターンがあるが、当たり判定にぶつかる場合は当たり判定最優先で移動方向を変える他、</p>
+<p>上に記した、OBJマップデータのNo.10とNo.11の値の組み合わせ次第で、様々なスプライトの移動（モーション）パターンが設定できることになる。<br>
+スプライトのモーションや移動処理については、以下で詳細な処理を紹介している。</p>
 
 <ul>
-	<li>移動し続けるパターン：<br>乱数で決めたマス分移動した後に、移動方向を乱数で決定</li>
-	<li>移動と停止を繰り返すパターン：<br>移動方向を乱数で決定し<span class="formula">60</span>フレーム停止してから1マス移動……を繰り返し</li>
+	<li><a href="map02.html">移動なし足踏み</a></li>
+	<li><a href="map03.html">ランダム移動</a></li>
+	<li><a href="map04.html">追尾タイプの移動</a></li>
+	<li><a href="map05.html">移動・停止繰り返し移動</a></li>
 </ul>
 
-<p>と、移動方向を乱数で決めるタイミングが異なる。<br>
-ランダム移動でも、味方キャラ追尾タイプの移動でも、移動方向を決めるタイミングは同じ。</p>
+<p>大まかにまとめると、以下のようになる。<br>
+いずれの移動パターンも、<br>
+移動方向決定→向き変え→移動先マスに移動できるか判定→移動開始<br>
+の順なので、移動先マスに移動できない時でも（当たり判定や他スプライトがいる場合）、向き変えだけする。</p>
+
+<h5>移動マス数の決定方法</h5>
+
+<p>移動し続ける場合、次の向き変えまでの移動マス数は、モーション切り替えタイマーA（OBJマップデータ02）で管理している。<br>
+初期値は<span class="formula">$01</span>で、マップ切り替え時に<span class="formula">$00</span>に減るのですぐにモーション切り替えタイマーAを再計算する。<br>
+<span class="formula">モーション切り替えタイマーA = モーション切り替えタイマーA | ($01～$08の乱数)</span><br>
+当たり判定にぶつかった時でも（モーション切り替えタイマーAが0にならなかった時でも）、再計算するので、<span class="formula">$09</span>以上の値になる時がある。</p>
+
+<p>移動・停止繰り返し移動の場合、次の向き変えまでの移動マス数は、1マスで固定。<br>
+移動・停止繰り返し移動における停止時間は、どの移動速度でも、<span class="formula">60</span>フレーム（<span class="formula">1</span>秒）で固定。<br>
+この場合、モーション切り替えタイマーAは<span class="formula">60</span>フレームカウントダウンタイマーになり、<br>
+移動方向決定→向き変え→移動先マスに移動できるか判定→1マス移動→<span class="formula">60</span>フレームカウントダウン（移動停止）→……<br>
+を繰り返す。</p>
+
+<p>1マス分の移動時間は、OBJマップデータ10のBit0～1で設定する<a href="#speed">移動速度</a>に従う。</p>
+
+<h5>ランダム移動</h5>
+
+<p>移動マス数だけ移動した後に、移動方向を乱数で決定する（上下左右それぞれ均等な1/4の確率）。<br>
+移動方向に当たり判定がある場合、移動方向の逆（左&#x2194;右または上&#x2194;下）が次の移動方向になる。</p>
+
+<h5>追尾タイプの移動</h5>
+
+<p>移動マス数だけ移動した後に（モーション切り替えタイマーAでの管理はランダム移動と同様）、味方キャラ（先頭のキャラ）の座標から、</p>
+<ol>
+	<li>Y座標判定（上下方向のみ向き変更処理）を行い、味方キャラがいる方向へ移動開始。Y座標が同一である時はX座標判定</li>
+	<li>X座標判定（左右方向のみ向き変更処理）を行い、味方キャラがいる方向へ移動開始。X座標が同一である時はY座標判定</li>
+</ol>
+<p>を繰り返すことで移動方向を決定する。<br>
+座標判定は、味方キャラが複数でも、先頭キャラのみで行う。<br>
+移動方向に当たり判定がある場合も上処理を繰り返すので、何らかの障害物を操作キャラと追尾タイプで挟むと追尾タイプのスプライトは移動できなくなる。</p>
+
+<p>幕末編で隠れ蓑を使用中だと、追尾タイプに設定されたスプライトはランダム移動を行う。</p>
 
 <hr>
 
@@ -1615,8 +1657,8 @@ RRはマップ乱数なので、壽商会に入る度に初期値が変わる。
 <tbody>
 	<tr><td>00</td><td><span class="formula">$80</span></td><td>Bit7:キャラ表示(<span class="formula">1</span>で表示) / Bit0～3:向き（下）</td></tr>
 	<tr><td>01</td><td><span class="formula">$00</span></td><td>当たり判定及びモーション切り替え値</td></tr>
-	<tr><td>02</td><td>RR</td><td>モーション切り替えタイマー1 乱数 <span class="formula">$01</span>～<span class="formula">$20</span></td></tr>
-	<tr><td>03</td><td>RR</td><td>モーション切り替えタイマー2 乱数 <span class="formula">$01</span>～<span class="formula">$20</span></td></tr>
+	<tr><td>02</td><td>RR</td><td>モーション切り替えタイマーA 乱数 <span class="formula">$01</span>～<span class="formula">$20</span></td></tr>
+	<tr><td>03</td><td>RR</td><td>モーション切り替えタイマーB 乱数 <span class="formula">$01</span>～<span class="formula">$20</span></td></tr>
 	<tr><td>04</td><td><span class="formula">$00</span></td><td>X座標 ピクセル単位</td></tr>
 	<tr><td>05</td><td><span class="formula">$20</span></td><td>X座標 マス目単位</td></tr>
 	<tr><td>06</td><td><span class="formula">$00</span></td><td>Y座標 ピクセル単位</td></tr>

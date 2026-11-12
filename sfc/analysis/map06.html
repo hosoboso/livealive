@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; 隠れ蓑">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; 隠れ蓑">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; 隠れ蓑</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.apu_code-container,
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.apu_code-container pre,
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="sprite.html">スプライト</a></li>
+		<li><a href="bg.html">背景グラフィックと効果</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">マップ</button>
+	<ul>
+		<li><a href="map01.html">マップ構造とスプライトの配置</a></li>
+		<li><a href="map02.html">スプライト処理</a></li>
+		<li><a href="map03.html">ランダム移動</a></li>
+		<li><a href="map04.html">追尾タイプの移動</a></li>
+		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
+		<li><a href="map06.html">隠れ蓑</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="map01.html">マップ構造とスプライトの配置</a> &gt; 隠れ蓑</h1>
+<h2>マップ構造とスプライトの配置 &gt; 隠れ蓑</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>幕末編の特殊コマンドである、Yボタンを押した時に発動する「かくれみの」（以下「隠れ蓑」とする）について。<br>
+フィールド上で姿を消すことによって、結局のところ敵シンボル（スプライト）の挙動を変化させるため、<a href="map01.html">マップ構造とスプライトの配置</a>の項目で紹介する。<br>
+他にも本丸1階の隠れた忍者を出現させたり、箱入り娘イベント、いんろうの女性の出現条件に関わるなど、各種フラグに影響している。</p>
+
+<h3>メモリアドレス</h3>
+
+<p>隠れ蓑フラグを記録するアドレス<code>[$00:10E3]</code>が重要な役割を担っている。</p>
+
+<table>
+<thead>
+	<tr><th>値</th><th>隠れ蓑フラグの状態</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>隠れ蓑なし（Yボタン押しても隠れない）</td></tr>
+	<tr><td><span class="formula">$01</span></td><td>隠れ蓑あり（Yボタン押していない）</td></tr>
+	<tr><td><span class="formula">$81</span></td><td>隠れ蓑使用中（Yボタン押しっぱなし）</td></tr>
+</tbody>
+</table>
+
+<p>実質、幕末編でしか変動しない値と思われるが、同じくYボタンが特殊コマンドになる近未来編や最終編でも値が入ると妙な挙動をすることがあるようだ。<br>
+（実際のプレイでは起こらないようになっているようだが）</p>
+
+<h3>サブルーチン</h3>
+
+<p>幕末編では<code>[$00:10E3]</code>に<span class="formula">$01</span>が入ることで隠れ蓑が発動するフラグになるのだが、幕末編のどのタイミングで<code>[$00:10E3]</code>に値が入るのかというと、シナリオ選択で幕末編を選んだ直後の初期処理（暗転中の処理）である。<br>
+まず、全シナリオ共通で各種フラグの初期化が行われる。</p>
+
+<div class="code-container"><pre>
+$C0/0359 JSR $03EF  [$C0:03EF]   ;[$C0:03EF]へジャンプ
+
+$C0/03EF STZ $10E6  [$00:10E6]   ;[$00:10E6]に$00を書き込み
+$C0/03F2 LDA #$FF                ;Aに$FFをロード
+$C0/03F4 STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/03F7 STZ $022E  [$00:022E]   ;[$00:022E]に$00を書き込み
+$C0/03FA STA $0A60  [$00:0A60]   ;Aを[$00:0A60]に書き込み　BGMID
+$C0/03FD STA $0A68  [$00:0A68]   ;Aを[$00:0A68]に書き込み　BGMID
+$C0/0400 STA $0A69  [$00:0A69]   ;Aを[$00:0A69]に書き込み
+$C0/0403 STZ $0A0D  [$00:0A0D]   ;[$00:0A0D]に$00を書き込み
+$C0/0406 STZ $0A18  [$00:0A18]   ;[$00:0A18]に$00を書き込み　キャラ1　表示スプライト番号加算値
+$C0/0409 STZ $0A19  [$00:0A19]   ;[$00:0A19]に$00を書き込み　キャラ2　表示スプライト番号加算値
+$C0/040C STZ $0A1A  [$00:0A1A]   ;[$00:0A1A]に$00を書き込み　キャラ3　表示スプライト番号加算値
+$C0/040F STZ $0A1F  [$00:0A1F]   ;[$00:0A1F]に$00を書き込み
+$C0/0412 STZ $0AC7  [$00:0AC7]   ;[$00:0AC7]に$00を書き込み　ポゴが匂いを嗅ぐ能力を所持しているかどうか
+$C0/0415 STZ $0A0F  [$00:0A0F]   ;[$00:0A0F]に$00を書き込み　Yボタン判定フラグ 
+$C0/0418 STZ $10E4  [$00:10E4]   ;[$00:10E4]に$00を書き込み
+$C0/041B STZ $10E3  [$00:10E3]   ;[$00:10E3]に$00を書き込み　隠れ蓑フラグ
+$C0/041E STZ $0A1C  [$00:0A1C]   ;[$00:0A1C]に$00を書き込み
+$C0/0421 STZ $0A0A  [$00:0A0A]   ;[$00:0A0A]に$00を書き込み
+$C0/0424 STZ $0A0B  [$00:0A0B]   ;[$00:0A0B]に$00を書き込み
+$C0/0427 STZ $10E2  [$00:10E2]   ;[$00:10E2]に$00を書き込み
+$C0/042A STZ $0A08  [$00:0A08]   ;[$00:0A08]に$00を書き込み
+$C0/042D STZ $0A09  [$00:0A09]   ;[$00:0A09]に$00を書き込み
+$C0/0430 STZ $0AC0  [$00:0AC0]   ;[$00:0AC0]に$00を書き込み　マップタイマー
+$C0/0433 STZ $0AC1  [$00:0AC1]   ;[$00:0AC1]に$00を書き込み　マップタイマー
+$C0/0436 STZ $0AC2  [$00:0AC2]   ;[$00:0AC2]に$00を書き込み　マップタイマー
+$C0/0439 STZ $0AC3  [$00:0AC3]   ;[$00:0AC3]に$00を書き込み　マップタイマー
+$C0/043C STZ $01D2  [$00:01D2]   ;[$00:01D2]に$00を書き込み
+$C0/043F STZ $0A1B  [$00:0A1B]   ;[$00:0A1B]に$00を書き込み　キャラ4　表示スプライト番号加算値
+$C0/0442 STZ $0A0C  [$00:0A0C]   ;[$00:0A0C]に$00を書き込み
+$C0/0445 STZ $0ACD  [$00:0ACD]   ;[$00:0ACD]に$00を書き込み
+$C0/0448 STZ $0A0E  [$00:0A0E]   ;[$00:0A0E]に$00を書き込み　最終編異次元空間階段フラグ
+$C0/044B LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード　シナリオID
+$C0/044E STA $0ACE  [$00:0ACE]   ;Aを[$00:0ACE]に書き込み　主人公キャラID
+$C0/0451 STA $0ACF  [$00:0ACF]   ;Aを[$00:0ACF]に書き込み
+$C0/0454 STZ $0ACC  [$00:0ACC]   ;[$00:0ACC]に$00を書き込み
+$C0/0457 STZ $0A58  [$00:0A58]   ;[$00:0A58]に$00を書き込み
+$C0/045A STZ $0A6A  [$00:0A6A]   ;[$00:0A6A]に$00を書き込み
+$C0/045D STZ $10E7  [$00:10E7]   ;[$00:10E7]に$00を書き込み
+$C0/0460 LDX #$FFFF              ;Xに$FFFFをロード
+$C0/0463 STX $0A4C  [$00:0A4C]   ;Xを[$00:0A4C]に書き込み
+$C0/0466 STX $0A4E  [$00:0A4E]   ;Xを[$00:0A4E]に書き込み
+$C0/0469 LDA #$00                ;Aに$00をロード
+$C0/046B XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/046C LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード シナリオID
+$C0/046F TAX                     ;Aの値をXレジスタに転送
+$C0/0470 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/0471 LDA #$C0                ;Aに$C0をロード
+$C0/0473 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/0474 PLB                     ;DBレジスタにスタックからプル
+$C0/0475 LDA $1353,x[$C0:135A]   ;Aに[$1353,x]をロード
+$C0/0478 PLB                     ;DBレジスタにスタックからプル
+$C0/0479 STA $10E5  [$00:10E5]   ;Aを[$00:10E5]に書き込み　戦闘時のBGMのID
+$C0/047C JSR $119B  [$C0:119B]   ;[$C0:119B]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/041B</span></code>で、<code>[$00:10E3]</code>に<span class="formula">$00</span>が入る。これは初期化である。<br>
+隠れ蓑関係だと、<code>[$00:0A18]</code>～<code>[$00:0A1B]</code>の4バイトのアドレスも重要。これはパーティメンバー4キャラ分の表示スプライト番号加算値で、操作キャラのスプライトを歩行グラフィック以外で変更する場合に入る値。<br>
+おぼろ丸が天井裏などで腹這いになったり、水中で竹筒状態になるのもこのアドレスが関係している。</p>
+
+<p>ここからかなり後、シナリオ毎の初期処理で、幕末編では以下処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/2B33 LDA $0010E3[$00:10E3]   ;Aに[$00:10E3]をロード
+$C0/2B37 AND #$01                ;Aと$01で論理積
+$C0/2B39 EOR #$01                ;Aと$01で排他的論理和XOR
+$C0/2B3B STA $0010E3[$00:10E3]   ;Aを[$00:10E3]に書き込み
+$C0/2B3F BRL $F05F  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p><code><span class="r">$C0/2B3B</span></code>にて、<code>[$00:10E3]</code> &amp; <span class="formula">$01</span> XOR <span class="formula">$01</span>が新たな<code>[$00:10E3]</code>になる。<br>
+<code>[$00:10E3]</code>には初期化で<span class="formula">$00</span>が入ったから、</p>
+
+<p><span class="formula"><code>[$00:10E3]</code> &amp; $01 XOR $01</span><br>
+<span class="formula">= $00 &amp; $01 XOR $01</span><br>
+<span class="formula">= $01</span></p>
+
+<p>となり、この時点からYボタンで隠れ蓑使用可能ということになる。<br>
+（シナリオ的にはオープニング中にハヤテから「かくれみの」をもらう設定だが、実際にはそれ以前から隠れ蓑使用フラグは立っていたということになる）<br>
+なお、幕末編をクリアして次シナリオを選ぶまで<code>[$00:10E3]</code>には<span class="formula">$01</span>が入ったまま。<br>
+他シナリオを開始すると初期化で<span class="formula">$00</span>が入る。<br>
+また、最終編でおぼろ丸を主人公にしても、<code>[$00:10E3]</code>に<span class="formula">$01</span>が入ることはない。</p>
+
+<p>以上の処理で<code>[$00:10E3]</code>に<span class="formula">$01</span>が入っている、かつ、おぼろ丸をフィールド上で操作できる時は、Yボタンを押すと隠れ蓑が発動することになる。</p>
+
+
+<h4>隠れ蓑発動</h4>
+
+
+<p><span class="tri"><a href="program9_3.html#c2">特殊なマップタイマー &gt; ポゴの匂いタイマー</a></span>で紹介したが、フィールドでYボタンを押した時、匂いを嗅ぐ・心を読む・隠れ蓑のどれなのか（またはいずれの発動条件も満たしていないか）を判定するのが<code><span class="r">$C0/135C</span></code>～<code><span class="r">$C0/13B4</span></code>である。詳細は上リンク先で紹介している。</p>
+
+<ol>
+	<li><code>[$00:0A0F]</code>：近未来編なら<span class="formula">$01</span>、最終編で本能のダンジョンまたは心のダンジョンに入ると<span class="formula">$01</span>、それ以外は<span class="formula">$00</span></li>
+	<li><code>[$00:0AC7]</code>：ポゴの匂いを嗅ぐフラグ　<span class="formula">$00</span>は匂い嗅げない、<span class="formula">$01</span>は嗅げる、<span class="formula">$81</span>は匂いが漂っている</li>
+</ol>
+
+<p>の順に判定するので、幕末編だとどちらも条件を満たさないため、<code><span class="r">$C0/13B4</span></code>でサブルーチンが戻る。</p>
+
+<div class="code-container"><pre>
+;隠れ蓑ON
+;ボタンの値からイベント分岐処理
+$C0/0831 LDA $05    [$00:0005]   ;Aに[$00:0005]をロード　コントローラ1のボタン判定用　Yボタン:$40
+$C0/0833 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/0835 BEQ $03    [$083A]      ;ゼロフラグが立っているとき[$083A]分岐
+;ゼロフラグOFF　Yボタン判定
+$C0/0837 JSR $135C  [$C0:135C]   ;[$C0:135C]へジャンプ
+
+$C0/135C LDA $0A0F  [$00:0A0F]   ;Aに[$00:0A0F]をロード Yボタン判定フラグ（近未来編なら$01　最終編はフラグ次第で$01）
+$C0/135F BEQ $05    [$1366]      ;ゼロフラグが立っているとき[$1366]分岐
+;ゼロフラグON
+$C0/1366 LDA $0AC7  [$00:0AC7]   ;Aに[$00:0AC7]をロード ポゴが匂いを嗅ぐ能力を所持しているかどうか
+$C0/1369 BEQ $49    [$13B4]      ;ゼロフラグが立っているとき[$13B4]分岐
+;ゼロフラグON
+$C0/13B4 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p><code><span class="r">$C0/0837</span></code>からの戻り先の<code><span class="r">$C0/083A</span></code>が<code>[$00:10E3]</code>、つまり隠れ蓑判定値である。</p>
+
+<div class="code-container"><pre>
+$C0/083A LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード　隠れ蓑判定値
+$C0/083D BEQ $3E    [$087D]      ;ゼロフラグが立っているとき[$087D]分岐
+;ゼロフラグOFF隠れ蓑所持
+$C0/083F LDA $01    [$00:0001]   ;Aに[$00:0001]をロード　コントローラ1のボタンを押した判定
+$C0/0841 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）Yボタン:$40
+$C0/0843 BEQ $29    [$086E]      ;ゼロフラグが立っているとき[$086E]分岐
+;ゼロフラグON　Yボタン:$40
+$C0/0845 LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード　隠れ蓑判定値
+$C0/0848 BPL $03    [$084D]      ;ネガティブフラグが立っていないとき[$084D]分岐
+;$C0/0848ネガティブフラグON　隠れ蓑で消えている状態
+$C0/084A BRL $019F  [$09EC]      ;フラグにかかわりなく常に分岐[$09EC]
+;$C0/0848ネガティブフラグOFF　隠れ蓑で消えている状態ではない
+$C0/084D LDA #$04                ;Aに$04をロード　スプライト番号加算値 = $04は水中の筒
+$C0/084F CMP $0A18  [$00:0A18]   ;Aと[$00:0A18]を減算比較（ステータスレジスタ変更のみ）キャラ1表示スプライト番号加算値
+$C0/0852 BEQ $29    [$087D]      ;ゼロフラグが立っているとき[$087D]分岐
+$C0/0854 CMP $0A19  [$00:0A19]   ;Aと[$00:0A19]を減算比較（ステータスレジスタ変更のみ）キャラ2表示スプライト番号加算値
+$C0/0857 BEQ $24    [$087D]      ;ゼロフラグが立っているとき[$087D]分岐
+$C0/0859 CMP $0A1A  [$00:0A1A]   ;Aと[$00:0A1A]を減算比較（ステータスレジスタ変更のみ）キャラ3表示スプライト番号加算値
+$C0/085C BEQ $1F    [$087D]      ;ゼロフラグが立っているとき[$087D]分岐
+$C0/085E LDA #$01                ;Aに$01をロード
+$C0/0860 JSR $1B74  [$C0:1B74]   ;[$C0:1B74]へジャンプ
+</pre></div>
+
+<p>幕末編のみ、<code><span class="r">$C0/083D</span></code>でゼロフラグが立たない。<br>
+よって、<code><span class="r">$C0/083F</span></code>以降は実質幕末編専用処理である。<br>
+<code><span class="r">$C0/083F</span></code>～<code><span class="r">$C0/0843</span></code>でもう一度Yボタン判定をして（押し続けているかどうかの判定）、<code><span class="r">$C0/0845</span></code>で<code>[$00:10E3]</code>（隠れ蓑判定値）にネガティブフラグがついているか判定。<br>
+後で処理があるが、隠れ蓑で消えている時には<code>[$00:10E3]</code>に<span class="formula">$81</span>が入るので、ここでネガティブフラグが立つなら消えている最中。<br>
+消えている時は隠れ蓑使用時処理を行う必要はないので、<code><span class="r">$C0/084A</span></code>→<code><span class="r">$C0/09EC</span></code>にジャンプして処理終了である。</p>
+
+<p>消えていない時はネガティブフラグが立たず、<code><span class="r">$C0/084D</span></code>に進む。<br>
+<code><span class="r">$C0/084D</span></code>～は、<code>[$00:0A18]</code>, <code>[$00:0A19]</code>, <code>[$00:0A1A]</code>がそれぞれ<span class="formula">$04</span>ではないかどうかのフラグ。<br>
+<code>[$00:0A18]</code>～<code>[$00:0A1B]</code>はパーティメンバー4キャラそれぞれについてのスプライト番号加算値になり、<span class="formula">$04</span>がセットされているのなら、VRAMのアドレス<code>$C000</code>～に入るキャラのスプライトに<span class="formula">+4</span>したタイル位置のスプライトが表示される。<br>
+幕末編の場合だと、<span class="formula">+$04</span>すると水中の竹筒、<span class="formula">+$06</span>すると伏せた状態になる（伏せ状態はおぼろ丸のスプライトしかなく、カラクリ丸はカラーパレットを変えて兼用）。<br>
+上処理から、味方キャラ1（おぼろ丸）、味方キャラ2（とらわれの男）、味方キャラ3（カラクリ丸）のいずれもスプライト番号加算値が<span class="formula">$04</span>ではない場合のみ、<code><span class="r">$C0/085E</span></code>まで進む。<br>
+誰か1人だけでもスプライト番号加算値が<span class="formula">$04</span>だったら、<code><span class="r">$C0/087D</span></code>へ分岐処理になる。<br>
+<code><span class="r">$C0/087D</span></code>は後々で紹介するが、隠れ蓑解除時の処理の最後であり、隠れ蓑を行わない、ということになる。<br>
+つまり、キャラのグラフィックが竹筒状態＝水堀の中に居る時には隠れ蓑は使えない。<br>
+Yボタンを押しても何の処理もされないことになる。</p>
+
+<p>なお、隠れ蓑使用中でスプライトが変わっても、<code>[$00:0A18]</code>, <code>[$00:0A19]</code>, <code>[$00:0A1A]</code>は変動しない。<br>
+あくまでも通常状態のスプライトにおける番号加算値である。</p>
+
+<p>以上から、水堀以外であれば隠れ蓑は使用可能ということでもある。<br>
+その場合は<code>A</code>に<span class="formula">$01</span>をロードし、<code><span class="r">$C0/1B74</span></code>にジャンプする。<br>
+ここから隠れ蓑発動時のサウンド処理と、グラフィック処理が行われるが、少し長いので、先に<code><span class="r">$C0/0860</span></code>からの戻り先処理を記しておく。</p>
+
+<div class="code-container"><pre>
+$C0/0863 LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード
+$C0/0866 ORA #$80                ;Aと$80で論理和
+$C0/0868 STA $10E3  [$00:10E3]   ;Aを[$00:10E3]に書き込み
+$C0/086B BRL $017E  [$09EC]      ;フラグにかかわりなく常に分岐[$09EC]
+$C0/09EC JSR $0AC9  [$C0:0AC9]   ;[$C0:0AC9]へジャンプ
+</pre></div>
+
+<p>サウンド処理やグラフィック処理を行ったところで、</p>
+
+<p><span class="formula"><code>[$00:10E3]</code> | $80</span></p>
+
+<p>が新たな<code>[$00:10E3]</code>に書き込まれる。<br>
+つまり、</p>
+
+<p><span class="formula">$01 | $80 = $81</span></p>
+
+<p>となり、隠れ蓑使用中は<code>[$00:10E3]</code>に<span class="formula">$81</span>が入ることになる。</p>
+
+<p><code><span class="r">$C0/0860</span></code>からの処理は少々長いので適度に端折るが、味方キャラが動けない場合、敵側のOBJマップデータEv00～Ev04に処理が入る。<br>
+Yボタンを押してから、<span class="formula">16</span>フレーム（<span class="formula">16/60</span>秒）で姿を消すのだが、その間、<code>$00:0200</code>に<span class="formula">$01</span>が入り、敵シンボルなど他スプライトを停止させる。このための処理になる。</p>
+
+<div class="code-container"><pre>
+$C0/1B74 STZ $0201  [$00:0201]   ;[$00:0201]に$00を書き込み
+$C0/1B77 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/1B78 JSR $41EA  [$C0:41EA]   ;[$C0:41EA]へジャンプ
+
+$C0/41EA LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード
+$C0/41ED CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/41EF BEQ $05    [$41F6]      ;ゼロフラグが立っているとき[$41F6]分岐
+$C0/41F1 STZ $0206  [$00:0206]   ;[$00:0206]に$00を書き込み
+$C0/41F4 BRA $05    [$41FB]      ;フラグにかかわりなく常に分岐[$41FB]
+;（中略）
+$C0/4249 LDA $0A03  [$00:0A03]   ;Aに[$00:0A03]をロード　マップのスプライト数
+$C0/424C BEQ $4A    [$4298]      ;ゼロフラグが立っているとき[$4298]分岐
+$C0/424E STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+;ループ処理
+$C0/4250 LDA $0F,x  [$00:1338]   ;Aに[$00:1338]をロード OBJマップデータ10
+$C0/4252 AND #$40                ;Aと$40で論理積
+$C0/4254 STA $00,x  [$00:1329]   ;Aを[$00:1329]に書き込み OBJマップデータEv00
+$C0/4256 LDA $0F,x  [$00:1338]   ;Aに[$00:1338]をロード OBJマップデータ10
+$C0/4258 AND #$03                ;Aと$03で論理積
+$C0/425A STA $01,x  [$00:132A]   ;Aを[$00:132A]に書き込み OBJマップデータEv01
+$C0/425C STZ $02,x  [$00:132B]   ;[$00:132B]に$00を書き込み OBJマップデータEv02
+$C0/425E STZ $03,x  [$00:132C]   ;[$00:132C]に$00を書き込み OBJマップデータEv03
+$C0/4260 STZ $04,x  [$00:132D]   ;[$00:132D]に$00を書き込み OBJマップデータEv04
+$C0/4262 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/4264 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/4265 CLC                     ;キャリーフラグクリア
+$C0/4266 ADC #$0011              ;A + $0011
+$C0/4269 TAX                     ;Aの値をXレジスタに転送
+$C0/426A SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/426C DEC $30    [$00:0030]   ;[$00:0030]をデクリメント -1
+$C0/426E BNE $E0    [$4250]      ;ゼロフラグが立っていないとき[$4250]分岐
+;ループ処理ここまで（マップのスプライト数繰り返し）
+;（中略）
+$C0/429E RTS                     ;サブルーチン戻り
+
+$C0/1B7B LDA #$01                ;Aに$01をロード
+$C0/1B7D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/1B80 STZ $0214  [$00:0214]   ;[$00:0214]に$00を書き込み
+$C0/1B83 STZ $021A  [$00:021A]   ;[$00:021A]に$00を書き込み
+$C0/1B86 STZ $0202  [$00:0202]   ;[$00:0202]に$00を書き込み
+$C0/1B89 STZ $0203  [$00:0203]   ;[$00:0203]に$00を書き込み
+;（後略）
+</pre></div>
+
+<p>Ev00は<br>
+<span class="formula">OBJマップデータ10 &amp; $40</span>（Bit6）<br>
+が入り、Ev01は<br>
+<span class="formula">OBJマップデータ10 &amp; $03</span>（Bit0～1）<br>
+が入る。<br>
+OBJマップデータEv02～OBJマップデータEv04は<span class="formula">$00</span>が入る。<br>
+つまり、Ev00にはスプライト切り替えパターンの値、Ev01は移動速度の値が入る。<br>
+全スプライトに対し処理した後、<code><span class="r">$C0/1B7D</span></code>で<code>[$00:0200]</code>に<span class="formula">$01</span>が書き込まれる。</p>
+
+<p>すると、スプライトの挙動を計算する<code><span class="r">$C0/8E88</span></code>～のループはどうなるか。</p>
+
+<div class="code-container"><pre>
+$C0/8E88 LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード
+$C0/8E8B BNE $27    [$8EB4]      ;ゼロフラグが立っていないとき[$8EB4]分岐
+;ゼロフラグOFF プレイヤーがキャラ操作不可能
+$C0/8EB4 LDA $010A  [$00:010A]   ;Aに[$00:010A]をロード
+$C0/8EB7 BNE $F8    [$8EB1]      ;ゼロフラグが立っていないとき[$8EB1]分岐
+$C0/8EB9 LDA $01,x  [$00:132A]   ;Aに[$00:132A]をロード OBJマップデータEv01
+$C0/8EBB AND #$03                ;Aと$03で論理積
+$C0/8EBD BEQ $14    [$8ED3]      ;ゼロフラグが立っているとき[$8ED3]分岐
+;ゼロフラグOFF
+$C0/8EBF CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/8EC1 BEQ $0C    [$8ECF]      ;ゼロフラグが立っているとき[$8ECF]分岐
+;ゼロフラグOFF 
+$C0/8EC3 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/8EC5 BEQ $04    [$8ECB]      ;ゼロフラグが立っているとき[$8ECB]分岐
+;ゼロフラグOFF ※速度の値を書き込む処理
+$C0/8EC7 LDA #$04                ;Aに$04をロード
+$C0/8EC9 BRA $0A    [$8ED5]      ;フラグにかかわりなく常に分岐[$8ED5]
+$C0/8ED5 STA $24    [$00:0024]   ;Aを[$00:0024]に書き込み
+$C0/8ED7 STZ $25    [$00:0025]   ;[$00:0025]に$00を書き込み
+$C0/8ED9 LSR A                   ;Aを論理右シフト　(/2)
+$C0/8EDA LSR A                   ;Aを論理右シフト　(/2)
+$C0/8EDB STA $010D  [$00:010D]   ;Aを[$00:010D]に書き込み 01
+$C0/8EDE LDA $0200  [$00:0200]   ;Aに[$00:0200]をロード 01
+$C0/8EE1 BNE $03    [$8EE6]      ;ゼロフラグが立っていないとき[$8EE6]分岐
+;ゼロフラグOFF プレイヤーがキャラ操作不可能
+$C0/8EE6 LDA $01,x  [$00:132A]   ;Aに[$00:132A]をロード OBJマップデータEv01
+$C0/8EE8 BIT #$04                ;Aと$04で論理積（ステータスフラグ変更のみ）
+$C0/8EEA BNE $20    [$8F0C]      ;ゼロフラグが立っていないとき[$8F0C]分岐
+;ゼロフラグON
+$C0/8EEC BIT #$20                ;Aと$20で論理積（ステータスフラグ変更のみ）
+$C0/8EEE BNE $22    [$8F12]      ;ゼロフラグが立っていないとき[$8F12]分岐
+;ゼロフラグON
+$C0/8EF0 BIT #$10                ;Aと$10で論理積（ステータスフラグ変更のみ）
+$C0/8EF2 BNE $74    [$8F68]      ;ゼロフラグが立っていないとき[$8F68]分岐
+;ゼロフラグON
+$C0/8EF4 BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C0/8EF6 BNE $2F    [$8F27]      ;ゼロフラグが立っていないとき[$8F27]分岐
+;ゼロフラグON
+$C0/8EF8 LDA $03,x  [$00:132C]   ;Aに[$00:132C]をロード OBJマップデータEv03
+$C0/8EFA BNE $13    [$8F0F]      ;ゼロフラグが立っていないとき[$8F0F]分岐
+;ゼロフラグON
+$C0/8EFC LDA $02,x  [$00:132B]   ;Aに[$00:132B]をロード OBJマップデータEv02
+$C0/8EFE BNE $0F    [$8F0F]      ;ゼロフラグが立っていないとき[$8F0F]分岐
+;ゼロフラグON
+$C0/8F00 LDA $00,x  [$00:1329]   ;Aに[$00:1329]をロード OBJマップデータEv00　スプライト切り替えパターン（00か40）
+$C0/8F02 BIT #$20                ;Aと$20で論理積（ステータスフラグ変更のみ）
+$C0/8F04 BEQ $03    [$8F09]      ;ゼロフラグが立っているとき[$8F09]分岐
+;ゼロフラグON
+$C0/8F09 BRL $01A2  [$90AE]      ;フラグにかかわりなく常に分岐[$90AE]
+$C0/90AE LDA $01,x  [$00:132A]   ;Aに[$00:132A]をロード OBJマップデータEv01
+$C0/90B0 AND #$C0                ;Aと$C0(1100 0000)で論理積
+$C0/90B2 STA $21    [$00:0021]   ;Aを[$00:0021]に書き込み
+$C0/90B4 BRL $038C  [$9443]      ;フラグにかかわりなく常に分岐[$9443]
+;通常処理と合流
+$C0/9443 LDA $05,x  [$00:132E]   ;Aに[$00:132E]をロード OBJマップデータ00
+$C0/9445 BMI $03    [$944A]      ;ネガティブフラグが立っているとき[$944A]分岐
+$C0/9447 BRL $00C7  [$9511]      ;フラグにかかわりなく常に分岐[$9511]
+$C0/9511 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9513 TXA                     ;Xレジスタの値をAレジスタに転送
+$C0/9514 CLC                     ;キャリーフラグクリア
+$C0/9515 ADC #$0011              ;A + $0011
+$C0/9518 TAX                     ;Aの値をXレジスタに転送
+$C0/9519 TYA                     ;Yレジスタの値をAレジスタに転送
+$C0/951A CLC                     ;キャリーフラグクリア
+$C0/951B ADC #$002E              ;A + $002E
+$C0/951E TAY                     ;Aの値をYレジスタに転送
+$C0/951F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9521 DEC $2C    [$00:002C]   ;[$00:002C]をデクリメント -1
+$C0/9523 BEQ $03    [$9528]      ;ゼロフラグが立っているとき[$9528]分岐
+$C0/9525 BRL $F960  [$8E88]      ;フラグにかかわりなく常に分岐[$8E88]
+</pre></div>
+
+<p>大雑把にいえば、プレイヤーが操作できない間は、OBJマップデータEv00～Ev04でスプライトの移動を制御する、ということになる。<br>
+タイマー関係の処理もすべてスキップされている。<br>
+結果としてスプライトが停止することになり、移動用のタイマーも減少しない。<br>
+隠れ蓑で完全に隠れると、<code>[$00:0200]</code>が<span class="formula">$00</span>に戻るので、移動を再開する。</p>
+
+<p>操作キャラのモーションは、</p>
+
+<ol>
+	<li>3フレーム目でパーティメンバーの向きを全員下向きに変更</li>
+	<li>効果音演奏開始</li>
+	<li>6フレーム目で隠れ蓑半分のスプライト</li>
+	<li>12フレーム目で手だけのスプライト</li>
+	<li>16フレーム目で消える</li>
+</ol>
+
+<p>という順で変動する。</p>
+
+<p>サウンド処理は3フレーム目でパーティメンバーの向きを全員下向きに変更した直後。</p>
+
+<div class="code-container"><pre>
+$C0/2F15 BRL $EC89  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:93AD]   ;Aに[$7F:93AD]をロード 81
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1CDC] ;[$C0:1CDC]へジャンプ(レジスタをスタックに積まない)
+$C0/1CDC LDA $8E00,y[$7F:93AE]   ;Aに[$7F:93AE]をロード $DB
+$C0/1CDF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1CE1 JSR $1183  [$C0:1183]   ;[$C0:1183]へジャンプ
+</pre></div>
+
+<p><code>$7F:8E00</code>～に各シナリオのフラグ（定数）が入っているが、<code>[$7F:93AE]</code>に格納されている<span class="formula">$DB</span>が隠れ蓑用の効果音IDである。<br>
+後は、サウンドドライバファンクションのコマンド<span class="formula">$18 xx yy</span>（効果音ID<span class="formula">$00</span>～<span class="formula">$FF</span> 演奏開始）で演奏する。</p>
+
+<div class="code-container"><pre>
+$C0/1183 LDA #$80                ;Aに$80をロード
+$C0/1185 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1187 STA $000A63[$00:0A63]   ;Aを[$00:0A63]に書き込み
+$C0/118B LDA #$18                ;Aに$18をロード
+$C0/118D BRL $013F  [$12CF]      ;フラグにかかわりなく常に分岐[$12CF]
+$C0/12CF LDX #$1D00              ;Xに$1D00をロード
+$C0/12D2 STA $00,x  [$00:1D00]   ;Aを[$00:1D00]に書き込み 18
+$C0/12D4 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/12D6 STA $01,x  [$00:1D01]   ;Aを[$00:1D01]に書き込み DB
+$C0/12D8 LDA $31    [$00:0031]   ;Aに[$00:0031]をロード
+$C0/12DA STA $02,x  [$00:1D02]   ;Aを[$00:1D02]に書き込み 80
+$C0/12DC LDA $70    [$00:0070]   ;Aに[$00:0070]をロード
+$C0/12DE CMP #$01                ;Aと$01を減算比較（ステータスレジスタ変更のみ）
+$C0/12E0 BEQ $04    [$12E6]      ;ゼロフラグが立っているとき[$12E6]分岐
+$C0/12E2 JSL $C30004[$C3:0004]   ;[$C3:0004]へジャンプ
+
+;コマンド$18 DB 80で効果音演奏
+$C3/0004 JMP $0131  [$C3:0131]   ;[$C3:0131]へジャンプ(レジスタをスタックに積まない)
+$C3/0131 PHB                     ;DBレジスタをスタックにプッシュ
+$C3/0132 PHD                     ;Dレジスタをスタックへプッシュ
+$C3/0133 PHP                     ;ステータスレジスタをスタックへプッシュ
+$C3/0134 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0136 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0138 PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0139 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/013A PHY                     ;Yレジスタをスタックへプッシュ
+$C3/013B SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/013D LDA #$00                ;Aに$00をロード
+$C3/013F PHA                     ;Aレジスタをスタックにプッシュ
+$C3/0140 PLB                     ;DBレジスタにスタックからプル
+$C3/0141 LDX #$1D00              ;Xに$1D00をロード
+$C3/0144 PHX                     ;Xレジスタをスタックにプッシュ
+$C3/0145 PLD                     ;Dレジスタにスタックからプル
+$C3/0146 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0148 LDA $00    [$00:1D00]   ;Aに[$00:1D00]をロード
+$C3/014A BEQ $25    [$0171]      ;ゼロフラグが立っているとき[$0171]分岐
+$C3/014C BMI $19    [$0167]      ;ネガティブフラグが立っているとき[$0167]分岐
+$C3/014E CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C3/0150 BCC $1F    [$0171]      ;キャリーフラグが立っていないとき[$0171]分岐
+$C3/0152 CMP #$18                ;Aと$18を減算比較（ステータスレジスタ変更のみ）
+$C3/0154 BCS $0D    [$0163]      ;キャリーフラグが立っているとき[$0163]分岐
+$C3/0163 CMP #$30                ;Aと$30を減算比較（ステータスレジスタ変更のみ）
+$C3/0165 BCS $03    [$016A]      ;キャリーフラグが立っているとき[$016A]分岐
+$C3/0167 JMP $05AC  [$C3:05AC]   ;[$C3:05AC]へジャンプ(レジスタをスタックに積まない)
+$C3/05AC SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/05AE LDA $03    [$00:1D03]   ;Aに[$00:1D03]をロード
+$C3/05B0 STA $2143  [$00:2143]   ;Aを[$00:2143]に書き込み
+$C3/05B3 LDA $02    [$00:1D02]   ;Aに[$00:1D02]をロード
+$C3/05B5 STA $2142  [$00:2142]   ;Aを[$00:2142]に書き込み
+$C3/05B8 LDA $01    [$00:1D01]   ;Aに[$00:1D01]をロード
+$C3/05BA STA $2141  [$00:2141]   ;Aを[$00:2141]に書き込み
+$C3/05BD LDA $00    [$00:1D00]   ;Aに[$00:1D00]をロード
+$C3/05BF LDX #$0800              ;Xに$0800をロード
+$C3/05C2 STA $2140  [$00:2140]   ;Aを[$00:2140]に書き込み
+;ループ処理
+$C3/05C5 CMP $2140  [$00:2140]   ;Aと[$00:2140]を減算比較（ステータスレジスタ変更のみ）
+$C3/05C8 BEQ $05    [$05CF]      ;ゼロフラグが立っているとき[$05CF]分岐
+$C3/05CA DEX                     ;Xをデクリメント -1
+$C3/05CB BNE $F8    [$05C5]      ;ゼロフラグが立っていないとき[$05C5]分岐
+;ループ処理ここまで
+$C3/05CF CMP #$F0                ;Aと$F0を減算比較（ステータスレジスタ変更のみ）
+$C3/05D1 BCC $21    [$05F4]      ;キャリーフラグが立っていないとき[$05F4]分岐
+$C3/05F4 JMP $0171  [$C3:0171]   ;[$C3:0171]へジャンプ(レジスタをスタックに積まない)
+$C3/0171 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C3/0173 STZ $00    [$00:1D00]   ;[$00:1D00]に$00を書き込み
+$C3/0175 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C3/0177 REP #$10                ;X/Yレジスタを16bit幅に変更、Xフラグをクリア
+$C3/0179 PLY                     ;Yレジスタにスタックからプル
+$C3/017A PLX                     ;Xレジスタにスタックからプル
+$C3/017B PLA                     ;Aレジスタにスタックからプル
+$C3/017C PLP                     ;Pレジスタにスタックからプル
+$C3/017D PLD                     ;Dレジスタにスタックからプル
+$C3/017E PLB                     ;DBレジスタにスタックからプル
+$C3/017F RTL                     ;サブルーチン戻り
+
+$C0/12E6 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<h4>隠れ蓑解除</h4>
+
+<p>隠れ蓑中に、Yボタンを離すと（押すのを止めると）、隠れ蓑は解除される。<br>
+サウンドは発動時と同じ効果音ID<span class="formula">$DB</span>を鳴らすが、値は<code>[$7F:93E0]</code>から取り出している。</p>
+
+<div class="code-container"><pre>
+;隠れ蓑OFF
+;ボタンの値からイベント分岐処理
+$C0/0831  LDA $05    [$00:0005]   ;Aに[$00:0005]をロード
+$C0/0833  BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/0835  BEQ $03    [$083A]      ;ゼロフラグが立っているとき[$083A]分岐
+;ゼロフラグON Yボタン押されていない
+$C0/083A  LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード
+$C0/083D  BEQ $3E    [$087D]      ;ゼロフラグが立っているとき[$087D]分岐
+;ゼロフラグOFF　隠れ蓑使える状態
+$C0/083F  LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/0841  BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/0843  BEQ $29    [$086E]      ;ゼロフラグが立っているとき[$086E]分岐
+;ゼロフラグON Yボタン押されていない
+$C0/086E  LDA $10E3  [$00:10E3]   ;Aに[$00:10E3]をロード
+$C0/0871  BPL $0A    [$087D]      ;ネガティブフラグが立っていないとき[$087D]分岐
+;ネガティブフラグON　隠れ蓑で隠れていた
+$C0/0873  AND #$7F                ;Aと$7Fで論理積
+$C0/0875  STA $10E3  [$00:10E3]   ;Aを[$00:10E3]に書き込み　$81 &amp; $7F = $01
+$C0/0878  LDA #$02                ;Aに$02をロード
+$C0/087A  JSR $1B74  [$C0:1B74]   ;[$C0:1B74]へジャンプ
+;
+;（中略　隠れ蓑解除処理）
+</pre></div>
+
+<p>つまり、「Yボタンが押されていない」かつ「<code>[$00:10E3]</code>に<span class="formula">$81</span>が入っている（隠れている状態）」なら、</p>
+
+<p><span class="formula"><code>[$00:10E3]</code>($81) &amp; $7F = $01</span></p>
+
+<p>で<code>[$00:10E3]</code>に元の値<span class="formula">$01</span>を書き込み、解除処理へ進むことになる。<br>
+隠れ蓑開始時とは異なり、先に<code>[$00:10E3]</code>を更新してからモーション・サウンド処理を行う。<br>
+こちらも16フレームで元の状態へ戻り、その間は他スプライトは停止する。<br>
+<code><span class="r">$C0/087A</span></code>からの戻りは以下で、実質ボタン判定の続きである。<br>
+Yボタン以外のボタンが押されていなければ処理終了で、スプライトのグラフィック処理へ移る。</p>
+
+<div class="code-container"><pre>
+$C0/087D LDA $04    [$00:0004]   ;Aに[$00:0004]をロード　コントローラ1のボタン
+$C0/087F BPL $03    [$0884]      ;ネガティブフラグが立っていないとき[$0884]分岐
+;ネガティブフラグOFF Aボタン判定
+$C0/0884 LDA $0A1F  [$00:0A1F]   ;Aに[$00:0A1F]をロード
+$C0/0887 BNE $0D    [$0896]      ;ゼロフラグが立っていないとき[$0896]分岐
+;ゼロフラグON
+$C0/0889 LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/088B BPL $0E    [$089B]      ;ネガティブフラグが立っていないとき[$089B]分岐
+;ネガティブフラグOFF
+$C0/089B LDX #$0010              ;Xに$0010をロード
+$C0/089E BRA $08    [$08A8]      ;フラグにかかわりなく常に分岐[$08A8]
+$C0/08A8 STX $01A8  [$00:01A8]   ;Xを[$00:01A9][$00:01A8]に書き込み
+$C0/08AB STX $01AE  [$00:01AE]   ;Xを[$00:01AF][$00:01AE]に書き込み
+$C0/08AE LDA $04    [$00:0004]   ;Aに[$00:0004]をロード
+$C0/08B0 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/08B2 BEQ $17    [$08CB]      ;ゼロフラグが立っているとき[$08CB]分岐
+;ゼロフラグON
+$C0/08CB LDA $0A1C  [$00:0A1C]   ;Aに[$00:0A1C]をロード
+$C0/08CE BEQ $56    [$0926]      ;ゼロフラグが立っているとき[$0926]分岐
+$C0/0926 LDA $01    [$00:0001]   ;Aに[$00:0001]をロード
+$C0/0928 STA $020A  [$00:020A]   ;Aを[$00:020A]に書き込み
+$C0/092B LDA $020A  [$00:020A]   ;Aに[$00:020A]をロード
+$C0/092E BIT #$08                ;Aと$08で論理積（ステータスフラグ変更のみ）
+$C0/0930 BEQ $2C    [$095E]      ;ゼロフラグが立っているとき[$095E]分岐
+;ゼロフラグON
+$C0/095E LDA $020A  [$00:020A]   ;Aに[$00:020A]をロード
+$C0/0961 BIT #$04                ;Aと$04で論理積（ステータスフラグ変更のみ）
+$C0/0963 BEQ $27    [$098C]      ;ゼロフラグが立っているとき[$098C]分岐
+;ゼロフラグON
+$C0/098C LDA $020A  [$00:020A]   ;Aに[$00:020A]をロード
+$C0/098F BIT #$02                ;Aと$02で論理積（ステータスフラグ変更のみ）
+$C0/0991 BEQ $29    [$09BC]      ;ゼロフラグが立っているとき[$09BC]分岐
+;ゼロフラグON
+$C0/09BC LDA $020A  [$00:020A]   ;Aに[$00:020A]をロード
+$C0/09BF BIT #$01                ;Aと$01で論理積（ステータスフラグ変更のみ）
+$C0/09C1 BEQ $29    [$09EC]      ;ゼロフラグが立っているとき[$09EC]分岐
+;隠れ蓑使用時と処理合流
+$C0/09EC JSR $0AC9  [$C0:0AC9]   ;[$C0:0AC9]へジャンプ
+</pre></div>
+
+<!-- <script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script> -->
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="map05.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="map05.html"><span class="button">&#9654;次 </span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="map01.html">マップ構造</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
