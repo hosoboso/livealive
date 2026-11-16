@@ -195,6 +195,7 @@ table {
 		<li><a href="map04.html">追尾タイプの移動</a></li>
 		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
 		<li><a href="map06.html">隠れ蓑</a></li>
+		<li><a href="map07.html">匂いを嗅ぐ</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -479,6 +480,7 @@ table {
 	<tr><td><code>$C0:12CF</code>～<code>$C0:12E2</code></td><td><code>$00:1D00</code>～<code>$00:1D02</code>を書き込んでサウンド処理<code>$C3/0004</code>にジャンプ</td></tr>
 	<tr><td><code>$C0:12E7</code>～<code>$C0:1316</code></td><td><code>[$00:0030]</code>にロードされたBGMIDを<code>[$00:0A60]</code>に書き込み</td></tr>
 	<tr><td><code>$C0:135C</code>～<code>$C0:13B4</code></td><td>フィールドでYボタンを押した時の判定分岐（匂いを嗅ぐ・心を読む・隠れ蓑）</td></tr>
+	<tr><td><code>$C0:13A2</code>～<code>$C0:13B1</code></td><td>匂いを嗅いだ時のタイマーセット</td></tr>
 	<tr><td><code>$C0:13B8</code>～<code>$C0:1575</code></td><td>近未来編または最終編でYボタン判定フラグが立っている時のYボタン処理（匂いを嗅ぐ・心を読むをマップ・座標で分岐判定）</td></tr>
 	<tr><td><code>$C0:1A69</code>～<code>$C0:1ADB</code></td><td>マップタイマーのカウントダウン計算</td></tr>
 	<tr><td><code>$C0:1C62</code>～<code>$C0:1C68</code></td><td><code>[$00:0A0F]</code>（Yボタン判定フラグ）に<span class="formula">$01</span>書き込み（近未来編冒頭及び、最終編で本能のダンジョンまたは心のダンジョンに入る）</td></tr>
@@ -488,17 +490,19 @@ table {
 	<tr><td><code>$C0:27FB</code>～<code>$C0:2813</code></td><td>原始編でポゴが匂いを嗅げるかどうかのフラグ切り替え<code>[$00:0AC7]</code>（匂い嗅げるフラグ）に<span class="formula">$00</span>または<span class="formula">$01</span>、<code>[$00:0AC8]</code>に<span class="formula">$00</span>、<code>[$00:0AC9]</code>に<span class="formula">$23</span>書き込み</td></tr>
 	<tr><td><code>$C0:282C</code>～<code>$C0:282F</code></td><td>近未来編オープニング　BGMID<span class="formula">$18</span>「GO!GO!ブリキ大王!!」のループをストップしてコーダ部分演奏切り替え</td></tr>
 	<tr><td><code>$C0:29F2</code>～<code>$C0:2A16</code></td><td>シナリオクリア時、<code>$00:0A01</code>の更新</td></tr>
-	<tr><td><code>$C0:2B33</code>～<code>$C0:2B3F</code></td><td>幕末編開始/終了時、<span class="formula">([$00:10E3] &amp; $01) XOR $01</span>で隠れ蓑フラグ<code>[$00:10E3]</code>更新</td></tr>
+	<tr><td><code>$C0:2B33</code>～<code>$C0:2B3F</code></td><td>幕末編開始時、<span class="formula">([$00:10E3] &amp; $01) XOR $01</span>で隠れ蓑フラグ<code>[$00:10E3]</code>更新</td></tr>
 	<tr><td><code>$C0:302B</code>～<code>$C0:304D</code></td><td>固定色の輝度<code>[$00:0A04]</code>～<code>[$00:0A07]</code>を設定</td></tr>
 	<tr><td><code>$C0:30C5</code>～<code>$C0:30DB</code></td><td>イベント戦闘時のサウンドデータを<code>[$00:0043]</code>, <code>[$00:0044]</code>に書き込み</td></tr>
 	<tr><td><code>$C0:31A0</code>～<code>$C0:31B2</code></td><td>戦闘前処理 <code>[$00:0040]</code>に<span class="formula">$03</span>、<code>[$00:0043]</code>に<span class="formula">$00</span>、<code>[$00:0044]</code>に<code>[$00:10E5]</code>（シナリオの通常戦闘BGMID）を書き込み<code>$C0:181B</code>にジャンプ</td></tr>
 	<tr><td><code>$C0:328A</code>～<code>$C0:32AF</code></td><td>マップタイマー初期値読み込み</td></tr>
 	<tr><td><code>$C0:378F</code>～<code>$C0:37BE</code></td><td>マップでの乱数イベント関連（戦闘中のテレポート飛び先判定も含む）</td></tr>
 	<tr><td><code>$C0:37D8</code>～<code>$C0:3806</code></td><td>持ち物一覧を開いて何かのアイテムを選ぶことで進行するイベント</td></tr>
-	<tr><td><code>$C0:40C8</code>～<code>$C0:40D6</code></td><td><code>[$00:0119]</code>の値をBGMIDとして<code>[$00:0030]</code>に書き込み</td></tr>
+	<tr><td><code>$C0:40C8</code>～<code>$C0:40DC</code></td><td><code>[$00:0119]</code>の値をBGMIDとして<code>[$00:0030]</code>に書き込み、サウンド処理実行</td></tr>
 	<tr><td><code>$C0:4104</code>～<code>$C0:419C</code></td><td>イベント中におけるマップ上のスプライトの位置処理</td></tr>
 	<tr><td><code>$C0:41EA</code>～<code>$C0:429E</code></td><td>イベント中におけるマップ上のスプライトの停止処理</td></tr>
 	<tr><td><code>$C0:421A</code>～<code>$C0:429E</code></td><td>マップに入った時、操作不可能時、マップ上スプライトの初期配置に5バイトのヘッダ付与処理（OBJマップデータ）</td></tr>
+	<tr><td><code>$C0:4669</code>～<code>$C0:468D</code></td><td>匂いを嗅いだ時のタイマーカウントダウン処理</td></tr>
+	<tr><td><code>$C0:468F</code>～<code>$C0:476B</code></td><td>匂いを嗅いだ時の匂いスプライトの表示・非表示処理</td></tr>
 	<tr><td><code>$C0:47E8</code>～<code>$C0:482C</code></td><td>アイテム取得時に持ち物欄の空欄に該当アイテムを入れ個数を<span class="formula">+1</span>する、または既に所持しているなら該当アイテムの個数を+1する処理</td></tr>
 	<tr><td><code>$C0:4839</code>～<code>$C0:4853</code></td><td>アイテム使用時に持ち物欄から指定アイテム個数を<span class="formula">-1</span>する処理</td></tr>
 	<tr><td><code>$C0:48B0</code>～<code>$C0:4A47</code></td><td>マップ移動時　<code>[$00:0A02]</code>（マップ番号）からマップのマップ構造・グラフィックデータやBGMID計算など</td></tr>
@@ -511,6 +515,8 @@ table {
 	<tr><td><code>$C0:53C0</code>～<code>$C0:541C</code></td><td>BG1・BG2の水平/垂直スクロール量更新</td></tr>
 	<tr><td><code>$C0:617F</code>～<code>$C0:619A</code></td><td>スプライトの移動先座標イベント判定</td></tr>
 	<tr><td><code>$C0:619B</code>～<code>$C0:61B4</code></td><td>移動時、効果音IDの計算＆演奏</td></tr>
+	<tr><td><code>$C0:6898</code>～<code>$C0:6918</code></td><td>味方キャラとスプライトの接触判定用座標計算～当たり判定チェック</td></tr>
+	<tr><td><code>$C0:6B24</code>～<code>$C0:6C44</code></td><td>スプライトとの当たり判定チェック</td></tr>
 	<tr><td><code>$C0:6C45</code>～<code>$C0:6EF4</code></td><td>スプライトの移動先座標がマップ構造内に収まっているか、他スプライトがないかの判定</td></tr>
 	<tr><td><code>$C0:6F47</code>～<code>$C0:6F4E</code></td><td>16bitでスタックの値をダイレクトページレジスタに転送＋8bitでスタックの値をダイレクトページレジスタに転送</td></tr>
 	<tr><td><code>$C0:6FC0</code>～<code>$C0:7023</code></td><td><code>7E:F800</code>～を<code>7E:EC00</code>～にMVN転送</td></tr>
@@ -1188,7 +1194,10 @@ table {
 </thead>
 <tbody>
 	<tr><td><code>$00:FFB0</code>～<code>$00:FFB4</code></td><td>リセット時初期処理</td></tr>
-	<tr><td><code>$CE:CD7A</code>～<code>$CE:CE61</code></td><td>セーブデータへのセーブ用データ圧縮</td></tr>
+	<tr><td><code>$CE:CD7A</code>～<code>$CE:CE61</code></td><td>セーブデータへのセーブ用データ圧縮<br>
+<code>$00:1200</code>～<code>$00:130F</code>を圧縮し、<code>[$00:11D0]</code>～<code>[$00:11EF]</code>及び<code>[$00:10FE]</code>～<code>[$00:10FF]</code>にコピー<br>
+<code>$7F:7E00</code>～の、シナリオにおける全スプライトの存在状態のみ1ビット値を取り出して圧縮し、<code>$00:0A70</code>～<code>$00:0AAF</code>にコピー<br>
+<code>$00:1329</code>～<code>$00:158C</code>（現在のマップにおけるスプライトの配置データ）から、各スプライトに必要な8バイトのデータのみ取り出し、<code>$00:0FC0</code>～<code>$00:10DF</code>にコピー</td></tr>
 	<tr><td><code>$CE:CEEF</code>～<code>$CE:CF13</code></td><td>セーブデータからのセーブ用データ解凍（<code>$00:12xx</code>用）</td></tr>
 	<tr><td><code>$CE:D03D</code>～<code>$CE:D0A2</code></td><td>シナリオ開始時　画像データ呼び出し用シナリオ分岐判定</td></tr>
 	<tr><td><code>$CE:D0A6</code>～<code>$CE:D0CF</code></td><td>シナリオ開始時　<code>[$0003,x]</code><code>[$0002,x]+2</code> を<code>[$0001,x]</code><code>[$0000,x]</code>に書き込むループ

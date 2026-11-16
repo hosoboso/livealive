@@ -186,6 +186,7 @@ table {
 		<li><a href="map04.html">追尾タイプの移動</a></li>
 		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
 		<li><a href="map06.html">隠れ蓑</a></li>
+		<li><a href="map07.html">匂いを嗅ぐ</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -438,7 +439,7 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 
 <h4>OBJマップデータ</h4>
 
-<p>OBJマップデータは<code>$00:1329</code>～に配置される。<br>
+<p>OBJマップデータは<code>$00:1329</code>～最大で<code>$00:1578</code>（スプライト数次第で変動、最大スプライト数36）に配置される。<br>
 スプライト1個あたり<span class="formula">17</span>バイトのデータだが、最初の<span class="formula">5</span>バイトは、操作キャラが画面中央にいない（マップに入った時、マップ隅から中央へ移動する間など）時に入る値。<br>
 プレイヤーが操作可能な時には値は入らず使用もされない（はず）なので、最初の<span class="formula">5</span>バイトは便宜上イベント用アドレスNo.Ev00～Ev04としておく。<br>
 後ろの<span class="formula">12</span>バイトがスプライトの各種データで、No.00～11とする。<br>
@@ -464,7 +465,7 @@ $C0/4A47 JSL $CED47E[$CE:D47E]   ;[$CE:D47E]へジャンプ
 	<tr><td>06</td><td rowspan="2">Y座標（2バイト値）　マップ構造基準座標、<span class="formula">ピクセル単位*$10</span><br>上1バイトがマス目単位、下1バイトがマスとマスの間の<span class="formula">ピクセル単位*$10</span>に相当</td></tr>
 	<tr><td>07</td></tr>
 	<tr><td>08</td><td>スプライト番号指定</td></tr>
-	<tr><td>09</td><td>-</td></tr>
+	<tr><td>09</td><td>接触時コマンド判定値（エンカウントなど動作判定） 味方キャラ接触時<code>[$00:0AC5]</code>に入る</td></tr>
 	<tr><td>10</td><td>Bit2～7:モーション指定1<br>Bit0～1:モーション切り替え及び移動速度<br><span class="formula">%00</span>:通常、<span class="formula">%01</span>:速度2倍、<span class="formula">%10</span>:速度1/2倍、<span class="formula">%11</span>:速度1/4倍</td></tr>
 	<tr><td>11</td><td>Bit4～7:モーション指定2<br>Bit0～3:カラーパレット(<span class="formula">$0</span>～<span class="formula">$7</span>)</td></tr>
 </tbody>
@@ -728,7 +729,7 @@ $CE/D25D MVN 7F 00               ;MVN転送
 ;A:転送データサイズ-1 $0012([$00:0020])
 ;X:転送元アドレス $83FA（$CE/D24Fの時点のXレジスタ値）
 ;Y:転送先アドレス $14B5
-;オペランド:転送元と転送先バンク 7F -> 00
+;オペランド:転送元と転送先バンク 7F -&gt; 00
 ;$7F:83FA -&gt; $00:14B5 +$0012バイト
 </pre></div>
 
@@ -1634,9 +1635,9 @@ RRはマップ乱数なので、壽商会に入る度に初期値が変わる。
 <p><code>$00:14B5</code>～<code>$00:14C6</code></p>
 
 <div class="mono">
-00 28 12 29 E2 48 <br>
-50 20 15 98 60 4D <br>
-02 27 1A 99 66 6E 
+00 28 12 29 62 48<br>
+50 20 15 98 E0 4D<br>
+02 27 1A 99 66 6E
 </div>
 
 <p><code>$00:132E</code>～<code>$00:135B</code></p>
@@ -1655,7 +1656,7 @@ RRはマップ乱数なので、壽商会に入る度に初期値が変わる。
 	<tr><th>No.</th><th>値</th><th>内容</th></tr>
 </thead>
 <tbody>
-	<tr><td>00</td><td><span class="formula">$80</span></td><td>Bit7:キャラ表示(<span class="formula">1</span>で表示) / Bit0～3:向き（下）</td></tr>
+	<tr><td>00</td><td><span class="formula">$80</span></td><td>Bit7:キャラが存在(<span class="formula">1</span>で存在) / Bit0～3:向き（下）</td></tr>
 	<tr><td>01</td><td><span class="formula">$00</span></td><td>当たり判定及びモーション切り替え値</td></tr>
 	<tr><td>02</td><td>RR</td><td>モーション切り替えタイマーA 乱数 <span class="formula">$01</span>～<span class="formula">$20</span></td></tr>
 	<tr><td>03</td><td>RR</td><td>モーション切り替えタイマーB 乱数 <span class="formula">$01</span>～<span class="formula">$20</span></td></tr>
@@ -1670,8 +1671,108 @@ RRはマップ乱数なので、壽商会に入る度に初期値が変わる。
 </tbody>
 </table>
 
+<p>以上のようにOBJマップデータが初期値として指定される。<br>
+次ページから、<a href="map02.html">スプライトの1フレーム毎の処理</a>を紹介していくが、スプライト配置とデータ保存について少し下で説明しておく。</p>
 
-<p>以上のようにOBJマップデータが初期値として指定される。</p>
+<h3>セーブデータへの記録</h3>
+
+<p>現在のマップ内のスプライトの状態は、各スプライトのOBJマップデータ00～07を<code>$00:0FC0</code>～にコピーして保存する。<br>
+だが、マップ外、つまり現在プレイ中のシナリオ全体のスプライトの状態はどのようにして保存するのか。<br>
+マップを出入りすると復活する、近未来編のワールドマップの敵シンボルであれば、OBJマップデータ00の上1ビット（Bit7）はマップに入り直した時、いつも<span class="formula">%1</span>である（終盤のチビッコハウスの火災からは変わるが）。<br>
+だが、筑波研究所の中の敵シンボル（黒フク）は、一度倒すといなくなり、マップを切り替えても復活しない。<br>
+ということは、OBJマップデータ初期配置が何らかの形で変更され、かつ、セーブデータに保存されるということである。<br>
+上で紹介した通り、OBJマップデータ初期配置は元々、下サブルーチンにてバンク<code>$7F</code>から転送した値である。</p>
+
+<div class="code-container"><pre>
+$CE/D25D MVN 7F 00               ;MVN転送
+;A:転送データサイズ-1 $0012([$00:0020])
+;X:転送元アドレス $83FA（$CE/D24Fの時点のXレジスタ値）
+;Y:転送先アドレス $14B5
+;オペランド:転送元と転送先バンク 7F -&gt; 00
+;$7F:83FA -&gt; $00:14B5 +$0012バイト
+</pre></div>
+
+<p>そして、OBJマップデータ00の上1ビット（Bit7）は、OBJマップデータ初期配置の5バイト目の値のBit7だった。<br>
+藤兵衛なら、</p>
+
+<div class="mono">$00:14BB～$00:14C0<br>
+50 20 15 98 E0 4D</div>
+
+<p>5バイト目、つまり<code>$00:14BF</code>は<span class="formula">$E0</span>(<span class="formula">%1110 0000</span>)だから存在している。<br>
+この値は、バンク<code>$7F</code>だと、<code>$7F:8404</code>に書き込まれていた。<br>
+要するに、各シナリオの全スプライト（全マップ）のOBJマップデータ初期配置はバンク<code>$7F:7E00</code>～に格納されていて、各スプライトの存在状態もOBJマップデータ初期配置の5バイト目Bit7を更新することで管理している。<br>
+敵シンボルで、一度倒したら復活しないタイプも、バンク<code>$7F</code>の数値で管理し、セーブデータにはOBJマップデータ初期配置の5バイト目Bit7（1ビット値）だけ記録すれば、該当敵シンボルを倒したかどうか記録できる、という仕組みである。</p>
+
+<p>このあたりは<span class="tri"><a href="mprogram35.html">セーブデータのセーブ・ロード</a></span>で詳しく説明している。</p>
+
+<h4>おまけ　OBJマップデータアドレス配置</h4>
+
+<p>OBJマップデータは1個のスプライトあたり<span class="formula">17</span>バイトなので、アドレス値で見るとキリが悪い。<br>
+<span class="formula">16</span>バイト（<span class="formula">$10</span>バイト）なら、16進数表記の時、1の桁が揃って見やすいのだが、<span class="formula">17</span>バイトなので<span class="formula">1</span>ずつズレていく。<br>
+調査の上でわかりにくくて困るという筆者の個人的な理由のため、スプライトが最大36個並ぶ場合のアドレス一覧を下に載せておく。<br>
+バンクは省略し、アドレスのみ掲載。</p>
+
+<table>
+<thead>
+	<tr><th rowspan="2">No.</th><th colspan="12">スプライト番号</th></tr>
+	<tr><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th><th>06</th><th>07</th><th>08</th><th>09</th><th>10</th><th>11</th><th>12</th></tr>
+</thead>
+<tbody>
+	<tr><td>Ev00</td><td>1329</td><td>133A</td><td>134B</td><td>135C</td><td>136D</td><td>137E</td><td>138F</td><td>13A0</td><td>13B1</td><td>13C2</td><td>13D3</td><td>13E4</td></tr>
+	<tr><td>Ev01</td><td>132A</td><td>133B</td><td>134C</td><td>135D</td><td>136E</td><td>137F</td><td>1390</td><td>13A1</td><td>13B2</td><td>13C3</td><td>13D4</td><td>13E5</td></tr>
+	<tr><td>Ev02</td><td>132B</td><td>133C</td><td>134D</td><td>135E</td><td>136F</td><td>1380</td><td>1391</td><td>13A2</td><td>13B3</td><td>13C4</td><td>13D5</td><td>13E6</td></tr>
+	<tr><td>Ev03</td><td>132C</td><td>133D</td><td>134E</td><td>135F</td><td>1370</td><td>1381</td><td>1392</td><td>13A3</td><td>13B4</td><td>13C5</td><td>13D6</td><td>13E7</td></tr>
+	<tr><td>Ev04</td><td>132D</td><td>133E</td><td>134F</td><td>1360</td><td>1371</td><td>1382</td><td>1393</td><td>13A4</td><td>13B5</td><td>13C6</td><td>13D7</td><td>13E8</td></tr>
+	<tr><td>00</td><td>132E</td><td>133F</td><td>1350</td><td>1361</td><td>1372</td><td>1383</td><td>1394</td><td>13A5</td><td>13B6</td><td>13C7</td><td>13D8</td><td>13E9</td></tr>
+	<tr><td>01</td><td>132F</td><td>1340</td><td>1351</td><td>1362</td><td>1373</td><td>1384</td><td>1395</td><td>13A6</td><td>13B7</td><td>13C8</td><td>13D9</td><td>13EA</td></tr>
+	<tr><td>02</td><td>1330</td><td>1341</td><td>1352</td><td>1363</td><td>1374</td><td>1385</td><td>1396</td><td>13A7</td><td>13B8</td><td>13C9</td><td>13DA</td><td>13EB</td></tr>
+	<tr><td>03</td><td>1331</td><td>1342</td><td>1353</td><td>1364</td><td>1375</td><td>1386</td><td>1397</td><td>13A8</td><td>13B9</td><td>13CA</td><td>13DB</td><td>13EC</td></tr>
+	<tr><td>04</td><td>1332</td><td>1343</td><td>1354</td><td>1365</td><td>1376</td><td>1387</td><td>1398</td><td>13A9</td><td>13BA</td><td>13CB</td><td>13DC</td><td>13ED</td></tr>
+	<tr><td>05</td><td>1333</td><td>1344</td><td>1355</td><td>1366</td><td>1377</td><td>1388</td><td>1399</td><td>13AA</td><td>13BB</td><td>13CC</td><td>13DD</td><td>13EE</td></tr>
+	<tr><td>06</td><td>1334</td><td>1345</td><td>1356</td><td>1367</td><td>1378</td><td>1389</td><td>139A</td><td>13AB</td><td>13BC</td><td>13CD</td><td>13DE</td><td>13EF</td></tr>
+	<tr><td>07</td><td>1335</td><td>1346</td><td>1357</td><td>1368</td><td>1379</td><td>138A</td><td>139B</td><td>13AC</td><td>13BD</td><td>13CE</td><td>13DF</td><td>13F0</td></tr>
+	<tr><td>08</td><td>1336</td><td>1347</td><td>1358</td><td>1369</td><td>137A</td><td>138B</td><td>139C</td><td>13AD</td><td>13BE</td><td>13CF</td><td>13E0</td><td>13F1</td></tr>
+	<tr><td>09</td><td>1337</td><td>1348</td><td>1359</td><td>136A</td><td>137B</td><td>138C</td><td>139D</td><td>13AE</td><td>13BF</td><td>13D0</td><td>13E1</td><td>13F2</td></tr>
+	<tr><td>10</td><td>1338</td><td>1349</td><td>135A</td><td>136B</td><td>137C</td><td>138D</td><td>139E</td><td>13AF</td><td>13C0</td><td>13D1</td><td>13E2</td><td>13F3</td></tr>
+	<tr><td>11</td><td>1339</td><td>134A</td><td>135B</td><td>136C</td><td>137D</td><td>138E</td><td>139F</td><td>13B0</td><td>13C1</td><td>13D2</td><td>13E3</td><td>13F4</td></tr>
+	<tr><th>No.</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th></tr>
+	<tr><td>Ev00</td><td>13F5</td><td>1406</td><td>1417</td><td>1428</td><td>1439</td><td>144A</td><td>145B</td><td>146C</td><td>147D</td><td>148E</td><td>149F</td><td>14B0</td></tr>
+	<tr><td>Ev01</td><td>13F6</td><td>1407</td><td>1418</td><td>1429</td><td>143A</td><td>144B</td><td>145C</td><td>146D</td><td>147E</td><td>148F</td><td>14A0</td><td>14B1</td></tr>
+	<tr><td>Ev02</td><td>13F7</td><td>1408</td><td>1419</td><td>142A</td><td>143B</td><td>144C</td><td>145D</td><td>146E</td><td>147F</td><td>1490</td><td>14A1</td><td>14B2</td></tr>
+	<tr><td>Ev03</td><td>13F8</td><td>1409</td><td>141A</td><td>142B</td><td>143C</td><td>144D</td><td>145E</td><td>146F</td><td>1480</td><td>1491</td><td>14A2</td><td>14B3</td></tr>
+	<tr><td>Ev04</td><td>13F9</td><td>140A</td><td>141B</td><td>142C</td><td>143D</td><td>144E</td><td>145F</td><td>1470</td><td>1481</td><td>1492</td><td>14A3</td><td>14B4</td></tr>
+	<tr><td>00</td><td>13FA</td><td>140B</td><td>141C</td><td>142D</td><td>143E</td><td>144F</td><td>1460</td><td>1471</td><td>1482</td><td>1493</td><td>14A4</td><td>14B5</td></tr>
+	<tr><td>01</td><td>13FB</td><td>140C</td><td>141D</td><td>142E</td><td>143F</td><td>1450</td><td>1461</td><td>1472</td><td>1483</td><td>1494</td><td>14A5</td><td>14B6</td></tr>
+	<tr><td>02</td><td>13FC</td><td>140D</td><td>141E</td><td>142F</td><td>1440</td><td>1451</td><td>1462</td><td>1473</td><td>1484</td><td>1495</td><td>14A6</td><td>14B7</td></tr>
+	<tr><td>03</td><td>13FD</td><td>140E</td><td>141F</td><td>1430</td><td>1441</td><td>1452</td><td>1463</td><td>1474</td><td>1485</td><td>1496</td><td>14A7</td><td>14B8</td></tr>
+	<tr><td>04</td><td>13FE</td><td>140F</td><td>1420</td><td>1431</td><td>1442</td><td>1453</td><td>1464</td><td>1475</td><td>1486</td><td>1497</td><td>14A8</td><td>14B9</td></tr>
+	<tr><td>05</td><td>13FF</td><td>1410</td><td>1421</td><td>1432</td><td>1443</td><td>1454</td><td>1465</td><td>1476</td><td>1487</td><td>1498</td><td>14A9</td><td>14BA</td></tr>
+	<tr><td>06</td><td>1400</td><td>1411</td><td>1422</td><td>1433</td><td>1444</td><td>1455</td><td>1466</td><td>1477</td><td>1488</td><td>1499</td><td>14AA</td><td>14BB</td></tr>
+	<tr><td>07</td><td>1401</td><td>1412</td><td>1423</td><td>1434</td><td>1445</td><td>1456</td><td>1467</td><td>1478</td><td>1489</td><td>149A</td><td>14AB</td><td>14BC</td></tr>
+	<tr><td>08</td><td>1402</td><td>1413</td><td>1424</td><td>1435</td><td>1446</td><td>1457</td><td>1468</td><td>1479</td><td>148A</td><td>149B</td><td>14AC</td><td>14BD</td></tr>
+	<tr><td>09</td><td>1403</td><td>1414</td><td>1425</td><td>1436</td><td>1447</td><td>1458</td><td>1469</td><td>147A</td><td>148B</td><td>149C</td><td>14AD</td><td>14BE</td></tr>
+	<tr><td>10</td><td>1404</td><td>1415</td><td>1426</td><td>1437</td><td>1448</td><td>1459</td><td>146A</td><td>147B</td><td>148C</td><td>149D</td><td>14AE</td><td>14BF</td></tr>
+	<tr><td>11</td><td>1405</td><td>1416</td><td>1427</td><td>1438</td><td>1449</td><td>145A</td><td>146B</td><td>147C</td><td>148D</td><td>149E</td><td>14AF</td><td>14C0</td></tr>
+	<tr><th>No.</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th><th>32</th><th>33</th><th>34</th><th>35</th><th>36</th></tr>
+	<tr><td>Ev00</td><td>14C1</td><td>14D2</td><td>14E3</td><td>14F4</td><td>1505</td><td>1516</td><td>1527</td><td>1538</td><td>1549</td><td>155A</td><td>156B</td><td>157C</td></tr>
+	<tr><td>Ev01</td><td>14C2</td><td>14D3</td><td>14E4</td><td>14F5</td><td>1506</td><td>1517</td><td>1528</td><td>1539</td><td>154A</td><td>155B</td><td>156C</td><td>157D</td></tr>
+	<tr><td>Ev02</td><td>14C3</td><td>14D4</td><td>14E5</td><td>14F6</td><td>1507</td><td>1518</td><td>1529</td><td>153A</td><td>154B</td><td>155C</td><td>156D</td><td>157E</td></tr>
+	<tr><td>Ev03</td><td>14C4</td><td>14D5</td><td>14E6</td><td>14F7</td><td>1508</td><td>1519</td><td>152A</td><td>153B</td><td>154C</td><td>155D</td><td>156E</td><td>157F</td></tr>
+	<tr><td>Ev04</td><td>14C5</td><td>14D6</td><td>14E7</td><td>14F8</td><td>1509</td><td>151A</td><td>152B</td><td>153C</td><td>154D</td><td>155E</td><td>156F</td><td>1580</td></tr>
+	<tr><td>00</td><td>14C6</td><td>14D7</td><td>14E8</td><td>14F9</td><td>150A</td><td>151B</td><td>152C</td><td>153D</td><td>154E</td><td>155F</td><td>1570</td><td>1581</td></tr>
+	<tr><td>01</td><td>14C7</td><td>14D8</td><td>14E9</td><td>14FA</td><td>150B</td><td>151C</td><td>152D</td><td>153E</td><td>154F</td><td>1560</td><td>1571</td><td>1582</td></tr>
+	<tr><td>02</td><td>14C8</td><td>14D9</td><td>14EA</td><td>14FB</td><td>150C</td><td>151D</td><td>152E</td><td>153F</td><td>1550</td><td>1561</td><td>1572</td><td>1583</td></tr>
+	<tr><td>03</td><td>14C9</td><td>14DA</td><td>14EB</td><td>14FC</td><td>150D</td><td>151E</td><td>152F</td><td>1540</td><td>1551</td><td>1562</td><td>1573</td><td>1584</td></tr>
+	<tr><td>04</td><td>14CA</td><td>14DB</td><td>14EC</td><td>14FD</td><td>150E</td><td>151F</td><td>1530</td><td>1541</td><td>1552</td><td>1563</td><td>1574</td><td>1585</td></tr>
+	<tr><td>05</td><td>14CB</td><td>14DC</td><td>14ED</td><td>14FE</td><td>150F</td><td>1520</td><td>1531</td><td>1542</td><td>1553</td><td>1564</td><td>1575</td><td>1586</td></tr>
+	<tr><td>06</td><td>14CC</td><td>14DD</td><td>14EE</td><td>14FF</td><td>1510</td><td>1521</td><td>1532</td><td>1543</td><td>1554</td><td>1565</td><td>1576</td><td>1587</td></tr>
+	<tr><td>07</td><td>14CD</td><td>14DE</td><td>14EF</td><td>1500</td><td>1511</td><td>1522</td><td>1533</td><td>1544</td><td>1555</td><td>1566</td><td>1577</td><td>1588</td></tr>
+	<tr><td>08</td><td>14CE</td><td>14DF</td><td>14F0</td><td>1501</td><td>1512</td><td>1523</td><td>1534</td><td>1545</td><td>1556</td><td>1567</td><td>1578</td><td>1589</td></tr>
+	<tr><td>09</td><td>14CF</td><td>14E0</td><td>14F1</td><td>1502</td><td>1513</td><td>1524</td><td>1535</td><td>1546</td><td>1557</td><td>1568</td><td>1579</td><td>158A</td></tr>
+	<tr><td>10</td><td>14D0</td><td>14E1</td><td>14F2</td><td>1503</td><td>1514</td><td>1525</td><td>1536</td><td>1547</td><td>1558</td><td>1569</td><td>157A</td><td>158B</td></tr>
+	<tr><td>11</td><td>14D1</td><td>14E2</td><td>14F3</td><td>1504</td><td>1515</td><td>1526</td><td>1537</td><td>1548</td><td>1559</td><td>156A</td><td>157B</td><td>158C</td></tr>
+</tbody>
+</table>
 
 <script>//リストタイトル静的生成
 document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});

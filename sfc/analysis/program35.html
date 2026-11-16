@@ -183,6 +183,7 @@ table {
 		<li><a href="map04.html">追尾タイプの移動</a></li>
 		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
 		<li><a href="map06.html">隠れ蓑</a></li>
+		<li><a href="map07.html">匂いを嗅ぐ</a></li>
 	</ul>
 </li>
 <li class="other"><button type="button">画像</button>
@@ -272,26 +273,47 @@ HiROMにおけるSRAMは、バンク<code>$30</code>～<code>$3F</code>のアド
 	<tr><td><code>$00:1300</code>～<code>$00:1301</code></td><td>心山拳伝承者のデータ</td></tr>
 	<tr><td><code>$00:1303</code></td><td>初期値<span class="formula">$00</span>、西部編最後のマッドドッグとの戦闘で逃げると<span class="formula">$01</span></td></tr>
 	<tr><td><code>$00:1304</code></td><td>初期値<span class="formula">$00</span>、幕末編最後の選択肢で「面白い」を選ぶと<span class="formula">$01</span></td></tr>
+	<tr><td><code>$00:1329</code>～<code>$00:158C</code></td><td>現在のマップにおけるスプライトの配置データ及び計算値</td></tr>
 </tbody>
 </table>
+
+<p>更に、シナリオ全体におけるスプライトの存在状態の記録も必要である。<br>
+例えば、一度倒したらマップ切り替えでは復活しない敵シンボルや、最終編においてサンダウンを仲間にする時のサンダウンの位置など。<br>
+各マップにおけるスプライトの初期座標や向き、マップに存在する・しないといった、OBJマップ初期データは、<code>$7F:7E00</code>～に、スプライト1個につき6バイトのデータで書き込まれている。<br>
+ただ、スプライトの初期座標や向きはROM内にも入っているので、セーブデータに記録する必要はない。<br>
+ゲームプレイ中に変動する、敵シンボルを倒したかどうか（そのマップに居るか居ないか）、という、スプライトの存在状態1ビット分のデータだけ保存できれば充分である。</p>
+
+<p>※スプライトのマップ配置関係については、<span class="tri"><a href="map01.html">マップ構造とスプライトの配置</a></span>の知識が必要となるため、そちらも参照していただきたい。</p>
 
 <p>以上のデータはセーブデータに記録しておかなければならないが、<code>$00:0A00</code>～<code>$00:11F7</code>の中にはない。<br>
 どのようにして、データを格納しているのか。</p>
 
-
-
 <h3>データの圧縮</h3>
 
-<p><code>$00:1200</code>～からのデータだが、1バイトあたり、<span class="formula">$00</span>か<span class="formula">$01</span>しか入らないようにプログラムが組まれている。<br>
+<p><code>$00:1200</code>～<code>$00:130F</code>のデータだが、1バイトあたり、<span class="formula">$00</span>か<span class="formula">$01</span>しか入らないようにプログラムが組まれている。<br>
 <span class="tri"><a href="flag.html">シナリオ進行フラグ</a></span>一覧を見ていただければわかるが、例えば幕末編なら、パーティにとらわれの男がいたら<code>$00:1200</code>に<span class="formula">$01</span>が入り、パーティに加入する前なら<span class="formula">$00</span>が入っている、というようにONとOFFの切り替えに使っている。</p>
 
 <p>1バイトあたり8ビットのデータを格納できるのだから、<span class="formula">0</span>か<span class="formula">1</span>かを記録するだけなら、1バイト中にフラグを8個分格納可能である。<br>
 実際、状態異常など、石化・酔い・眠り・マヒ・毒・腕かため・足かため・首かための状況を1バイトにまとめて戦闘中に読み書きしているサブルーチンもある。<br>
 容量の節約にはなるが、その分、1バイトのデータからどの状態異常になっているかを取り出したり書き込むためのサブルーチンの処理量は増える。<br>
-ということで、容量と処理時間のバランスを見た上で、<code>$00:1200</code>～からのデータは1バイトあたり<span class="formula">$00</span>か<span class="formula">$01</span>のみ記録するようにしたのだろう、と思われる（おそらく）。</p>
+ということで、容量と処理時間のバランスを見た上で、<code>$00:1200</code>～<code>$00:130F</code>のデータは1バイトあたり<span class="formula">$00</span>か<span class="formula">$01</span>のみ記録するようにしたのだろう、と思われる（おそらく）。</p>
 
-<p>とはいえセーブデータの容量は限りがあるので、<code>$00:1200</code>～については、1バイト（8ビット）に、8バイト分の<span class="formula">$00</span>または<span class="formula">$01</span>のデータを詰め込んで圧縮し保存する、という仕組みを使っている。<br>
+<p>とはいえセーブデータの容量は限りがあるので、<code>$00:1200</code>～<code>$00:130F</code>については、1バイト（8ビット）に、8バイト分の<span class="formula">$00</span>または<span class="formula">$01</span>のデータを詰め込んで圧縮し保存する、という仕組みを使っている。<br>
 データ圧縮のサブルーチンが<code><span class="r">$CE/CD7A</span></code>～<code><span class="r">$CE/CE61</span></code>になる。</p>
+
+<code><span class="r">$CE/CD7A</span></code>～<code><span class="r">$CE/CE61</span></code>は大まかに3つの処理に分かれる。
+
+<ul>
+	<li><code>$00:1200</code>～<code>$00:130F</code>を圧縮し、<code>[$00:11D0]</code>～<code>[$00:11EF]</code>及び<code>[$00:10FE]</code>～<code>[$00:10FF]</code>にコピー</li>
+	<li><code>$7F:7E00</code>～の、シナリオにおける全スプライトの存在状態のみ1ビット値を取り出して圧縮し、<code>$00:0A70</code>～<code>$00:0AAF</code>にコピー</li>
+	<li><code>$00:1329</code>～<code>$00:158C</code>（現在のマップにおけるスプライトの配置データ）から、各スプライトに必要な8バイトのデータのみ取り出し、<code>$00:0FC0</code>～<code>$00:10DF</code>にコピー</li>
+</ul>
+
+<p>順に紹介していく。</p>
+
+<h4>シナリオ進行フラグなどの圧縮とコピー</h4>
+
+<p>まず、<code><span class="r">$CE/CD7A</span></code>～<code><span class="r">$CE/CDC0</span></code>で、<code>$00:1200</code>～<code>$00:130F</code>の処理を行う。</p>
 
 <div class="code-container"><pre>
 $CE/CD7A LDX #$1200              ;Xに$1200をロード
@@ -355,9 +377,367 @@ $CE/CDC0 BNE $E6    [$CDA8]      ;ゼロフラグが立っていないとき[$CD
 <p>というデータ圧縮を行う。<br>
 これで、<code>$00:1200</code>～<code>$00:130F</code>（<span class="formula">272</span>バイト）が、セーブデータに記録される<code>$00:10FE</code>～<code>$00:10FF</code>・<code>$00:11D0</code>～<code>$00:11EF</code>(<span class="formula">34</span>バイト)の領域に収まったことになる。</p>
 
-<p>その後も各種データがコピーされるが、最後の<code><span class="r">$CE/CE3E</span></code>～<code><span class="r">$CE/CE61</span></code>が、現在のマップにおけるスプライトの配置の保存である。</p>
+
+<h4>シナリオにおける全スプライトの存在状態の圧縮とコピー</h4>
+
+<p><code><span class="r">$CE/CDC2</span></code>～<code><span class="r">$CE/CE3B</span></code>が、プレイ中のシナリオの全スプライトの存在状態のデータ処理にあたる。</p>
+
+<p>まず、<code>$7F:7E00</code>～について説明する。<br>
+<code>$7F:7E00</code>～は、プレイ中のシナリオにおける、各マップのスプライトのOBJマップデータ初期値を1スプライトにつき6バイトのデータで記録している。<br>
+マップにはシナリオ毎に番号が振ってあるが、このナンバリングはマップ切り替え時に<code>[$00:0A02]</code>に入る。<br>
+<code>$7F:7E00</code>の最初の方は、「各マップのOBJマップデータ初期値の開始アドレス」の一覧表で、それが終わると実際のOBJマップデータ初期値がずらりと並ぶ。</p>
+
+<p>例として近未来編だと<code>$7F:7E00</code>～は以下のようになっている。</p>
+
+<table>
+<thead>
+	<tr><th><code>[$00:0A02]</code></th><th>OBJマップデータ<br>開始アドレス</th><th>値</th><th>スプライト数</th><th>場所</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td><code>$7F:7E00～01</code></td><td><span class="formula">$00A2</span></td><td><span class="formula">$0F</span></td><td>ワールドマップ</td></tr>
+	<tr><td><span class="formula">$01</span></td><td><code>$7F:7E02～03</code></td><td><span class="formula">$0101</span></td><td><span class="formula">$1E</span></td><td>チビッコハウス・庭</td></tr>
+	<tr><td><span class="formula">$02</span></td><td><code>$7F:7E04～05</code></td><td><span class="formula">$01BA</span></td><td><span class="formula">$13</span></td><td>港の埠頭</td></tr>
+	<tr><td><span class="formula">$03</span></td><td><code>$7F:7E06～07</code></td><td><span class="formula">$0231</span></td><td><span class="formula">$20</span></td><td>公園</td></tr>
+	<tr><td><span class="formula">$04</span></td><td><code>$7F:7E08～09</code></td><td><span class="formula">$02F6</span></td><td><span class="formula">$0B</span></td><td>筑波研究所・庭</td></tr>
+	<tr><td><span class="formula">$05</span></td><td><code>$7F:7E0A～0B</code></td><td><span class="formula">$033D</span></td><td><span class="formula">$12</span></td><td>御出居寺</td></tr>
+	<tr><td><span class="formula">$06</span></td><td><code>$7F:7E0C～0D</code></td><td><span class="formula">$03AE</span></td><td><span class="formula">$00</span></td><td>未使用マップ（御出居寺スプライトなし？）</td></tr>
+	<tr><td><span class="formula">$07</span></td><td><code>$7F:7E0E～0F</code></td><td><span class="formula">$03AE</span></td><td><span class="formula">$05</span></td><td>バー</td></tr>
+	<tr><td><span class="formula">$08</span></td><td><code>$7F:7E10～11</code></td><td><span class="formula">$03D1</span></td><td><span class="formula">$0B</span></td><td>御出居寺・内部</td></tr>
+	<tr><td><span class="formula">$09</span></td><td><code>$7F:7E12～13</code></td><td><span class="formula">$0418</span></td><td><span class="formula">$10</span></td><td>チビッコハウス・1Fフロア</td></tr>
+	<tr><td><span class="formula">$0A</span></td><td><code>$7F:7E14～15</code></td><td><span class="formula">$047D</span></td><td><span class="formula">$04</span></td><td>チビッコハウス・洗濯機前</td></tr>
+	<tr><td><span class="formula">$0B</span></td><td><code>$7F:7E16～17</code></td><td><span class="formula">$049A</span></td><td><span class="formula">$01</span></td><td>チビッコハウス・風呂</td></tr>
+	<tr><td><span class="formula">$0C</span></td><td><code>$7F:7E18～19</code></td><td><span class="formula">$04A5</span></td><td><span class="formula">$02</span></td><td>チビッコハウス・トイレ</td></tr>
+	<tr><td><span class="formula">$0D</span></td><td><code>$7F:7E1A～1B</code></td><td><span class="formula">$04B6</span></td><td><span class="formula">$0B</span></td><td>チビッコハウス・教室</td></tr>
+	<tr><td><span class="formula">$0E</span></td><td><code>$7F:7E1C～1D</code></td><td><span class="formula">$04FD</span></td><td><span class="formula">$0A</span></td><td>チビッコハウス・子供4人部屋</td></tr>
+	<tr><td><span class="formula">$0F</span></td><td><code>$7F:7E1E～1F</code></td><td><span class="formula">$053E</span></td><td><span class="formula">$14</span></td><td>チビッコハウス・カオリの部屋</td></tr>
+	<tr><td><span class="formula">$10</span></td><td><code>$7F:7E20～21</code></td><td><span class="formula">$05BB</span></td><td><span class="formula">$04</span></td><td>チビッコハウス・妙子の部屋</td></tr>
+	<tr><td><span class="formula">$11</span></td><td><code>$7F:7E22～23</code></td><td><span class="formula">$05D8</span></td><td><span class="formula">$04</span></td><td>チビッコハウス・園長の部屋</td></tr>
+	<tr><td><span class="formula">$12</span></td><td><code>$7F:7E24～25</code></td><td><span class="formula">$05F5</span></td><td><span class="formula">$03</span></td><td>壽商会・1F</td></tr>
+	<tr><td><span class="formula">$13</span></td><td><code>$7F:7E26～27</code></td><td><span class="formula">$060C</span></td><td><span class="formula">$0D</span></td><td>壽商会・地下1F</td></tr>
+	<tr><td><span class="formula">$14</span></td><td><code>$7F:7E28～29</code></td><td><span class="formula">$065F</span></td><td><span class="formula">$18</span></td><td>壽商会地下・ブリキ大王部屋</td></tr>
+	<tr><td><span class="formula">$15</span></td><td><code>$7F:7E2A～2B</code></td><td><span class="formula">$06F4</span></td><td><span class="formula">$01</span></td><td>壽商会・1Fトイレ</td></tr>
+	<tr><td><span class="formula">$16</span></td><td><code>$7F:7E2C～2D</code></td><td><span class="formula">$06FF</span></td><td><span class="formula">$0A</span></td><td>ブリキ大王コクピット</td></tr>
+	<tr><td><span class="formula">$17</span></td><td><code>$7F:7E2E～2F</code></td><td><span class="formula">$0740</span></td><td><span class="formula">$03</span></td><td>筑波研究所・北1F正面フロア</td></tr>
+	<tr><td><span class="formula">$18</span></td><td><code>$7F:7E30～31</code></td><td><span class="formula">$0757</span></td><td><span class="formula">$01</span></td><td>筑波研究所・北1F右通路</td></tr>
+	<tr><td><span class="formula">$19</span></td><td><code>$7F:7E32～33</code></td><td><span class="formula">$0762</span></td><td><span class="formula">$03</span></td><td>筑波研究所・北1F右下部屋</td></tr>
+	<tr><td><span class="formula">$1A</span></td><td><code>$7F:7E34～35</code></td><td><span class="formula">$0779</span></td><td><span class="formula">$02</span></td><td>筑波研究所・北2F左フロア</td></tr>
+	<tr><td><span class="formula">$1B</span></td><td><code>$7F:7E36～37</code></td><td><span class="formula">$078A</span></td><td><span class="formula">$01</span></td><td>筑波研究所・北2Fトイレ</td></tr>
+	<tr><td><span class="formula">$1C</span></td><td><code>$7F:7E38～39</code></td><td><span class="formula">$0795</span></td><td><span class="formula">$03</span></td><td>筑波研究所・北2F中央部屋</td></tr>
+	<tr><td><span class="formula">$1D</span></td><td><code>$7F:7E3A～3B</code></td><td><span class="formula">$07AC</span></td><td><span class="formula">$01</span></td><td>筑波研究所・北2F通路前</td></tr>
+	<tr><td><span class="formula">$1E</span></td><td><code>$7F:7E3C～3D</code></td><td><span class="formula">$07B7</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南2F中央通路前</td></tr>
+	<tr><td><span class="formula">$1F</span></td><td><code>$7F:7E3E～3F</code></td><td><span class="formula">$07C8</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南2F扉下</td></tr>
+	<tr><td><span class="formula">$20</span></td><td><code>$7F:7E40～41</code></td><td><span class="formula">$07D9</span></td><td><span class="formula">$00</span></td><td>筑波研究所・南1F左エレベータ下</td></tr>
+	<tr><td><span class="formula">$21</span></td><td><code>$7F:7E42～43</code></td><td><span class="formula">$07D9</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南1Fトイレ</td></tr>
+	<tr><td><span class="formula">$22</span></td><td><code>$7F:7E44～45</code></td><td><span class="formula">$07EA</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南1Fトイレ左下フロア</td></tr>
+	<tr><td><span class="formula">$23</span></td><td><code>$7F:7E46～47</code></td><td><span class="formula">$07FB</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南1F機密書類部屋前</td></tr>
+	<tr><td><span class="formula">$24</span></td><td><code>$7F:7E48～49</code></td><td><span class="formula">$080C</span></td><td><span class="formula">$01</span></td><td>筑波研究所・南1F機密書類部屋</td></tr>
+	<tr><td><span class="formula">$25</span></td><td><code>$7F:7E4A～4B</code></td><td><span class="formula">$0817</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南1Fプラズマスパーク部屋</td></tr>
+	<tr><td><span class="formula">$26</span></td><td><code>$7F:7E4C～4D</code></td><td><span class="formula">$0828</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南1Fクルセイダーズ部屋前</td></tr>
+	<tr><td><span class="formula">$27</span></td><td><code>$7F:7E4E～4F</code></td><td><span class="formula">$0839</span></td><td><span class="formula">$05</span></td><td>筑波研究所・南1Fクルセイダーズ部屋</td></tr>
+	<tr><td><span class="formula">$28</span></td><td><code>$7F:7E50～51</code></td><td><span class="formula">$085C</span></td><td><span class="formula">$06</span></td><td>筑波研究所・南1F通路</td></tr>
+	<tr><td><span class="formula">$29</span></td><td><code>$7F:7E52～53</code></td><td><span class="formula">$0885</span></td><td><span class="formula">$09</span></td><td>筑波研究所・南1F通路右上部屋</td></tr>
+	<tr><td><span class="formula">$2A</span></td><td><code>$7F:7E54～55</code></td><td><span class="formula">$08C0</span></td><td><span class="formula">$06</span></td><td>筑波研究所・南1FVIPルーム</td></tr>
+	<tr><td><span class="formula">$2B</span></td><td><code>$7F:7E56～57</code></td><td><span class="formula">$08E9</span></td><td><span class="formula">$03</span></td><td>筑波研究所・南1Fラボ右側の部屋</td></tr>
+	<tr><td><span class="formula">$2C</span></td><td><code>$7F:7E58～59</code></td><td><span class="formula">$0900</span></td><td><span class="formula">$02</span></td><td>筑波研究所・南1Fラボ左側の部屋</td></tr>
+	<tr><td><span class="formula">$2D</span></td><td><code>$7F:7E5A～5B</code></td><td><span class="formula">$0911</span></td><td><span class="formula">$00</span></td><td>筑波研究所・2F通路</td></tr>
+	<tr><td><span class="formula">$2E</span></td><td><code>$7F:7E5C～5D</code></td><td><span class="formula">$0911</span></td><td><span class="formula">$00</span></td><td>近未来編オープニング・アキラのアップ</td></tr>
+	<tr><td><span class="formula">$2F</span></td><td><code>$7F:7E5E～5F</code></td><td><span class="formula">$0911</span></td><td><span class="formula">$0A</span></td><td>港（ワールドマップ側マップ）</td></tr>
+	<tr><td><span class="formula">$30</span></td><td><code>$7F:7E60～61</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・2F</td></tr>
+	<tr><td><span class="formula">$31</span></td><td><code>$7F:7E62～63</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・3F</td></tr>
+	<tr><td><span class="formula">$32</span></td><td><code>$7F:7E64～65</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・4F</td></tr>
+	<tr><td><span class="formula">$33</span></td><td><code>$7F:7E66～67</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・5F</td></tr>
+	<tr><td><span class="formula">$34</span></td><td><code>$7F:7E68～69</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・6F</td></tr>
+	<tr><td><span class="formula">$35</span></td><td><code>$7F:7E6A～6B</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・7F</td></tr>
+	<tr><td><span class="formula">$36</span></td><td><code>$7F:7E6C～6D</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・8F</td></tr>
+	<tr><td><span class="formula">$37</span></td><td><code>$7F:7E6E～6F</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・9F</td></tr>
+	<tr><td><span class="formula">$38</span></td><td><code>$7F:7E70～71</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・10F</td></tr>
+	<tr><td><span class="formula">$39</span></td><td><code>$7F:7E72～73</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>壽商会地下・ブリキ大王部屋前</td></tr>
+	<tr><td><span class="formula">$3A</span></td><td><code>$7F:7E74～75</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$00</span></td><td>未使用マップ</td></tr>
+	<tr><td><span class="formula">$3B</span></td><td><code>$7F:7E76～77</code></td><td><span class="formula">$0952</span></td><td><span class="formula">$23</span></td><td>チビッコハウス・庭/火災</td></tr>
+	<tr><td><span class="formula">$3C</span></td><td><code>$7F:7E78～79</code></td><td><span class="formula">$0A29</span></td><td><span class="formula">$03</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$3D</span></td><td><code>$7F:7E7A～7B</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$3E</span></td><td><code>$7F:7E7C～7D</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$3F</span></td><td><code>$7F:7E7E～7F</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$40</span></td><td><code>$7F:7E80～81</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$41</span></td><td><code>$7F:7E82～83</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$42</span></td><td><code>$7F:7E84～85</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$43</span></td><td><code>$7F:7E86～87</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$44</span></td><td><code>$7F:7E88～89</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$45</span></td><td><code>$7F:7E8A～8B</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$46</span></td><td><code>$7F:7E8C～8D</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$47</span></td><td><code>$7F:7E8E～8F</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$48</span></td><td><code>$7F:7E90～91</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$49</span></td><td><code>$7F:7E92～93</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$4A</span></td><td><code>$7F:7E94～95</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$4B</span></td><td><code>$7F:7E96～97</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$4C</span></td><td><code>$7F:7E98～99</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$4D</span></td><td><code>$7F:7E9A～9B</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$4E</span></td><td><code>$7F:7E9C～9D</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$4F</span></td><td><code>$7F:7E9E～9F</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+	<tr><td><span class="formula">$50</span></td><td><code>$7F:7EA0～A1</code></td><td><span class="formula">$0A40</span></td><td><span class="formula">$00</span></td><td>-</td></tr>
+</tbody>
+</table>
+
+<p>OBJマップデータ開始アドレスにバンク<span class="formula">$7F</span>をつければ、該当マップのスプライトのデータ開始位置である。<br>
+また、次のマップの開始アドレスから、該当マップに幾つスプライトが設置されているか計算できる。1スプライトあたり6バイトのデータだから、引き算して6で割れば良い。</p>
+
+<p><code>$7F:7E00～01</code>に<span class="formula">$00A2</span>が入っているから、<code>$7F:7EA2</code>からワールドマップ（<span class="formula"><code>[$00:0A02]</code>=$00</span>）のスプライトのデータが開始になることがわかる。<br>
+また、近未来編のスプライトはトータルで<span class="formula">$174</span>（10進数<span class="formula">372</span>）ということがわかる。<br>
+これはマップに表示されるスプライトの累積なので、同じ人物でもマップが異なると加算されるし、筑波研究所入口の見張り黒服のように、「会話可能な黒フク」から「敵シンボルの黒フク」に変化するためスプライトとしては2個と数えるスプライトもある。</p>
+
+<p>マップ番号にあたる<code>[$00:0A02]</code>の<span class="formula">$3D</span>以降はデータがないが、他シナリオにある程度合わせて番号（アドレス）を割り振りしているか、開発中はもう少し何かしらのデータがあったか、デバッグ用の部屋か、そのあたりは不明。</p>
+
+<p><code>$7F:7EA2</code>～から、スプライトのOBJマップデータ初期値（1スプライトあたり<span class="formula">6</span>バイトのデータ）が開始になる。<br>
+セーブデータには、それらの5バイト目の上1ビット（Bit7）だけ記録していく仕組みがある。<br>
+<code><span class="r">$CE/CDC2</span></code>～<code><span class="r">$CE/CE3B</span></code>は以下のようになっている。<br>
+近未来編でのセーブ処理でアドレスを追ってみた。</p>
 
 <div class="code-container"><pre>
+;$7F:7E00～処理
+$CE/CDC2 PHB                     ;DBレジスタをスタックにプッシュ
+$CE/CDC3 LDA #$7F                ;Aに$7Fをロード
+$CE/CDC5 PHA                     ;Aレジスタをスタックにプッシュ
+$CE/CDC6 PLB                     ;DBレジスタにスタックからプル
+$CE/CDC7 LDA #$08                ;Aに$08をロード
+$CE/CDC9 STA $26    [$00:0026]   ;Aを[$00:0026]に書き込み $08
+$CE/CDCB STZ $20    [$00:0020]   ;[$00:0020]に$00を書き込み
+$CE/CDCD LDX #$0A70              ;Xに$0A70をロード
+$CE/CDD0 LDY #$7E00              ;Yに$7E00をロード
+$CE/CDD3 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$CE/CDD5 LDA $0000,y[$7F:7E00]   ;Aに[$7F:7E01][$7F:7E00]をロード 00A2
+$CE/CDD8 LSR A                   ;Aを論理右シフト　(/2)
+$CE/CDD9 DEC A                   ;Aをデクリメント -1
+$CE/CDDA STA $24    [$00:0024]   ;Aを[$00:0025][$00:0024]に書き込み 0050
+;$CE/CDDCループ&#x2460;処理開始
+$CE/CDDC LDA $0002,y[$7F:7E02]   ;Aに[$7F:7E03][$7F:7E02]をロード 0101
+$CE/CDDF STA $22    [$00:0022]   ;Aを[$00:0023][$00:0022]に書き込み 0101
+$CE/CDE1 SEC                     ;キャリーフラグON
+$CE/CDE2 SBC $0000,y[$7F:7E00]   ;A - [$7F:7E01][$7F:7E00]  $0101 - $00A2
+$CE/CDE5 BEQ $37    [$CE1E]      ;ゼロフラグが立っているとき[$CE1E]分岐 A:005F
+$CE/CDE7 CMP #$0005              ;Aと$0005を減算比較（ステータスレジスタ変更のみ）
+$CE/CDEA BEQ $32    [$CE1E]      ;ゼロフラグが立っているとき[$CE1E]分岐
+$CE/CDEC PHY                     ;Yレジスタをスタックへプッシュ Y:7E00
+$CE/CDED LDA $0000,y[$7F:7E00]   ;Aに[$7F:7E01][$7F:7E00]をロード 00A2
+$CE/CDF0 CLC                     ;キャリーフラグクリア
+$CE/CDF1 ADC #$0005              ;A + $0005
+$CE/CDF4 TAY                     ;Aの値をYレジスタに転送 Y:00A7
+;$CE/CDF5ループ&#x2461;処理開始
+$CE/CDF5 SEP #$20                ;MフラグON　Aレジスタは8bit幅 
+$CE/CDF7 LDA $7E04,y[$7F:7EAB]   ;Aに[$7F:7EAB]をロード
+$CE/CDFA ASL A                   ;Aを算術左シフト *2
+$CE/CDFB ROR $20    [$00:0020]   ;[$00:0020](初期値$00)をキャリーフラグを含めた9bitで右ローテート
+$CE/CDFD DEC $26    [$00:0026]   ;[$00:0026](初期値$08)をデクリメント -1
+$CE/CDFF BNE $10    [$CE11]      ;ゼロフラグが立っていないとき[$CE11]分岐
+;ゼロフラグOFF
+$CE/CE11 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$CE/CE13 TYA                     ;Yレジスタの値をAレジスタに転送
+$CE/CE14 CLC                     ;キャリーフラグクリア
+$CE/CE15 ADC #$0006              ;A + $0006
+$CE/CE18 TAY                     ;Aの値をYレジスタに転送
+$CE/CE19 CMP $22    [$00:0022]   ;Aと[$00:0023][$00:0022](0101)を減算比較（ステータスレジスタ変更のみ）
+$CE/CE1B BNE $D8    [$CDF5]      ;ゼロフラグが立っていないとき[$CDF5]分岐
+;$CE/CDF5ループ処理&#x2461;ここまで
+</pre></div>
+
+<p>上処理はループ処理が入れ子になっているので、便宜上、外側ループを&#x2460;（<code><span class="r">$CE/CDDC</span></code>～）、内側ループを&#x2461;（<code><span class="r">$CE/CDF5</span></code>～<code><span class="r">$CE/CE1B</span></code>）としておく。<br>
+外側ループの回数は<code><span class="r">$CE/CDD5</span></code>～<code><span class="r">$CE/CDDA</span></code>の <code>[$7F:7E01]</code><code>[$7F:7E00]</code>/2-1 （今回は<span class="formula">$0050</span>）で計算されている。<br>
+ループ&#x2460;はマップ毎のスプライト処理ということである。<br>
+先の一覧表から、最初に処理されるのはワールドマップのスプライトで、<code>$7F:7E00</code>～を2バイト値としてみたら<span class="formula">$0050</span>番目の2バイト値から処理開始である。</p>
+
+<table>
+<thead>
+	<tr><th><code>[$00:0A02]</code></th><th>OBJマップデータ開始アドレス</th><th>値</th><th>スプライト数</th><th>場所</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td><code>$7F:7E00～01</code></td><td><span class="formula">$00A2</span></td><td><span class="formula">$0F</span></td><td>ワールドマップ</td></tr>
+	<tr><td><span class="formula">$01</span></td><td><code>$7F:7E02～03</code></td><td><span class="formula">$0101</span></td><td><span class="formula">$1E</span></td><td>チビッコハウス・庭</td></tr>
+</tbody>
+</table>
+
+<p><code><span class="r">$CE/CDE2</span></code>で、次のマップ（チビッコハウス・庭）の開始アドレス<code>[$7F:7E03]</code><code>[$7F:7E02]</code>（<span class="formula">$0101</span>）から、ワールドマップの開始アドレス<code>[$7F:7E01]</code><code>[$7F:7E00]</code>(<span class="formula">$00A2</span>)を引いている。<br>
+この差が<span class="formula">0</span>より大きいなら、該当マップに1個以上のスプライトが設置されているので、セーブデータに記録する必要がある。<br>
+<code><span class="r">$CE/CDE5</span></code>で減算結果のゼロフラグ分岐があるのは、「該当マップのスプライト数は0なので、該当マップのスプライト処理をする必要はなく、次のマップ処理に移る」という意味なのである。<br>
+<code><span class="r">$CE/CDEA</span></code>のゼロフラグ分岐は、ループ処理の結果、残りのデータが5バイト以下になったので処理を抜けるの意味（スプライト1個のデータが6バイトなので）。</p>
+
+<p>内部のループ&#x2461;、<code><span class="r">$CE/CDF5</span></code>～<code><span class="r">$CE/CE1B</span></code>は、マップ内におけるスプライト1個ずつの処理である。<br>
+つまり、OBJマップデータ初期配置の5バイト目の上1ビットだけ取り出していく処理になる。<br>
+<code><span class="r">$CE/CDF1</span></code>は、OBJマップデータ初期配置開始アドレスに+5して、5バイト目を取り出すための準備なのである。</p>
+
+<p>取り出したデータは、8個分集めて8ビットのデータ＝1バイトのデータにする。<br>
+<code><span class="r">$CE/CDFF</span></code>のゼロフラグ分岐は、8個分のデータが溜まったかどうかの判定用ということである。<br>
+マップによりスプライトの数は異なるから、8個分のデータが溜まるタイミングと、ループ&#x2461;を抜けるタイミング（マップ1つ分のスプライトの処理）はまったく異なってくるので、処理を追いかけていくとなかなかややこしい。</p>
+
+<p>ループ&#x2461;内の<code><span class="r">$CE/CDF5</span></code>～<code><span class="r">$CE/CDFF</span></code>の処理は、OBJマップデータ初期配置の5バイト目の値を算術左シフト（*2）することで、Bit7に<span class="formula">1</span>が入っていたらキャリーフラグを立たせ、Bit7に<span class="formula">0</span>が入っていたらキャリーフラグを立たせないことを利用し、<code><span class="r">$CE/CDFB</span></code>でキャリーフラグを含めた9bitで<code>[$00:0020]</code>(初期値<span class="formula">$00</span>)を右ローテートさせ、OBJマップデータ初期配置の5バイト目Bit7の値を1ビットずつ<code>[$00:0020]</code>にコピーする、という処理である。<br>
+<code><span class="r">$CE/CDFD</span></code>で、<code>[$00:0026]</code>(初期値<span class="formula">$08</span>)をデクリメントさせゼロフラグ分岐させることにより、ループ内ループで、<code>[$00:0020]</code>に8ビット分のデータを入れたら<code><span class="r">$CE/CDFF</span></code>でゼロフラグをONにさせてループを抜けさせる。<br>
+<code><span class="r">$CE/CDFF</span></code>でゼロフラグOFF、つまり<code>[$00:0020]</code>に8ビット分のデータが入っていない時は、次のOBJマップデータ初期配置の5バイト目Bit7の値を呼びだすため、<code><span class="r">$CE/CE11</span></code>～<code><span class="r">$CE/CE1B</span></code>の処理を行う。<br>
+<code>[$7F:7EAB]</code>の次に呼び出すのは、ちょうど6バイト後の値、<code>[$7F:7EB1]</code>である。ワールドマップにおける2個目のスプライトのデータにあたる。<br>
+……を繰り返して、ひとまず<code><span class="r">$CE/CDFF</span></code>で最初にゼロフラグがONになる、つまり<code>[$00:0020]</code>に8ビット分のデータを入れた時の処理を見てみよう。ループ8回目である。</p>
+
+<div class="code-container"><pre>
+;ループ&#x2461;処理開始
+$CE/CDF5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/CDF7 LDA $7E04,y[$7F:7ED5]   ;Aに[$7F:7ED5]をロード
+$CE/CDFA ASL A                   ;Aを算術左シフト *2
+$CE/CDFB ROR $20    [$00:0020]   ;[$00:0020]をキャリーフラグを含めた9bitで右ローテート
+$CE/CDFD DEC $26    [$00:0026]   ;[$00:0026]をデクリメント -1
+$CE/CDFF BNE $10    [$CE11]      ;ゼロフラグが立っていないとき[$CE11]分岐
+;ゼロフラグON（[$00:0020]に8ビット分のデータが入った）
+$CE/CE01 CPX #$0AA8              ;Xと$0AA8を減算比較（ステータスレジスタ変更のみ）
+$CE/CE04 BCC $02    [$CE08]      ;キャリーフラグが立っていないとき[$CE08]分岐
+$CE/CE08 LDA #$08                ;Aに$08をロード
+$CE/CE0A STA $26    [$00:0026]   ;Aを[$00:0026]に書き込み　$08
+$CE/CE0C LDA $20    [$00:0020]   ;Aに[$00:0020]をロード　[$7F:7EAB]～[$7F:7ED5]のBit7の8ビット分のデータ1バイト
+$CE/CE0E STA $00,x  [$00:0A70]   ;Aを[$00:0A70]に書き込み
+$CE/CE10 INX                     ;Xをインクリメント +1
+$CE/CE11 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$CE/CE13 TYA                     ;Yレジスタの値をAレジスタに転送
+$CE/CE14 CLC                     ;キャリーフラグクリア
+$CE/CE15 ADC #$0006              ;A + $0006
+$CE/CE18 TAY                     ;Aの値をYレジスタに転送
+$CE/CE19 CMP $22    [$00:0022]   ;Aと[$00:0023][$00:0022](0101)を減算比較（ステータスレジスタ変更のみ）
+$CE/CE1B BNE $D8    [$CDF5]      ;ゼロフラグが立っていないとき[$CDF5]分岐
+;ループ&#x2461;処理ここまで
+</pre></div>
+
+<p><code>[$7F:7EAB]</code>～<code>[$7F:7ED5]</code>のBit7の値だけ8ビットに格納した<code>[$00:0020]</code>は、<code>[$00:0A70]</code>に書き込まれた。<br>
+この<code>[$00:0A70]</code>は、<code>$00,x</code>（<span class="formula">X:0A70</span>）で計算されており、<code><span class="r">$CE/CE10</span></code>で<code>X</code>をインクリメントしているから、この後も8ビットデータが溜まる度に<br>
+<span class="formula"><code>[$00:0A70]</code> + n</span><br>
+のアドレスに書き込まれていくことがわかる。</p>
+
+<p><code><span class="r">$CE/CDF5</span></code>～<code><span class="r">$CE/CE1B</span></code>ループが16回で内側ループ&#x2461;を抜ける時の処理が以下。<br>
+ここで初めて<code><span class="r">$CE/CDDC</span></code>～のループ&#x2460;1周分が終わる。<br>
+つまり、ワールドマップ設置分のスプライト処理終了である。</p>
+
+<div class="code-container"><pre>
+;ループ&#x2461;処理開始
+$CE/CDF5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/CDF7 LDA $7E04,y[$7F:7EFF]   ;Aに[$7F:7EFF]をロード
+$CE/CDFA ASL A                   ;Aを算術左シフト *2
+$CE/CDFB ROR $20    [$00:0020]   ;A[$00:0020]をキャリーフラグを含めた9bitで右ローテート
+$CE/CDFD DEC $26    [$00:0026]   ;[$00:0026]をデクリメント -1
+$CE/CDFF BNE $10    [$CE11]      ;ゼロフラグが立っていないとき[$CE11]分岐
+;ゼロフラグOFF
+$CE/CE11 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$CE/CE13 TYA                     ;Yレジスタの値をAレジスタに転送
+$CE/CE14 CLC                     ;キャリーフラグクリア
+$CE/CE15 ADC #$0006              ;A + $0006
+$CE/CE18 TAY                     ;Aの値をYレジスタに転送
+$CE/CE19 CMP $22    [$00:0022]   ;Aと[$00:0023][$00:0022](0101)を減算比較（ステータスレジスタ変更のみ）
+$CE/CE1B BNE $D8    [$CDF5]      ;ゼロフラグが立っていないとき[$CDF5]分岐
+;ゼロフラグON
+$CE/CE1D PLY                     ;Yレジスタにスタックからプル
+$CE/CE1E INY                     ;Y(7E00)をインクリメント +1　★
+$CE/CE1F INY                     ;Yをインクリメント +1
+$CE/CE20 DEC $24    [$00:0024]   ;[$00:0025][$00:0024]（初期値0050）をデクリメント -1
+$CE/CE22 BNE $B8    [$CDDC]      ;ゼロフラグが立っていないとき[$CDDC]分岐
+;$CE/CDDCループ&#x2460;処理ここまで
+
+$CE/CDDC LDA $0002,y[$7F:7E04]   ;Aに[$7F:7E54][$7F:7E04]をロード　01BA
+$CE/CDDF STA $22    [$00:0022]   ;Aを[$00:0032][$00:0022]に書き込み
+$CE/CDE1 SEC                     ;キャリーフラグON
+$CE/CDE2 SBC $0000,y[$7F:7E02]   ;A(01BA) - [$7F:7E03][$7F:7E02]($0101)
+$CE/CDE5 BEQ $37    [$CE1E]      ;ゼロフラグが立っているとき[$CE1E]分岐→★
+;ゼロフラグOFF
+$CE/CDE7 CMP #$0005              ;Aと$0005を減算比較（ステータスレジスタ変更のみ）
+$CE/CDEA BEQ $32    [$CE1E]      ;ゼロフラグが立っているとき[$CE1E]分岐→★
+;ゼロフラグOFF
+$CE/CDEC PHY                     ;Yレジスタをスタックへプッシュ
+$CE/CDED LDA $0000,y[$7F:7E02]   ;Aに[$7F:7E03][$7F:7E02]($0101)をロード
+$CE/CDF0 CLC                     ;キャリーフラグクリア
+$CE/CDF1 ADC #$0005              ;A + $0005
+$CE/CDF4 TAY                     ;Aの値をYレジスタに転送
+
+$CE/CDF5 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/CDF7 LDA $7E04,y[$7F:7F0A]   ;Aに[$7F:7F0A]をロード
+$CE/CDFA ASL A                   ;Aを算術左シフト *2
+$CE/CDFB ROR $20    [$00:0020]   ;A[$00:0020]をキャリーフラグを含めた9bitで右ローテート
+$CE/CDFD DEC $26    [$00:0026]   ;[$00:0026]をデクリメント -1
+$CE/CDFF BNE $10    [$CE11]      ;ゼロフラグが立っていないとき[$CE11]分岐
+$CE/CE01 CPX #$0AA8              ;Xと$0AA8を減算比較（ステータスレジスタ変更のみ）
+$CE/CE04 BCC $02    [$CE08]      ;キャリーフラグが立っていないとき[$CE08]分岐
+$CE/CE08 LDA #$08                ;Aに$08をロード
+$CE/CE0A STA $26    [$00:0026]   ;Aを[$00:0026]に書き込み
+$CE/CE0C LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$CE/CE0E STA $00,x  [$00:0A71]   ;Aを[$00:0A71]に書き込み
+$CE/CE10 INX                     ;Xをインクリメント +1
+$CE/CE11 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$CE/CE13 TYA                     ;Yレジスタの値をAレジスタに転送
+$CE/CE14 CLC                     ;キャリーフラグクリア
+$CE/CE15 ADC #$0006              ;A + $0006
+$CE/CE18 TAY                     ;Aの値をYレジスタに転送
+$CE/CE19 CMP $22    [$00:0022]   ;Aと[$00:0022]を減算比較（ステータスレジスタ変更のみ）
+$CE/CE1B BNE $D8    [$CDF5]      ;ゼロフラグが立っていないとき[$CDF5]分岐
+</pre></div>
+
+<p>ここからは次のマップである、チビッコハウス・庭のスプライトの処理になる。<br>
+以上を繰り返して、<code>$00:0A70</code>～にはスプライトの存在のみを1ビット値で記したデータが書き込まれていく。<br>
+先の一覧のスプライト数を合計するなりすればわかるが、近未来編のスプライト数は<span class="formula">$174</span>（10進数<span class="formula">372</span>）。<br>
+<span class="formula">8</span>で割ると、<span class="formula">372÷8 = 46</span>余り<span class="formula">4</span>だから、<span class="formula">46</span>バイトのデータ＋<span class="formula">4</span>ビットのあまりが生じる。実際には<span class="formula">47</span>バイト分の領域がないと記録できない。<br>
+ループの最後はどうやって処理しているのか見てみよう。<br>
+ちなみに最後の<span class="formula">8</span>ビット分のデータは<code>$00:0A9D</code>に入っている。</p>
+
+<div class="code-container"><pre>
+;最後のマップ処理（ループ&#x2460;）
+$CE/CDDC LDA $0002,y[$7F:7EA0]   ;Aに[$7F:7EA1][$7F:7EA0]をロード
+$CE/CDDF STA $22    [$00:0022]   ;Aを[$00:0023][$00:0022]に書き込み
+$CE/CDE1 SEC                     ;キャリーフラグON
+$CE/CDE2 SBC $0000,y[$7F:7E9E]   ;A - [$7F:7E9E]
+$CE/CDE5 BEQ $37    [$CE1E]      ;ゼロフラグが立っているとき[$CE1E]分岐
+$CE/CE1E INY                     ;Yをインクリメント +1
+$CE/CE1F INY                     ;Yをインクリメント +1
+$CE/CE20 DEC $24    [$00:0024]   ;[$00:0025][$00:0024]をデクリメント -1
+$CE/CE22 BNE $B8    [$CDDC]      ;ゼロフラグが立っていないとき[$CDDC]分岐
+;ループ&#x2461;処理終了
+$CE/CE24 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$CE/CE26 LDA $26    [$00:0026]   ;Aに[$00:0026]をロード
+$CE/CE28 CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$CE/CE2A BEQ $11    [$CE3D]      ;ゼロフラグが立っているとき[$CE3D]分岐
+;ゼロフラグON　[$00:0026]残り回数1～7回（半端が出る）
+;ループ処理開始　[$00:0026]の残り回数分、[$00:0020]の残りビット0で穴埋め
+$CE/CE2C LSR $20    [$00:0020]   ;[$00:0020]を論理右シフト　(/2)
+$CE/CE2E DEC $26    [$00:0026]   ;[$00:0026]をデクリメント -1
+$CE/CE30 BNE $FA    [$CE2C]      ;ゼロフラグが立っていないとき[$CE2C]分岐
+;ループ処理ここまで
+$CE/CE32 CPX #$0AA8              ;Xと$0AA8を減算比較（ステータスレジスタ変更のみ）
+$CE/CE35 BCC $02    [$CE39]      ;キャリーフラグが立っていないとき[$CE39]分岐
+$CE/CE39 LDA $20    [$00:0020]   ;Aに[$00:0020]をロード
+$CE/CE3B STA $00,x  [$00:0A9E]   ;Aを[$00:0A9E]に書き込み
+</pre></div>
+
+<p>ということで、簡単に言えば、<span class="formula">4</span>ビットだけデータが埋まった<code>[$00:0020]</code>の残り<span class="formula">4</span>ビットを<span class="formula">0</span>で埋めて、最後に<code>[$00:0A9E]</code>に値を書き込み終了である。<br>
+これで、近未来編の全スプライトの存在状態が<code>$00:0A70</code>～<code>$00:0A9E</code>に書き込まれた。</p>
+
+<p><code>$00:0AB0</code>からは、現在のパーティメンバーの戦闘行動順の値が入るため、スプライトのデータで埋めても構わない領域は<code>$00:0AAF</code>までと推測される。<br>
+つまり、<code>$00:0A70</code>～<code>$00:0AAF</code>の<span class="formula">$40</span>バイトがスプライト用に確保されていると思われる。<br>
+ここから逆算して、1つのシナリオで設定できるスプライト数は、<span class="formula">$40*8 = $200（512）</span>までと思われる。<br>
+ただ、各シナリオで確認する限り、最終編の<code>$00:0AA6</code>が最大のようである。<code>$00:0AAF</code>まで埋まることはないようだ。</p>
+
+<table>
+<thead>
+	<tr><th>シナリオ</th><th>最後のアドレス</th></tr>
+</thead>
+<tbody>
+	<tr><td>原始</td><td><code>$00:0AA1</code></td></tr>
+	<tr><td>ＳＦ</td><td><code>$00:0A99</code></td></tr>
+	<tr><td>功夫</td><td><code>$00:0A88</code></td></tr>
+	<tr><td>西部</td><td><code>$00:0A94</code></td></tr>
+	<tr><td>現代</td><td><code>$00:0A73</code></td></tr>
+	<tr><td>近未来</td><td><code>$00:0A9E</code></td></tr>
+	<tr><td>幕末</td><td><code>$00:0AA2</code></td></tr>
+	<tr><td>中世</td><td><code>$00:0A88</code></td></tr>
+	<tr><td>最終</td><td><code>$00:0AA6</code></td></tr>
+</tbody>
+</table>
+
+<p>ということで、<code><span class="r">$CE/CE3B</span></code>までの処理が、シナリオ内における全スプライトの存在状態のセーブデータへの保存である。</p>
+
+<h4>現在のマップにおけるスプライトの配置データのコピー</h4>
+
+<p>最後の<code><span class="r">$CE/CE3D</span></code>～<code><span class="r">$CE/CE61</span></code>が、現在のマップにおけるスプライトの配置の保存である。</p>
+
+
+<div class="code-container"><pre>
+$CE/CE3D PLB                     ;DBレジスタにスタックからプル
 $CE/CE3E LDA $0A03  [$00:0A03]   ;Aに[$00:0A03]をロード　マップスプライト総数
 $CE/CE41 BEQ $1E    [$CE61]      ;ゼロフラグが立っているとき[$CE61]分岐
 $CE/CE43 STA $20    [$00:0020]   ;Aを[$00:0020]に書き込み　マップスプライト総数
@@ -371,7 +751,7 @@ $CE/CE52 MVN 00 00               ;データ転送
 ;A:転送データサイズ-1 $0007
 ;X:転送元アドレス $132E + $0011*n
 ;Y:転送先アドレス $0FC0 + $0008*n
-;オペランド:転送元と転送先バンク 00 -> 00
+;オペランド:転送元と転送先バンク 00 → 00
 ;$00:132E → $00:0FC0 +$0005バイト
 $CE/CE55 TXA                     ;Xレジスタの値をAレジスタに転送
 $CE/CE56 CLC                     ;キャリーフラグクリア
@@ -669,7 +1049,6 @@ $CE/CF13 RTL                     ;サブルーチン戻り
 </pre></div>
 
 <p>以上が大まかな処理である。<br>
-シナリオによりまだ処理が続くが、とりあえず紹介はここまで。<br>
 最後にクリアデータについて記しておく。</p>
 
 <h3>クリアデータについて</h3>
