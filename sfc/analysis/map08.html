@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; 存在状態フラグの更新">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; 存在状態フラグの更新">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; マップ構造とスプライトの配置 &gt; 存在状態フラグの更新</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.apu_code-container,
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.apu_code-container pre,
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="mapno.html">マップID一覧</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">マップ</button>
+	<ul>
+		<li><a href="map01.html">マップ構造とスプライトの配置</a></li>
+		<li><a href="map02.html">スプライト処理</a></li>
+		<li><a href="map03.html">ランダム移動</a></li>
+		<li><a href="map04.html">追尾タイプの移動</a></li>
+		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
+		<li><a href="map06.html">隠れ蓑</a></li>
+		<li><a href="map07.html">匂いを嗅ぐ</a></li>
+		<li><a href="map08.html">存在状態フラグ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="map01.html">マップ構造とスプライトの配置</a> &gt; 存在状態フラグの更新</h1>
+<h2>マップ構造とスプライトの配置 &gt; 存在状態フラグの更新</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p><span class="tri"><a href="map01.html">マップ構造とスプライトの配置</a></span>と、<span class="tri"><a href="program35.html">セーブデータのセーブ・ロード</a></span>に記した通り、マップに入った時に、OBJマップデータは、</p>
+
+<p><code>$7F:7E00</code>～（1スプライトあたり<span class="formula">6</span>バイトのデータ）<br>
+↓<br>
+OBJマップ初期データ　<code>$00:14B5</code>～（1スプライトあたり<span class="formula">6</span>バイトのデータ）<br>
+↓<br>
+OBJマップデータ　<code>$00:132E</code>～（1スプライトあたり<span class="formula">17</span>バイトのデータ）</p>
+
+<p>と入り、シナリオの進行度合いやプレイヤーの行動によって、スプライトの存在状態フラグが更新される。</p>
+
+<p>シナリオ中のスプライトの存在状態（1ビット値）は、OBJマップ初期データの5バイト目のBit7→OBJマップデータ00のBit7に書き込まれ、それが例えば敵シンボルだった場合、倒すと<span class="formula">%1</span>から<span class="formula">%0</span>に値が更新され、<code>$7F:7E00</code>～の元データにも反映される。<br>
+さらに、セーブ時には<code>$7F:7E00</code>～からOBJマップ初期データの5バイト目のBit7だけ取り出して、シナリオ内の全スプライトの存在状態を保存する。<br>
+この「OBJマップ初期データの5バイト目のBit7」を「<span style="font-weight:bold;">スプライト存在状態フラグ</span>」とする。</p>
+
+<p>「スプライト存在状態フラグ」により、一度倒したら復活しない敵シンボルの状態や、他の様々なスプライトの状態もまた記録されていく。<br>
+プレイヤーの行動により変化するスプライトの存在状態フラグの例として、最終編のサンダウンの状態の処理を追ってみよう。<br>
+サンダウンまたはオルステッド以外を最終編主人公に選ぶと、最終編の初期状態で、サンダウンは勇者の山の山小屋横にいる。<br>
+話しかけてはサンダウンが移動して……を繰り返すことで最終的に仲間にできることは、プレイ済みの方ならご存知の通りである。<br>
+サンダウンの現在の位置や仲間にしたフラグはどこに記録されるのか。<br>
+<span class="tri"><a href="flag.html">シナリオ進行フラグ</a></span>には、最終編の味方キャラを仲間にしたかどうかというフラグはあるが、サンダウンに話しかけた回数や、今サンダウンがどこにいるのかといったフラグは見当たらない。<br>
+それらはスプライトの存在状態フラグで記録しているのである。</p>
+
+<div id="captiondata"></div>
+
+<h3>シナリオ進行フラグ</h3>
+
+<p><code>$00:12??</code>には各シナリオにおけるシナリオ進行フラグが入る（値は<span class="formula">$00</span>でOFF、<span class="formula">$01</span>でONのboolean値）。<br>
+最終編におけるサンダウン仲間フラグ関係のアドレスは以下の通り。<br>
+サンダウンのスプライトの存在状態フラグと合わせて、サンダウンを仲間にする時の処理に使われる。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$00:1205</code></td><td>サンダウンがパーティにいる。</td></tr>
+	<tr><td><code>$00:1211</code></td><td>サンダウンの仲間フラグONで、話しかけ選択肢が出ている時にON</td></tr>
+	<tr><td><code>$00:1217</code></td><td>サンダウンを城下町入口で仲間にする（同時に<code>$00:1218</code>が<span class="formula">$00</span>に戻る）</td></tr>
+	<tr><td><code>$00:1218</code></td><td>サンダウンをルクレチア城玉座右の部屋まで追いかけて話しかける（仲間になる条件を満たす）</td></tr>
+	<tr><td><code>$00:1221</code></td><td>サンダウンがパーティにいない時、各地に居るサンダウンに話しかける。話しかけると移動し<span class="formula">$00</span>に戻る。</td></tr>
+	<tr><td><code>$00:1237</code></td><td>サンダウンが仲間になる。パーティから外すと<span class="formula">$00</span>。ピュアオディオ戦後にパーティにいない時は合流時に<span class="formula">$01</span>。</td></tr>
+</tbody>
+</table>
+
+
+<h3><code>$7F:7E00</code>～のスプライトのOBJマップ初期データ</h3>
+
+<p><code>$7F:7E00</code>～には、現在プレイ中のスプライトの状態が入り、各マップに入った時にOBJマップ初期データとして利用されるが、まずは最終編開始時のスプライトの状態を見てみよう。<br>
+今回はサンダウンを追いかけるため、心山拳師範（サモ）を主人公にしてみた。勇者の山山頂から開始なのでサンダウンを追いかけやすい。<br>
+<span class="tri"><a href="mapno.html">マップIDとスプライト数一覧</a></span>も参照のこと。</p>
+
+<p><code>$7F:7E00</code>～のデータだが、まず最初に2バイト値で各マップのスプライトデータの開始位置が記述されている。<br>
+最終編だと、<code>$7F:7E00</code>～<code>$7F:8001</code>まで、開始位置アドレスが記されている。<br>
+最初のマップのスプライトデータは<code>$7F:8002</code>から開始である（<code>$7F:7E00～01</code>に<span class="formula">$0202</span>と書かれているので、<code>$7F:7E00</code> + <span class="formula">$0202</span>で<code>$7F:8002</code>が最初のマップのスプライトのデータ開始位置）。<br>
+マップの順がマップIDとなり<code>$00:0A02</code>に入るが、最終編だと最初のマップID<span class="formula">$00</span>はルクレチア城外観（中庭と城下町）である。<br>
+<code>$7F:7E02</code>～03には<span class="formula">$022B</span>が入っているから、マップID<span class="formula">$00</span>のスプライトデータは、引き算して<span class="formula">$29</span>バイト。<br>
+最初の5バイトにヘッダ値が入るので（<code>$00:0A4B</code>～<code>$00:0A4F</code>にコピー）、<span class="formula">$24</span>バイトがOBJマップデータにあたる。<br>
+1つのスプライトで6バイトのデータなので、<span class="formula">$24÷6 = $06</span>であり、6個のスプライトが設置されていることがわかる。<br>
+実際のデータは以下の通り。2～3バイト目はマップ座標。</p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:8002</code></td><td class="formula">08 19 1B 1A 1A </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:8007</code></td><td class="formula">50 0B 29 42 26 4A </td><td>(<span class="formula">$0B</span>, <span class="formula">$29</span>)</td><td><span class="formula">%0</span></td><td>サンダウン（城下町）</td></tr>
+	<tr><td>02</td><td><code>$7F:800D</code></td><td class="formula">50 11 39 06 6F 4A </td><td>(<span class="formula">$11</span>, <span class="formula">$39</span>)</td><td><span class="formula">%0</span></td><td>サンダウン（城門の外）</td></tr>
+	<tr><td>03</td><td><code>$7F:8013</code></td><td class="formula">00 09 2A C6 80 50 </td><td>(<span class="formula">$09</span>, <span class="formula">$2A</span>)</td><td><span class="formula">%1</span></td><td>城下町左上民家左の扉</td></tr>
+	<tr><td>04</td><td><code>$7F:8019</code></td><td class="formula">00 0E 2A C6 80 50 </td><td>(<span class="formula">$0E</span>, <span class="formula">$2A</span>)</td><td><span class="formula">%1</span></td><td>城下町左上民家右の扉</td></tr>
+	<tr><td>05</td><td><code>$7F:801F</code></td><td class="formula">00 19 2A C6 80 50 </td><td>(<span class="formula">$19</span>, <span class="formula">$2A</span>)</td><td><span class="formula">%1</span></td><td>城下町右上民家扉</td></tr>
+	<tr><td>06</td><td><code>$7F:8025</code></td><td class="formula">00 0B 2F C6 80 50 </td><td>(<span class="formula">$0B</span>, <span class="formula">$2F</span>)</td><td><span class="formula">%1</span></td><td>城下町左下民家扉</td></tr>
+</tbody>
+</table>
+
+<p>スプライト03～06は城下町の4個の扉のスプライトにあたる。マップに入ると必ず存在している。<br>
+スプライト01、02はどちらもサンダウンで、5バイト目のBit7を見ると、</p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td>02</td><td><code>$7F:8011</code></td><td><span class="formula">$26</span> (<span class="formula">%0010 0110</span>)</td></tr>
+	<tr><td>03</td><td><code>$7F:8017</code></td><td><span class="formula">$6F</span> (<span class="formula">%0110 1111</span>)</td></tr>
+</tbody>
+</table>
+
+<p>だから、存在していない。<br>
+最終編を開始した時点ではどちらも存在していないということだが、サンダウンに一切話しかけていない時には城下町にはいないので当然である。<br>
+また、城門の外のスプライト02は、サンダウンが仲間になる時のイベント用である。</p>
+
+<p>というように、サンダウンを追いかける時にサンダウンがいるマップには、OBJマップ初期データとして、あらかじめサンダウンのスプライトの位置や挙動などがセットしてある。<br>
+後はOBJマップ初期データの存在状態フラグ、つまり5バイト目のBit7をイベント進行に合わせて更新していけばよい。</p>
+
+<p>では、サンダウンの移動順に各マップのデータを見てみよう。</p>
+
+<h5>マップID<span class="formula">$28</span> 勇者の山　山小屋マップ</h5>
+
+<p>スプライト数<span class="formula">$03</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:83F1</code></td><td class="formula">08 19 1B 06 1A </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:83F6</code></td><td class="formula">50 09 17 3F A6 4A </td><td>(<span class="formula">$09</span>, <span class="formula">$17</span>)</td><td><span class="formula">%1</span></td><td>サンダウン</td></tr>
+	<tr><td>02</td><td><code>$7F:83FC</code></td><td class="formula">3E 23 0F 22 51 6C </td><td>(<span class="formula">$23</span>, <span class="formula">$0F</span>)</td><td><span class="formula">%0</span></td><td>バッテリー（鉄の箱）</td></tr>
+	<tr><td>03</td><td><code>$7F:8402</code></td><td class="formula">00 0B 17 FA 84 70 </td><td>(<span class="formula">$0B</span>, <span class="formula">$17</span>)</td><td><span class="formula">%1</span></td><td>山小屋の扉</td></tr>
+</tbody>
+</table>
+
+<p>ここがサンダウンの初期位置マップになり、存在状態フラグはONになっている。<br>
+（5バイト目の値が<span class="formula">$A6 = %1010 0110</span>でBit7に<span class="formula">1</span>が立っている）</p>
+
+<p>キューブを仲間にするために必要な「バッテリー（なんかの部品、鉄の箱、？？？？）」はこのマップの右上あたりで拾うが、その位置がスプライト02、座標(<span class="formula">$23</span>, <span class="formula">$0F</span>)にあたる。<br>
+近くの一定のマスを踏んだ時にだけ、座標(<span class="formula">$23</span>, <span class="formula">$0F</span>)に光るスプライトが表示される仕組みがあるので、このマップに入った時には必ず非表示（存在なし扱い）。<br>
+もちろん、キューブ主人公時や、該当アイテムを拾ったあとも非表示。<br>
+スプライト02が最初から存在扱いになると、マップのどこにいても光るスプライトが表示されたままになる。</p>
+
+
+<h5>マップID<span class="formula">$10</span> 勇者の山　麓マップ</h5>
+
+<p>スプライト数<span class="formula">$03</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:811F</code></td><td class="formula">08 19 14 12 13 </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:8124</code></td><td class="formula">50 21 15 40 2A 4A </td><td>(<span class="formula">$21</span>, <span class="formula">$15</span>)</td><td><span class="formula">%0</span></td><td>サンダウン</td></tr>
+	<tr><td>02</td><td><code>$7F:812A</code></td><td class="formula">54 22 0D DF 53 BB </td><td>(<span class="formula">$22</span>, <span class="formula">$0D</span>)</td><td><span class="formula">%0</span></td><td>本能のダンジョン入口から発生する匂い</td></tr>
+	<tr><td>03</td><td><code>$7F:8130</code></td><td class="formula">00 22 0D E1 80 60 </td><td>(<span class="formula">$22</span>, <span class="formula">$0D</span>)</td><td><span class="formula">%1</span></td><td>洞窟入口</td></tr>
+</tbody>
+</table>
+
+<p>2番目以降のサンダウンのスプライト存在状態フラグは、最終編開始時は必ず<span class="formula">%0</span>。<br>
+麓マップ側は他にも本能のダンジョン関係のスプライトが設置されている。</p>
+
+<h5>マップID<span class="formula">$0F</span> ルクレチアの森</h5>
+
+<p>スプライト数<span class="formula">$0F</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:80C0</code></td><td class="formula">08 19 17 28 16 </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:80C5</code></td><td class="formula">50 21 1F 41 26 4A </td><td>(<span class="formula">$21</span>, <span class="formula">$1F</span>)</td><td><span class="formula">%0</span></td><td>サンダウン</td></tr>
+	<tr><td>02</td><td><code>$7F:80CB</code></td><td class="formula">36 15 07 09 02 6C </td><td>(<span class="formula">$15</span>, <span class="formula">$07</span>)</td><td><span class="formula">%0</span></td><td>アポフィスフィオ（ヘビ頭）</td></tr>
+	<tr><td>03</td><td><code>$7F:80D1</code></td><td class="formula">1C 2A 34 14 40 4C </td><td>(<span class="formula">$2A</span>, <span class="formula">$34</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬1</td></tr>
+	<tr><td>04</td><td><code>$7F:80D7</code></td><td class="formula">1D 2A 35 14 40 4C </td><td>(<span class="formula">$2A</span>, <span class="formula">$35</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬1（走る）</td></tr>
+	<tr><td>05</td><td><code>$7F:80DD</code></td><td class="formula">1E 2D 3C 14 40 4C </td><td>(<span class="formula">$2D</span>, <span class="formula">$3C</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬2</td></tr>
+	<tr><td>06</td><td><code>$7F:80E3</code></td><td class="formula">1F 2D 3D 14 40 4C </td><td>(<span class="formula">$2D</span>, <span class="formula">$3D</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬2（走る）</td></tr>
+	<tr><td>07</td><td><code>$7F:80E9</code></td><td class="formula">8E 32 3B 14 70 4C </td><td>(<span class="formula">$32</span>, <span class="formula">$3B</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬3</td></tr>
+	<tr><td>08</td><td><code>$7F:80EF</code></td><td class="formula">8C 33 3B 14 70 4C </td><td>(<span class="formula">$33</span>, <span class="formula">$3B</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬3（走る）</td></tr>
+	<tr><td>09</td><td><code>$7F:80F5</code></td><td class="formula">96 32 3C 14 70 4C </td><td>(<span class="formula">$32</span>, <span class="formula">$3C</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬4</td></tr>
+	<tr><td>0A</td><td><code>$7F:80FB</code></td><td class="formula">94 33 3C 14 70 4C </td><td>(<span class="formula">$33</span>, <span class="formula">$3C</span>)</td><td><span class="formula">%0</span></td><td>時のダンジョンへの馬4（走る）</td></tr>
+	<tr><td>0B</td><td><code>$7F:8101</code></td><td class="formula">54 32 1E DD 53 BB </td><td>(<span class="formula">$32</span>, <span class="formula">$1E</span>)</td><td><span class="formula">%0</span></td><td>魔王山からの匂い</td></tr>
+	<tr><td>0C</td><td><code>$7F:8107</code></td><td class="formula">34 15 06 FA 02 6C </td><td>(<span class="formula">$15</span>, <span class="formula">$06</span>)</td><td><span class="formula">%0</span></td><td>アポフィスフィオ（頭）</td></tr>
+	<tr><td>0D</td><td><code>$7F:810D</code></td><td class="formula">35 14 07 FA 02 6C </td><td>(<span class="formula">$14</span>, <span class="formula">$07</span>)</td><td><span class="formula">%0</span></td><td>アポフィスフィオ（左ヒレ）</td></tr>
+	<tr><td>0E</td><td><code>$7F:8113</code></td><td class="formula">B5 16 07 FA 02 6C </td><td>(<span class="formula">$16</span>, <span class="formula">$07</span>)</td><td><span class="formula">%0</span></td><td>アポフィスフィオ（右ヒレ）</td></tr>
+	<tr><td>0F</td><td><code>$7F:8119</code></td><td class="formula">53 32 21 09 24 4C </td><td>(<span class="formula">$32</span>, <span class="formula">$21</span>)</td><td><span class="formula">%0</span></td><td>おぼろ丸</td></tr>
+</tbody>
+</table>
+
+<p>ルクレチアの森のスプライトは、看板前のサンダウンの他に、高原がパーティにいる時のみ存在するアポフィスフィオのスプライト（スプライト4個分で形成されている）、時のダンジョンへ行く時に出現する馬、魔王山から出てくる魔王の匂い、看板を調べた時に出現するおぼろ丸のスプライトが設置されている。<br>
+馬は、その場でいななくスプライトと、走り去る馬とで別扱いのため、上のように1匹の馬に2パターンのスプライトが用意されており、合計で8個のスプライトを使っている。</p>
+
+<p>高原主人公でない限り、最初にこのマップを訪れた時、存在扱いのスプライトはない。</p>
+
+<p>城下町のスプライトは後で説明する。</p>
+
+<h5>マップID<span class="formula">$04</span> ルクレチア城　宝物庫</h5>
+
+<p>スプライト数<span class="formula">$01</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:807D</code></td><td class="formula">08 19 1B 1A 1A </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:8082</code></td><td class="formula">50 23 21 43 2E 4A </td><td>(<span class="formula">$23</span>, <span class="formula">$21</span>)</td><td><span class="formula">%0</span></td><td>サンダウン</td></tr>
+</tbody>
+</table>
+
+<p>ここから先のマップはサンダウンのスプライトのみ設置。初期状態で存在状態フラグはOFF。</p>
+
+<h5>マップID<span class="formula">$08</span> ルクレチア城　玉座の間</h5>
+
+<p>スプライト数<span class="formula">$01</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:8088</code></td><td class="formula">08 19 1B 1A 1A </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:808D</code></td><td class="formula">50 0D 2F 44 26 4A </td><td>(<span class="formula">$0D</span>, <span class="formula">$2F</span>)</td><td><span class="formula">%0</span></td><td>サンダウン</td></tr>
+</tbody>
+</table>
+
+<h5>マップID<span class="formula">$0B</span> ルクレチア城　玉座左側の部屋</h5>
+
+<p>スプライト数<span class="formula">$01</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:80B5</code></td><td class="formula">08 19 1B 1A 1A </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:80BA</code></td><td class="formula">50 38 03 45 22 4A </td><td>(<span class="formula">$38</span>, <span class="formula">$03</span>)</td><td><span class="formula">%0</span></td><td>サンダウン</td></tr>
+</tbody>
+</table>
+
+<h5>マップID<span class="formula">$0A</span> ルクレチア城　玉座右側の部屋</h5>
+
+<p>スプライト数<span class="formula">$01</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:80AA</code></td><td class="formula">08 19 1B 1A 1A </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:80AF</code></td><td class="formula">50 2D 19 46 26 4A </td><td>(<span class="formula">$2D</span>, <span class="formula">$19</span>)</td><td><span class="formula">%0</span></td><td>サンダウン</td></tr>
+</tbody>
+</table>
+
+<p>ここが最後にサンダウンが出現するマップであり、フラグも別処理。後述する。</p>
+
+<h5>マップID<span class="formula">$00</span> ルクレチア城　外観（中庭と城下町）</h5>
+
+<p>スプライト数<span class="formula">$06</span></p>
+
+<table>
+<thead>
+	<tr><th>スプライト</th><th>開始アドレス</th><th>内容</th><th>座標</th><th>存在状態</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>ヘッダ5バイト</td><td><code>$7F:8002</code></td><td class="formula">08 19 1B 1A 1A </td><td>-</td><td>-</td><td>-</td></tr>
+	<tr><td>01</td><td><code>$7F:8007</code></td><td class="formula">50 0B 29 42 26 4A </td><td>(<span class="formula">$0B</span>, <span class="formula">$29</span>)</td><td><span class="formula">%0</span></td><td>サンダウン（城下町）</td></tr>
+	<tr><td>02</td><td><code>$7F:800D</code></td><td class="formula">50 11 39 06 6F 4A </td><td>(<span class="formula">$11</span>, <span class="formula">$39</span>)</td><td><span class="formula">%0</span></td><td>サンダウン（城門の外）</td></tr>
+	<tr><td>03</td><td><code>$7F:8013</code></td><td class="formula">00 09 2A C6 80 50 </td><td>(<span class="formula">$09</span>, <span class="formula">$2A</span>)</td><td><span class="formula">%1</span></td><td>城下町左上民家左の扉</td></tr>
+	<tr><td>04</td><td><code>$7F:8019</code></td><td class="formula">00 0E 2A C6 80 50 </td><td>(<span class="formula">$0E</span>, <span class="formula">$2A</span>)</td><td><span class="formula">%1</span></td><td>城下町左上民家右の扉</td></tr>
+	<tr><td>05</td><td><code>$7F:801F</code></td><td class="formula">00 19 2A C6 80 50 </td><td>(<span class="formula">$19</span>, <span class="formula">$2A</span>)</td><td><span class="formula">%1</span></td><td>城下町右上民家扉</td></tr>
+	<tr><td>06</td><td><code>$7F:8025</code></td><td class="formula">00 0B 2F C6 80 50 </td><td>(<span class="formula">$0B</span>, <span class="formula">$2F</span>)</td><td><span class="formula">%1</span></td><td>城下町左下民家扉</td></tr>
+</tbody>
+</table>
+
+<p>先に説明した通りに、スプライト01が城下町にいる時のサンダウンの位置。<br>
+スプライト02は城門の外で仲間に加わる時のイベント位置であるが、存在状態フラグはOFFの状態でイベントが開始になる。詳細は後述。</p>
+
+
+<h3>サブルーチン</h3>
+
+<p>各所にいるサンダウンに対して、Aボタンで話しかけ、BGM変更と共に、サンダウンの「‥‥」というセリフ表示後に画面外まで移動してBGM終了、というのが一連のイベントである。<br>
+つまり、サウンド処理、会話処理、サンダウンの移動処理なども行われるのであるが、ここでは存在状態フラグの更新部分をメインで見ていこう。</p>
+
+<h4>1回目（山小屋横）</h4>
+
+<p>処理を見ると、存在状態フラグの更新は、サンダウンが画面外へと移動し終えたタイミング、つまり一連のイベント終了時に更新されている。<br>
+その前に、イベント中の会話について、<code>$00:1217</code>（サンダウンを城下町入口で仲間にしたかどうか）の分岐判定があるので見ておこう。<br>
+初回では、<code>$00:1217</code>には必ず<span class="formula">$00</span>が入っている。</p>
+
+<div class="code-container"><pre>
+$C0/1CC9 PLY                     ;Yレジスタにスタックからプル
+$C0/1CCA INY                     ;Yをインクリメント +1
+$C0/1CCB BRL $FED3  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AA5C]   ;Aに[$7F:AA5C]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:271D] ;[$C0:271D]へジャンプ(レジスタをスタックに積まない)
+;[$C0:271D]
+$C0/271D LDA #$00                ;Aに$00をロード
+$C0/271F STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/2721 LDA $8E00,y[$7F:AA5D]   ;Aに[$7F:AA5D]をロード
+$C0/2724 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2726 AND #$00FF              ;Aと$00FFで論理積
+$C0/2729 CLC                     ;キャリーフラグクリア
+$C0/272A ADC #$1200              ;A + $1200
+$C0/272D TAX                     ;Aの値をXレジスタに転送
+$C0/272E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2730 LDA $00,x  [$00:1217]   ;Aに[$00:1217]をロード サンダウンを城下町入口で仲間にしたかどうかフラグ
+$C0/2732 BEQ $06    [$273A]      ;ゼロフラグが立っているとき[$273A]分岐
+;ゼロフラグON　サンダウンを仲間にしていない
+$C0/273A LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/273C BNE $07    [$2745]      ;ゼロフラグが立っていないとき[$2745]分岐
+$C0/273E TYX                     ;Yレジスタの値をXレジスタに転送
+$C0/273F LDY $8E01,x[$7F:AA5E]   ;Yに[$7F:AA5E]をロード
+$C0/2742 BRL $F45C  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AA85]   ;Aに[$7F:AA85]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1EC8] ;[$C0:1EC8]へジャンプ(レジスタをスタックに積まない)
+;[$C0:1EC8]
+$C0/1EC8 LDA #$00                ;Aに$00をロード
+$C0/1ECA STA $0001C5[$00:01C5]   ;Aを[$00:01C5]に書き込み
+$C0/1ECE LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1ED0 SEC                     ;キャリーフラグON
+$C0/1ED1 SBC #$A0                ;A - $A0
+$C0/1ED3 BRA $0B    [$1EE0]      ;フラグにかかわりなく常に分岐[$1EE0]
+$C0/1EE0 STA $0001C0[$00:01C0]   ;Aを[$00:01C0]に書き込み
+$C0/1EE4 LDA $8E00,y[$7F:AA86]   ;Aに[$7F:AA86]をロード 40
+$C0/1EE7 STA $0001C4[$00:01C4]   ;Aを[$00:01C4]に書き込み
+$C0/1EEB INY                     ;Yをインクリメント +1
+$C0/1EEC LDA $0001C0[$00:01C0]   ;Aに[$00:01C0]をロード 04
+$C0/1EF0 LSR A                   ;Aを論理右シフト　(/2)
+$C0/1EF1 BEQ $29    [$1F1C]      ;ゼロフラグが立っているとき[$1F1C]分岐
+$C0/1EF3 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1EF5 BEQ $25    [$1F1C]      ;ゼロフラグが立っているとき[$1F1C]分岐
+$C0/1F1C LDA $8E00,y[$7F:AA87]   ;Aに[$7F:AA87]をロード 06
+$C0/1F1F STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/1F21 INY                     ;Yをインクリメント +1
+$C0/1F22 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/1F23 LDA #$00                ;Aに$00をロード
+$C0/1F25 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/1F26 PLB                     ;DBレジスタにスタックからプル
+$C0/1F27 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1F28 LDA #$40                ;Aに$40をロード
+$C0/1F2A STA $36    [$00:0036]   ;Aを[$00:0036]に書き込み
+$C0/1F2C JSR $20BC  [$C0:20BC]   ;[$C0:20BC]へジャンプ
+</pre></div>
+
+<p>初回だと、<code><span class="r">$C0/2730</span> LDA $00,x [$00:1217]</code>でゼロフラグが立つから、必ず<code><span class="r">$C0/273A</span></code>に進む。<br>
+仲間になっていない場合は何も言わずに立ち去ってしまうイベントになる。<br>
+一度でも仲間にしていて、サンダウンがパーティ外の時は、<code><span class="r">$C0/2732</span></code>でゼロフラグがOFFの分岐になるが、それは最後に紹介する。</p>
+
+<div class="code-container"><pre>
+;フラグ処理
+$C0/2FDE PLB                     ;DBレジスタにスタックからプル
+$C0/2FDF PLY                     ;Yレジスタにスタックからプル
+$C0/2FE0 BRL $EBBE  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;$C0/1C1B
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AA91]   ;Aに[$7F:AA91]をロード　E2
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2211] ;[$C0:2211]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2211]
+$C0/2211 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/2213 LDA $8E00,y[$7F:AA92]   ;Aに[$7F:AA92]をロード 21
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード　$00
+$C0/2224 STA $00,x  [$00:1221]   ;Aを[$00:1221]に書き込み　サンダウンがパーティにいない時話しかけるとON（$01）終わるとOFF（$00）
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AA93]   ;Aに[$7F:AA93]をロード E4
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2230] ;[$C0:2230]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2230]
+$C0/2230 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/2232 LDA $8E00,y[$7F:AA94]   ;Aに[$7F:AA94]をロード 28
+$C0/2235 STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/2237 STZ $33    [$00:0033]   ;[$00:0033]に$00を書き込み
+$C0/2239 LDA $8E01,y[$7F:AA95]   ;Aに[$7F:AA95]をロード 06
+$C0/223C CMP #$2C                ;Aと$2Cを減算比較（ステータスレジスタ変更のみ）
+$C0/223E BCC $0C    [$224C]      ;キャリーフラグが立っていないとき[$224C]分岐
+$C0/224C SEC                     ;キャリーフラグON
+$C0/224D SBC #$06                ;A - $06
+$C0/224F BCS $03    [$2254]      ;キャリーフラグが立っているとき[$2254]分岐
+$C0/2254 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み 00
+$C0/2256 STZ $35    [$00:0035]   ;[$00:0035]に$00を書き込み
+$C0/2258 INY                     ;Yをインクリメント +1
+$C0/2259 INY                     ;Yをインクリメント +1
+$C0/225A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/225C LDA $32    [$00:0032]   ;Aに[$00:0032](28)をロード
+$C0/225E ASL A                   ;Aを算術左シフト *2
+$C0/225F TAX                     ;Aの値をXレジスタに転送
+$C0/2260 LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/2262 ASL A                   ;Aを算術左シフト *2
+$C0/2263 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/2265 ASL A                   ;Aを算術左シフト *2
+$C0/2266 CLC                     ;キャリーフラグクリア
+$C0/2267 ADC $34    [$00:0034]   ;A + [$00:0034]
+$C0/2269 CLC                     ;キャリーフラグクリア
+$C0/226A ADC $7E00,x[$7F:7E50]   ;A + [$7F:7E50]
+$C0/226D TAX                     ;Aの値をXレジスタに転送
+$C0/226E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2270 LDA $7E09,x[$7F:83FA]   ;Aに[$7F:83FA]をロード　$28勇者の山　山小屋マップ OBJマップ初期データ　サンダウン5バイト目
+$C0/2273 AND #$7F                ;Aと$7Fで論理積
+$C0/2275 ORA $30    [$00:0030]   ;Aと[$00:0030]($00)で論理和
+$C0/2277 STA $7E09,x[$7F:83FA]   ;Aを[$7F:83FA]に書き込み
+$C0/227A BRL $F924  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AA96]   ;Aに[$7F:AA96]をロード　E3
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:222A] ;[$C0:222A]へジャンプ(レジスタをスタックに積まない)
+;[$C0:222A]
+$C0/222A LDA #$80                ;Aに$80をロード
+$C0/222C STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/222E BRA $02    [$2232]      ;フラグにかかわりなく常に分岐[$2232]
+$C0/2232 LDA $8E00,y[$7F:AA97]   ;Aに[$7F:AA97]をロード　10
+$C0/2235 STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/2237 STZ $33    [$00:0033]   ;[$00:0033]に$00を書き込み　06
+$C0/2239 LDA $8E01,y[$7F:AA98]   ;Aに[$7F:AA98]をロード
+$C0/223C CMP #$2C                ;Aと$2Cを減算比較（ステータスレジスタ変更のみ）
+$C0/223E BCC $0C    [$224C]      ;キャリーフラグが立っていないとき[$224C]分岐
+$C0/224C SEC                     ;キャリーフラグON
+$C0/224D SBC #$06                ;A - $06
+$C0/224F BCS $03    [$2254]      ;キャリーフラグが立っているとき[$2254]分岐
+$C0/2254 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/2256 STZ $35    [$00:0035]   ;[$00:0035]に$00を書き込み
+$C0/2258 INY                     ;Yをインクリメント +1
+$C0/2259 INY                     ;Yをインクリメント +1
+$C0/225A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/225C LDA $32    [$00:0032]   ;Aに[$00:0032]をロード
+$C0/225E ASL A                   ;Aを算術左シフト *2
+$C0/225F TAX                     ;Aの値をXレジスタに転送
+$C0/2260 LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/2262 ASL A                   ;Aを算術左シフト *2
+$C0/2263 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/2265 ASL A                   ;Aを算術左シフト *2
+$C0/2266 CLC                     ;キャリーフラグクリア
+$C0/2267 ADC $34    [$00:0034]   ;A + [$00:0034]
+$C0/2269 CLC                     ;キャリーフラグクリア
+$C0/226A ADC $7E00,x[$7F:7E20]   ;A + [$7F:7E20]
+$C0/226D TAX                     ;Aの値をXレジスタに転送
+$C0/226E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2270 LDA $7E09,x[$7F:8128]   ;Aに[$7F:8128]をロード マップID$10	勇者の山　麓マップ　サンダウン
+$C0/2273 AND #$7F                ;Aと$7Fで論理積
+$C0/2275 ORA $30    [$00:0030]   ;Aと[$00:0030]($80)で論理和
+$C0/2277 STA $7E09,x[$7F:8128]   ;Aを[$7F:8128]に書き込み
+$C0/227A BRL $F924  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AA99]   ;Aに[$7F:AA99]をロード 90
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1CBC] ;[$C0:1CBC]へジャンプ(レジスタをスタックに積まない)
+;[$C0:1CBC]
+$C0/1CBC LDA $8E00,y[$7F:AA9A]   ;Aに[$7F:AA9A]をロード 00
+$C0/1CBF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1CC1 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1CC2 LDA #$FF                ;Aに$FFをロード
+$C0/1CC4 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1CC6 JSR $10D8  [$C0:10D8]   ;[$C0:10D8]へジャンプ
+</pre></div>
+
+<p>上はイベントのスクリプト処理で、<code>LDA $8E00,y</code>を追っていくとわかるが、<code>$8E00,y</code>で呼び出されている<code>$7F:AA91</code>～<code>$7F:AA9A</code>を順に処理しているのがわかる。<br>
+最終編用のスクリプトコマンド用の定数が<code>$7F:8E00</code>～に入っていて、サンダウンに最初に話しかけた時の処理の一部が<code>$7F:AA91</code>～<code>$7F:AA9A</code>で指定されている。<br>
+細かいことは抜きにするが、イベントのスクリプト処理で最初に判定が入るのが<code><span class="r">$C0/1BA1</span></code>～<code><span class="r">$C0/1BC1</span></code>で、<code>[$00:0203]</code>, <code>[$00:0214]</code>, <code>[$00:021A]</code>などはイベント中のテキスト表示やモーションのタイミングをカウントする値になり、何らかの値が入っている時は専用処理へ進む。<br>
+そうでない場合はスクリプトの指示に従ってサブルーチンを処理していく。</p>
+
+<p>上処理を見ると、</p>
+
+<p><code><span class="r">$C0/1BA1</span></code>～<code><span class="r">$C0/1BC1</span></code>で<code>[$00:022E]</code>, <code>[$00:0203]</code>, <code>[$00:0214]</code>, <code>[$00:021A]</code>がすべてゼロ<br>
+↓<br>
+<code><span class="r">$C0/1C1B</span></code>にジャンプして、<code>$8E00,y</code>（<code>$7F:AA91</code>～<code>$7F:AA9A</code>）の値から処理分岐</p>
+
+<p>を繰り返していることがわかる。<br>
+サンダウン関係なら、</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>処理</th></tr>
+</thead>
+<tbody>
+	<tr><td><code><span class="r">$C0/2211</span></code>～<code><span class="r">$C0/2227</span></code></td><td><code>[$7F:AA91]</code>～<code>[$7F:AA92]</code><br><span class="formula">E2 21</span></td><td><code>[$00:1221]</code>の値を更新（サンダウンとのイベント中に<span class="formula">$01</span>が入っていたが、<span class="formula">$00</span>へ戻す処理）</td></tr>
+	<tr><td><code><span class="r">$C0/2230</span></code>～<code><span class="r">$C0/227A</span></code></td><td><code>[$7F:AA93]</code>～<code>[$7F:AA95]</code><br><span class="formula">E4 28 06</span></td><td>勇者の山山小屋マップのサンダウンのスプライトにおけるOBJマップ初期データの5バイト目<code>[$7F:83FA]</code>のBit7を更新（<span class="formula">0</span>を立ててスプライト存在状態フラグOFF）</td></tr>
+	<tr><td><code><span class="r">$C0/222A</span></code>～<code><span class="r">$C0/227A</span></code></td><td><code>[$7F:AA96]</code>～<code>[$7F:AA98]</code><br><span class="formula">E3 10 06</span></td><td>勇者の山麓マップのサンダウンのスプライトにおけるOBJマップ初期データの5バイト目<code>[$7F:8128]</code>のBit7を更新（<span class="formula">1</span>を立ててスプライト存在状態フラグON）</td></tr>
+</tbody>
+</table>
+
+<p>を、行ったことがわかる。<br>
+<code><span class="r">$C0/1C1E</span> LDA $8E00,y</code>で呼び出される値がスクリプトコマンドで、今回だと<span class="formula">$E2</span>～<span class="formula">$E4</span>なのだろうということも大体察しがつくが、とりあえず今回は横に置く。<br>
+何はともあれ重要なのは<code>[$7F:83FA]</code>と<code>[$7F:8128]</code>の更新である。<br>
+まず、勇者の山山小屋マップにおける<code><span class="r">$C0/2230</span></code>～<code><span class="r">$C0/227A</span></code>の処理を取り出してみる。<br>
+大半はアドレス呼び出し用の処理で、最後に以下処理が入る。<br>
+上で紹介したとおり、<code>[$7F:83FA]</code>は山小屋マップにおけるスプライト01のサンダウンのデータの5バイト目で、初期値は<span class="formula">$A6</span>であり、Bit7に<span class="formula">1</span>が立っているからサンダウンは存在している。</p>
+
+<div class="code-container"><pre>
+$C0/2270 LDA $7E09,x[$7F:83FA]   ;Aに[$7F:83FA]をロード　山小屋マップ OBJマップ初期データ　サンダウン5バイト目
+$C0/2273 AND #$7F                ;Aと$7Fで論理積
+$C0/2275 ORA $30    [$00:0030]   ;Aと[$00:0030]($00)で論理和
+$C0/2277 STA $7E09,x[$7F:83FA]   ;Aを[$7F:83FA]に書き込み
+</pre></div>
+
+<p>ここで、</p>
+
+<p><span class="formula">(<code>[$7F:83FA]</code> &amp; $7F) | <code>[$00:0030]</code>($00)</span><br>
+<span class="formula">= ($A6 &amp; $7F) | $00</span><br>
+<span class="formula">= $26</p>
+
+<p>と、Bit7が<span class="formula">1</span>から<span class="formula">0</span>に更新されるので、マップを切り替えて山小屋マップに戻っても、サンダウンは山小屋横からいなくなっている。<br>
+この、</p>
+
+<p><span class="formula">(OBJマップ初期データ5バイト目 &amp; $7F) | <code>[$00:0030]</code></span></p>
+
+<p>で、スプライトの存在状態フラグを切り替える処理は他シナリオ、他イベントでも入る処理である。<br>
+<code><span class="r">$C0/2230</span></code>～<code><span class="r">$C0/227A</span></code>の時には<code>[$00:0030]</code>に<span class="formula">$00</span>が入り、<code><span class="r">$C0/222A</span></code>～<code><span class="r">$C0/227A</span></code>なら<code><span class="r">$C0/222A</span></code>～<code><span class="r">$C0/222E</span></code>で<code>[$00:0030]</code>に<span class="formula">$80</span>が入るという違いにより、前者は存在状態フラグをOFFに、後者は存在状態フラグをONにできる。<br>
+<code><span class="r">$C0/222A</span></code>～<code><span class="r">$C0/227A</span></code>だと、勇者の山の麓マップのサンダウンのOBJマップ初期データ5バイト目にあたる<code>[$7F:8128]</code>（初期値<span class="formula">$2A</span>）に対し、以下処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/2270 LDA $7E09,x[$7F:8128]   ;Aに[$7F:8128]をロード マップID$10	勇者の山　麓マップ　サンダウン
+$C0/2273 AND #$7F                ;Aと$7Fで論理積
+$C0/2275 ORA $30    [$00:0030]   ;Aと[$00:0030]($80)で論理和
+$C0/2277 STA $7E09,x[$7F:8128]   ;Aを[$7F:8128]に書き込み
+</pre></div>
+
+<p>サブルーチンのアドレスは同じ箇所なのだが、<code>[$00:0030]</code>には<span class="formula">$80</span>が入っているから、</p>
+
+<p><span class="formula">(<code>[$7F:8128]</code> &amp; $7F) | <code>[$00:0030]</code>($80)</span><br>
+<span class="formula">= ($2A &amp; $7F) | $80</span><br>
+<span class="formula">= $AA</span></p>
+
+<p>が新たな<code>[$7F:8128]</code>になって、勇者の山の麓マップに入った時、右上あたりの本能のダンジョン近くの崖上にサンダウンのスプライトが存在するようになる、という処理である。<br>
+これが、サンダウンに話しかけるたびにスプライトの位置が移動する仕組みである。<br>
+サンダウンのスプライト自体はあらかじめ各マップに設置しておき、存在状態フラグのON/OFFで移動しているように見せるという仕掛けである。</p>
+
+<p>また、存在状態フラグは<code>$7F:7E00</code>～のスプライトのOBJマップ初期データ一覧で常に更新されているので、ゲームプレイ中は<code>$7F:7E00</code>～を参照しスプライトを設置すれば良い。<br>
+セーブ時には、現在プレイ中のシナリオの、<code>$7F:7E00</code>～のスプライトのOBJマップ初期データ内の5バイト目/Bit7のみすべて保存する、ということについては、<span class="tri"><a href="program35.html" target="_blank">セーブデータのセーブ・ロード</a></span>で説明している通りである。</p>
+
+
+<h4>8回目（ルクレチア城　玉座の間の右の部屋）</h4>
+
+<p>以上の1回目の移動時処理はどの移動でも共通で、今いるマップの存在状態フラグをOFF→次移動先のマップの存在状態フラグをONを繰り返していくが、最後の移動8回目、ルクレチア城・玉座の間の右の部屋の処理には追加処理が加わる。<br>
+<code>$00:1218</code>に関する処理で、<code>$00:1218</code>を読み込んだり値を更新するのは移動8回目と仲間になるルクレチア城城下町の外の処理だけである。</p>
+
+<div class="code-container"><pre>
+;フラグ処理
+$C0/2FDE PLB                     ;DBレジスタにスタックからプル
+$C0/2FDF PLY                     ;Yレジスタにスタックからプル
+$C0/2FE0 BRL $EBBE  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AC8E]   ;Aに[$7F:AC8E]をロード　E2
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2211] ;[$C0:2211]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2211]
+$C0/2211 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/2213 LDA $8E00,y[$7F:AC8F]   ;Aに[$7F:AC8F]をロード　21
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/2224 STA $00,x  [$00:1221]   ;Aを[$00:1221]に書き込み
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AC90]   ;Aに[$7F:AC90]をロード　E4
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2230] ;[$C0:2230]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2230]
+$C0/2230 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/2232 LDA $8E00,y[$7F:AC91]   ;Aに[$7F:AC91]をロード　0A
+$C0/2235 STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/2237 STZ $33    [$00:0033]   ;[$00:0033]に$00を書き込み
+$C0/2239 LDA $8E01,y[$7F:AC92]   ;Aに[$7F:AC92]をロード　06
+$C0/223C CMP #$2C                ;Aと$2Cを減算比較（ステータスレジスタ変更のみ）
+$C0/223E BCC $0C    [$224C]      ;キャリーフラグが立っていないとき[$224C]分岐
+$C0/224C SEC                     ;キャリーフラグON
+$C0/224D SBC #$06                ;A - $06
+$C0/224F BCS $03    [$2254]      ;キャリーフラグが立っているとき[$2254]分岐
+$C0/2254 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/2256 STZ $35    [$00:0035]   ;[$00:0035]に$00を書き込み
+$C0/2258 INY                     ;Yをインクリメント +1
+$C0/2259 INY                     ;Yをインクリメント +1
+$C0/225A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/225C LDA $32    [$00:0032]   ;Aに[$00:0032]をロード
+$C0/225E ASL A                   ;Aを算術左シフト *2
+$C0/225F TAX                     ;Aの値をXレジスタに転送
+$C0/2260 LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/2262 ASL A                   ;Aを算術左シフト *2
+$C0/2263 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/2265 ASL A                   ;Aを算術左シフト *2
+$C0/2266 CLC                     ;キャリーフラグクリア
+$C0/2267 ADC $34    [$00:0034]   ;A + [$00:0034]
+$C0/2269 CLC                     ;キャリーフラグクリア
+$C0/226A ADC $7E00,x[$7F:7E14]   ;A + [$7F:7E14]
+$C0/226D TAX                     ;Aの値をXレジスタに転送
+$C0/226E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2270 LDA $7E09,x[$7F:80B3]   ;Aに[$7F:80B3]をロード　A6
+$C0/2273 AND #$7F                ;Aと$7Fで論理積
+$C0/2275 ORA $30    [$00:0030]   ;Aと[$00:0030]で論理和　$00
+$C0/2277 STA $7E09,x[$7F:80B3]   ;Aを[$7F:80B3]に書き込み　26
+$C0/227A BRL $F924  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AC93]   ;Aに[$7F:AC93]をロード　90
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1CBC] ;[$C0:1CBC]へジャンプ(レジスタをスタックに積まない)
+$C0/1CBC LDA $8E00,y[$7F:AC94]   ;Aに[$7F:AC94]をロード　00
+$C0/1CBF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1CC1 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1CC2 LDA #$FF                ;Aに$FFをロード
+$C0/1CC4 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1CC6 JSR $10D8  [$C0:10D8]   ;[$C0:10D8]へジャンプ
+</pre></div>
+
+<p>ここまでは存在状態フラグの処理。<br>
+<code><span class="r">$C0/2270</span></code>～<code><span class="r">$C0/2277</span></code>で、玉座の間の右の部屋におけるサンダウンの存在状態フラグが入っている<code>[$7F:80B3]</code>に対し、</p>
+
+<p><span class="formula"><code>[$7F:80B3]</code>($A6) &amp; $7F | <code>[$00:0030]</code>($00)</span></p>
+
+<p>で、存在状態フラグをOFFにしている。<br>
+これまでは、この後に次の移動先の存在状態フラグをONにしていたはずが、その処理に進んでいない。<br>
+最後の<code><span class="r">$C0/1C1E</span> LDA $8E00,y[$7F:AC93]</code>で呼び出した<code>[$7F:AC93]</code>の値は<span class="formula">$90</span>である。<br>
+これまでなら<span class="formula">$E3</span>をロードし、次の移動先の処理をしていたはずが、なくなっている。<br>
+つまり、この時点でサンダウンのスプライトは全地点で「存在なし」になる。<br>
+代わりに、BGMのフェードアウト処理の後の以下処理で、<code>$00:1218</code>のフラグを操作する。</p>
+
+<div class="code-container"><pre>
+$C0/12E6 RTS                     ;サブルーチン戻り
+
+$C0/1D89 INY                     ;Yをインクリメント +1
+$C0/1D8A INY                     ;Yをインクリメント +1
+$C0/1D8B BRL $FE13  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AC98]   ;Aに[$7F:AC98]をロード　E1
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:220B] ;[$C0:220B]へジャンプ(レジスタをスタックに積まない)
+;[$C0:220B]
+$C0/220B LDA #$01                ;Aに$01をロード
+$C0/220D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/220F BRA $02    [$2213]      ;フラグにかかわりなく常に分岐[$2213]
+$C0/2213 LDA $8E00,y[$7F:AC99]   ;Aに[$7F:AC99]をロード　18
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード　$01
+$C0/2224 STA $00,x  [$00:1218]   ;Aを[$00:1218]に書き込み　サンダウン・仲間になる条件を満たしたフラグ
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AC9A]   ;Aに[$7F:AC9A]をロード　00
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:4085] ;[$C0:4085]へジャンプ(レジスタをスタックに積まない)
+;[$C0:4085]
+$C0/4085 PLB                     ;DBレジスタにスタックからプル
+$C0/4086 DEC $0200  [$00:0200]   ;[$00:0200]をデクリメント -1
+$C0/4089 BNE $51    [$40DC]      ;ゼロフラグが立っていないとき[$40DC]分岐
+$C0/408B LDA #$01                ;Aに$01をロード
+$C0/408D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/4090 JSR $414E  [$C0:414E]   ;[$C0:414E]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/220B</span></code>～<code><span class="r">$C0/2227</span></code>で、<br>
+「<code><span class="r">$C0/2213</span> LDA $8E00,y</code>で指定した値」 + 「アドレス<span class="formula">$001200</span>」<br>
+に、<code>[$00:0030]</code>を書き込んでいる。<br>
+つまりこのサブルーチンは、シナリオ進行フラグである<code>$00:12??</code>の任意のアドレス（アドレス値は<code><span class="r">$C0/2213</span> LDA $8E00,y</code>で指定）に対し、<code>[$00:0030]</code>で指定した値を書き込む処理になる。<br>
+今回は<code><span class="r">$C0/220B</span></code>～<code><span class="r">$C0/220D</span></code>で<code>[$00:0030]</code>に<span class="formula">$01</span>を書き込んでいるため、<code>[$00:1218]</code>に<span class="formula">$01</span>が入りフラグがONになった。</p>
+
+<p>ということは、その少し前の<code><span class="r">$C0/1C1E</span> LDA $8E00,y[$7F:AC98]</code>（<code>[$7F:AC98]</code>の値は<span class="formula">$F1</span>）は、<br>
+「シナリオ進行フラグである<code>$00:12??</code>の任意のアドレスに<span class="formula">$01</span>を書き込んでフラグをONにするコマンド」<br>
+なのだろう、という推測ができる。</p>
+
+<p>ということで、ここまでで、</p>
+
+<ul>
+	<li>各地のサンダウンのスプライトの存在状態フラグが、すべてOFFになった</li>
+	<li><code>[$00:1218]</code>に<span class="formula">$01</span>が入りフラグがONになった</li>
+</ul>
+
+<p>という処理が行われた。<br>
+次の行き先である、城下町の城門の外のサンダウンのスプライトの存在状態フラグはOFFのままである。</p>
+
+<h4>城下町の城門前（仲間になる時）</h4>
+
+<p>では、最後の城下町の城門の外の処理を見てみよう。<br>
+まず、城門の外に移動した時（特定マスを踏んだ時）、イベントを発生させるかどうかの判定処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/1B7B LDA #$01                ;Aに$01をロード
+$C0/1B7D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/1B80 STZ $0214  [$00:0214]   ;[$00:0214]に$00を書き込み
+$C0/1B83 STZ $021A  [$00:021A]   ;[$00:021A]に$00を書き込み
+$C0/1B86 STZ $0202  [$00:0202]   ;[$00:0202]に$00を書き込み
+$C0/1B89 STZ $0203  [$00:0203]   ;[$00:0203]に$00を書き込み
+$C0/1B8C PLA                     ;Aレジスタにスタックからプル
+$C0/1B8D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1B8F STZ $31    [$00:0031]   ;[$00:0031]に$00を書き込み
+$C0/1B91 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/1B92 LDA #$7F                ;Aに$7Fをロード
+$C0/1B94 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/1B95 PLB                     ;DBレジスタにスタックからプル
+$C0/1B96 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1B98 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1B9A ASL A                   ;Aを算術左シフト *2
+$C0/1B9B TAX                     ;Aの値をXレジスタに転送
+$C0/1B9C LDY $8E00,x[$7F:8E8E]   ;Yに[$7F:8E8F][$7F:8E8E]をロード Y:1E9B
+$C0/1B9F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AC9B]   ;Aに[$7F:AC9B]をロード E0
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:21CD] ;[$C0:21CD]へジャンプ(レジスタをスタックに積まない)
+;[$C0:21CD]
+$C0/21CD LDA $8E00,y[$7F:AC9C]   ;Aに[$7F:AC9C]をロード 60
+$C0/21D0 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/21D2 LDA $8E01,y[$7F:AC9D]   ;Aに[$7F:AC9D]をロード 55 
+$C0/21D5 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/21D7 INY                     ;Yをインクリメント +1
+$C0/21D8 INY                     ;Yをインクリメント +1
+$C0/21D9 LDA $8E00,y[$7F:AC9E]   ;Aに[$7F:AC9E]をロード 00
+$C0/21DC CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/21DE BCS $22    [$2202]      ;キャリーフラグが立っているとき[$2202]分岐
+$C0/21E0 LDA $8E01,y[$7F:AC9F]   ;Aに[$7F:AC9F]をロード 18
+$C0/21E3 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/21E5 AND #$00FF              ;Aと$00FFで論理積
+$C0/21E8 CLC                     ;キャリーフラグクリア
+$C0/21E9 ADC #$1200              ;A + $1200
+$C0/21EC TAX                     ;Aの値をXレジスタに転送
+$C0/21ED SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/21EF LDA $8E00,y[$7F:AC9E]   ;Aに[$7F:AC9E]をロード 00
+$C0/21F2 BNE $06    [$21FA]      ;ゼロフラグが立っていないとき[$21FA]分岐
+$C0/21F4 LDA $00,x  [$00:1218]   ;Aに[$00:1218]をロード 01
+$C0/21F6 BEQ $0E    [$2206]      ;ゼロフラグが立っているとき[$2206]分岐
+;ゼロフラグOFF サンダウン出現条件を満たしている
+$C0/21F8 BRA $04    [$21FE]      ;フラグにかかわりなく常に分岐[$21FE]
+$C0/21FE INY                     ;Yをインクリメント +1
+$C0/21FF INY                     ;Yをインクリメント +1
+$C0/2200 BRA $D7    [$21D9]      ;フラグにかかわりなく常に分岐[$21D9]
+;[$21D9]
+$C0/21D9 LDA $8E00,y[$7F:ACA0]   ;Aに[$7F:ACA0]をロード 01
+$C0/21DC CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/21DE BCS $22    [$2202]      ;キャリーフラグが立っているとき[$2202]分岐
+$C0/21E0 LDA $8E01,y[$7F:ACA1]   ;Aに[$7F:ACA1]をロード 05
+$C0/21E3 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/21E5 AND #$00FF              ;Aと$00FFで論理積
+$C0/21E8 CLC                     ;キャリーフラグクリア
+$C0/21E9 ADC #$1200              ;A + $1200
+$C0/21EC TAX                     ;Aの値をXレジスタに転送
+$C0/21ED SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/21EF LDA $8E00,y[$7F:ACA0]   ;Aに[$7F:ACA0]をロード 01
+$C0/21F2 BNE $06    [$21FA]      ;ゼロフラグが立っていないとき[$21FA]分岐
+$C0/21FA LDA $00,x  [$00:1205]   ;Aに[$00:1205]をロード 00 サンダウンがパーティにいるフラグ（初期値00）
+$C0/21FC BNE $08    [$2206]      ;ゼロフラグが立っていないとき[$2206]分岐
+;ゼロフラグON サンダウンがパーティにいない
+$C0/21FE INY                     ;Yをインクリメント +1
+$C0/21FF INY                     ;Yをインクリメント +1
+$C0/2200 BRA $D7    [$21D9]      ;フラグにかかわりなく常に分岐[$21D9]
+;[$21D9]
+$C0/21D9 LDA $8E00,y[$7F:ACA2]   ;Aに[$7F:ACA2]をロード FF
+$C0/21DC CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/21DE BCS $22    [$2202]      ;キャリーフラグが立っているとき[$2202]分岐
+$C0/2202 INY                     ;Yをインクリメント +1
+$C0/2203 BRL $F99B  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACA3]   ;Aに[$7F:ACA3]をロード FF
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:271D] ;[$C0:271D]へジャンプ(レジスタをスタックに積まない)
+;[$C0:271D]
+$C0/271D LDA #$00                ;Aに$00をロード
+$C0/271F STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/2721 LDA $8E00,y[$7F:ACA4]   ;Aに[$7F:ACA4]をロード 17
+$C0/2724 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2726 AND #$00FF              ;Aと$00FFで論理積
+$C0/2729 CLC                     ;キャリーフラグクリア
+$C0/272A ADC #$1200              ;A + $1200
+$C0/272D TAX                     ;Aの値をXレジスタに転送
+$C0/272E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2730 LDA $00,x  [$00:1217]   ;Aに[$00:1217]をロード サンダウンを城下町入口で仲間にしたフラグ（初期値00）
+$C0/2732 BEQ $06    [$273A]      ;ゼロフラグが立っているとき[$273A]分岐
+;ゼロフラグON　サンダウンを城下町入口で仲間にしていない
+$C0/273A LDA $30    [$00:0030]   ;Aに[$00:0030]をロード　$00
+$C0/273C BNE $07    [$2745]      ;ゼロフラグが立っていないとき[$2745]分岐
+;ゼロフラグON
+$C0/273E TYX                     ;Yレジスタの値をXレジスタに転送
+$C0/273F LDY $8E01,x[$7F:ACA5]   ;Yに[$7F:ACA5]をロード 00 
+$C0/2742 BRL $F45C  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACB7]   ;Aに[$7F:ACB7]をロード FE
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2719] ;[$C0:2719]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2719]
+$C0/2719 LDA #$01                ;Aに$01をロード
+$C0/271B BRA $02    [$271F]      ;フラグにかかわりなく常に分岐[$271F]
+$C0/271F STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/2721 LDA $8E00,y[$7F:ACB8]   ;Aに[$7F:ACB8]をロード 17
+$C0/2724 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2726 AND #$00FF              ;Aと$00FFで論理積
+$C0/2729 CLC                     ;キャリーフラグクリア
+$C0/272A ADC #$1200              ;A + $1200
+$C0/272D TAX                     ;Aの値をXレジスタに転送
+$C0/272E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2730 LDA $00,x  [$00:1217]   ;Aに[$00:1217]をロード サンダウンを城下町入口で仲間にしたフラグ（初期値00）
+$C0/2732 BEQ $06    [$273A]      ;ゼロフラグが立っているとき[$273A]分岐
+;ゼロフラグON
+$C0/273A LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/273C BNE $07    [$2745]      ;ゼロフラグが立っていないとき[$2745]分岐
+;ゼロフラグOFF
+$C0/2745 INY                     ;Yをインクリメント +1
+$C0/2746 INY                     ;Yをインクリメント +1
+$C0/2747 INY                     ;Yをインクリメント +1
+$C0/2748 BRL $F456  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACBB]   ;Aに[$7F:ACBB]をロード A4
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1EC8] ;[$C0:1EC8]へジャンプ(レジスタをスタックに積まない)
+;[$C0:1EC8]
+$C0/1EC8 LDA #$00                ;Aに$00をロード
+$C0/1ECA STA $0001C5[$00:01C5]   ;Aを[$00:01C5]に書き込み
+$C0/1ECE LDA $30    [$00:0030]   ;Aに[$00:0030]をロード A4
+$C0/1ED0 SEC                     ;キャリーフラグON
+$C0/1ED1 SBC #$A0                ;A(A4) - $A0
+$C0/1ED3 BRA $0B    [$1EE0]      ;フラグにかかわりなく常に分岐[$1EE0]
+$C0/1EE0 STA $0001C0[$00:01C0]   ;Aを[$00:01C0]に書き込み 04
+$C0/1EE4 LDA $8E00,y[$7F:ACBC]   ;Aに[$7F:ACBC]をロード 42
+$C0/1EE7 STA $0001C4[$00:01C4]   ;Aを[$00:01C4]に書き込み 
+$C0/1EEB INY                     ;Yをインクリメント +1
+$C0/1EEC LDA $0001C0[$00:01C0]   ;Aに[$00:01C0]をロード 04
+$C0/1EF0 LSR A                   ;Aを論理右シフト　(/2) 02
+$C0/1EF1 BEQ $29    [$1F1C]      ;ゼロフラグが立っているとき[$1F1C]分岐
+$C0/1EF3 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1EF5 BEQ $25    [$1F1C]      ;ゼロフラグが立っているとき[$1F1C]分岐
+$C0/1F1C LDA $8E00,y[$7F:ACBD]   ;Aに[$7F:ACBD]をロード 07
+$C0/1F1F STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/1F21 INY                     ;Yをインクリメント +1
+$C0/1F22 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/1F23 LDA #$00                ;Aに$00をロード
+$C0/1F25 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/1F26 PLB                     ;DBレジスタにスタックからプル
+$C0/1F27 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1F28 LDA #$40                ;Aに$40をロード
+$C0/1F2A STA $36    [$00:0036]   ;Aを[$00:0036]に書き込み
+$C0/1F2C JSR $20BC  [$C0:20BC]   ;[$C0:20BC]へジャンプ
+</pre></div>
+
+<p>最後の<code><span class="r">$C0/1EC8</span></code>～<code><span class="r">$C0/1F2C</span></code>はセリフ（吹き出し）など関係の処理の開始であり、実質、<code><span class="r">$C0/1EC8</span></code>～はサンダウンのイベント発生確定である。<br>
+それまでにいくつか判定・分岐があったので改めて追ってみる。</p>
+
+<div class="code-container"><pre>
+$C0/21F4 LDA $00,x  [$00:1218]   ;Aに[$00:1218]をロード 01
+$C0/21F6 BEQ $0E    [$2206]      ;ゼロフラグが立っているとき[$2206]分岐
+;ゼロフラグOFF サンダウン出現条件を満たしている
+$C0/21F8 BRA $04    [$21FE]      ;フラグにかかわりなく常に分岐[$21FE]
+$C0/21FE INY                     ;Yをインクリメント +1
+$C0/21FF INY                     ;Yをインクリメント +1
+$C0/2200 BRA $D7    [$21D9]      ;フラグにかかわりなく常に分岐[$21D9]
+</pre></div>
+
+<p>ここが最初のシナリオ進行フラグ判定。<br>
+先の玉座の間の右の部屋の処理で<code>[$00:1218]</code>に<span class="formula">$01</span>が入ったところだが、最初の判定はこの<code>[$00:1218]</code>である。<br>
+<code><span class="r">$C0/21F6</span></code>でゼロフラグ分岐だが、<span class="formula">$01</span>が入っているから、ゼロフラグは立たず、<code><span class="r">$C0/21F8</span></code>へ進む。</p>
+
+<div class="code-container"><pre>
+$C0/21FA LDA $00,x  [$00:1205]   ;Aに[$00:1205]をロード 00 サンダウンがパーティにいるフラグ（初期値00）
+$C0/21FC BNE $08    [$2206]      ;ゼロフラグが立っていないとき[$2206]分岐
+;ゼロフラグON サンダウンがパーティにいない
+$C0/21FE INY                     ;Yをインクリメント +1
+$C0/21FF INY                     ;Yをインクリメント +1
+$C0/2200 BRA $D7    [$21D9]      ;フラグにかかわりなく常に分岐[$21D9]
+</pre></div>
+
+<p>続いて、<code>[$00:1205]</code>をロードして、ゼロフラグ判定を行う。<br>
+<code>[$00:1205]</code>はサンダウンがパーティにいるかどうかの判定で、サンダウン主人公でない限り初期値は<span class="formula">$00</span>である。<br>
+このフラグ自体は、サンダウンを仲間にしてもパーティにいない時にはゼロフラグが立つようになっている。</p>
+
+<div class="code-container"><pre>
+$C0/2730 LDA $00,x  [$00:1217]   ;Aに[$00:1217]をロード
+$C0/2732 BEQ $06    [$273A]      ;ゼロフラグが立っているとき[$273A]分岐
+;ゼロフラグON　サンダウンを城下町入口で仲間にしていない
+$C0/273A LDA $30    [$00:0030]   ;Aに[$00:0030]をロード　$00
+$C0/273C BNE $07    [$2745]      ;ゼロフラグが立っていないとき[$2745]分岐
+;ゼロフラグON
+$C0/273E TYX                     ;Yレジスタの値をXレジスタに転送
+$C0/273F LDY $8E01,x[$7F:ACA5]   ;Yに[$7F:ACA5]をロード 00 
+$C0/2742 BRL $F45C  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p>次が<code>[$00:1217]</code>、これも初期値は<span class="formula">$00</span>で、サンダウンを城下町入口で仲間にすると<span class="formula">$01</span>が入る（後で処理を紹介する）。<br>
+これまでにサンダウンを仲間にしていない場合は<span class="formula">$00</span>であるから、<code><span class="r">$C0/2732</span></code>でゼロフラグが立ち処理が進む。<br>
+この時点でサンダウン出現イベントが発生することは確定のはず。</p>
+
+<div class="code-container"><pre>
+$C0/2719 LDA #$01                ;Aに$01をロード
+$C0/271B BRA $02    [$271F]      ;フラグにかかわりなく常に分岐[$271F]
+$C0/271F STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/2721 LDA $8E00,y[$7F:ACB8]   ;Aに[$7F:ACB8]をロード 17
+$C0/2724 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2726 AND #$00FF              ;Aと$00FFで論理積
+$C0/2729 CLC                     ;キャリーフラグクリア
+$C0/272A ADC #$1200              ;A + $1200
+$C0/272D TAX                     ;Aの値をXレジスタに転送
+$C0/272E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2730 LDA $00,x  [$00:1217]   ;Aに[$00:1217]をロード サンダウンを城下町入口で仲間にしたフラグ（初期値00）
+$C0/2732 BEQ $06    [$273A]      ;ゼロフラグが立っているとき[$273A]分岐
+;ゼロフラグON
+$C0/273A LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/273C BNE $07    [$2745]      ;ゼロフラグが立っていないとき[$2745]分岐
+;ゼロフラグOFF
+$C0/2745 INY                     ;Yをインクリメント +1
+$C0/2746 INY                     ;Yをインクリメント +1
+$C0/2747 INY                     ;Yをインクリメント +1
+$C0/2748 BRL $F456  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p>ここで再度<code>[$00:1217]</code>の判定があり、やはり<code><span class="r">$C0/2732</span></code>でゼロフラグが立つので<code><span class="r">$C0/273A</span></code>以降へ進む。</p>
+
+<p>ということで、</p>
+
+<ul>
+	<li><code>[$00:1218]</code>に<span class="formula">$01</span>が入っている（ルクレチア城玉座右の部屋でサンダウンに話しかけた）</li>
+	<li><code>[$00:1205]</code>に<span class="formula">$00</span>が入っている（サンダウンがパーティにいない）</li>
+	<li><code>[$00:1217]</code>に<span class="formula">$00</span>が入っている（サンダウンを城下町入口で仲間にしていない）</li>
+</ul>
+
+<p>をすべて満たしていると、城下町入口でサンダウンの加入イベントが発生する、ということがわかる。<br>
+OBJマップ初期データの判定は一切ない。<br>
+ただ、<code>[$00:1218]</code>に<span class="formula">$01</span>が入っているのなら、サンダウンの各地のスプライトのOBJマップ初期データについて、存在状態フラグをすべてOFFにしているはずであるから、わざわざ判定しないのであろう（おそらく）。</p>
+
+<p>ちなみにサンダウン加入イベント中に、城下町入口のサンダウンのスプライト初期値、つまりスプライト02のデータ<code>$7F:800D</code>～<code>$7F:8013</code>は一切変更されない。<br>
+イベント中に存在状態フラグを変更するのは、現在いるマップのOBJマップデータが入る、<code>$00:1329</code>～<code>$00:158C</code>でのみ。<br>
+<code>$7F:800D</code>～<code>$7F:8013</code>はあくまでも初期値で、イベント中のみ存在状態フラグや座標変更をする時に何かしらの変更をする必要はない。</p>
+
+<p>加入時の会話イベント自体の処理は省略。<br>
+選択肢で、サンダウンをパーティに加えると、以下処理が入る。</p>
+
+<div class="code-container"><pre>
+$C0/24B8 BRL $F6E6  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACEF]   ;Aに[$7F:ACEF]をロード F5
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:263E] ;[$C0:263E]へジャンプ(レジスタをスタックに積まない)
+;[$C0:263E]
+$C0/263E LDA #$01                ;Aに$01をロード
+$C0/2640 BRA $10    [$2652]      ;フラグにかかわりなく常に分岐[$2652]
+$C0/2652 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み $01
+$C0/2654 LDA $8E00,y[$7F:ACF0]   ;Aに[$7F:ACF0]をロード 01
+$C0/2657 INY                     ;Yをインクリメント +1
+$C0/2658 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/265A AND #$00FF              ;Aと$00FFで論理積
+$C0/265D CLC                     ;キャリーフラグクリア
+$C0/265E ADC #$11F0              ;A + $11F0
+$C0/2661 TAX                     ;Aの値をXレジスタに転送
+$C0/2662 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2664 LDA $00,x  [$00:11F1]   ;Aに[$00:11F1]をロード $00:11F1 主人公以外のパーティメンバー数(0～3）
+$C0/2666 CLC                     ;キャリーフラグクリア
+$C0/2667 ADC $30    [$00:0030]   ;A + [$00:0030] $01
+$C0/2669 STA $00,x  [$00:11F1]   ;Aを[$00:11F1]に書き込み パーティメンバー数更新
+$C0/266B BRL $F533  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACF1]   ;Aに[$7F:ACF1]をロード E1
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:220B] ;[$C0:220B]へジャンプ(レジスタをスタックに積まない)
+;[$C0:220B]
+$C0/220B LDA #$01                ;Aに$01をロード
+$C0/220D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/220F BRA $02    [$2213]      ;フラグにかかわりなく常に分岐[$2213]
+$C0/2213 LDA $8E00,y[$7F:ACF2]   ;Aに[$7F:ACF2]をロード 05
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/2224 STA $00,x  [$00:1205]   ;Aを[$00:1205]に書き込み　サンダウンがパーティにいる
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACF3]   ;Aに[$7F:ACF3]をロード E1
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:220B] ;[$C0:220B]へジャンプ(レジスタをスタックに積まない)
+;[$C0:220B]
+$C0/220B LDA #$01                ;Aに$01をロード
+$C0/220D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/220F BRA $02    [$2213]      ;フラグにかかわりなく常に分岐[$2213]
+$C0/2213 LDA $8E00,y[$7F:ACF4]   ;Aに[$7F:ACF4]をロード 37
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/2224 STA $00,x  [$00:1237]   ;Aを[$00:1237]に書き込み サンダウンが仲間になる。パーティから外すと$00
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACF5]   ;Aに[$7F:ACF5]をロード E1
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:220B] ;[$C0:220B]へジャンプ(レジスタをスタックに積まない)
+;[$C0:220B]
+$C0/220B LDA #$01                ;Aに$01をロード
+$C0/220D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/220F BRA $02    [$2213]      ;フラグにかかわりなく常に分岐[$2213]
+$C0/2213 LDA $8E00,y[$7F:ACF6]   ;Aに[$7F:ACF6]をロード 17
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/2224 STA $00,x  [$00:1217]   ;Aを[$00:1217]に書き込み　サンダウンを城下町入口で仲間にした
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACF7]   ;Aに[$7F:ACF7]をロード E2
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2211] ;[$C0:2211]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2211]
+$C0/2211 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/2213 LDA $8E00,y[$7F:ACF8]   ;Aに[$7F:ACF8]をロード 18
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/2224 STA $00,x  [$00:1218]   ;Aを[$00:1218]に書き込み　ルクレチア城玉座右の部屋でサンダウンに話しかけたフラグ
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:ACF9]   ;Aに[$7F:ACF9]をロード 00
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:4085] ;[$C0:4085]へジャンプ(レジスタをスタックに積まない)
+$C0/4085 PLB                     ;DBレジスタにスタックからプル
+$C0/4086 DEC $0200  [$00:0200]   ;[$00:0200]をデクリメント -1
+$C0/4089 BNE $51    [$40DC]      ;ゼロフラグが立っていないとき[$40DC]分岐
+$C0/408B LDA #$01                ;Aに$01をロード
+$C0/408D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/4090 JSR $414E  [$C0:414E]   ;[$C0:414E]へジャンプ
+</pre></div>
+
+<p>フラグ関係の処理をざっと紹介する。</p>
+
+<div class="code-container"><pre>
+$C0/263E LDA #$01                ;Aに$01をロード
+$C0/2640 BRA $10    [$2652]      ;フラグにかかわりなく常に分岐[$2652]
+$C0/2652 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み $01
+$C0/2654 LDA $8E00,y[$7F:ACF0]   ;Aに[$7F:ACF0]をロード 01
+$C0/2657 INY                     ;Yをインクリメント +1
+$C0/2658 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/265A AND #$00FF              ;Aと$00FFで論理積
+$C0/265D CLC                     ;キャリーフラグクリア
+$C0/265E ADC #$11F0              ;A + $11F0
+$C0/2661 TAX                     ;Aの値をXレジスタに転送
+$C0/2662 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2664 LDA $00,x  [$00:11F1]   ;Aに[$00:11F1]をロード $00:11F1 主人公以外のパーティメンバー数(0～3）
+$C0/2666 CLC                     ;キャリーフラグクリア
+$C0/2667 ADC $30    [$00:0030]   ;A + [$00:0030] $01
+$C0/2669 STA $00,x  [$00:11F1]   ;Aを[$00:11F1]に書き込み パーティメンバー数更新
+$C0/266B BRL $F533  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p><code><span class="r">$C0/1C1E</span> LDA $8E00,y</code> で<span class="formula">$F5</span>を指示すると、<code>$00:11F?</code>（シナリオカウンター）の処理<code><span class="r">$C0/263E</span></code>～<code><span class="r">$C0/266B</span></code>を行う。<br>
+最終編におけるシナリオカウンター<code>[$00:11F1]</code>は、主人公以外のパーティメンバー数（<span class="formula">$00</span>～<span class="formula">$03</span>）の更新。<br>
+ここでパーティメンバー数が4人を超えたら、別途、パーティメンバー入れ替え処理にジャンプすることになる。</p>
+
+<div class="code-container"><pre>
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/2224 STA $00,x  [$00:1205]   ;Aを[$00:1205]に書き込み　サンダウンがパーティにいる
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p><span class="formula">$E1</span>を指示して、<code>[$00:1205]</code>に<span class="formula">$01</span>を書き込み、サンダウンがパーティにいるフラグをONにする。</p>
+
+<div class="code-container"><pre>
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/2224 STA $00,x  [$00:1237]   ;Aを[$00:1237]に書き込み サンダウンが仲間になる。パーティから外すと$00
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p>こちらも<span class="formula">$E1</span>を指示して、<code>[$00:1237]</code>に<span class="formula">$01</span>を書き込む。<br>
+最終編ではシナリオ進行フラグの<code>$00:1234</code>～<code>$00:123B</code>が、仲間キャラの仲間フラグの記録アドレスになっており、サンダウンは<code>[$00:1237]</code>。</p>
+
+<div class="code-container"><pre>
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $01
+$C0/2224 STA $00,x  [$00:1217]   ;Aを[$00:1217]に書き込み　サンダウンを城下町入口で仲間にした
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p>こちらも<span class="formula">$E1</span>を指示して、<code>[$00:1217]</code>に<span class="formula">$01</span>を書き込む。<br>
+サンダウンを城下町入口で仲間にしたフラグが立つ。</p>
+
+<div class="code-container"><pre>
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード $00
+$C0/2224 STA $00,x  [$00:1218]   ;Aを[$00:1218]に書き込み　ルクレチア城玉座右の部屋でサンダウンに話しかけたフラグ
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+</pre></div>
+
+<p>これは<span class="formula">$E2</span>を指示することで、<code>[$00:1218]</code>に<span class="formula">$00</span>を書き込み、フラグをOFFにする。<br>
+ここで、ルクレチア城玉座右の部屋でサンダウンに話しかけたフラグが消える。</p>
+
+<p>以上のフラグ操作を行い、サンダウンの城下町城門のイベント処理終了となる。</p>
+
+<p>サンダウンの城下町城門のイベントで、パーティに入れなかった場合はスプライトの処理を行う。<br>
+つまり、勇者の山の山小屋横のサンダウンのスプライトのOBJマップ初期データ5バイト目（<code>$7F:83FA</code>）に対し、存在状態フラグを再び立てる。</p>
+
+<div class="code-container"><pre>
+$C0/2FDE PLB                     ;DBレジスタにスタックからプル
+$C0/2FDF PLY                     ;Yレジスタにスタックからプル
+$C0/2FE0 BRL $EBBE  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AD05]   ;Aに[$7F:AD05]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2211] ;[$C0:2211]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2211]
+$C0/2211 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/2213 LDA $8E00,y[$7F:AD06]   ;Aに[$7F:AD06]をロード
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/2224 STA $00,x  [$00:1221]   ;Aを[$00:1221]に書き込み サンダウンがパーティにいない時話しかけるとON
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AD07]   ;Aに[$7F:AD07]をロード E3
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:222A] ;[$C0:222A]へジャンプ(レジスタをスタックに積まない)
+;[$C0:222A]
+$C0/222A LDA #$80                ;Aに$80をロード
+$C0/222C STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/222E BRA $02    [$2232]      ;フラグにかかわりなく常に分岐[$2232]
+$C0/2232 LDA $8E00,y[$7F:AD08]   ;Aに[$7F:AD08]をロード 28
+$C0/2235 STA $32    [$00:0032]   ;Aを[$00:0032]に書き込み
+$C0/2237 STZ $33    [$00:0033]   ;[$00:0033]に$00を書き込み
+$C0/2239 LDA $8E01,y[$7F:AD09]   ;Aに[$7F:AD09]をロード 06
+$C0/223C CMP #$2C                ;Aと$2Cを減算比較（ステータスレジスタ変更のみ）
+$C0/223E BCC $0C    [$224C]      ;キャリーフラグが立っていないとき[$224C]分岐
+$C0/224C SEC                     ;キャリーフラグON
+$C0/224D SBC #$06                ;A - $06
+$C0/224F BCS $03    [$2254]      ;キャリーフラグが立っているとき[$2254]分岐
+$C0/2254 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/2256 STZ $35    [$00:0035]   ;[$00:0035]に$00を書き込み
+$C0/2258 INY                     ;Yをインクリメント +1
+$C0/2259 INY                     ;Yをインクリメント +1
+$C0/225A REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/225C LDA $32    [$00:0032]   ;Aに[$00:0032]をロード
+$C0/225E ASL A                   ;Aを算術左シフト *2
+$C0/225F TAX                     ;Aの値をXレジスタに転送
+$C0/2260 LDA $34    [$00:0034]   ;Aに[$00:0034]をロード
+$C0/2262 ASL A                   ;Aを算術左シフト *2
+$C0/2263 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/2265 ASL A                   ;Aを算術左シフト *2
+$C0/2266 CLC                     ;キャリーフラグクリア
+$C0/2267 ADC $34    [$00:0034]   ;A + [$00:0034]
+$C0/2269 CLC                     ;キャリーフラグクリア
+$C0/226A ADC $7E00,x[$7F:7E50]   ;A + [$7F:7E50]
+$C0/226D TAX                     ;Aの値をXレジスタに転送
+$C0/226E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2270 LDA $7E09,x[$7F:83FA]   ;Aに[$7F:83FA]($26)をロード　山小屋横のサンダウンのスプライトのOBJマップ初期データ5バイト目
+$C0/2273 AND #$7F                ;Aと$7Fで論理積
+$C0/2275 ORA $30    [$00:0030]   ;Aと[$00:0030]で論理和
+$C0/2277 STA $7E09,x[$7F:83FA]   ;A($A6)を[$7F:83FA]に書き込み
+$C0/227A BRL $F924  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AD0A]   ;Aに[$7F:AD0A]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1CBC] ;[$C0:1CBC]へジャンプ(レジスタをスタックに積まない)
+$C0/1CBC LDA $8E00,y[$7F:AD0B]   ;Aに[$7F:AD0B]をロード 00
+$C0/1CBF STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1CC1 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1CC2 LDA #$FF                ;Aに$FFをロード
+$C0/1CC4 STA $31    [$00:0031]   ;Aを[$00:0031]に書き込み
+$C0/1CC6 JSR $10D8  [$C0:10D8]   ;[$C0:10D8]へジャンプ
+</pre></div>
+
+<p>パーティに加入しなかった場合は、<code><span class="r">$C0/1C1E</span> LDA $8E00,y[$7F:AD07]</code>でコマンド<span class="formula">$E3</span>が呼び出され、</p>
+
+<div class="code-container"><pre>
+$C0/2270 LDA $7E09,x[$7F:83FA]   ;Aに[$7F:83FA]($26)をロード　山小屋横のサンダウンのスプライトのOBJマップ初期データ5バイト目
+$C0/2273 AND #$7F                ;Aと$7Fで論理積
+$C0/2275 ORA $30    [$00:0030]   ;Aと[$00:0030]($80)で論理和
+$C0/2277 STA $7E09,x[$7F:83FA]   ;A($A6)を[$7F:83FA]に書き込み
+</pre></div>
+
+<p><span class="formula">(<code>[$7F:83FA]</code>($26) &amp; $7F) | <code>[$00:0030]</code>($80)</span><br>
+<span class="formula">= $A6</span></p>
+
+<p>というように、<code>[$7F:83FA]</code>のBit7に<span class="formula">1</span>が立って、サンダウンの山小屋横のサンダウンのスプライトの存在状態フラグが立つ。<br>
+初期位置に戻ったことになる。<br>
+さらに、<code>[$00:1217]</code>と<code>[$00:1218]</code>は、パーティに入れた時と同じ処理で値が更新される。</p>
+
+<div class="code-container"><pre>
+$C0/1D89 INY                     ;Yをインクリメント +1
+$C0/1D8A INY                     ;Yをインクリメント +1
+$C0/1D8B BRL $FE13  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AD0F]   ;Aに[$7F:AD0F]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:220B] ;[$C0:220B]へジャンプ(レジスタをスタックに積まない)
+;[$C0:220B]
+$C0/220B LDA #$01                ;Aに$01をロード
+$C0/220D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/220F BRA $02    [$2213]      ;フラグにかかわりなく常に分岐[$2213]
+$C0/2213 LDA $8E00,y[$7F:AD10]   ;Aに[$7F:AD10]をロード 17
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/2224 STA $00,x  [$00:1217]   ;Aを[$00:1217]に書き込み
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AD11]   ;Aに[$7F:AD11]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:2211] ;[$C0:2211]へジャンプ(レジスタをスタックに積まない)
+;[$C0:2211]
+$C0/2211 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/2213 LDA $8E00,y[$7F:AD12]   ;Aに[$7F:AD12]をロード
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/2224 STA $00,x  [$00:1218]   ;Aを[$00:1218]に書き込み
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AD13]   ;Aに[$7F:AD13]をロード
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:4085] ;[$C0:4085]へジャンプ(レジスタをスタックに積まない)
+$C0/4085 PLB                     ;DBレジスタにスタックからプル
+$C0/4086 DEC $0200  [$00:0200]   ;[$00:0200]をデクリメント -1
+$C0/4089 BNE $51    [$40DC]      ;ゼロフラグが立っていないとき[$40DC]分岐
+$C0/408B LDA #$01                ;Aに$01をロード
+$C0/408D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/4090 JSR $414E  [$C0:414E]   ;[$C0:414E]へジャンプ
+</pre></div>
+
+<p><code><span class="r">$C0/220B</span></code>～<code><span class="r">$C0/2227</span></code>と、<code><span class="r">$C0/2211</span></code>～<code><span class="r">$C0/2227</span></code>で、</p>
+
+<p><code>[$00:1217]</code>に<span class="formula">$01</span><br>
+<code>[$00:1218]</code>に<span class="formula">$00</span></p>
+
+<p>が書き込まれた。</p>
+
+<p>この状態で、勇者の山の山小屋横へ行くとサンダウンがいるが、話しかけた時のイベントは、仲間になっていない時と異なる。<br>
+最初に紹介した処理とは<code>[$00:1217]</code>の値で分岐することになる。</p>
+
+<div class="code-container"><pre>
+$C0/1CC9 PLY                     ;Yレジスタにスタックからプル
+$C0/1CCA INY                     ;Yをインクリメント +1
+$C0/1CCB BRL $FED3  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+;（中略）
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+;（中略）
+$C0/1C2A JMP ($429F,x)[$C0:271D] ;[$C0:271D]へジャンプ(レジスタをスタックに積まない)
+;[$C0:271D]
+$C0/271D LDA #$00                ;Aに$00をロード
+$C0/271F STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/2721 LDA $8E00,y[$7F:AA5D]   ;Aに[$7F:AA5D]をロード
+$C0/2724 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2726 AND #$00FF              ;Aと$00FFで論理積
+$C0/2729 CLC                     ;キャリーフラグクリア
+$C0/272A ADC #$1200              ;A + $1200
+$C0/272D TAX                     ;Aの値をXレジスタに転送
+$C0/272E SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2730 LDA $00,x  [$00:1217]   ;Aに[$00:1217]をロード
+$C0/2732 BEQ $06    [$273A]      ;ゼロフラグが立っているとき[$273A]分岐
+;ゼロフラグOFF　サンダウンを仲間にしたことがある
+$C0/2734 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/2736 BEQ $0D    [$2745]      ;ゼロフラグが立っているとき[$2745]分岐
+$C0/2745 INY                     ;Yをインクリメント +1
+$C0/2746 INY                     ;Yをインクリメント +1
+$C0/2747 INY                     ;Yをインクリメント +1
+$C0/2748 BRL $F456  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]　以降で呼び出す$8E00,yの値が分岐
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:AA60]   ;Aに[$7F:AA60]をロード　A0
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1EC8] ;[$C0:1EC8]へジャンプ(レジスタをスタックに積まない)
+;[$C0:1EC8]
+$C0/1EC8 LDA #$00                ;Aに$00をロード
+$C0/1ECA STA $0001C5[$00:01C5]   ;Aを[$00:01C5]に書き込み
+$C0/1ECE LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1ED0 SEC                     ;キャリーフラグON
+$C0/1ED1 SBC #$A0                ;A - $A0
+$C0/1ED3 BRA $0B    [$1EE0]      ;フラグにかかわりなく常に分岐[$1EE0]
+$C0/1EE0 STA $0001C0[$00:01C0]   ;Aを[$00:01C0]に書き込み
+$C0/1EE4 LDA $8E00,y[$7F:AA61]   ;Aに[$7F:AA61]をロード　45
+$C0/1EE7 STA $0001C4[$00:01C4]   ;Aを[$00:01C4]に書き込み
+$C0/1EEB INY                     ;Yをインクリメント +1
+$C0/1EEC LDA $0001C0[$00:01C0]   ;Aに[$00:01C0]をロード
+$C0/1EF0 LSR A                   ;Aを論理右シフト　(/2)
+$C0/1EF1 BEQ $29    [$1F1C]      ;ゼロフラグが立っているとき[$1F1C]分岐
+$C0/1F1C LDA $8E00,y[$7F:AA62]   ;Aに[$7F:AA62]をロード 06
+$C0/1F1F STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/1F21 INY                     ;Yをインクリメント +1
+$C0/1F22 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/1F23 LDA #$00                ;Aに$00をロード
+$C0/1F25 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/1F26 PLB                     ;DBレジスタにスタックからプル
+$C0/1F27 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1F28 LDA #$40                ;Aに$40をロード
+$C0/1F2A STA $36    [$00:0036]   ;Aを[$00:0036]に書き込み
+$C0/1F2C JSR $20BC  [$C0:20BC]   ;[$C0:20BC]へジャンプ
+</pre></div>
+
+<p>処理自体は初回同様、セリフや吹き出しの処理へ進むが、<code>[$00:1217]</code>の値で分岐後、<code><span class="r">$C0/1C1E</span> LDA $8E00,y</code>で呼び出す値が、<code>[$7F:AA85]</code>（<span class="formula">$A4</span>）から<code>[$7F:AA60]</code>（<span class="formula">$A0</span>）に変更される。<br>
+これにより会話内容が変化し、パーティに加わるかどうかの会話へジャンプすることになる。</p>
+
+<p>ここでパーティに加えることを断ると、再びサンダウンは各地をさまよい出す。つまり再びスプライトの処理を行う。<br>
+ただ、会話内容は毎回<code>[$00:1217]</code>の値で変わり、パーティに加わるかの会話が発生することになる。<br>
+（ちなみに、リメイク版では一度仲間にすると山小屋横から移動しなくなる）</p>
+
+<p>以上が、スプライト関係の処理やフラグの処理の例である。</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="map07.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="map09.html"><span class="button">&#9654;次 </span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="map01.html">マップ構造</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
