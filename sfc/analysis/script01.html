@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="ライブ・ア・ライブ,ライブアライブ,LIVE A LIVE,攻略,スーパーファミコン,スーファミ,SFC,バーチャルコンソール">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileImage" content="../img/social.png">
+<meta name="description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スクリプト &gt; テキスト関連">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livealive.client.jp/sfc/">
+<meta property="og:image" content="https://livealive.client.jp/sfc/img/social.png">
+<meta property="og:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="Summary">
+<meta name="twitter:title" content="ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スクリプト &gt; テキスト関連">
+<meta name="twitter:description" content="スーパーファミコン版「ライブ・ア・ライブ」の攻略です。システム解説・隠しボス攻略・マップ画像あり。各シナリオのやりこみ、元ネタ＆雑学紹介コーナーなども掲載。バーチャルコンソール版対応。">
+<meta name="twitter:image" content="https://livealive.client.jp/sfc/img/social.png" />
+<meta name="twitter:url" content="https://livealive.client.jp/sfc/">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="icon alternate" href="../img/social.png" type="image/png">
+<title>ライブ・ア・ライブ（SFC版） 攻略メモ帳 &gt; プログラミング関係解説＆調査 &gt; スクリプト &gt; テキスト関連</title>
+<link href="../../css/main.min.css?20260714" rel="stylesheet">
+<link href="../../css/sfc.css?20260301" rel="stylesheet">
+<link href="../../css/cssmenu.css?20240801" rel="stylesheet">
+<link href="../../css/GEsubset.css?20231001" rel="stylesheet">
+<link href="../../css/calculation.css" rel="stylesheet">
+<link href="../../css/modal.css?20250712" rel="stylesheet">
+<style>
+.apu_code-container,
+.code-container {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f4f4f4;
+  margin: 0 auto;
+  font-family:GEsubset,monospace,serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.apu_code-container pre,
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+code {
+  font-family:GEsubset,monospace,serif;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ニーモニックの色 (青) */
+.mnemonic {
+  color: #0000FF;
+}
+
+/* コメントの色 (グレー) */
+.comment {
+  color: #555555;
+  font-style: italic;
+}
+
+#captiondata {
+	border: 1px solid #CCC;
+	padding: .1em;
+	background: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+table {
+	font-size:smaller;
+	}
+}
+</style>
+</head>
+<body>
+<div class="maincontainer">
+
+<div id="header">
+<div id="topsection">
+
+<div class="innertube">
+<a href="../index.html"><img alt="ライブ・ア・ライブ 攻略メモ帳" src="../img/title.svg"></a>
+</div>
+
+</div>
+</div>
+
+<div id="contentcolumn">
+<div class="innertube">
+
+<nav class="droplinetabs">
+<ul>
+<li class="other"><a href="index.html">TOP</a></li>
+<li class="other"><button type="button">データ一覧</button>
+	<ul>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="sounddata.html">サウンドデータ</a></li>
+		<li><a href="sequence.html">シーケンスデータ</a></li>
+		<li><a href="soundfunc.html">サウンドドライバファンクション</a></li>
+		<li><a href="textno.html">テキストアドレス一覧</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="mapno.html">マップID一覧</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="memo.html">雑多メモ</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・基本</button>
+	<ul>
+		<li><a href="program4.html">ダメージ計算式</a></li>
+		<li><a href="program5.html">戦闘用乱数計算</a></li>
+		<li><a href="program6_3.html">命中判定について</a></li>
+		<li><a href="program6_4.html">ヒット数</a></li>
+		<li><a href="program6_5.html">敵ターゲット決定</a></li>
+		<li><a href="program8.html">ドロップアイテム</a></li>
+		<li><a href="program10.html">経験値計算</a></li>
+		<li><a href="program10_2.html">ステータス上昇値</a></li>
+		<li><a href="program10_3.html">技習得</a></li>
+		<li><a href="program15.html">逃げるコマンド</a></li>
+		<li><a href="program17.html">行動異常</a></li>
+		<li><a href="program18.html">状態異常</a></li>
+		<li><a href="program26.html">ダメージフィールド</a></li>
+		<li><a href="program27.html">反撃</a></li>
+		<li><a href="program32.html">位置変化・向き変え</a></li>
+		<li><a href="program34.html">ステータス変動</a></li>
+		<li><a href="program36.html">回復技</a></li>
+		<li><a href="program37.html">特殊タイプの技処理</a></li>
+		<li><a href="program38.html">回避属性</a></li>
+		<li><a href="program39.html">向き補正</a></li>
+		<li><a href="program40.html">行動ポイント</a></li>
+		<li><a href="program40_2.html">順序ポイント</a></li>
+		<li><a href="program41.html">敵の行動選択</a></li>
+		<li><a href="program41_2.html">技の範囲判定</a></li>
+		<li><a href="program41_3.html">回復技判定</a></li>
+		<li><a href="program41_4.html">敵の移動・向き変え</a></li>
+		<li><a href="program47.html">味方の移動</a></li>
+		<li><a href="program44.html">戦闘コマンド</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">戦闘・その他</button>
+	<ul>
+		<li><a href="program2.html">テレポートの仕様</a></li>
+		<li><a href="program6.html">オディオモールのダメージ量処理</a></li>
+		<li><a href="program6_2.html">「ほいこーろー」の仕様</a></li>
+		<li><a href="program11.html">セレクトバグ</a></li>
+		<li><a href="program13.html">現代編ワタナベイベント</a></li>
+		<li><a href="program16.html">最終編敵パーティ</a></li>
+		<li><a href="program16_2.html">原始/中世/近未来編敵パーティ</a></li>
+		<li><a href="program20.html">幕末編のザコ敵</a></li>
+		<li><a href="program22.html">ラーニング</a></li>
+		<li><a href="program23.html">功夫編・修行</a></li>
+		<li><a href="program24.html">味方との戦闘</a></li>
+		<li><a href="program28.html">ざき3戦目</a></li>
+		<li><a href="program29.html">功夫編終盤</a></li>
+		<li><a href="program30.html">ＳＦ編終盤</a></li>
+		<li><a href="program31.html">ブリキ大王戦</a></li>
+		<li><a href="program33.html">オディオ戦</a></li>
+		<li><a href="program45.html">技モーション</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">フィールド</button>
+	<ul>
+		<li><a href="program3.html">アイテム改造などの確率の仕様</a></li>
+		<li><a href="program7.html">マップ乱数について</a></li>
+		<li><a href="program9_1.html">マップタイマー</a></li>
+		<li><a href="program12.html">サモに与えるアイテム</a></li>
+		<li><a href="program14.html">キューブのバッテリー</a></li>
+		<li><a href="program25.html">かわひもバグ</a></li>
+		<li><a href="program19.html">副能力変動値</a></li>
+		<li><a href="program21.html">文字入力と判定</a></li>
+		<li><a href="program42.html">アイテム並び替え</a></li>
+		<li><a href="program43.html">隊形</a></li>
+		<li><a href="program46.html">音声</a></li>
+		<li><a href="program35.html">セーブ・ロード</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">マップ</button>
+	<ul>
+		<li><a href="map01.html">マップ構造とスプライトの配置</a></li>
+		<li><a href="map02.html">スプライト処理</a></li>
+		<li><a href="map03.html">ランダム移動</a></li>
+		<li><a href="map04.html">追尾タイプの移動</a></li>
+		<li><a href="map05.html">移動・停止繰り返し移動</a></li>
+		<li><a href="map06.html">隠れ蓑</a></li>
+		<li><a href="map07.html">匂いを嗅ぐ</a></li>
+		<li><a href="map08.html">存在状態フラグ</a></li>
+	</ul>
+</li>
+<li class="here"><button type="button">スクリプト</button>
+	<ul>
+		<li><a href="script.html">スクリプトについて</a></li>
+		<li><a href="script01.html">テキスト関連</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">画像</button>
+	<ul>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sprite.html">スプライト(1)</a></li>
+		<li><a href="sprite2.html">スプライト(2)</a></li>
+		<li><a href="bg.html">背景</a></li>
+		<li><a href="bg1.html">背景(フィールド)</a></li>
+		<li><a href="bg2.html">背景(戦闘)</a></li>
+		<li><a href="bg3.html">背景(メニュー画面)</a></li>
+		<li><a href="colormath.html">カラーマス</a></li>
+		<li><a href="colormath2.html">固定色</a></li>
+		<li><a href="window.html">ウィンドウ効果</a></li>
+		<li><a href="mosaic.html">モザイク処理</a></li>
+		<li><a href="scroll.html">スクロール</a></li>
+		<li><a href="rasterscroll.html">ラスタースクロール</a></li>
+		<li><a href="mode7.html">背景拡大縮小回転</a></li>
+		<li><a href="graphic1.html">カラーパレット変更</a></li>
+	</ul>
+</li>
+<li class="other"><button type="button">音</button>
+	<ul>
+		<li><a href="sound.html">サウンドについて</a></li>
+		<li><a href="sound1.html">BGMの演奏</a></li>
+		<li><a href="sound2.html">BGMIDの呼び出し</a></li>
+		<li><a href="sound5.html">効果音の演奏</a></li>
+		<li><a href="sound3.html">シーケンスデータ調査</a></li>
+		<li><a href="sound6.html">LISTENING ROOM</a></li>
+	</ul>
+</li>
+</ul>
+</nav>
+</div>
+
+<div class="maincontents">
+<h1><a href="../index.html">TOP</a> &gt; <a href="index.html">プログラミング関係解説＆調査</a> &gt; <a href="script.html">スクリプト</a> &gt; テキスト関連</h1>
+<h2>スクリプト &gt; テキスト関連</h2>
+
+<div class="place">当ページの内容は、ある程度のプログラミングの知識を必要とする。<br>
+まず、<a href="index.html">プログラミング関係解説＆調査</a>をひととおり読んでいただきたい。</div>
+
+<p>ここでは、スクリプトコマンドの中の、テキスト表示系コマンドについて述べる。</p>
+
+<div id="captiondata"></div>
+
+<p>テキスト表示用のコマンドは数が多く、スクリプトコマンド<span class="formula">$9C</span>～<span class="formula">$9D</span>, <span class="formula">$A0</span>～<span class="formula">$E0</span>が担当する。更に選択肢表示用のコマンド<span class="formula">$70</span>～<span class="formula">$73</span>も存在する。<br>
+コマンドがやたらと多いのは、コマンドでセリフウィンドウ種類などの表示形式を選択するためである。<br>
+また、同じ内容がスクリプトコマンド<span class="formula">$A0</span>～<span class="formula">$BF</span>と<span class="formula">$C0</span>～<span class="formula">$DF</span>でほぼ被っているのだが、これはテキスト番号（仮称）のナンバリングの都合である。<br>
+コマンドは<span class="formula">$A0</span>～<span class="formula">$B8</span>及び<span class="formula">$C0</span>～<span class="formula">$D9</span>なら引数2個を指定で、</p>
+
+<dl>
+	<dt>コマンド<span class="formula">$NN xx yy</span></dt>
+	<dd>NN：セリフウィンドウ指定<br>
+	xx：テキスト番号<br>
+	yy：スプライト番号（セリフウィンドウの三角マーク位置指定）</dd>
+</dl>
+
+<p>となっている。</p>
+
+<p>xxのテキスト番号は、各シナリオに振ってあるテキスト開始位置の番号のようなもの。アドレスの指定ではない。<br>
+xxの値からセリフ開始アドレスを計算し、通常は1フレームに1文字ずつセリフの文字を表示する（セリフ表示速度が変動するセリフウィンドウもある）。<br>
+このテキスト番号なのだが、2バイト値になっている。<br>
+厳密には<span class="formula">$0000</span>～<span class="formula">$01FF</span>で、各シナリオで<span class="formula">$000</span>～<span class="formula">$1FF</span>（<span class="formula">0～511</span>）までセリフに番号が振られており、上コマンドで指定した番号のセリフを喋る（またはテキスト表示）。<br>
+しかし、上コマンドだと1バイト値しかテキスト番号が指定できない。<br>
+そこで、コマンド<span class="formula">$A0</span>～<span class="formula">$BF</span>はテキスト番号<span class="formula">$000</span>～<span class="formula">$0FF</span>の時に下1バイト値を指定、<span class="formula">$C0</span>～<span class="formula">$DF</span>はテキスト番号<span class="formula">$100</span>～<span class="formula">$1FF</span>の時に下1バイト値を指定、と使い分けている。</p>
+
+<p>セリフウィンドウの中で、思考用のウィンドウ（雲っぽい形のやつ）のみ、キャラから出る&#x25ef;の部分がアニメーションする。つまりグラフィックを切り替えている。<br>
+グラフィックは<span class="formula">16</span>フレーム（<span class="formula">16/60</span>秒）のタイマーで切り替わっている（<code>$00:01CC</code>～<code>$00:01CD</code>）。<br>
+<code>[$00:01C5]</code>に<span class="formula">$81</span>を指定することでタイマーが動く。</p>
+
+<p>yyはスプライト番号で、スプライトのOBJマップデータにおけるスプライトの番号なのだが、マップによってはそのまま番号が適用されない（後述する）。<br>
+スプライト番号から、話をするスプライトの位置（座標）を獲得して、表示位置と、セリフウィンドウの吹き出し三角位置を決めている。<br>
+例えば、近未来編の公園では子供がランダム移動しており、アキラが子供の上側から話しかけると、セリフウィンドウは画面下に表示されるし、下側からだと画面上に表示される。<br>
+また、子供の右側から話しかけると、吹き出しの三角マークは子供の真上（アキラの1マス左）に出るし、左側から話しかければ、吹き出しの三角マークはアキラの1マス右に出る。<br>
+といった位置調整を、話をするスプライトの座標から獲得するため、スプライト番号が必要になっている。</p>
+
+<p>コマンド<span class="formula">$B9</span>～<span class="formula">$BB</span>, <span class="formula">$DA</span>～<span class="formula">$DC</span>は、テキスト背景を透過して、テキストが徐々に表示される（ドット単位で表示していく）時のコマンドであり、引数3個を指定する。</p>
+
+<dl>
+	<dt>コマンド<span class="formula">$NN xx yy zz</span></dt>
+	<dd>xx：テキスト表示位置<br>
+	yy：コントローラ入力受付タイミング指定（<span class="formula">$01</span>だと文字表示直後にAボタンで進む　<span class="formula">$00</span>だと表示してから1秒待ち）<br>
+	zz：テキスト番号</dd>
+</dl>
+
+<p>テキスト番号の指定方法は同じで、コマンド<span class="formula">$B9</span>～<span class="formula">$BB</span>はテキスト番号<span class="formula">$000</span>～<span class="formula">$0FF</span>の時に下1バイト値を指定、<span class="formula">$DA</span>～<span class="formula">$DC</span>はテキスト番号<span class="formula">$100</span>～<span class="formula">$1FF</span>の時に下1バイト値を指定。</p>
+
+<p>シナリオ進行によりセリフが変わるキャラ（スプライト）は、まずシナリオ進行フラグをチェックし「話す」実行という手順になる。<br>
+たとえば、中世編のルクレチア城・城下町は、中盤の偽魔王撃破まで同じ位置にいる町の人や兵士が多いが、ハッシュやウラヌスがパーティに加わるタイミングや魔王撃破後でセリフが変動するため、毎回フラグチェックをしてセリフを選択することになる。</p>
+
+<h3>選択肢が出る場合</h3>
+
+<p>会話中、選択肢用ウィンドウが右下に表示され、選択肢を選ぶ場面もある。<br>
+この場合は、上のテキスト表示系コマンドに続いて、スクリプトコマンド<span class="formula">$70</span>～<span class="formula">$73</span>で指定する。<br>
+選択肢もテキスト番号で指定する都合で、テキスト番号によりコマンドが変わる。<br>
+また、選択肢の数でもコマンドが変わる。</p>
+
+<dl>
+	<dt>コマンド<span class="formula">$70 xx</span></dt>
+	<dd>テキスト番号<span class="formula">$000</span>～<span class="formula">$0FF</span><br>
+	選択肢が2つの場合<br>
+	xx：テキスト番号</dd>
+</dl>
+<dl>
+	<dt>コマンド<span class="formula">$71 xx yy</span></dt>
+	<dd>テキスト番号<span class="formula">$000</span>～<span class="formula">$0FF</span><br>
+	xx：選択肢数<br>
+	yy：テキスト番号</dd>
+</dl>
+<dl>
+	<dt>コマンド<span class="formula">$72 xx</span></dt>
+	<dd>テキスト番号<span class="formula">$100</span>～<span class="formula">$1FF</span><br>
+	選択肢が2つの場合<br>
+	xx：テキスト番号</dd>
+</dl>
+<dl>
+	<dt>コマンド<span class="formula">$73 xx yy</span></dt>
+	<dd>テキスト番号<span class="formula">$100</span>～<span class="formula">$1FF</span><br>
+	xx：選択肢数<br>
+	yy：テキスト番号</dd>
+</dl>
+
+<p>選択肢が2個の時は、引数が1個で、選択肢用のテキスト番号を指定するのみ。<br>
+選択肢が3個以上の時だけ引数を2個にして、選択肢の数と、テキスト番号を指定する。この場合はスクリプトコマンドが3バイト値になるということである。<br>
+本作で選択肢が出る場合、2個のケースが大半なので、スクリプトコマンドの容量を減らすため（2バイトにするため）、選択肢が2個か3個以上かでコマンドを分けているのかもしれない。<br>
+選択肢が3個以上のケースは、幕末編の合言葉（4個）や、近未来編のたい焼き屋の金額、筑波研究所のVIPルームパスコード、西部編のマスター（罠仕掛け時の「たのむ」の下に「いっぱいくれ」が追加され、選択肢3個）など。</p>
+
+<p>選択肢用の右下ウィンドウ形状は固定で、思考用の雲形状のため、ウィンドウの指定はない。<br>
+選択肢用の思考ウィンドウも、16フレーム毎に&#x25ef;の部分のグラフィック切り替え処理をしているが、制御用アドレスはセリフウィンドウの次の2バイト位置（<code>$00:01CE</code>～<code>$00:01CF</code>）。</p>
+
+<h3>ＳＦ編コンピュータテキスト</h3>
+
+<p>ＳＦ編では、画面全体が暗くなって（<a href="colormath2.html">固定色処理</a>）、テキストのみ緑色の文字で表示する、コンピュータ表示を模したテキスト表示の場面がある。<br>
+この時のスクリプトコマンドは<span class="formula">$9C</span>と<span class="formula">$9D</span>で、こちらもテキスト番号によりコマンドが変わる。<br>
+どちらも引数は1個。</p>
+
+<dl>
+	<dt>コマンド<span class="formula">$9C xx</span></dt>
+	<dd>テキスト番号<span class="formula">$000</span>～<span class="formula">$0FF</span><br>
+	xx：テキスト番号</dd>
+</dl>
+<dl>
+	<dt>コマンド<span class="formula">$9D xx</span></dt>
+	<dd>テキスト番号<span class="formula">$100</span>～<span class="formula">$1FF</span><br>
+	xx：テキスト番号</dd>
+</dl>
+
+<p>以上は表示するテキスト番号の指定だけで、実際には上処理前に、固定色処理や、コンピュータ音の指定なども入る。<br>
+また、いずれも<code>[$00:01C5]</code>に<span class="formula">$19</span>を指定する。<br>
+フォントはコンピュータテキスト用の8×8ピクセル画像を指定するため、グラフィック処理も通常の文字フォント処理とは変わる。</p>
+
+<p>また、テキストの最後に「＿」（アンダーライン）が点滅表示するが、コンピュータの入力待ちカーソル状態を表現していると思われる。<br>
+こちらは<span class="formula">$20</span>フレームタイマーで表示切り替えを行っている（<code>$00:01CC</code>～<code>$00:01CD</code>）。<br>
+<code>[$00:01C5]</code>に<span class="formula">$19</span>を指定することでアンダーライン用タイマーが動く。</p>
+
+
+<h3>セリフ表示の例</h3>
+
+<p>近未来編・公園でたい焼き屋を開いている無法松にAボタンで話しかけた時のサブルーチンを例として説明する。</p>
+
+<p>セリフは、</p>
+
+<div style="border: 1px solid gray; padding: .1em;">無法松「よ　アキラ。<br>
+　手伝ってけよ。</div>
+
+<p>であるが、「アキラ」の部分はプレイヤーがつけた名前になる。</p>
+
+<p>まず、近未来編・公園で無法松がたい焼き屋を開いている時のスプライトのOBJマップ初期データを見ておこう。<br>
+マップIDは<span class="formula">$03</span>、データは<code>$7F:8031</code>、スプライト数は<span class="formula">$20（32）</span><br>
+この時点で存在判定フラグが立っている（5バイト目Bit7に<span class="formula">1</span>が立っている）キャラのみ★マークをつけた。</p>
+
+<table>
+<thead>
+	<tr><th>スプライト番号</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td>-</td><td class="formula">08 19 1B 1A 1A </td><td>ヘッダ</td></tr>
+	<tr><td><span class="formula">$00</span></td><td class="formula">55 23 29 0F 69 4A</td><td>クルセイダー1</td></tr>
+	<tr><td><span class="formula">$01</span></td><td class="formula">55 1B 25 10 60 4A</td><td>クルセイダー2</td></tr>
+	<tr><td><span class="formula">$02</span></td><td class="formula">55 1B 2C 11 65 4A</td><td>クルセイダー3</td></tr>
+	<tr><td><span class="formula">$03</span></td><td class="formula">55 18 2D 12 64 4A</td><td>クルセイダー4</td></tr>
+	<tr><td><span class="formula">$04</span></td><td class="formula">02 23 29 FB 29 4E</td><td>-</td></tr>
+	<tr><td><span class="formula">$05</span></td><td class="formula">51 0A 30 1A AE 49</td><td>左下ベンチ女性★</td></tr>
+	<tr><td><span class="formula">$06</span></td><td class="formula">56 0B 30 19 A1 4B</td><td>左下ベンチ男性★</td></tr>
+	<tr><td><span class="formula">$07</span></td><td class="formula">00 16 26 FB 63 48</td><td>-</td></tr>
+	<tr><td><span class="formula">$08</span></td><td class="formula">0D 22 29 1D 01 4E</td><td>-</td></tr>
+	<tr><td><span class="formula">$09</span></td><td class="formula">0E 23 29 FB 01 4E</td><td>-</td></tr>
+	<tr><td><span class="formula">$0A</span></td><td class="formula">0F 22 2A 1D 01 4E</td><td>-</td></tr>
+	<tr><td><span class="formula">$0B</span></td><td class="formula">14 23 2A FB 01 4E</td><td>-</td></tr>
+	<tr><td><span class="formula">$0C</span></td><td class="formula">54 11 21 16 E3 49</td><td>左上ベンチ右老人★</td></tr>
+	<tr><td><span class="formula">$0D</span></td><td class="formula">54 0A 2D 18 E3 4A</td><td>覗き見老人★</td></tr>
+	<tr><td><span class="formula">$0E</span></td><td class="formula">54 08 2B 18 6B 4A</td><td>老人（川を見ている）</td></tr>
+	<tr><td><span class="formula">$0F</span></td><td class="formula">53 13 33 1C E9 01</td><td>子供1★</td></tr>
+	<tr><td><span class="formula">$10</span></td><td class="formula">53 0E 23 1B 64 02</td><td>子供2（気安く話しかけるな少年）</td></tr>
+	<tr><td><span class="formula">$11</span></td><td class="formula">57 08 1F CA E9 0E</td><td>鳥1★</td></tr>
+	<tr><td><span class="formula">$12</span></td><td class="formula">57 0C 2A 46 E5 0F</td><td>鳥2★</td></tr>
+	<tr><td><span class="formula">$13</span></td><td class="formula">57 10 31 CA E5 0E</td><td>鳥3★</td></tr>
+	<tr><td><span class="formula">$14</span></td><td class="formula">57 16 22 46 E1 0F</td><td>鳥4★</td></tr>
+	<tr><td><span class="formula">$15</span></td><td class="formula">56 0E 21 15 A1 4D</td><td>左上ベンチ左男性★</td></tr>
+	<tr><td><span class="formula">$16</span></td><td class="formula">8D 18 29 1D 00 4E</td><td>バイク1</td></tr>
+	<tr><td><span class="formula">$17</span></td><td class="formula">8E 17 29 FB 00 4E</td><td>バイク2</td></tr>
+	<tr><td><span class="formula">$18</span></td><td class="formula">8F 18 2A 1D 00 4E</td><td>バイク3</td></tr>
+	<tr><td><span class="formula">$19</span></td><td class="formula">94 17 2A FB 00 4E</td><td>バイク4</td></tr>
+	<tr><td><span class="formula">$1A</span></td><td class="formula">02 16 26 84 E2 4E</td><td>無法松★</td></tr>
+	<tr><td><span class="formula">$1B</span></td><td class="formula">53 12 24 1C 69 83</td><td>たい焼き屋客・子供</td></tr>
+	<tr><td><span class="formula">$1C</span></td><td class="formula">54 1D 29 18 6A 8B</td><td>たい焼き屋客・老人</td></tr>
+	<tr><td><span class="formula">$1D</span></td><td class="formula">51 0D 27 1A 6D 8B</td><td>たい焼き屋客・女性</td></tr>
+	<tr><td><span class="formula">$1E</span></td><td class="formula">56 15 2F 19 64 8C</td><td>たい焼き屋客・男性</td></tr>
+	<tr><td><span class="formula">$1F</span></td><td class="formula">56 15 27 9A 67 0E</td><td>筑波研究所クリア後男性</td></tr>
+</tbody>
+</table>
+
+<p>無法松のスプライト番号は<span class="formula">$1A</span>である。<br>
+ということは、</p>
+
+<p><span class="formula">NN</span>：セリフウィンドウ指定<br>
+<span class="formula">xx</span>：テキスト番号<br>
+<span class="formula">yy</span>：スプライト番号</p>
+
+<p>引数yyに<span class="formula">$1A</span>を入れるのかというと、そうではないのである。</p>
+
+<p>では、スクリプトコマンドを見てみよう。<br>
+無法松に話しかけた時のスクリプトコマンドは<code>[$7F:BBAE]</code>～<code>[$7F:BBB6]</code>。<br>
+（スクリプトコマンドのアドレス計算は横に置く）</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7F:BBAE</code></td><td><span class="formula">$7F</span></td></tr>
+	<tr><td><code>$7F:BBAF</code></td><td><span class="formula">$B7</span></td></tr>
+	<tr><td><code>$7F:BBB0</code></td><td><span class="formula">$2D</span></td></tr>
+	<tr><td><code>$7F:BBB1</code></td><td><span class="formula">$C4</span></td></tr>
+	<tr><td><code>$7F:BBB2</code></td><td><span class="formula">$A1</span></td></tr>
+	<tr><td><code>$7F:BBB3</code></td><td><span class="formula">$20</span></td></tr>
+	<tr><td><code>$7F:BBB4</code></td><td><span class="formula">$E1</span></td></tr>
+	<tr><td><code>$7F:BBB5</code></td><td><span class="formula">$33</span></td></tr>
+	<tr><td><code>$7F:BBB6</code></td><td><span class="formula">$00</span></td></tr>
+</tbody>
+</table>
+
+<p>これをどう読むのか。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>値</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>$7F:BBAE</code></td><td><span class="formula">$7F</span></td><td>心を読む用分岐　<code>[$00:0201]</code>に<span class="formula">$00</span>が入っていたら<code>Y</code>レジスタ+2、<span class="formula">$01</span>が入っていたら次2バイトを<code>Y</code>レジスタへ</td></tr>
+	<tr><td><code>$7F:BBAF</code>～<code>$7F:BBB0</code></td><td><span class="formula">$2DB7</span></td><td><code>[$00:0201]</code>に<span class="formula">$01</span>が入っている時用分岐（<span class="formula">$8E00</span> + <span class="formula">$2DB7</span> = <code>$7F:BBB7</code>へ）</td></tr>
+	<tr><td><code>$7F:BBB1</code>～7F:BBB3</td><td><span class="formula">$C4 A1 20</span></td><td>「話す」コマンド指示</td></tr>
+	<tr><td><code>$7F:BBB4</code>～<code>$7F:BBB5</code></td><td><span class="formula">$E1 33</span></td><td><code>$00:1233</code>に<span class="formula">$01</span>を書き込んでフラグをONにする</td></tr>
+	<tr><td><code>$7F:BBB6</code></td><td><span class="formula">$00</span></td><td>処理終了</td></tr>
+	<tr><td><code>$7F:BBB7</code>～</td><td>-</td><td><code>[$00:0201]</code>に<span class="formula">$01</span>が入っている時のジャンプ先</td></tr>
+</tbody>
+</table>
+
+<p>まず、コマンド<span class="formula">$7F</span>だが、</p>
+
+<ul>
+	<li><code>[$00:0201]</code>に<span class="formula">$00</span>が入っていたら（話す）、<code>Y</code>レジスタ+2して、スクリプトコマンドのアドレス+2にジャンプ</li>
+	<li><code>[$00:0201]</code>に<span class="formula">$01</span>が入っていたら（心を読む）、次のスクリプトコマンドを2バイト値で読み込み<code>Y</code>レジスタへ</li>
+</ul>
+
+<p>という分岐である。<br>
+実質「話す」と「心を読む」の処理を分岐させるための処理である。<br>
+「話す」の場合は、<code>$7F:BBAE</code>に<span class="formula">+2</span>したアドレスである<code>$7F:BBB1</code>にジャンプして処理を続ける。<br>
+<code>$7F:BBAE</code>の直後の2バイトである<code>$7F:BBAF</code>～<code>$7F:BBB0</code>は<span class="formula">$2DB7</span>が入っていて、<span class="formula">$8E00 + $2DB7 = <code>$7F:BBB7</code></span>へジャンプする。<br>
+近未来編で心が読めるキャラは、「話す」処理と「心を読む」処理がスクリプトコマンドで連続して記されているようだ。</p>
+
+<ul>
+	<li><code>$7F:BBAE</code>：<code>[$00:0201]</code>による分岐処理</li>
+	<li><code>$7F:BBAF</code>～<code>$7F:BBB0</code>：<code>[$00:0201]</code>に<span class="formula">$01</span>が入っている時のジャンプ先指示</li>
+	<li><code>$7F:BBB1</code>～<code>$7F:BBB6</code>：<code>[$00:0201]</code>に<span class="formula">$00</span>が入っている時の処理（話す）</li>
+	<li><code>$7F:BBB7</code>～<code>$7F:BBBE</code>：<code>[$00:0201]</code>に<span class="formula">$01</span>が入っている時の処理（心を読む）</li>
+</ul>
+
+<p>ただ、「心を読む」は、ただセリフを表示するだけではなく、背景の色を変えたり、効果音を演奏したり、アキラのスプライトを変えたり……という別処理のサブルーチンへも飛ぶことになる。</p>
+
+<p>それはさておき、<code>$7F:BBB1</code>～<code>$7F:BBB3</code>の3バイト「<span class="formula">C4 A1 20</span>」が、「話す」コマンド指示にあたる。<br>
+<span class="formula">$C0</span>～<span class="formula">$DF</span>はテキスト番号<span class="formula">$100</span>～<span class="formula">$1FF</span>を指定するので、</p>
+<ul>
+	<li><span class="formula">C4</span>：セリフウィンドウ指定</li>
+	<li><span class="formula">A1</span>：テキスト番号 <span class="formula">$100 + $A1 = $1A1</span></li>
+	<li><span class="formula">20</span>：スプライト番号　？</li>
+</ul>
+
+<p>こうなのだが、スプライト番号が<span class="formula">$20</span>に指定されている。<br>
+上で述べたとおり、無法松はスプライト番号<span class="formula">$1A</span>なのである。<br>
+このズレは公園にいるキャラ全員で起こる。</p>
+
+<p>たとえば、</p>
+
+<ul>
+	<li>左下ベンチ女性のスプライト番号は<span class="formula">$05</span>だが、話しかけた時のコマンドは「<span class="formula">A4 42 0B</span>」</li>
+	<li>左下ベンチ男性のスプライト番号は<span class="formula">$06</span>だが、話しかけた時のコマンドは「<span class="formula">A4 40 0C</span>」</li>
+	<li>左上ベンチ左男性のスプライト番号は<span class="formula">$15</span>だが、話しかけた時のコマンドは「<span class="formula">A4 38 1B</span>」</li>
+</ul>
+
+<p>……と、全キャラ<span class="formula">$06</span>ズレていることがわかる。指定した値から<span class="formula">-$06</span>しなければスプライト番号と合わない。<br>
+これは、最初の<span class="formula">$00</span>～<span class="formula">$05</span>に、パーティメンバーなどのスプライトを割り振っている都合である。</p>
+
+<p>実際のサブルーチンをざっと見てみる。</p>
+
+<div class="code-container"><pre>
+$C0/1B7B LDA #$01                ;Aに$01をロード
+$C0/1B7D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/1B80 STZ $0214  [$00:0214]   ;[$00:0214]に$00を書き込み
+$C0/1B83 STZ $021A  [$00:021A]   ;[$00:021A]に$00を書き込み
+$C0/1B86 STZ $0202  [$00:0202]   ;[$00:0202]に$00を書き込み
+$C0/1B89 STZ $0203  [$00:0203]   ;[$00:0203]に$00を書き込み
+$C0/1B8C PLA                     ;Aレジスタにスタックからプル
+$C0/1B8D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1B8F STZ $31    [$00:0031]   ;[$00:0031]に$00を書き込み
+$C0/1B91 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/1B92 LDA #$7F                ;Aに$7Fをロード
+$C0/1B94 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/1B95 PLB                     ;DBレジスタにスタックからプル
+$C0/1B96 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1B98 LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/1B9A ASL A                   ;Aを算術左シフト *2
+$C0/1B9B TAX                     ;Aの値をXレジスタに転送
+$C0/1B9C LDY $8E00,x[$7F:8F08]   ;Yに[$7F:8F09][$7F:8F08]をロード　Y:2DAE
+$C0/1B9F SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:BBAE]   ;Aに[$7F:BBAE]をロード 7F
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:3809] ;[$C0:3809]へジャンプ(レジスタをスタックに積まない)
+;スクリプトコマンド$7F
+;[$C0:3809]
+$C0/3809 LDA $000201[$00:0201]   ;Aに[$00:0201]をロード
+$C0/380D BNE $05    [$3814]      ;ゼロフラグが立っていないとき[$3814]分岐
+;ゼロフラグON（[$00:0201]が$00、話すコマンド）
+$C0/380F INY                     ;Yをインクリメント +1
+$C0/3810 INY                     ;Yをインクリメント +1
+$C0/3811 BRL $E38D  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+;[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+;スクリプトコマンド$C4
+;[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:BBB1]   ;Aに[$7F:BBB1]をロード C4
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:1ED5] ;[$C0:1ED5]へジャンプ(レジスタをスタックに積まない)
+;スクリプトコマンド$C4　引数xx = $A1
+;[$C0:1ED5]
+$C0/1ED5 LDA #$01                ;Aに$01をロード
+$C0/1ED7 STA $0001C5[$00:01C5]   ;Aを[$00:01C5]に書き込み 01
+$C0/1EDB LDA $30    [$00:0030]   ;Aに[$00:0030]をロード C4
+$C0/1EDD SEC                     ;キャリーフラグON
+$C0/1EDE SBC #$C0                ;A - $C0
+$C0/1EE0 STA $0001C0[$00:01C0]   ;Aを[$00:01C0]に書き込み 04
+$C0/1EE4 LDA $8E00,y[$7F:BBB2]   ;Aに[$7F:BBB2]をロード A1
+$C0/1EE7 STA $0001C4[$00:01C4]   ;Aを[$00:01C4]に書き込み
+$C0/1EEB INY                     ;Yをインクリメント +1
+$C0/1EEC LDA $0001C0[$00:01C0]   ;Aに[$00:01C0]をロード 04
+$C0/1EF0 LSR A                   ;Aを論理右シフト　(/2)
+$C0/1EF1 BEQ $29    [$1F1C]      ;ゼロフラグが立っているとき[$1F1C]分岐
+$C0/1EF3 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1EF5 BEQ $25    [$1F1C]      ;ゼロフラグが立っているとき[$1F1C]分岐
+;スクリプトコマンド$C4　引数yy = $20
+;[$1F1C]
+$C0/1F1C LDA $8E00,y[$7F:BBB3]   ;Aに[$7F:BBB3]をロード 20
+$C0/1F1F STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/1F21 INY                     ;Yをインクリメント +1
+$C0/1F22 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/1F23 LDA #$00                ;Aに$00をロード
+$C0/1F25 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/1F26 PLB                     ;DBレジスタにスタックからプル
+$C0/1F27 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/1F28 LDA #$40                ;Aに$40をロード
+$C0/1F2A STA $36    [$00:0036]   ;Aを[$00:0036]に書き込み
+$C0/1F2C JSR $20BC  [$C0:20BC]   ;[$C0:20BC]へジャンプ
+</pre></div>
+
+<p>まずここまでで、<code>$7F:BBAE</code>（<span class="formula">$7F</span>）による<code>[$00:0201]</code>の分岐と、<code>$7F:BBB1</code>～<code>$7F:BBB3</code>の<span class="formula">3</span>バイト「<span class="formula">C4 A1 20</span>」を読み込んだ。<br>
+ここまででメモリアドレスに以下のような処理が入っている。</p>
+
+<table>
+<thead>
+	<tr><th>アドレス</th><th>内容</th></tr>
+</thead>
+<tbody>
+	<tr><td><code>[$00:01C5]</code></td><td>テキスト番号の上1バイトに<span class="formula">$01</span>を入れた（<code><span class="r">$C0/1ED7</span></code>）</td></tr>
+	<tr><td><code>[$00:01C0]</code></td><td>スクリプトコマンド<span class="formula">$C4 - $C0 = $04</span>書き込み（<code><span class="r">$C0/1EE0</span></code>）</td></tr>
+	<tr><td><code>[$00:01C4]</code></td><td><span class="formula">引数xx = $A1</span>を書き込み（<code><span class="r">$C0/1EE7</span></code>）</td></tr>
+	<tr><td><code>[$00:0034]</code></td><td><span class="formula">引数yy = $20</span>を書き込み（<code><span class="r">$C0/1F1F</span></code>）</td></tr>
+	<tr><td><code>[$00:0036]</code></td><td><span class="formula">$40</span>を書き込み（<code><span class="r">$C0/1F2A</span></code>）</td></tr>
+</tbody>
+</table>
+
+<p>この時点で<code>[$00:01C5]</code>に<span class="formula">$01</span>が書き込まれている点に注意。<br>
+コマンド<span class="formula">$C0</span>～は、テキスト番号$100以降のテキストを呼び出すので、<code>[$00:01C5]</code><code>[$00:01C4]</code>の2バイト値の上の桁に01を書き込んでいる。<br>
+逆に、コマンド<span class="formula">$A0</span>～だと<code>[$00:01C5]</code>にはこの時点で<span class="formula">$00</span>を書き込むようになっている。</p>
+
+<div class="code-container"><pre>
+$C0/20BC LDA #$00                ;Aに$00をロード
+$C0/20BE XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/20BF LDA $34    [$00:0034]   ;Aに[$00:0034]をロード 引数yy = $20
+$C0/20C1 CMP #$2C                ;Aと$2Cを減算比較（ステータスレジスタ変更のみ）
+$C0/20C3 BCC $0A    [$20CF]      ;キャリーフラグが立っていないとき[$20CF]分岐
+;キャリーフラグOFF 引数yyは$2C未満
+$C0/20CF DEC A                   ;Aをデクリメント -1
+$C0/20D0 BEQ $01    [$20D3]      ;ゼロフラグが立っているとき[$20D3]分岐
+;ゼロフラグOFF 引数yyは$01ではない
+$C0/20D2 DEC A                   ;Aをデクリメント -1
+$C0/20D3 CMP #$04                ;Aと$04を減算比較（ステータスレジスタ変更のみ）
+$C0/20D5 BCS $1A    [$20F1]      ;キャリーフラグが立っているとき[$20F1]分岐
+;キャリーフラグON 引数yyは$06以上
+$C0/20F1 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/20F3 SEC                     ;キャリーフラグON
+$C0/20F4 SBC #$0004              ;A - $0004
+$C0/20F7 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み　引数yy - $06
+$C0/20F9 ASL A                   ;Aを算術左シフト *2
+$C0/20FA ASL A                   ;Aを算術左シフト *2
+$C0/20FB ASL A                   ;Aを算術左シフト *2
+$C0/20FC ASL A                   ;Aを算術左シフト *2
+$C0/20FD CLC                     ;キャリーフラグクリア A:01A0
+$C0/20FE ADC $34    [$00:0034]   ;A + [$00:0034]
+$C0/2100 TAY                     ;Aの値をYレジスタに転送
+$C0/2101 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2103 LDA $1332,y[$00:14EC]   ;Aに[$00:14EC]をロード OBJマップデータ04 X座標上1バイト00
+$C0/2106 STA $3A    [$00:003A]   ;Aを[$00:003A]に書き込み
+$C0/2108 LDA $1333,y[$00:14ED]   ;Aに[$00:14ED]をロード OBJマップデータ05 X座標 16
+$C0/210B STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み
+$C0/210D LDA $1335,y[$00:14EF]   ;Aに[$00:14EF]をロード OBJマップデータ06 Y座標 26
+$C0/2110 STA $35    [$00:0035]   ;Aを[$00:0035]に書き込み
+$C0/2112 LDA $0A41  [$00:0A41]   ;Aに[$00:0A41]をロード　0F
+$C0/2115 INC A                   ;Aをインクリメント +1
+$C0/2116 STA $38    [$00:0038]   ;Aを[$00:0038]に書き込み　10
+$C0/2118 BMI $0C    [$2126]      ;ネガティブフラグが立っているとき[$2126]分岐
+;ネガティブフラグOFF
+$C0/211A LDA $34    [$00:0034]   ;Aに[$00:0034]をロード X座標 16
+$C0/211C SEC                     ;キャリーフラグON
+$C0/211D SBC $38    [$00:0038]   ;A(X座標) - [$00:0038](10)
+$C0/211F BCS $0C    [$212D]      ;キャリーフラグが立っているとき[$212D]分岐
+$C0/212D CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C0/212F BCC $03    [$2134]      ;キャリーフラグが立っていないとき[$2134]分岐
+$C0/2134 ASL A                   ;Aを算術左シフト *2
+$C0/2135 STA $34    [$00:0034]   ;Aを[$00:0034]に書き込み 0C
+$C0/2137 LDA $36    [$00:0036]   ;Aに[$00:0036]をロード 40
+$C0/2139 BIT #$40                ;Aと$40で論理積（ステータスフラグ変更のみ）
+$C0/213B BNE $08    [$2145]      ;ゼロフラグが立っていないとき[$2145]分岐
+$C0/2145 LDA $0A43  [$00:0A43]   ;Aに[$00:0A43]をロード 20
+$C0/2148 STA $38    [$00:0038]   ;Aを[$00:0038]に書き込み
+$C0/214A BMI $0C    [$2158]      ;ネガティブフラグが立っているとき[$2158]分岐
+;ネガティブフラグOFF
+$C0/214C LDA $35    [$00:0035]   ;Aに[$00:0035]をロード Y座標 26
+$C0/214E SEC                     ;キャリーフラグON
+$C0/214F SBC $38    [$00:0038]   ;A - [$00:0038] [$00:0A43]20
+$C0/2151 BCS $0C    [$215F]      ;キャリーフラグが立っているとき[$215F]分岐 06
+;キャリーフラグON（減算結果正）
+$C0/215F CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C0/2161 BCC $03    [$2166]      ;キャリーフラグが立っていないとき[$2166]分岐
+;キャリーフラグOFF
+$C0/2166 ASL A                   ;Aを算術左シフト *2
+$C0/2167 STA $35    [$00:0035]   ;Aを[$00:0035]に書き込み
+$C0/2169 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>前半部は引数yyの判定である。<br>
+処理を見ると、「引数yyが<span class="formula">$06</span>以上<span class="formula">$2C</span>未満」だと、引数yy-<span class="formula">$06</span>がスプライト番号として扱われていることがわかる。<br>
+引数yyが<span class="formula">$01</span>～<span class="formula">$05</span>の時はそのままスプライト番号になるようだ。<br>
+そこから先は、スプライト番号から座標を計算して、吹き出し位置を計算しているが、ここでは詳細を省く。<br>
+つまり、テキスト表示の時はまず吹き出し位置や形状などの計算が先に行われる。</p>
+
+<p>ではセリフのテキストはどのように処理しているのか。<br>
+<code>[$00:01C4]</code>に書き込んだ、テキスト番号（<span class="formula">引数xx = $A1</span>）の処理まで飛んでみよう。</p>
+
+<div class="code-container"><pre>
+$C0/9B65 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9B66 LDA #$D0                ;Aに$D0をロード
+$C0/9B68 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/9B6A PHA                     ;Aレジスタをスタックにプッシュ
+$C0/9B6B PLB                     ;DBレジスタにスタックからプル
+$C0/9B6C LDX #$8000              ;Xに$8000をロード
+$C0/9B6F LDA $000A00[$00:0A00]   ;Aに[$00:0A00]をロード　シナリオID：近未来編$06
+$C0/9B73 INC A                   ;Aをインクリメント +1
+$C0/9B74 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9B76 AND #$00FF              ;Aと$00FFで論理積
+$C0/9B79 ASL A                   ;Aを算術左シフト *2
+$C0/9B7A ASL A                   ;Aを算術左シフト *2
+$C0/9B7B CMP $0000,x[$D0:8000]   ;Aと[$D0:8001][$D0:8000](0010)を減算比較（ステータスレジスタ変更のみ）
+$C0/9B7E BCC $14    [$9B94]      ;キャリーフラグが立っていないとき[$9B94]分岐
+;キャリーフラグON　シナリオIDが3以上　功夫,西部,現代,近未来,幕末,最終
+$C0/9B80 SBC $0000,x[$D0:8000]   ;A - [$D0:8001][$D0:8000](0010)
+$C0/9B83 STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み　A:000C
+$C0/9B85 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9B87 LDA #$D1                ;Aに$D1をロード
+$C0/9B89 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/9B8B PHA                     ;Aレジスタをスタックにプッシュ
+$C0/9B8C PLB                     ;DBレジスタにスタックからプル
+$C0/9B8D REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9B8F LDA #$0000              ;Aに$0000をロード
+$C0/9B92 BRA $03    [$9B97]      ;フラグにかかわりなく常に分岐[$9B97]
+;キャリーフラグOFF　シナリオIDが3未満　中世,原始,ＳＦ
+$C0/9B94 STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み
+$C0/9B96 TXA                     ;Xレジスタの値をAレジスタに転送
+;処理合流
+$C0/9B97 STA $34    [$00:0034]   ;Aを[$00:0035][$00:0034]に書き込み　0000
+$C0/9B99 CLC                     ;キャリーフラグクリア
+$C0/9B9A ADC $32    [$00:0032]   ;A(0000) + [$00:0033][$00:0032](000C)
+$C0/9B9C TAX                     ;Aの値をXレジスタに転送
+$C0/9B9D LDA $0002,x[$D1:000E]   ;Aに[$D1:000F][$D1:000E]をロード(697F)
+$C0/9BA0 STA $36    [$00:0036]   ;Aを[$00:0037][$00:0036]に書き込み
+$C0/9BA2 LDA $0001C4[$00:01C4]   ;Aに[$00:01C5][$00:01C4]をロード　01A1　テキスト番号
+$C0/9BA6 ASL A                   ;Aを算術左シフト *2
+$C0/9BA7 CLC                     ;キャリーフラグクリア
+$C0/9BA8 ADC $0000,x[$D1:000C]   ;A + [$D1:000D][$D1:000C] 657F 
+$C0/9BAB CLC                     ;キャリーフラグクリア
+$C0/9BAC ADC $34    [$00:0034]   ;A + [$00:0035][$00:0034]
+$C0/9BAE TAY                     ;Aの値をYレジスタに転送
+$C0/9BAF LDA $0000,y[$D1:68C1]   ;Aに[$D1:68C2][$D1:68C1]をロード　27DF
+$C0/9BB2 CLC                     ;キャリーフラグクリア
+$C0/9BB3 ADC $36    [$00:0036]   ;A + [$00:0037][$00:0036]　27DF + 697F = 915E
+$C0/9BB5 CLC                     ;キャリーフラグクリア
+$C0/9BB6 ADC $34    [$00:0034]   ;A + [$00:0035][$00:0034] 915E + 0000
+$C0/9BB8 STA $32    [$00:0032]   ;Aを[$00:0033][$00:0032]に書き込み テキストアドレス
+$C0/9BBA SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9BBC PLB                     ;DBレジスタにスタックからプル
+$C0/9BBD RTS                     ;サブルーチン戻り
+
+$C0/9BEA LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/9BEC STA $01C3  [$00:01C3]   ;Aを[$00:01C3]に書き込み
+$C0/9BEF LDX $32    [$00:0032]   ;Xに[$00:0033][$00:0032]をロード　X:915E
+$C0/9BF1 STX $01C6  [$00:01C6]   ;Xを[$00:01C7][$00:01C6]に書き込み
+$C0/9BF4 STZ $01C2  [$00:01C2]   ;[$00:01C2]に$00を書き込み
+$C0/9BF7 LDA $01C0  [$00:01C0]   ;Aに[$00:01C0]をロード
+$C0/9BFA BMI $1C    [$9C18]      ;ネガティブフラグが立っているとき[$9C18]分岐
+$C0/9BFC JSR $0A8D  [$C0:0A8D]   ;[$C0:0A8D]へジャンプ
+</pre></div>
+
+<p>テキストを呼び出す準備として、シナリオIDで処理を分けていることがわかる。<br>
+処理を見ると、シナリオIDが3以上か否かで分けていて、後の処理から、テキストを取得するバンクがシナリオで異なっていることがわかる。<br>
+<code>[$00:0030]</code>にバンク、<code>[$00:0033]</code><code>[$00:0032]</code>にアドレスが入るが、以下のように計算されている。</p>
+
+<ul>
+	<li>シナリオID<span class="formula">$00</span>～<span class="formula">$02</span>の中世, 原始, ＳＦ</li>
+	<ul><li><code>[$00:0030]</code>：<span class="formula">$D0</span></li>
+	<li><code>[$00:0033]</code><code>[$00:0032]</code>：<span class="formula">(シナリオID + 1)*4 </span></li></ul>
+	<li>シナリオID<span class="formula">$03</span>以上の功夫, 西部, 現代, 近未来, 幕末, 最終</li>
+	<ul><li><code>[$00:0030]</code>：<span class="formula">$D1</span></li>
+	<li><code>[$00:0033]</code><code>[$00:0032]</code>：<span class="formula">(シナリオID + 1)*4 - $0010</span></li></ul>
+</ul>
+
+<p>以上で計算される<code>[$00:0033]</code><code>[$00:0032]</code>の値+2のアドレス（<code>LDA $0002,x</code>）を2バイト値で呼び出しているのが<code><span class="r">$C0/9B9D</span></code>。<br>
+呼び出した値は、<code>[$00:0037]</code><code>[$00:0036]</code>に書き込まれる。<br>
+ということは、シナリオ別だと以下表のようになる。</p>
+
+<table>
+<thead>
+	<tr><th>ID</th><th>シナリオ</th><th><code>[$00:0033]</code><code>[$00:0032]</code></th><th>アドレス<span class="formula">$0002,x</span></th><th><code>[$00:0037]</code><code>[$00:0036]</code></th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>中世</td><td><span class="formula">$0004</span></td><td><code>$D0:8006</code>～<code>$D0:8007</code></td><td><span class="formula">$08A8</span></td></tr>
+	<tr><td><span class="formula">$01</span></td><td>原始</td><td><span class="formula">$0008</span></td><td><code>$D0:800A</code>～<code>$D0:800B</code></td><td><span class="formula">$2982</span> </td></tr>
+	<tr><td><span class="formula">$02</span></td><td>ＳＦ</td><td><span class="formula">$000C</span></td><td><code>$D0:800E</code>～<code>$D0:800F</code></td><td><span class="formula">$2FDA</span> </td></tr>
+	<tr><td><span class="formula">$03</span></td><td>功夫</td><td><span class="formula">$0000</span></td><td><code>$D1:0002</code>～<code>$D1:0003</code></td><td><span class="formula">$0418</span></td></tr>
+	<tr><td><span class="formula">$04</span></td><td>西部</td><td><span class="formula">$0004</span></td><td><code>$D1:0006</code>～<code>$D1:0007</code></td><td><span class="formula">$3B45</span></td></tr>
+	<tr><td><span class="formula">$05</span></td><td>現代</td><td><span class="formula">$0008</span></td><td><code>$D1:000A</code>～<code>$D1:000B</code></td><td><span class="formula">$613D</span></td></tr>
+	<tr><td><span class="formula">$06</span></td><td>近未来</td><td><span class="formula">$000C</span></td><td><code>$D1:000E</code>～<code>$D1:000F</code></td><td><span class="formula">$697F</span></td></tr>
+	<tr><td><span class="formula">$07</span></td><td>幕末</td><td><span class="formula">$0010</span></td><td><code>$D1:0012</code>～<code>$D1:0013</code></td><td><span class="formula">$9C34</span></td></tr>
+	<tr><td><span class="formula">$08</span></td><td>最終</td><td><span class="formula">$0014</span></td><td><code>$D1:0016</code>～<code>$D1:0017</code></td><td><span class="formula">$C54A</span></td></tr>
+</tbody>
+</table>
+
+<p>更に、<span class="formula">テキスト番号*2 + アドレス$0000,x</span>を計算しているのが<code><span class="r">$C0/9BA8</span></code>。<br>
+アドレス<span class="formula">$0000,x</span>の値は以下のようになっている。</p>
+
+<table>
+<thead>
+	<tr><th>ID</th><th>シナリオ</th><th>アドレス<span class="formula">$0000,x</span></th><th>値</th></tr>
+</thead>
+<tbody>
+	<tr><td><span class="formula">$00</span></td><td>中世</td><td><code>$D0:8004</code>～<code>$D0:8005</code></td><td><span class="formula">$04A8</span></td></tr>
+	<tr><td><span class="formula">$01</span></td><td>原始</td><td><code>$D0:8008</code>～<code>$D0:8009</code></td><td><span class="formula">$2942</span></td></tr>
+	<tr><td><span class="formula">$02</span></td><td>ＳＦ</td><td><code>$D0:800C</code>～<code>$D0:800D</code></td><td><span class="formula">$2BDA</span></td></tr>
+	<tr><td><span class="formula">$03</span></td><td>功夫</td><td><code>$D1:0000</code>～<code>$D1:0001</code></td><td><span class="formula">$0018</span></td></tr>
+	<tr><td><span class="formula">$04</span></td><td>西部</td><td><code>$D1:0004</code>～<code>$D1:0005</code></td><td><span class="formula">$3745</span></td></tr>
+	<tr><td><span class="formula">$05</span></td><td>現代</td><td><code>$D1:0008</code>～<code>$D1:0009</code></td><td><span class="formula">$5D3D</span></td></tr>
+	<tr><td><span class="formula">$06</span></td><td>近未来</td><td><code>$D1:000C</code>～<code>$D1:000D</code></td><td><span class="formula">$657F</span></td></tr>
+	<tr><td><span class="formula">$07</span></td><td>幕末</td><td><code>$D1:0010</code>～<code>$D1:0011</code></td><td><span class="formula">$9914</span></td></tr>
+	<tr><td><span class="formula">$08</span></td><td>最終</td><td><code>$D1:0014</code>～<code>$D1:0015</code></td><td><span class="formula">$C14A</span></td></tr>
+</tbody>
+</table>
+
+<p>この値に<span class="formula">テキスト番号*2</span>を加算した値を2バイトアドレスとして呼び出す（<code><span class="r">$C0/9BAF</span></code>）。<br>
+更に、<code>[$00:0037]</code><code>[$00:0036]</code>を加算した値が、テキスト1文字目のアドレスである。</p>
+
+<p>実際に計算してみよう。<br>
+近未来編で、テキスト番号<span class="formula">$01A1</span>の1文字目を呼び出す場合、</p>
+
+<p><span class="formula">$01A1*2 + $657F($0000,x) = $68C1</span></p>
+
+<p>なので、<code>[$D1:68C2]</code><code>[$D1:68C1]</code>をロードする（<span class="formula">$27DF</span>）。<br>
+これに<code>[$00:0037]</code><code>[$00:0036]</code>を加算するから、</p>
+
+<p><span class="formula">$27DF + <code>[$00:0037]</code><code>[$00:0036]</code>($697F) = $915E</span></p>
+
+<p>ということで、やたら大変な計算の末に、<code>$D1:915E</code>というアドレスにどうにかたどりついた。<br>
+<code><span class="r">$C0/9BEA</span></code>～からの処理で、この呼び出し先の値は、</p>
+
+<p>バンク<span class="formula">$D1</span>→<code>[$00:01C3]</code><br>
+アドレス<span class="formula">$915E</span>→<code>[$00:01C7]</code><code>[$00:01C6]</code></p>
+
+<p>と、書き込まれたことがわかる。</p>
+
+<p>ここで呼び出されたのはあくまでも、テキストの最初の1バイト目である、という点に注意。<br>
+とりあえず、<code>$D1:915E</code>～を見てみよう。</p>
+
+<p>本作の文字コード表は<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ76u1DG13aRJetBHMDE6Dp3AccNpdgh7a0jKPPZmiz58svvUkPGFyY2hxs-c4mnfjV-50anNFMnSdD/pubhtml" target="_blank">SFCLAL_character_encode - Google スプレッドシート</a><br>
+<a href="https://paiza.io/projects/InnZQCAVdMOGJnYEz4XRmg" target="_blank">text処理（デコード）| paiza.IO</a>も合わせて参照のこと。<br>
+データを見ると、</p>
+
+<p><code>$D1:915E</code>～</p>
+
+<div class="mono">14 D6 20 16 3B 01 20 1E 33 1F 0F E1 C3 B9 D6 0F</div>
+
+<p>これをそのまま文字コード表にしたがってデコードすると、</p>
+
+<div style="border: 1px solid gray; padding: .1em;">4よ　6。《改行》　手伝ってけよ。《改行》</div>
+
+<p>『無法松「』の部分が「4」（<span class="formula">$14</span>）に、『アキラ』の部分が「6」（<span class="formula">$16</span>）になっている以外は、正しくデコードできている。<br>
+<span class="formula">$14</span>や<span class="formula">$16</span>には、定型テキストが予め登録されている。つまり定型テキスト番号である。<br>
+<code>$D1:915E</code>（<span class="formula">$14</span>）をロード後、デコードではなく、定型テキスト変換処理が入るはずだ。</p>
+
+<p>上のサブルーチン後、しばらく後で<code>$D1:915E</code>がロードされる。</p>
+
+<div class="code-container"><pre>
+$C0/9C08 LDA $01C0  [$00:01C0]   ;Aに[$00:01C0]をロード
+$C0/9C0B CMP #$12                ;Aと$12を減算比較（ステータスレジスタ変更のみ）
+$C0/9C0D BCC $09    [$9C18]      ;キャリーフラグが立っていないとき[$9C18]分岐
+$C0/9C18 LDY $01C6  [$00:01C6]   ;Yに[$00:01C7][$00:01C6]をロード Y:915E
+$C0/9C1B LDA $01C2  [$00:01C2]   ;Aに[$00:01C2]をロード
+$C0/9C1E BEQ $10    [$9C30]      ;ゼロフラグが立っているとき[$9C30]分岐
+$C0/9C30 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9C31 LDA $01C3  [$00:01C3]   ;Aに[$00:01C3]をロード A:00D1
+$C0/9C34 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/9C35 PLB                     ;DBレジスタにスタックからプル
+$C0/9C36 LDA $0000,y[$D1:915E]   ;Aに[$D1:915E]をロード $14
+$C0/9C39 INY                     ;Yをインクリメント +1
+$C0/9C3A CMP #$20                ;Aと$20を減算比較（ステータスレジスタ変更のみ）
+$C0/9C3C BCS $10    [$9C4E]      ;キャリーフラグが立っているとき[$9C4E]分岐
+;キャリーフラグOFF　読み込んだ値が$20未満
+$C0/9C3E CMP #$1D                ;Aと$1Dを減算比較（ステータスレジスタ変更のみ）
+$C0/9C40 BCS $12    [$9C54]      ;キャリーフラグが立っているとき[$9C54]分岐
+;キャリーフラグOFF　読み込んだ値が$1D未満（漢字判定OFF）
+$C0/9C42 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9C44 AND #$00FF              ;Aと$00FFで論理積
+$C0/9C47 ASL A                   ;Aを算術左シフト *2
+$C0/9C48 TAX                     ;Aの値をXレジスタに転送　A:0028
+$C0/9C49 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9C4B JMP ($B75C,x)[$C0:9EC6] ;[$C0:9EC6]へジャンプ(レジスタをスタックに積まない)
+;[$C0:9EC6]
+$C0/9EC6 SEC                     ;キャリーフラグON
+$C0/9EC7 SBC #$20                ;A($28) - $20 
+$C0/9EC9 STA $30    [$00:0030]   ;A($08)を[$00:0030]に書き込み
+$C0/9ECB STZ $31    [$00:0031]   ;[$00:0031]に$00を書き込み
+$C0/9ECD PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9ECE LDA #$00                ;Aに$00をロード
+$C0/9ED0 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/9ED1 PLB                     ;DBレジスタにスタックからプル
+$C0/9ED2 PHY                     ;Yレジスタをスタックへプッシュ
+$C0/9ED3 LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード $06
+$C0/9ED6 CMP #$08                ;Aと$08を減算比較（ステータスレジスタ変更のみ）
+$C0/9ED8 BEQ $42    [$9F1C]      ;ゼロフラグが立っているとき[$9F1C]分岐
+;ゼロフラグOFF（最終編ではない）
+$C0/9EDA LDA $30    [$00:0030]   ;Aに[$00:0030]($08)をロード
+$C0/9EDC CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C0/9EDE BCS $5E    [$9F3E]      ;キャリーフラグが立っているとき[$9F3E]分岐
+;キャリーフラグOFF 読み込み値*2 - $20 が$10未満（読み込み値$17以下）
+$C0/9EE0 LSR A                   ;Aを論理右シフト　(/2) A:0004
+$C0/9EE1 CMP $0A00  [$00:0A00]   ;Aと[$00:0A00]を減算比較（ステータスレジスタ変更のみ）
+$C0/9EE4 BEQ $58    [$9F3E]      ;ゼロフラグが立っているとき[$9F3E]分岐
+;ゼロフラグOFF 主人公IDではない　※アキラは読み込み値 = $16でゼロフラグON
+$C0/9EE6 STA $32    [$00:0032]   ;A(04)を[$00:0032]に書き込み
+$C0/9EE8 LDA #$00                ;Aに$00をロード
+$C0/9EEA XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/9EEB LDA $0A00  [$00:0A00]   ;Aに[$00:0A00]をロード 06
+$C0/9EEE ASL A                   ;Aを算術左シフト *2
+$C0/9EEF ASL A                   ;Aを算術左シフト *2
+$C0/9EF0 ASL A                   ;Aを算術左シフト *2
+$C0/9EF1 CLC                     ;キャリーフラグクリア A:0030
+$C0/9EF2 ADC $32    [$00:0032]   ;A($30) + [$00:0032]($04)
+$C0/9EF4 TAX                     ;Aの値をXレジスタに転送 X:0034
+$C0/9EF5 LDA $C0B7D6,x[$C0:B80A] ;Aに[$C0:B80A](93)をロード C0B7D6 + 0034
+$C0/9EF9 BMI $0A    [$9F05]      ;ネガティブフラグが立っているとき[$9F05]分岐
+;ネガティブフラグON
+$C0/9F05 CMP #$FF                ;Aと$FFを減算比較（ステータスレジスタ変更のみ）
+$C0/9F07 BEQ $35    [$9F3E]      ;ゼロフラグが立っているとき[$9F3E]分岐
+;ゼロフラグOFF
+$C0/9F09 AND #$7F                ;Aと$7Fで論理積 $93 &amp; $7F
+$C0/9F0B STA $30    [$00:0030]   ;A(13)を[$00:0030]に書き込み
+$C0/9F0D JSR $9BC2  [$C0:9BC2]   ;[$C0:9BC2]へジャンプ
+;[$C0:9BC2]
+$C0/9BC2 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9BC3 LDA #$D0                ;Aに$D0をロード
+$C0/9BC5 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/9BC6 PLB                     ;DBレジスタにスタックからプル
+$C0/9BC7 LDA $30    [$00:0030]   ;Aに[$00:0030](13)をロード
+$C0/9BC9 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9BCB AND #$00FF              ;Aと$00FFで論理積
+$C0/9BCE ASL A                   ;Aを算術左シフト *2
+$C0/9BCF CLC                     ;キャリーフラグクリア A:0026
+$C0/9BD0 ADC $8000  [$D0:8000]   ;A(0026) + [$D0:8001][$D0:8000](0010)
+$C0/9BD3 TAY                     ;Aの値をYレジスタに転送 Y:0036
+$C0/9BD4 LDA $8000,y[$D0:8036]   ;Aに[$D0:8037][$D0:8036](0070)をロード$8000,y = $8036
+$C0/9BD7 CLC                     ;キャリーフラグクリア
+$C0/9BD8 ADC $8002  [$D0:8002]   ;A(0070) + [$D0:8003][$D0:8002](00CC)
+$C0/9BDB CLC                     ;キャリーフラグクリア
+$C0/9BDC ADC #$8000              ;A(013C) + $8000
+$C0/9BDF TAY                     ;Aの値をYレジスタに転送
+$C0/9BE0 SEP #$20                ;MフラグON　Aレジスタは8bit幅 Y:813C
+$C0/9BE2 PLB                     ;DBレジスタにスタックからプル
+$C0/9BE3 RTS                     ;サブルーチン戻り
+
+$C0/9F10 JSR $A090  [$C0:A090]   ;[$C0:A090]へジャンプ
+</pre></div>
+
+<p>長々と処理しているが、最後の<code><span class="r">$C0/9BDC</span></code>で計算された<code>A:813C</code>をアドレスとする、<code>[$D0:813C]</code>から「無法松」のテキストが入っている。<br>
+<code><span class="r">$C0/9C42</span></code>～が定型テキスト処理になっており、<code>[$D1:915E]</code>(<span class="formula">$14</span>)から、定型テキスト番号<span class="formula">$14</span>の開始アドレス<code>[$D0:813C]</code>を計算している。</p>
+
+<p><code>[$D0:813C]</code>~</p>
+<div class="mono">1F AF 1F 94 1E 5D 00</div>
+
+<p>で、「無法松（改行）」である。<br>
+また、上から、<code>$D0:8000</code>以降に定型テキストが入っていることもわかる。<br>
+（厳密には呼び出しアドレスと定型テキスト、スタッフロールのスタッフ名も入っている。<code>$D0:84A6</code>まで）</p>
+
+<div class="code-container"><pre>
+$C0/A090 LDX #$02E0              ;Xに$02E0をロード
+$C0/A093 STX $01C6  [$00:01C6]   ;Xを[$00:01C6]に書き込み
+$C0/A096 STZ $30    [$00:0030]   ;[$00:0030]に$00を書き込み
+$C0/A098 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/A099 LDA #$D0                ;Aに$D0をロード
+$C0/A09B PHA                     ;Aレジスタをスタックにプッシュ
+$C0/A09C PLB                     ;DBレジスタにスタックからプル
+;ループ処理（[$D0:813C]以降判定処理）
+$C0/A09D LDA $0000,y[$D0:813C]   ;Aに[$D0:813C]～[$D0:8142]をロード
+$C0/A0A0 BEQ $19    [$A0BB]      ;ゼロフラグが立っているとき[$A0BB]分岐
+$C0/A0A2 CMP #$1D                ;Aと$1Dを減算比較（ステータスレジスタ変更のみ）
+$C0/A0A4 BCC $0D    [$A0B3]      ;キャリーフラグが立っていないとき[$A0B3]分岐
+$C0/A0A6 CMP #$20                ;Aと$20を減算比較（ステータスレジスタ変更のみ）
+$C0/A0A8 BCS $09    [$A0B3]      ;キャリーフラグが立っているとき[$A0B3]分岐
+$C0/A0AA STA $00,x  [$00:02E0]   ;Aを[$00:02E0]に書き込み　漢字処理の時、$1D～$1Fを格納
+$C0/A0AC INX                     ;Xをインクリメント +1
+$C0/A0AD INY                     ;Yをインクリメント +1
+$C0/A0AE INC $30    [$00:0030]   ;A[$00:0030]をインクリメント +1
+$C0/A0B0 LDA $0000,y[$D0:813D]   ;Aに[$D0:813D]をロード　漢字処理の時、次の1バイト読み込み
+$C0/A0B3 STA $00,x  [$00:02E1]   ;Aを[$00:02E1]に書き込み
+$C0/A0B5 INX                     ;Xをインクリメント +1
+$C0/A0B6 INY                     ;Yをインクリメント +1
+$C0/A0B7 INC $30    [$00:0030]   ;A[$00:0030]をインクリメント +1
+$C0/A0B9 BRA $E2    [$A09D]      ;フラグにかかわりなく常に分岐[$A09D]
+;ループ処理ここまで
+$C0/A09D LDA $0000,y[$D0:8142]   ;Aに[$D0:8142]をロード
+$C0/A0A0 BEQ $19    [$A0BB]      ;ゼロフラグが立っているとき[$A0BB]分岐
+;ゼロフラグON テキスト区切りなので定型テキストロード処理終了
+$C0/A0BB PLB                     ;DBレジスタにスタックからプル
+$C0/A0BC LDA $30    [$00:0030]   ;Aに[$00:0030]をロード
+$C0/A0BE STA $01C2  [$00:01C2]   ;Aを[$00:01C2]に書き込み
+$C0/A0C1 RTS                     ;サブルーチン戻り
+</pre></div>
+
+<p>という手順で、<code>[$00:02E0]</code>～に定型テキストが格納される（無法松の場合、<code>[$00:02E5]</code>まで）。<br>
+最後に<code>[$00:0030]</code>（ループ回数、今回は<span class="formula">$06</span>）を<code>[$00:01C2]</code>に書き込んで終了。<br>
+後で文字数処理などに使用する。</p>
+
+<p>なお、<code>[$D1:9161]</code>に入っている定型テキスト番号<span class="formula">$16</span>（近未来編主人公名）だと、<code><span class="r">$C0/9EE4</span></code>で分岐が起こる。</p>
+
+<div class="code-container"><pre>
+$C0/9EE4 BEQ $58    [$9F3E]      ;A:0006　ゼロフラグが立っているとき[$9F3E]分岐
+;ゼロフラグON 定型テキスト番号$16
+$C0/9F3E STZ $01BC  [$00:01BC]   ;[$00:01BC]に$00を書き込み
+$C0/9F41 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/9F43 LDA $30    [$00:0030]   ;Aに[$00:0030](0C)をロード
+$C0/9F45 ASL A                   ;Aを算術左シフト *2
+$C0/9F46 ASL A                   ;Aを算術左シフト *2
+$C0/9F47 ASL A                   ;Aを算術左シフト *2
+$C0/9F48 ASL A                   ;Aを算術左シフト *2
+$C0/9F49 ASL A                   ;Aを算術左シフト *2
+$C0/9F4A CLC                     ;キャリーフラグクリア A:0180
+$C0/9F4B ADC #$0D34              ;A(0180) + $0D34
+$C0/9F4E STA $01C6  [$00:01C6]   ;Aを[$00:01C7][$00:01C6]に書き込み A:0EB4
+$C0/9F51 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/9F53 LDA #$0C                ;Aに$0Cをロード
+$C0/9F55 STA $01C2  [$00:01C2]   ;Aを[$00:01C2]に書き込み
+$C0/9F58 BRA $03    [$9F5D]      ;フラグにかかわりなく常に分岐[$9F5D]
+$C0/9F5D LDA $01C0  [$00:01C0]   ;Aに[$00:01C0]をロード 00
+$C0/9F60 CMP #$19                ;Aと$19を減算比較（ステータスレジスタ変更のみ）
+$C0/9F62 BEQ $05    [$9F69]      ;ゼロフラグが立っているとき[$9F69]分岐
+$C0/9F64 JSR $9C18  [$C0:9C18]   ;[$C0:9C18]へジャンプ
+
+$C0/9C18 LDY $01C6  [$00:01C6]   ;Yに[$00:01C7][$00:01C6](0EB4)をロード
+$C0/9C1B LDA $01C2  [$00:01C2]   ;Aに[$00:01C2]($0C)をロード
+$C0/9C1E BEQ $10    [$9C30]      ;ゼロフラグが立っているとき[$9C30]分岐
+;ゼロフラグOFF
+$C0/9C20 BMI $07    [$9C29]      ;ネガティブフラグが立っているとき[$9C29]分岐
+;ネガティブフラグOFF
+$C0/9C22 PHB                     ;DBレジスタをスタックにプッシュ
+$C0/9C23 LDA #$00                ;Aに$00をロード
+$C0/9C25 PHA                     ;Aレジスタをスタックにプッシュ
+$C0/9C26 PLB                     ;DBレジスタにスタックからプル
+$C0/9C27 BRA $0D    [$9C36]      ;フラグにかかわりなく常に分岐[$9C36]
+$C0/9C36 LDA $0000,y[$00:0EB4]   ;Aに[$00:0EB4]をロード シナリオ別キャラデータ$06,$34バイト目以降は近未来編主人公キャラ名
+$C0/9C39 INY                     ;Yをインクリメント +1
+$C0/9C3A CMP #$20                ;Aと$20を減算比較（ステータスレジスタ変更のみ）
+$C0/9C3C BCS $10    [$9C4E]      ;キャリーフラグが立っているとき[$9C4E]分岐
+$C0/9C4E STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/9C50 STZ $31    [$00:0031]   ;[$00:0031]に$00を書き込み
+$C0/9C52 BRA $18    [$9C6C]      ;フラグにかかわりなく常に分岐[$9C6C]
+$C0/9C6C PLB                     ;DBレジスタにスタックからプル
+$C0/9C6D STY $01C6  [$00:01C6]   ;Yを[$00:01C6]に書き込み
+$C0/9C70 LDA $01D0  [$00:01D0]   ;Aに[$00:01D0]をロード
+$C0/9C73 CMP #$10                ;Aと$10を減算比較（ステータスレジスタ変更のみ）
+$C0/9C75 BCC $18    [$9C8F]      ;キャリーフラグが立っていないとき[$9C8F]分岐
+$C0/9C8F JSR $A64B  [$C0:A64B]   ;[$C0:A64B]へジャンプ
+</pre></div>
+
+<p>というサブルーチンになり、<code><span class="r">$C0/9C36</span></code>からシナリオ別キャラデータの<span class="formula">$34</span>バイト目以降（各シナリオ主人公キャラ名、最大<span class="formula">12</span>バイトのデータ）が読み出せる。</p>
+
+<p>テキストデータから文字スプライトを呼び出す処理などは省略。<br>
+以上が大まかなスクリプトコマンド<code>$7F:BBB1</code>～<code>$7F:BBB3</code>「<span class="formula">C4 A1 20</span>」の処理方法である。</p>
+
+<p>テキスト表示が終わると（つまりセリフ表示が終わると）、無法松の場合、<code>$7F:BBB4</code>～<code>$7F:BBB5</code>「<span class="formula">E1 33</span>」が続き、最後の<code>$7F:BBB6</code>（<span class="formula">$00</span>）で処理終了である。<br>
+「<span class="formula">E1 33</span>」処理部分が下である。</p>
+
+<div class="code-container"><pre>
+$C0/1F7B BRA $03    [$1F80]      ;フラグにかかわりなく常に分岐[$1F80]
+$C0/1F80 PLB                     ;DBレジスタにスタックからプル
+$C0/1F81 PLY                     ;Yレジスタにスタックからプル
+$C0/1F82 BRL $FC1C  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:BBB4]   ;Aに[$7F:BBB4]をロード E1
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:220B] ;[$C0:220B]へジャンプ(レジスタをスタックに積まない)
+$C0/220B LDA #$01                ;Aに$01をロード
+$C0/220D STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/220F BRA $02    [$2213]      ;フラグにかかわりなく常に分岐[$2213]
+$C0/2213 LDA $8E00,y[$7F:BBB5]   ;Aに[$7F:BBB5]をロード 33
+$C0/2216 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/2218 AND #$00FF              ;Aと$00FFで論理積
+$C0/221B CLC                     ;キャリーフラグクリア
+$C0/221C ADC #$1200              ;A + $1200
+$C0/221F TAX                     ;Aの値をXレジスタに転送
+$C0/2220 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/2222 LDA $30    [$00:0030]   ;Aに[$00:0030]($01)をロード
+$C0/2224 STA $00,x  [$00:1233]   ;Aを[$00:1233]に書き込み [$00:1233]
+$C0/2226 INY                     ;Yをインクリメント +1
+$C0/2227 BRL $F977  [$1BA1]      ;フラグにかかわりなく常に分岐[$1BA1]
+$C0/1BA1 LDA $00022E[$00:022E]   ;Aに[$00:022E]をロード
+$C0/1BA5 CMP #$02                ;Aと$02を減算比較（ステータスレジスタ変更のみ）
+$C0/1BA7 BNE $06    [$1BAF]      ;ゼロフラグが立っていないとき[$1BAF]分岐
+$C0/1BAF LDA $000203[$00:0203]   ;Aに[$00:0203]をロード
+$C0/1BB3 BNE $0E    [$1BC3]      ;ゼロフラグが立っていないとき[$1BC3]分岐
+$C0/1BB5 LDA $000214[$00:0214]   ;Aに[$00:0214]をロード
+$C0/1BB9 BNE $41    [$1BFC]      ;ゼロフラグが立っていないとき[$1BFC]分岐
+$C0/1BBB LDA $00021A[$00:021A]   ;Aに[$00:021A]をロード
+$C0/1BBF BNE $08    [$1BC9]      ;ゼロフラグが立っていないとき[$1BC9]分岐
+$C0/1BC1 BRA $58    [$1C1B]      ;フラグにかかわりなく常に分岐[$1C1B]
+$C0/1C1B LDA #$00                ;Aに$00をロード
+$C0/1C1D XBA                     ;Aレジスタの上位バイトと下位バイトを交換
+$C0/1C1E LDA $8E00,y[$7F:BBB6]   ;Aに[$7F:BBB6]をロード 00 処理終了
+$C0/1C21 STA $30    [$00:0030]   ;Aを[$00:0030]に書き込み
+$C0/1C23 INY                     ;Yをインクリメント +1
+$C0/1C24 REP #$20                ;Aを16bit幅に変更、Mフラグをクリア
+$C0/1C26 ASL A                   ;Aを算術左シフト *2
+$C0/1C27 TAX                     ;Aの値をXレジスタに転送
+$C0/1C28 SEP #$20                ;MフラグON　Aレジスタは8bit幅
+$C0/1C2A JMP ($429F,x)[$C0:4085] ;[$C0:4085]へジャンプ(レジスタをスタックに積まない)
+$C0/4085 PLB                     ;DBレジスタにスタックからプル
+$C0/4086 DEC $0200  [$00:0200]   ;[$00:0200]をデクリメント -1
+$C0/4089 BNE $51    [$40DC]      ;ゼロフラグが立っていないとき[$40DC]分岐
+$C0/408B LDA #$01                ;Aに$01をロード
+$C0/408D STA $0200  [$00:0200]   ;Aを[$00:0200]に書き込み
+$C0/4090 JSR $414E  [$C0:414E]   ;[$C0:414E]へジャンプ
+</pre></div>
+
+<p>まとめると、コマンド<span class="formula">E1 33</span>で、引数<span class="formula">$33</span>は<code>$00:1200</code>のアドレス部に加算され、<code>[$00:1233]</code>に<span class="formula">$01</span>が書き込まれた。<br>
+近未来編のシナリオ進行フラグ<code>[$00:1233]</code>は、たい焼き屋手伝いフラグ。<br>
+無法松に話しかけて<code>[$00:1233]</code>に<span class="formula">$01</span>が立つと、無法松の左に立って下向きでAボタンを押した時、たい焼き屋の手伝いが可能になる。このためのフラグ操作である。<br>
+ちなみに、<code>[$00:1233]</code>に既に<span class="formula">$01</span>が入っていたとしても、無法松に話しかける度に上処理が入る。特に分岐処理をする必要がないからだろう。</p>
+
+<h3>テキストアドレス位置</h3>
+
+<p>さて、テキスト位置の計算を振り返ってみよう。<br>
+計算方法からテキスト呼び出しアドレスの位置や、テキストデータそのものの位置もわかるはずだ。</p>
+
+<p>例えば近未来編だったら、テキスト番号<span class="formula">$0000</span>～<span class="formula">$01FF</span>の位置は、</p>
+
+<p><span class="formula">$0000*2 + $657F = $657F</span><br>
+<span class="formula">$01FF*2 + $657F = $697D</span></p>
+
+<p><code>$D1:657F</code>～<code>$D1:697D</code>に値があるはずだ。<br>
+そして、これらの値に+<span class="formula">$697F</span>すると、テキスト開始位置となるはず。</p>
+
+<p>近未来編のテキスト開始位置は<code>$D1:697F</code>で、テキスト番号<span class="formula">$01FF</span>の開始位置は<code>$D1:98FE</code>。<br>
+テキスト番号<span class="formula">$01FF</span>のテキストが、<code>$D1:9913</code>で終了する。</p>
+
+<code>$D1:98FE</code>～<code>$D1:9913</code>
+<div class="mono">BA C9 61 62 73 81 CA 20 BF DA 1D 06 1E 64 01 1E<br>
+1B C3 CF BE DD 0F</div>
+<div style="border: 1px solid gray; padding: .1em;">このアイテムは　それ以上《改行》持てません。《改行》</div>
+
+<p>ということで、<code>$D1:697F</code>～<code>$D1:9913</code>が近未来編のテキスト領域ということがわかった。<span class="formula">$2F94</span>バイト（10進数<span class="formula">12,180</span>バイト）のデータである。<br>
+最終的に、以下が判明した。</p>
+
+<table>
+<thead>
+	<tr><th>シナリオ</th><th>テキスト番号</th><th>テキスト番号アドレス</th><th>テキストアドレス（容量）</th></tr>
+</thead>
+<tbody>
+	<tr><td>中世</td><td class="formula">$000～$1FF</td><td><code>$D0:84A8</code>～<code>$D0:88A6</code></td><td><code>$D0:88A8</code>～<code>$D0:A941</code>（<span class="formula">$2099</span>バイト）</td></tr>
+	<tr><td>原始</td><td class="formula">$000～$01D</td><td><code>$D0:A942</code>～<code>$D0:AD40</code></td><td><code>$D0:A982</code>～<code>$D0:AA3C</code>（<span class="formula">$00BA</span>バイト）</td></tr>
+	<tr><td>ＳＦ</td><td class="formula">$000～$1FF</td><td><code>$D0:ABDA</code>～<code>$D0:AFD8</code></td><td><code>$D0:AFDA</code>～<code>$D0:FF45</code>（<span class="formula">$4F6B</span>バイト）</td></tr>
+	<tr><td>功夫</td><td class="formula">$000～$1FF</td><td><code>$D1:0018</code>～<code>$D1:0416</code></td><td><code>$D1:0418</code>～<code>$D1:3744</code>（<span class="formula">$332C</span>バイト）</td></tr>
+	<tr><td>西部</td><td class="formula">$000～$1FF</td><td><code>$D1:3745</code>～<code>$D1:3B43</code></td><td><code>$D1:3B45</code>～<code>$D1:5D3C</code>（<span class="formula">$21F7</span>バイト）</td></tr>
+	<tr><td>現代</td><td class="formula">$000～$1FF</td><td><code>$D1:5D3D</code>～<code>$D1:613B</code></td><td><code>$D1:613D</code>～<code>$D1:657E</code>（<span class="formula">$0441</span>バイト）</td></tr>
+	<tr><td>近未来</td><td class="formula">$000～$1FF</td><td><code>$D1:657F</code>～<code>$D1:697D</code></td><td><code>$D1:697F</code>～<code>$D1:9913</code>（<span class="formula">$2F94</span>バイト）</td></tr>
+	<tr><td>幕末</td><td class="formula">$000～$18F</td><td><code>$D1:9914</code>～<code>$D1:9C32</code></td><td><code>$D1:9C34</code>～<code>$D1:C149</code>（<span class="formula">$2515</span>バイト）</td></tr>
+	<tr><td>最終</td><td class="formula">$000～$1FF</td><td><code>$D1:C14A</code>～<code>$D1:C548</code></td><td><code>$D1:C54A</code>～<code>$D1:FE29</code>（<span class="formula">$38DF</span>バイト）</td></tr>
+</tbody>
+</table>
+
+<p>更に、<code>$D0:8000</code>～<code>$D0:84A6</code>は、各シナリオ定型テキスト及び最終編用スタッフロール（スタッフ名）などのテキスト及び呼び出しアドレスだから、<code>$D0:8000</code>～<code>$D1:FFFF</code>はおおむね、本作のフィールドにおけるイベント関係のテキストデータということがわかる。</p>
+
+<p>実際のデータは膨大なので、他シナリオ分も合わせて別ページに掲載した。<br>
+<span class="tri"><a href="textno.html">テキスト番号・テキストアドレス一覧</a></span></p>
+
+<p>テキストアドレスから各シナリオのテキスト容量が計算できるが、やはり一番多いのはテキストメインのＳＦ編であった。<br>
+原始編は、ラストの叫び声と、スタッフロールしかテキストはない。（他にデバッグ用テキストが少し入っている）<br>
+中世編は最後の方にデバッグ用らしきテキストが含まれている。最初に作られたシナリオだからだろうか。</p>
+
+<p>現代編はテキスト番号自体は<span class="formula">$1FF</span>まで設定してあるが、データとしてはテキスト番号<span class="formula">$01A</span>までしか値は入っていない。<br>
+他、原始編はテキスト番号<span class="formula">$01D</span>まで、幕末編はテキスト番号<span class="formula">$18F</span>まで。</p>
+
+<script>//リストタイトル静的生成
+document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("captiondata"),t=document.body.querySelectorAll(".maincontents h3, .maincontents h4"),l=document.createElement("ul");l.id="captionlist";let n=-1,a=null;t.forEach((e,t)=>{if("H3"===e.tagName){n++;let i=document.createElement("li"),d=`no_${n}`;e.id=d;let p=document.createElement("a");p.href=`#${d}`,p.textContent=e.textContent,i.appendChild(p),l.appendChild(i),a=null}else if("H4"===e.tagName){a||(a=document.createElement("ul"),l.lastElementChild.appendChild(a));let c=a.children.length,o=`no_${n}_${c}`;e.id=o;let h=document.createElement("li"),r=document.createElement("a");r.href=`#${o}`,r.textContent=e.textContent,h.appendChild(r),a.appendChild(h)}}),e.appendChild(l)});
+</script>
+
+<script>//ソースコード色分け処理
+window.addEventListener("DOMContentLoaded",()=>{let P=document.querySelectorAll(".code-container pre"),n=RegExp("\\b(LDA|LDX|LDY|STA|STX|STY|STZ|TAX|TAY|TYA|TXA|TSX|TXS|TXY|TYX|TAD|TDA|TAS|TSA|XBA|PEA|PEI|PER|PHA|PHP|PHX|PHY|PLA|PLP|PLX|PLY|PHB|PHD|PHK|PLB|PLD|ADC|SBC|INC|INX|INY|DEC|DEX|DEY|ORA|AND|EOR|BIT|TRB|TSB|CMP|CPX|CPY|SEC|CLC|SEP|REP|SED|CLD|SEI|CLI|CLV|XCE|BCC|BCS|BEQ|BNE|BMI|BPL|BVC|BVS|BRA|BRL|JMP|JML|JSR|JSL|RTS|RTL|RTI|ASL|LSR|ROL|ROR|MVP|MVN|NOP|STP|BRK|COP|WAI|WDM)\\b","g");P.forEach(P=>{let L=P.innerHTML.split("\n").map(P=>{if(""===P.trim())return P;let L=(P=P.replace(/^(\$..\/....)/,'<span class="r">$1</span>')).split(/(;.*)/);return L[0]&&(L[0]=L[0].replace(n,'<span class="mnemonic">$1</span>')),L[1]&&(L[1]=`<span class="comment">${L[1]}</span>`),L.join("")});P.innerHTML=L.join("\n")})});
+</script>
+
+<div class="pagelink">
+	<div id="pageprev"><a href="script.html"><span class="button">&#9664;戻る</span></a></div>
+	<div id="pagecenter"><a href="index.html"><span class="button">&#9650;目次</span></a></div>
+<!-- 	<div id="pagenext"><a href="script02.html"><span class="button">&#9654;次 </span></a></div> -->
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div class="innertube">
+
+<!-- sidebar -->
+
+<script>let arrowOn=false;</script>
+<script src="../../js/modal.min.js?20250722"></script>
+
+<div class="accordion">
+
+<div id="google_search">
+</div>
+<script src="../../js/gsearch.js"></script>
+
+<div class="option">
+<input type="checkbox" id="toggle1" class="toggle">
+<label class="title" for="toggle1" style="color: #5c6266; background: #D8DEE9;">基礎知識</label>
+<div class="content">
+<p>基礎知識</p>
+	<ul>
+		<li><a href="../base01.html">基本操作とシナリオ</a></li>
+		<li><a href="../base07.html">メニュー画面</a></li>
+		<li><a href="../base02.html">データセーブ</a></li>
+		<li><a href="../base03.html">装備</a></li>
+		<li><a href="../base04.html">ステータス</a></li>
+		<li><a href="../base05.html">隊形</a></li>
+		<li><a href="../base06.html">アイテム</a></li>
+	</ul>
+<p>戦闘関係</p>
+	<ul>
+		<li><a href="../battle00.html">戦闘の基本</a></li>
+		<li><a href="../battle01.html">エンカウント</a></li>
+		<li><a href="../battle02.html">向き</a></li>
+		<li><a href="../battle03.html">ターン</a></li>
+		<li><a href="../battle04.html">技（その1）</a></li>
+		<li><a href="../battle04_2.html">技（その2）</a></li>
+		<li><a href="../battle05.html">状態異常</a></li>
+		<li><a href="../battle06.html">ステータス増減</a></li>
+		<li><a href="../battle07.html">フィールドダメージ</a></li>
+		<li><a href="../battle08.html">経験値</a></li>
+		<li><a href="../battle09.html">レベルとステータス上昇</a></li>
+		<li><a href="../battle10.html">回避属性</a></li>
+		<li><a href="../battle11.html">行動異常</a></li>
+		<li><a href="../battle12.html">BREAK DOWN</a></li>
+		<li><a href="../battle13.html">戦闘テクニック</a></li>
+		<li><a href="../program.html">プログラミング関係表記・解説</a></li>
+	</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle2" class="toggle">
+<label class="title" for="toggle2" style="color: #FFF; background: #734fab;" >幕末編</label>
+<div class="content">
+<ul>
+	<li><a href="../bakumatsu/index.html">幕末編トップページ</a></li>
+	<li><a href="../bakumatsu/kouryaku01.html">基本の攻略</a></li>
+	<li><a href="../bakumatsu/0nin.html">0人斬り（不殺）</a></li>
+	<li><a href="../bakumatsu/100nin.html">100人斬り</a></li>
+	<li><a href="../bakumatsu/boss.html">隠しボス</a></li>
+	<li><a href="../bakumatsu/nukenin.html">抜け忍バッドエンド</a></li>
+	<li><a href="../bakumatsu/meishou.html">敵名称一覧</a></li>
+	<li><a href="../bakumatsu/map.html">尾手城マップ一覧</a></li>
+	<li><a href="../bakumatsu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle3" class="toggle">
+<label class="title" for="toggle3" style="color: #FFF; background: #2fc4fa;" >近未来編</label>
+<div class="content">
+<ul>
+	<li><a href="../kinmirai/index.html">近未来編トップページ</a></li>
+	<li><a href="../kinmirai/kouryaku01.html">攻略</a></li>
+	<li><a href="../kinmirai/zako.html">ザコ敵戦闘</a></li>
+	<li><a href="../kinmirai/item.html">アイテム改造</a></li>
+	<li><a href="../kinmirai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle4" class="toggle">
+<label class="title" for="toggle4" style="color: #FFF; background: #64BA02;" >原始編</label>
+<div class="content">
+<ul>
+	<li><a href="../genshi/index.html">原始編トップページ</a></li>
+	<li><a href="../genshi/kouryaku01.html">攻略</a></li>
+	<li><a href="../genshi/boss.html">隠しボス・キングマンモー</a></li>
+	<li><a href="../genshi/item.html">アイテム合成</a></li>
+	<li><a href="../genshi/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle5" class="toggle">
+<label class="title" for="toggle5" style="color: #FFF; background: #E38C00;" >西部編</label>
+<div class="content">
+<ul>
+	<li><a href="../seibu/index.html">西部編トップページ</a></li>
+	<li><a href="../seibu/kouryaku01.html">攻略</a></li>
+	<li><a href="../seibu/omake.html">15人と戦ってみる</a></li>
+	<li><a href="../seibu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle6" class="toggle">
+<label class="title" for="toggle6" style="color: #FFF; background: #cc4d33;" >現代編</label>
+<div class="content">
+<ul>
+	<li><a href="../gendai/index.html">現代編トップページ</a></li>
+	<li><a href="../gendai/kouryaku01.html">攻略</a></li>
+	<li><a href="../gendai/watanabe.html">おまけ・ワタナベイベント</a></li>
+	<li><a href="../gendai/moribe.html">おまけ・森部を一番最後に倒す</a></li>
+	<li><a href="../gendai/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle7" class="toggle">
+<label class="title" for="toggle7" style="color: #FFF; background: #51635C;" >ＳＦ編</label>
+<div class="content">
+<ul>
+	<li><a href="../sf/index.html">ＳＦ編トップページ</a></li>
+	<li><a href="../sf/kouryaku01.html">攻略</a></li>
+	<li><a href="../sf/caps.html">キャプテンスクウェア攻略</a></li>
+	<li><a href="../sf/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle8" class="toggle">
+<label class="title" for="toggle8" style="color: #FFF; background: #3b27b0;" >功夫編</label>
+<div class="content">
+<ul>
+	<li><a href="../kunfu/index.html">功夫編トップページ</a></li>
+	<li><a href="../kunfu/kouryaku01.html">攻略</a></li>
+	<li><a href="../kunfu/shugyo.html">修行について（＆技習得バグ）</a></li>
+	<li><a href="../kunfu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle9" class="toggle">
+<label class="title" for="toggle9" style="color: #FFF; background: #b59f14;" >中世編</label>
+<div class="content">
+<ul>
+	<li><a href="../chusei/index.html">中世編トップページ</a></li>
+	<li><a href="../chusei/kouryaku01.html">攻略</a></li>
+	<li><a href="../chusei/item.html">中世編→最終編 アイテム変化一覧</a></li>
+	<li><a href="../chusei/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle10" class="toggle">
+<label class="title" for="toggle10" style="color: #FFF; background: #919c93;" >最終編</label>
+<div class="content">
+<ul>
+	<li><a href="../saishu/index.html">最終編トップページ</a></li>
+	<li><a href="../saishu/chui01.html">注意点</a></li>
+	<li><a href="../saishu/nakama.html">仲間を集める</a></li>
+	<li><a href="../saishu/dungeon.html">ダンジョン攻略</a></li>
+	<li><a href="../saishu/boss.html">隠しボス攻略</a></li>
+	<li><a href="../saishu/last.html">ラストバトル</a></li>
+	<li><a href="../saishu/omake.html">おまけのやりこみ</a></li>
+	<li><a href="../saishu/data.html">データ集</a></li>
+</ul>
+</div>
+</div>
+
+<div class="option">
+<input type="checkbox" id="toggle11" class="toggle">
+<label class="title" for="toggle11" style="color: #2d3133; background: #D8DEE9;">データ集</label>
+<div class="content">
+<ul>
+	<li><a href="../data/index.html">データ集トップページ</a></li>
+	<li><a href="../data/chara01.html">キャラクター</a></li>
+	<li><a href="../data/atama.html">装備</a></li>
+	<li><a href="../data/item01.html">アイテム</a></li>
+	<li><a href="../data/enemy_bakumatsu.html">敵</a></li>
+	<li><a href="../data/list01.html">一覧</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div class="option">
+<input type="checkbox" id="toggle12" class="toggle">
+<label class="title" for="toggle12" style="color: #2e3030; background: #c3c6c7;">プログラミング解説</label>
+<div class="content">
+	<ul>
+		<li><a href="index.html">解説トップページ</a></li>
+		<li><a href="datamap.html">データマップ</a></li>
+		<li><a href="flag.html">フラグ</a></li>
+		<li><a href="d5.html">各種データアドレス</a></li>
+		<li><a href="fontdata.html">文字データ</a></li>
+		<li><a href="program1.html">ボタン判定</a></li>
+		<li><a href="map01.html">マップ構造</a></li>
+		<li><a href="graphic.html">グラフィックについて</a></li>
+		<li><a href="sound.html">サウンドについて</a></li>
+	</ul>
+</div>
+</div>
+
+
+<br>
+<a href="../../index.html" target="_blank" style="text-decoration:none;">
+<div class="sidelink">リメイク版攻略へ</div>
+</a>
+
+</div>
+
+<!-- sidebarここまで -->
+
+<!-- socialButtons -->
+
+<br>
+<div class="sharelist">このページをシェアする</div>
+
+<div class="social">
+	<p><a href="#" target="_blank"><img src="../../img/social_x.svg" alt="Xでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_facebook.svg" alt="facebookでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_hatena.svg" alt="hatenaでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_line.svg" alt="Lineでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_bluesky.svg" alt="Blueskyでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/taitsu.svg" alt="タイッツーでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_misskey.svg" alt="misskey.ioでシェアする" width="88"></a></p>
+	<p><a href="#" target="_blank"><img src="../../img/social_mastodon.svg" alt="mastodon.jpでシェアする" width="88"></a></p>
+</div>
+<script src="../../js/social.min.js?20250624"></script>
+
+<!-- socialButtonsここまで -->
+
+<p id="top_arrow"><img src="../img/arrow_circle_up.svg" class="gotop" alt="上へ"></p> 
+
+</div>
+</div>
+
+<!-- ナビメニュー -->
+
+<div class="navigation">
+	<input type="checkbox" class="navigation__checkbox" id="nav-toggle">
+	<label for="nav-toggle" class="navigation__button">
+		<span class="navigation__icon" aria-label="toggle navigation menu"></span>
+	</label>
+	<div class="navigation__background"></div>
+	<nav class="navigation__nav" role="navigation">
+	<ul class="navigation__list">
+		<li class="navigation__item"><a href="../index.html"><label class="title_n2" style="color: #5c6266; background: #D8DEE9;">TOP</label></a></li>
+		<li class="navigation__item"><a href="../bakumatsu/index.html"><label class="title_n2" style="color: #FFF; background: #734fab;" >幕末編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kinmirai/index.html"><label class="title_n2" style="color: #FFF; background: #2fc4fa;" >近未来編攻略</label></a></li>
+		<li class="navigation__item"><a href="../genshi/index.html"><label class="title_n2" style="color: #FFF; background: #64BA02;" >原始編攻略</label></a></li>
+		<li class="navigation__item"><a href="../seibu/index.html"><label class="title_n2" style="color: #FFF; background: #E38C00;" >西部編攻略</label></a></li>
+		<li class="navigation__item"><a href="../gendai/index.html"><label class="title_n2" style="color: #FFF; background: #cc4d33;" >現代編攻略</label></a></li>
+		<li class="navigation__item"><a href="../sf/index.html"><label class="title_n2" style="color: #FFF; background: #51635C;" >ＳＦ編攻略</label></a></li>
+		<li class="navigation__item"><a href="../kunfu/index.html"><label class="title_n2" style="color: #FFF; background: #3b27b0;" >功夫編攻略</label></a></li>
+		<li class="navigation__item"><a href="../chusei/index.html"><label class="title_n2" style="color: #FFF; background: #b59f14;" >中世編攻略</label></a></li>
+		<li class="navigation__item"><a href="../saishu/index.html"><label class="title_n2" style="color: #FFF; background: #919c93;" >最終編攻略</label></a></li>
+		<li class="navigation__item"><a href="../data/index.html"><label class="title_n2" style="color: #2d3133; background: #D8DEE9;">データ集</label></a></li>
+	</ul>
+	</nav>
+</div>
+
+<!-- ナビメニュー　ここまで -->
+
+<div id="footer">
+ライブ・ア・ライブ（SFC版） 攻略メモ帳
+</div>
+
+</div>
+<script src="../../js/smoothScroll.js?20250712"></script>
+</body>
+</html>
